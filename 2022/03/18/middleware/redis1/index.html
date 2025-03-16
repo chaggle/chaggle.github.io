@@ -1,0 +1,1088 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="本博客主要是总结自己学习 Redis 中间件的经验，教程来源于b站狂神说 java 的 redis 教程  1、Redis 概念1、Redis 是基于计算机内存的数据库，一般称为缓存数据库，由于没有固定的表结构与关系，也叫 NoSQL (Not Only SQL) 数据库。 2、为什么要使用 Redis：  1、数据的爆发增长 2、没有固定关系的数据  3、最新的版本中，官方不建议直接在 win">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈 Redis 中间件">
+<meta property="og:url" content="https://chaggle.github.io/2022/03/18/middleware/redis1/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="本博客主要是总结自己学习 Redis 中间件的经验，教程来源于b站狂神说 java 的 redis 教程  1、Redis 概念1、Redis 是基于计算机内存的数据库，一般称为缓存数据库，由于没有固定的表结构与关系，也叫 NoSQL (Not Only SQL) 数据库。 2、为什么要使用 Redis：  1、数据的爆发增长 2、没有固定关系的数据  3、最新的版本中，官方不建议直接在 win">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chaggle.github.io/images/SQL/RDB.jpg">
+<meta property="og:image" content="https://chaggle.github.io/images/middleware/redis-pub-sub.png">
+<meta property="article:published_time" content="2022-03-17T16:41:40.000Z">
+<meta property="article:modified_time" content="2025-03-11T09:00:43.707Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://chaggle.github.io/images/SQL/RDB.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>浅谈 Redis 中间件 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="浅谈 Redis 中间件"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-03-18 00:41" pubdate>
+          2022年3月18日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          32 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">浅谈 Redis 中间件</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>本博客主要是总结自己学习 Redis 中间件的经验，教程来源于<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1S54y1R7SB">b站狂神说 java 的 redis 教程</a></p>
+</blockquote>
+<h2 id="1、Redis-概念"><a href="#1、Redis-概念" class="headerlink" title="1、Redis 概念"></a>1、Redis 概念</h2><p>1、Redis 是基于计算机内存的数据库，一般称为缓存数据库，由于没有固定的表结构与关系，也叫 NoSQL (Not Only SQL) 数据库。</p>
+<p>2、为什么要使用 Redis：</p>
+<ul>
+<li>1、数据的爆发增长</li>
+<li>2、没有固定关系的数据</li>
+</ul>
+<p>3、最新的版本中，官方不建议直接在 win 上使用操作 redis ，而是使用 WSL2 Linux 子系统进行 redis 的开发。</p>
+<p>4、redis 常见使用场景</p>
+<ul>
+<li>1、内存缓存</li>
+<li>2、不想使用 kafka，可以作为消息队列而存在</li>
+<li>3、做电商的热点数据保存，因为可以设置 TTL。</li>
+<li>4、朋友圈点赞</li>
+<li>5、做秒杀的库存</li>
+</ul>
+<h2 id="2、Redis-bench-mark-test"><a href="#2、Redis-bench-mark-test" class="headerlink" title="2、Redis bench-mark test"></a>2、Redis bench-mark test</h2><p>使用官方自带的 redis-benchmark 工具进行压力测试，其中<br>-h ：host ，可以是本地，也能是远程进行压力测试<br>-p ：port，即端口号<br>-c ：connection，连接的熟练，基本上连接都是基于 tcp&#x2F;socket 的。<br>-n：跟时间复杂度与空间复杂度差不多，即指定每一个连接数的请求次数。</p>
+<p><code>redis-benchmark  -h localhost -p 6379 -c 100 -n 10000</code></p>
+<p>如果需要保存再一个日志文件中，也能使用 <code>redis-benchmark  -h localhost -p 6379 -c 100 -n 10000 &gt; redis.log</code> 命令</p>
+<h2 id="3、Redis-基本知识说明"><a href="#3、Redis-基本知识说明" class="headerlink" title="3、Redis 基本知识说明"></a>3、Redis 基本知识说明</h2><p>redis 默认有 16 个数据库，默认是第 0 个数据库。</p>
+<p>redis 的命令大小写不敏感，而其中的 key - value 大小写敏感。常见的命令有：</p>
+<table>
+<thead>
+<tr>
+<th align="left">命令</th>
+<th align="left">效果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">select</td>
+<td align="left">切换数据库</td>
+</tr>
+<tr>
+<td align="left">dbsize</td>
+<td align="left">查看数据库大小</td>
+</tr>
+<tr>
+<td align="left">flushdb</td>
+<td align="left">清空当前数据库所有 K-V 值</td>
+</tr>
+<tr>
+<td align="left">flushall</td>
+<td align="left">清空 redis 数据库中所有 K-V 值</td>
+</tr>
+</tbody></table>
+<p>redis 的限制跟 cpu 的性能无关，性能主要受制于硬件的内存与网络带宽。</p>
+<h2 id="4、Redis-中五大基本类型"><a href="#4、Redis-中五大基本类型" class="headerlink" title="4、Redis 中五大基本类型"></a>4、Redis 中五大基本类型</h2><h3 id="String-类型"><a href="#String-类型" class="headerlink" title="String 类型"></a>String 类型</h3><p>string 类型中常见的几种命令：</p>
+<table>
+<thead>
+<tr>
+<th align="left">命令</th>
+<th align="left">效果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">keys *</td>
+<td align="left">查询所有的 key 值</td>
+</tr>
+<tr>
+<td align="left">type key</td>
+<td align="left">查看 key 的类型</td>
+</tr>
+<tr>
+<td align="left">exist key</td>
+<td align="left">是否存在 key</td>
+</tr>
+<tr>
+<td align="left">append key value</td>
+<td align="left">向 key 类型添加数据</td>
+</tr>
+<tr>
+<td align="left">incr key</td>
+<td align="left">key 的 value 原子性 + 1</td>
+</tr>
+<tr>
+<td align="left">decr key</td>
+<td align="left">key 的 value 原子性 - 1</td>
+</tr>
+<tr>
+<td align="left">incrby key [numbers]</td>
+<td align="left">key 的 value 原子性 + numbers</td>
+</tr>
+<tr>
+<td align="left">decrby key [numbers]</td>
+<td align="left">key 的 value 原子性 - numbers</td>
+</tr>
+<tr>
+<td align="left">expire key [second]</td>
+<td align="left">设置 key 的过期时间，默认是秒数</td>
+</tr>
+<tr>
+<td align="left">getrange key start end</td>
+<td align="left">取 key 的 value 从 start 到 end</td>
+</tr>
+<tr>
+<td align="left">setrange key offset val</td>
+<td align="left">设置 key 的 value 的 offset 位后替换为 val</td>
+</tr>
+<tr>
+<td align="left">ttl key</td>
+<td align="left">查看 key 剩余过期时间，默认是秒数</td>
+</tr>
+<tr>
+<td align="left">setex key expire value</td>
+<td align="left">设置 key value 以及过期时间 expire</td>
+</tr>
+<tr>
+<td align="left">setnx key value</td>
+<td align="left">如果 key 不存在，则设置 value，存在则设置失败（分布式锁使用，乐观锁）</td>
+</tr>
+<tr>
+<td align="left">getset key value</td>
+<td align="left">先得到 key 再设置 key value</td>
+</tr>
+</tbody></table>
+<p>getset 命令有点类似于 CompareAndSwap 这种类型的值。</p>
+<p>同理，还有 mset 、mget 为批量设置（非原子性），msetnx、msetex 等（原子性操作）</p>
+<p>在 redis 中，如果要设计一种封装类型的对象，语法可以如下所示：</p>
+<p>1、set user:1 {name:zhangsan, age : 18}</p>
+<p>2、set user:1:name zhangsan user:1:age 18</p>
+<p>string 常见的使用场景为：</p>
+<ul>
+<li>1、计数器</li>
+<li>2、统计多单位的数量</li>
+<li>3、粉丝数</li>
+<li>4、对象缓存存储</li>
+</ul>
+<h3 id="List类型"><a href="#List类型" class="headerlink" title="List类型"></a>List类型</h3><p>List 类型中常见的几种命令：</p>
+<table>
+<thead>
+<tr>
+<th align="left">命令</th>
+<th align="left">效果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">keys *</td>
+<td align="left">查询所有的 key 值</td>
+</tr>
+<tr>
+<td align="left">lpush [listname] value</td>
+<td align="left">将 value 插入 [listname] 队头</td>
+</tr>
+<tr>
+<td align="left">lrange [listname] start end</td>
+<td align="left">查看 [listname] 从队头的 start 到 end</td>
+</tr>
+<tr>
+<td align="left">lpop [listname]</td>
+<td align="left">将 [listname] 队头的元素移除</td>
+</tr>
+<tr>
+<td align="left">lindex [listname] index</td>
+<td align="left">从队头开始索引第 index 个值</td>
+</tr>
+<tr>
+<td align="left">rpush [listname] value</td>
+<td align="left">将 value 插入 [listname] 队尾</td>
+</tr>
+<tr>
+<td align="left">rrange [listname] start end</td>
+<td align="left">查看 [listname] 从队尾的 start 到 end</td>
+</tr>
+<tr>
+<td align="left">rpop [listname]</td>
+<td align="left">将 [listname] 队尾的元素移除</td>
+</tr>
+<tr>
+<td align="left">rindex [listname] index</td>
+<td align="left">从队尾开始索引第 index 个值</td>
+</tr>
+<tr>
+<td align="left">llen [listname]</td>
+<td align="left">查看 [listname] 长度</td>
+</tr>
+<tr>
+<td align="left">lrem [listname] count value</td>
+<td align="left">移除 [listname] 中 count 个值为 value 的值</td>
+</tr>
+<tr>
+<td align="left">ltrim [listname] start end</td>
+<td align="left">截断 [listname] 从 start 到 end</td>
+</tr>
+</tbody></table>
+<p>List 底层实现就是一个双向链表，所以优点跟缺点都跟双向链表一样，具体可以学习相应数据结构的知识。程序员的内功还是 408 + 算法。</p>
+<h3 id="Set-类型"><a href="#Set-类型" class="headerlink" title="Set 类型"></a>Set 类型</h3><p>set 集合类型，里面的值不重复。其中一般的命令就不写如上面的表格型的命令，这里直接举例了：</p>
+<ul>
+<li>1、sadd [setname] value ：向 [setname] 添加 value</li>
+<li>2、spop [setname] value ：向 [setname] 删除 value</li>
+<li>3、smembers  [setname] ：查看 [setname] 内所有值</li>
+<li>4、sismember [setname]  value ：判断 value 是否存在 [setname] 中</li>
+<li>5、srem [setname] value ：移除 [setname]  中的 value </li>
+<li>6、srandmember [setname] count ：随机获取 [setname]  内一个值</li>
+<li>7、smove source destination value ：将 value 从 source 移动到 destination 去</li>
+<li>8、sdiff [setname1]  [setname2] ：[setname1] 与 [setname2] 的差集</li>
+<li>9、sinter [setname1]  [setname2] ：[setname1] 与 [setname2] 的交集</li>
+<li>10、sunion [setname1]  [setname2] ：[setname1] 与 [setname2] 的并集</li>
+</ul>
+<p>set 为一个无序、不重复集合。</p>
+<h3 id="Hash-类型"><a href="#Hash-类型" class="headerlink" title="Hash 类型"></a>Hash 类型</h3><p>其实就是变为 key - map 结构，只是一个 map 集合。</p>
+<blockquote>
+<p>hash 类型的命令大同小异，只是在基本操作前加一个 h。</p>
+<p>如 hget、hset、hgetall、hlen、hexists、hmset 等。</p>
+<p>其中独有的特性即是： hkeys 与 hvals 是只获取 k 或 v ，以及 hincrby、hdecrby 、hsetnx、hsetex 等命令。</p>
+</blockquote>
+<p>虽然hash 与 string 很相似，但是从特点来看，hash 更适合存储结构体对象，string 更合适存储字符串类型。</p>
+<h3 id="Zset-类型"><a href="#Zset-类型" class="headerlink" title="Zset 类型"></a>Zset 类型</h3><p>有序集合，set 基础之上增加了一个集合。常见命令也就是 zadd、zrange、zrangebyscore xxx -inf +inf (正负无穷的问题)、zcard(记个数)、zrem 删除、zcount 其中没有 ( 与 ) 即是闭区间，有 “( “ “)” 是开区间，比大小时候经常使用的方式如此。</p>
+<p>zset 主要存储重要消息、带权重进行判断、排行榜的应用实现 Top N 测试。</p>
+<p>当然更多的命令，可以前往 <a target="_blank" rel="noopener" href="https://redis.io/commands/"> redis 的官网</a> 进行查询命令，以及我们使用 go 、java 、cpp 等语言做开发的时候。用 java 的jredis、go 的go-redis，使用看文档即可。</p>
+<p>程序设计最重要的是设计，程序是基石，设计是上层建筑，所以我们需要尽量把握设计的思想、代码的实现，这是很有重要性的概念。</p>
+<p>以上即是五大基本数据类型，还有三种特殊的数据类型</p>
+<h2 id="5、Redis-中-三大特殊数据类型"><a href="#5、Redis-中-三大特殊数据类型" class="headerlink" title="5、Redis 中 三大特殊数据类型"></a>5、Redis 中 三大特殊数据类型</h2><h3 id="geospatial"><a href="#geospatial" class="headerlink" title="geospatial"></a>geospatial</h3><p> geospatial 在 redis 中 即是 geo，在 redis 3.x 版本就已经推出了，可以推算地理位置信息，两地之间的距离、方圆几里的人。</p>
+<p>geo api 在现在的官网只有 9 个命令：geoadd、geopos、geodist、georadius。</p>
+<p>其中 geo 的底层实现还是基于 zset，所以 zset 的命令都能操作 geo 数据结构。</p>
+<p>如果不做地图地理信息的话，基本上项目内不会使用此数据类型</p>
+<h3 id="hyperloglog"><a href="#hyperloglog" class="headerlink" title="hyperloglog"></a>hyperloglog</h3><p>hyperloglog 是基数统计的算法，用于网页的 UV 计数。</p>
+<p>此数据结构占用内存非常小，只占用 $2^{64}$ B，即 12 KB 大小，所以从内存角度，Hyperloglog 是优先选择。</p>
+<p>使用即是 pfadd、pfcount、pfmerge</p>
+<h3 id="bitmaps"><a href="#bitmaps" class="headerlink" title="bitmaps"></a>bitmaps</h3><p>位图，跟操作系统里面的一样，redis 里面可以统计用户信息：活跃、登陆、打开</p>
+<p>操作为： setbit 、gerbit、bitcount</p>
+<p>以上的数据结构了解使用即可，具体的原理，可以在工作中继续进行一个学习，现在我们主要学习其中的一个具体的场景即可。</p>
+<h2 id="6、redis-中的事务"><a href="#6、redis-中的事务" class="headerlink" title="6、redis 中的事务"></a>6、redis 中的事务</h2><p><strong>在 Redis 中的单条命令保证原子性，而其事务是不保证原子性的！</strong> 事务的本质即是：一组命令的集合。事务具有一次性、顺序性、排他性。</p>
+<p>redis 中的事务是没有隔离性的概念，没有隔离级别。</p>
+<p>所有的命令在事务中没有被执行，必须发起执行命令时候，事务才能执行，即：exec 命令。</p>
+<p>redis 事务执行方式：</p>
+<ul>
+<li>开启事务 (multi)</li>
+<li>命令入队，返回值均为 queue </li>
+<li>执行事务 (exec)</li>
+</ul>
+<p>事务也能放弃，命令即是：discard (即放弃事务队列里的所有命令)</p>
+<p>以下两点异常需要注意</p>
+<ul>
+<li>1、编译型异常：代码错误、错误命令，redis 事务队列不会去执行。</li>
+<li>2、运行时异常：如果事务队列中存在语法性，那么执行命令的时候，只放弃命令命令错误的那几条。</li>
+<li>3、<strong>注意：错误命令与命令错误这两种说法的区别</strong></li>
+</ul>
+<h2 id="7、Redis-实现乐观锁"><a href="#7、Redis-实现乐观锁" class="headerlink" title="7、Redis 实现乐观锁"></a>7、Redis 实现乐观锁</h2><p>乐观锁：只会在更新数据的时候去判断一下，在此期间是否有修改过数据。</p>
+<p>所以使用 watch 命令对 key 值进行监视即可。修改失败，用 unwatch 解锁，再 watch key，即可。</p>
+<h2 id="8、Go-连接操作-Redis-数据库"><a href="#8、Go-连接操作-Redis-数据库" class="headerlink" title="8、Go 连接操作 Redis 数据库"></a>8、Go 连接操作 Redis 数据库</h2><h2 id="9、Redis-Conf-配置文件"><a href="#9、Redis-Conf-配置文件" class="headerlink" title="9、Redis.Conf 配置文件"></a>9、Redis.Conf 配置文件</h2><p>redis.conf 需要重点理解一下。</p>
+<p>redis 大小写不敏感在配置文件中已经说明了。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash">daemonize  <span class="hljs-built_in">yes</span> <span class="hljs-comment"># 后台守护进程开启，默认为 no 。</span><br><br>pidfile /var/run/redis_6379.pid <span class="hljs-comment"># 后台运行的 pid 值</span><br><br>save 900 1 <span class="hljs-comment"># 快照 900s 内修改一个，就自动保存一次。</span><br>save 300 10 <br>save 60 10000<br><br><br>config get / <span class="hljs-built_in">set</span> requirepass  <span class="hljs-comment"># 设置 redis 的安全密码</span><br><br>maxmemory-policy <span class="hljs-comment"># 内存到达上限的处理政策。一般以下 6 中处理方法</span><br>1、volatile-lru : 直对设置了过期时间的 key 进行 lru <br>2、allkeys-lru<br>3、volatile-random 随机删除设置了过期时间的 key <br>4、allkeys-lru<br>5、volatile-ttl 删除即将过期的<br>6、noeviction 永不过期，返回错误<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="10、AOF-与-RDB"><a href="#10、AOF-与-RDB" class="headerlink" title="10、AOF 与 RDB"></a>10、AOF 与 RDB</h2><p>在大部分情况下，RDB 是默认的持久化配置，大部分的情况下都够用了。</p>
+<p>一般进行数据持久化的保存操作过程一般分为五步：</p>
+<blockquote>
+<p>(1) 客户端向服务端发送写操作 (数据在客户端的内存中);</p>
+<p>(2) 数据库服务端接收到写请求的数据 (数据在服务端的内存中);</p>
+<p>(3) 服务端调用系统调用函数 write，将数据写入磁盘 (数据在系统内存的缓冲区中);</p>
+<p>(4) 操作系统将缓冲区中的数据转移到磁盘控制器上 (数据在磁盘缓存中);</p>
+<p>(5) 磁盘控制器将数据写到磁盘的物理介质中 (数据真正落到磁盘上);</p>
+</blockquote>
+<p>以上五个步骤为在理想条件下，一个正常的保存流程。但是在大多数情况下，我们的机器等等都会有各种各样的故障，这里划分了两种情况：</p>
+<blockquote>
+<p>1、Redis数据库发生故障，只要在上面的第三步执行完毕，那么就可以持久化保存，剩下的两步由操作系统替我们完成;</p>
+<p>2、操作系统发生故障，必须上面 5 步都完成才可保存。</p>
+</blockquote>
+<h3 id="RDB"><a href="#RDB" class="headerlink" title="RDB"></a>RDB</h3><p>RDB (Redis DataBase) 操作是<strong>在内存中的数据库记录定时dump到磁盘上的RDB持久化</strong>。这种方式是就是将内存中数据以快照的方式写入到二进制文件中, 默认的文件名为 dump.rdb，下列代码与图为 RDB 的存储字节流的内容格式。</p>
+<p><img src="/images/SQL/RDB.jpg" srcset="/img/loading.gif" lazyload alt="RDB"></p>
+<p>在执行 RDB 快照备份时候，一般会通过父进程，fork 一个子进程，将数据写到一个临时文件，快照写完后，替换原来的快照文件，子进程就退出，临时文件变成正式的 RDB 文件。</p>
+<p>但是 RDB 对数据的完整性不敏感，最后一次持久化之后的数据在宕机后可能丢失。</p>
+<p>RDB 文件默认的保存文件名称为 dump.rdb</p>
+<p>RDB 的触发条件如下：</p>
+<p>1、满足默认的 save  条件，会触发 rdb 规则<br>2、执行 flushall，也会触发 rdb 规则<br>3、退出 redis，也会产生 rdb 文件</p>
+<p>RDB 的恢复条件如下：</p>
+<p>1、将 dump.rdb 文件放在redis 启动目录即可，redis 会自动检查其中的数据并恢复<br>2、查看需要存在的位置： redis-cli 中 config get dir 即可。</p>
+<p>rdb 适合大规模的数据恢复，但是需要一定的时间间隔进程操作。</p>
+<p>RDB 具体更详细的内容请看此博客： <a target="_blank" rel="noopener" href="https://blog.csdn.net/damanchen/article/details/103326964">RDB文件格式</a></p>
+<h3 id="AOF"><a href="#AOF" class="headerlink" title="AOF"></a>AOF</h3><p>AOF (Append Only File) ，记录服务器执行的 <strong>所有写操作</strong> 命令，类似于 Mysql 中的日志。在服务器启动时，通过重新执行 AOF 这些命令来还原数据集，相应的配置文件为 appendonly.aof，默认不开启，需要手动进行启动！</p>
+<p>其他相应的配置可以查看 redis 的相应的conf 文件。比如 append async、auto-aof-rewrite-percentage、auto-aof-rewrite-min-size 等。</p>
+<p>aof 文件大小大于 64mb 后就会产生重写的操作。 </p>
+<p>当 aof 文件出现问题时，需要使用 <code>redis-check-aof --fix</code> 工具对 aof 文件进行修复。</p>
+<p>aof 同步设置：</p>
+<ul>
+<li>1、每一次修改都会同步，文件的完整性会更好；</li>
+<li>2、每 1s 同步一次，那么可能会丢失 1s 的数据；</li>
+<li>3、不同步效率是最高的。</li>
+</ul>
+<p>对比 aof 与 rdb，aof 是文件读写流操作，所以运行效率比rdb低，数据文件也比rdb大，修复数据的速度也比 rdb 慢。</p>
+<p>Redis 还可以<strong>同时使用 AOF 持久化和 RDB 持久化</strong>。</p>
+<p>在这种情况下， 当 Redis 重启时， 它会优先使用 AOF 文件来还原数据集， 因为 AOF 文件保存的数据集通常比 RDB 文件所保存的数据集更完整。</p>
+<h2 id="Redis-发布与订阅"><a href="#Redis-发布与订阅" class="headerlink" title="Redis 发布与订阅"></a>Redis 发布与订阅</h2><p>发布订阅 ( pub &#x2F; sub ) 是一种消息通信的模型，发送者发送消息，接收者接受消息。一般此模型涉及三种对象：</p>
+<blockquote>
+<p>1、消息发送者</p>
+<p>2、频道</p>
+<p>3、消息订阅者</p>
+</blockquote>
+<p>模型的视图如下：</p>
+<p><img src="/images/middleware/redis-pub-sub.png" srcset="/img/loading.gif" lazyload alt="redis-pub-sub"></p>
+<p>redis 的客户端可以订阅任意数量的频道，其相应的操作文档可以参考前文的 redis 官方文档，本博客只是介绍相应 redis pub &#x2F; sub 模型的概念与原理。</p>
+<h2 id="Redis-主从复制"><a href="#Redis-主从复制" class="headerlink" title="Redis 主从复制"></a>Redis 主从复制</h2><p>只要在企业中， Redis 集群是必用的，其架构通常为主从模式，一个主节点有多个从节点，一个从节点只有一个主节点。</p>
+<p><strong>主从复制的作用如下所示：</strong></p>
+<ul>
+<li>1、数据冗余：主从复制是可以热备份的，是区别于 redis 持久化的另外一种数据冗余的方式</li>
+<li>2、故障恢复：当主节点出现问题时，可以由从节点提供服务，实现故障的快速恢复，也能称为服务冗余</li>
+<li>3、负载均衡：主从架构主要是一种多读少写型的架构模式，通过多个 redis 服务器分担读的负载，可以大大提升 redis 服务器的并发量。</li>
+<li>4、高可用的基石：主从复制是哨兵和集群能实施的基础，所以说是基石。</li>
+</ul>
+<blockquote>
+<p>一般来说，单体 redis 服务器一旦发生单点故障，那么很有可能会丢失至少 1s 以上的数据，并且单体redis 需要处理所有的请求负载，压力较大。</p>
+<p>而且，单体 redis 由于服务器的内存有限，不可能让服务器内存全部交给 redis 进行数据存储。单台 redis 内存占用不应超过 20GB 。</p>
+</blockquote>
+<p><code>info replication</code> 表示查看当前的 redis 服务器的角色信息</p>
+<p>实现 redis 集群模式只需要修改三个配置属性即可，然后使用 redis 启动此三个配置即可：</p>
+<ul>
+<li>1、端口</li>
+<li>2、pid</li>
+<li>3、log 文件名</li>
+</ul>
+<p>配置从机时候，使用 <code>slaveof + host + port</code>  即可配置主从形式，但是一旦此redis 重启后，配置文件重置，若需要配置持久化的配置文件，需要手动设置 redis.conf 配置文件。具体可看 redis 的详细配置文件。</p>
+<p>主从复制一般两种形式：全量复制与增量复制。其中，但凡从机只要是重新连接主机，都会发生一次全量复制。</p>
+<hr>
+<p>本篇博客主要介绍相应的使用方法，浅谈一下原理，新开一个博客，用于自己对 redis 的底层源码与原理进行进一步的深入理解。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/redis/" class="print-no-link">#redis</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>浅谈 Redis 中间件</div>
+      <div>https://chaggle.github.io/2022/03/18/middleware/redis1/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年3月18日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2025年3月11日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="ND - 禁止演绎">
+                    <i class="iconfont icon-cc-nd"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/03/20/go/concurrency/Pool/" title="Go 语言中的 sync.Pool 学习">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Go 语言中的 sync.Pool 学习</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/03/16/go/interview/opensouce/" title="开源的思考">
+                        <span class="hidden-mobile">开源的思考</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '51f85d21161a06ffe026ef4c9e52716e'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.1/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

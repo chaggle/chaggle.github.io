@@ -1,0 +1,867 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="理解思考项目，原理先行，实践在后  1、redo-log 与 bin-log 两种日志区别首先，redo-log 与 bin-log 两种日志是 InnoDB 数据库引擎为了满足事务的持久性与原子性引入了的，其中，redo-log 是 InnoDB 的特性，bin-log 是mysql 中 server 层的日志。 redo-log 日志 在更新一条记录时，先将其先写入 redo-log 中，然">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL 原理">
+<meta property="og:url" content="https://chaggle.github.io/2022/03/29/middleware/mysql2/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="理解思考项目，原理先行，实践在后  1、redo-log 与 bin-log 两种日志区别首先，redo-log 与 bin-log 两种日志是 InnoDB 数据库引擎为了满足事务的持久性与原子性引入了的，其中，redo-log 是 InnoDB 的特性，bin-log 是mysql 中 server 层的日志。 redo-log 日志 在更新一条记录时，先将其先写入 redo-log 中，然">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chaggle.github.io/images/SQL/redo_log.png">
+<meta property="og:image" content="https://chaggle.github.io/images/SQL/MySQL-isolation1.png">
+<meta property="article:published_time" content="2022-03-28T17:25:15.000Z">
+<meta property="article:modified_time" content="2025-03-07T02:50:09.270Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://chaggle.github.io/images/SQL/redo_log.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>MySQL 原理 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="MySQL 原理"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-03-29 01:25" pubdate>
+          2022年3月29日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          19 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">MySQL 原理</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>理解思考项目，原理先行，实践在后</p>
+</blockquote>
+<h2 id="1、redo-log-与-bin-log-两种日志区别"><a href="#1、redo-log-与-bin-log-两种日志区别" class="headerlink" title="1、redo-log 与 bin-log 两种日志区别"></a>1、redo-log 与 bin-log 两种日志区别</h2><p>首先，redo-log 与 bin-log 两种日志是 InnoDB 数据库引擎为了满足事务的持久性与原子性引入了的，其中，redo-log 是 InnoDB 的特性，bin-log 是mysql 中 server 层的日志。</p>
+<h3 id="redo-log-日志"><a href="#redo-log-日志" class="headerlink" title="redo-log 日志"></a>redo-log 日志</h3><blockquote>
+<p>在更新一条记录时，先将其先写入 redo-log 中，然后更新内存，此时的记录就算更新完毕。等待数据库引擎空闲时，再将其更新至磁盘中。</p>
+<p>而 redo-log 大小固定，由 innodb_log_file_size 设置大小和 innodb_log_files_in_group 设置个数，若要修改，则需重启服务。</p>
+<p>一旦更新的数据条数达到 redo-log 日志记录数的上限，数据库引擎则先停止手中的活，将一部分的 redo-log 日志中的数据更新入磁盘，再继续运行。</p>
+</blockquote>
+<p>本质上来说，redo-log 就是一个循环队列，如下图所示(原图来自极客时间专栏)：<br><img src="/images/SQL/redo_log.png" srcset="/img/loading.gif" lazyload alt="redo-log"><br>其中 witer_pos 为当前记录日志的地址，checkpoint 为当前要擦除的地址，擦除记录前需要将记录更新到数据库文件。</p>
+<p>write_pos 和 checkpoint 之间的是 redo-log 空余的地址块，可以用来记录新的操作。如果 write pos 追上 checkpoint 即是 redo-log 记录操作已满，不能再执行新的更新，需要数据库引擎先擦除一些记录。</p>
+<p>redo-log 可以防止因为数据库异常重启，而导致提交记录丢失的问题 – 这种特性称为 “crash-safe”</p>
+<h3 id="bin-log-日志"><a href="#bin-log-日志" class="headerlink" title="bin-log 日志"></a>bin-log 日志</h3><blockquote>
+<p>先介绍一下 bin-log 日志的背景：</p>
+<p>最开始的时候，MySQL 中没有 InnoDB 数据库引擎，其自带的引擎为 MyISAM，而 MyISAM 没有 “crash-safe” 的能力，bin-log 日志只是归档记录的功能</p>
+</blockquote>
+<p>现在来区别一下这两种日志：</p>
+<ul>
+<li><p>1、redo-log 是 <strong>InnoDB 引擎特有</strong> 的；<br>   bin-log 是 MySQL 的 Server 层实现的，所有引擎都可以使用。</p>
+</li>
+<li><p>2、redo-log 是 <strong>物理日志</strong>，记录 “在某个数据页上的修改” ；<br>   bin-log 是逻辑日志，记录的是这个语句的 <strong>原始逻辑</strong>；比如 “给 ID&#x3D;2 这一行的 c 字段加 1 “。</p>
+</li>
+<li><p>3、redo-log 是 <strong>循环写的，空间固定</strong>；<br>    bin-log 是以 <strong>追加</strong> 的方式写入的。“追加写” 是 bin-log 文件达到一定大小后，会切换到下一个 bin-log 日志文件，并不会覆盖以前的日志。</p>
+</li>
+</ul>
+<p>所以可得到以下结论:</p>
+<blockquote>
+<p>1、redo-log 的写盘时间会直接影响系统的吞吐，所以 redo-log 的数据量要尽量少。</p>
+<p>2、由于系统崩溃的不确定性，重启重放 redo-log 文件时，系统不会知道，redo-log 中的那个 page 页已经修改入磁盘，所以 redo-log 的重放必须可以重入磁盘。</p>
+<p>3、一般来说，<strong>建议一个 redo-log 只涉及一个内存 page 页来进行修改</strong>，这样就可以兼顾逻辑日志与物理日志的优势！</p>
+</blockquote>
+<p>而 redo-log 提交是有两个阶段的：<strong>prepare 和 commit 阶段</strong>。</p>
+<p>而之所以进行两个阶段的提交，也是为了达到 “crash-safe” 的目的。</p>
+<h3 id="情景"><a href="#情景" class="headerlink" title="情景"></a>情景</h3><p>假设 redo-log 都是一次性提交，不分两个阶段，此时我们对一个字段 c 值进行更新，让 c 值从当前的 0，更新为 1。</p>
+<p>情景1：我们先写 redo-log 后写 bin-log。假设在 redo log 写完，binlog 并未写完时，MySQL 进程异常重启。</p>
+<blockquote>
+<p>redo log 写完之后，虽然系统崩溃也能将 MySQL 异常启动前的数据恢复回来。但是 bin-log 并未写完，此时记录的 bin-log 文件就没有记录之前操作的语句。</p>
+<p>因此，在之后备份日志的 bin-log 也没有相应的操作语句。而若我们需要恢复临时库，由于 bin-log 记录的语句丢失，临时库恢复出来的这一行 c 的值就是 0，与原库的值不同。</p>
+</blockquote>
+<p>情景2：我们先写 bin-log，后写 redo-log 假设在 binlog 写完，redo-log 并未写完时，MySQL 进程异常重启。</p>
+<blockquote>
+<p>如果在 bin-log 写完之后，系统崩溃，由于 bin-log 不具备 “crash-safe” 的功能，而 redo-log 没写，所以崩溃恢复以后这个事务无效。</p>
+<p>但是 bin-log 里面已经记录了”c 从 0 改为 1” 的日志。所以在之后用 bin-log 恢复临时库时，就会多出一个事务，恢复出来的 c 的值就是 1，与原库的值不同。</p>
+</blockquote>
+<p>所以两阶段提交就是让这 redo-log 与 bin-log 两个状态保持逻辑上的一致。</p>
+<p>针对于异常重启，在 MySQL 设置中的 <code>innodb_flush_log_at_trx_commit</code>、<code>sync_binlog</code> 均设置为 1，能保证 MySQL 异常重启之后数据不丢失与 bin-log 文件不丢失</p>
+<h3 id="一些补充"><a href="#一些补充" class="headerlink" title="一些补充"></a>一些补充</h3><p>1、MySQL 的 bin-log 完整性</p>
+<blockquote>
+<p>MYSQL 的 bin-log 拥有完整的形式：</p>
+<p>1、statement 格式，最后会有 COMMIT;</p>
+<p>2、row 格式，最后会有 XID event;</p>
+<p>3、MySQL 5.6.5 版本后也引入了 bin-log checksum 用于验证 bin-log 内容的正确性，所以一旦 bin-log 所在的磁盘出现故障，可以通过验证 checksum 来确定准确性！</p>
+</blockquote>
+<p>2、关于 bin-log 备份建议</p>
+<p>一般性建议是一周一备份与一日一备份进行选择。看业务的评估，比如 RTO (恢复目标时间) 指标，一周一备份存储成本小，但是 RTO 长，而一日一备份，RTO 时间小，但是存储的成本大。</p>
+<h2 id="2、事务中的隔离性"><a href="#2、事务中的隔离性" class="headerlink" title="2、事务中的隔离性"></a>2、事务中的隔离性</h2><p>事务概念：数据库在操作数据时，为了保证其逻辑的一致性的最小的单位，即是事务。</p>
+<blockquote>
+<p>事务的特性：<strong>A (Atomicity)、C (Consistency)、I (Isolation)、D (Durablity)</strong> 即原子性、一致性、隔离性、持久性;</p>
+</blockquote>
+<p>因此，事务是保持逻辑一致性、可恢复性的重要方法，而锁是保证事务的完整性与并发性的重要概念！</p>
+<p>本次主要讲内容为隔离性。</p>
+<h3 id="隔离性的概念"><a href="#隔离性的概念" class="headerlink" title="隔离性的概念"></a>隔离性的概念</h3><p>隔离性的存在主要是为了<strong>区分多个事务并行执行的顺序问题</strong>，比如多个事务并行执行时，出现脏读、不可重复读，幻读等。</p>
+<blockquote>
+<p>脏读：读取到其他的事物未提交的数据；</p>
+<p>不可重复读：前后读取记录内容不一致；</p>
+<p>幻读：前后读取记录数量不一致。</p>
+</blockquote>
+<p>所以隔离性针对于以上的情况，分成如下几个级别的隔离：<strong>读未提交、读提交、可重复读与串行化</strong></p>
+<ul>
+<li><p>1、读未提交：一个事物还未提交，其所做的变更可以被其他事务读取</p>
+</li>
+<li><p>2、读提交：一个事务提交之后，其所做的变更才能被其他事务读取</p>
+</li>
+<li><p>3、可重复读：一个事务执行过程中看到的数据是一致的，未提交时其所做的变更对其余事务不可见！</p>
+</li>
+<li><p>4、串行化：对一个记录进行加读写锁，若其发生冲突，后访问的事务需要等前一个事务执行完毕时，才能继续执行。</p>
+</li>
+</ul>
+<p>上面四种情况，并行性逐步降低，但是安全性逐步升高！</p>
+<p>Oracle 数据库的默认隔离级别是读提交，所以从 Oracle 数据库迁移到 MySQL 数据库中，需要设置 MySQL 的启动参数 <code>transaction-isolation</code> 的值设置成 <strong>READ-COMMITTED</strong></p>
+<p>MySQL 数据库默认的隔离级别是可重复读，但是可重复读会导致幻读的情况</p>
+<h3 id="隔离性的实现"><a href="#隔离性的实现" class="headerlink" title="隔离性的实现"></a>隔离性的实现</h3><p>在 MySQL 数据库中，为了控制并发执行的语句的顺序，引入了多版本分布式控制 MVCC (Mutiversion Concurrency Control)。</p>
+<p>其具体内容可以概况如下：每条记录在更新的时候都会同时记录一条回滚日志：undo-log，同一条记录在系统中可以存在多个版本。抽象不好理解，可以看下图：</p>
+<p><img src="/images/SQL/MySQL-isolation1.png" srcset="/img/loading.gif" lazyload alt="isolation"></p>
+<p>若我们需要将当前 4 的值恢复到 1 时，需要执行 3 次 undo-log 回滚。</p>
+<p>而当系统中不存在比回滚日志更早的 read-view 时，undo-log 则会被删除。</p>
+<p>以上图为例子，当 read-viewA 视图被删除后，将 3 改为 2 之前的 undo-log 即会被删除。</p>
+<p>所以说一般开发时，MySQL 数据层的事务尽量避免过长。</p>
+<h3 id="事务的启动方式"><a href="#事务的启动方式" class="headerlink" title="事务的启动方式"></a>事务的启动方式</h3><p>MySQL 中的事务启动方式一般为两种</p>
+<blockquote>
+<p>1、显式启动：使用 begin 或 start transaction。 配套的语句为 commit。回滚语句为 rollback</p>
+<p>2、set autocommit &#x3D; 0, 此命令会将线程自动关掉，只有手动执行上述两种配套的语句，才能进行一个事务的提交，或者断开连接时提交</p>
+</blockquote>
+<p>所以建议使用 <strong>set autocommit &#x3D; 1</strong>，通过显式语句来启动事务，而 commit 命令一般使用 <strong>commit work and chain</strong> 命令，即提交并且启动下一个事务。带来的效果是从程序开发的角度可以明确的知道每个语句是否存在于事务中！</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/MySQL/" class="print-no-link">#MySQL</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>MySQL 原理</div>
+      <div>https://chaggle.github.io/2022/03/29/middleware/mysql2/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年3月29日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2025年3月7日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="ND - 禁止演绎">
+                    <i class="iconfont icon-cc-nd"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/03/31/go/concurrency/HTTP/" title="Golang 开发一个 HTTP Web 服务器/客户端">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Golang 开发一个 HTTP Web 服务器/客户端</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/03/27/summary/22-3-28/" title="2022 年 12 - 13 周总结">
+                        <span class="hidden-mobile">2022 年 12 - 13 周总结</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '6e6c8fc9b65b8548f7813e128db23a6c'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.1/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,906 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="开始学习 Go 语言实现的 zinx 框架,项目地址为：https:&#x2F;&#x2F;github.com&#x2F;chaggle&#x2F;zinx-study  使用 go mod 管理, 初始化为 go mod init github.com&#x2F;chaggle&#x2F;zinx-study并部署代码到 github.com 以及使用 go get 同步到本地 Gopath 的 github 包下！  V0.1 基">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zinx 框架的学习">
+<meta property="og:url" content="https://chaggle.github.io/2022/01/10/go/zinx/zinx/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="开始学习 Go 语言实现的 zinx 框架,项目地址为：https:&#x2F;&#x2F;github.com&#x2F;chaggle&#x2F;zinx-study  使用 go mod 管理, 初始化为 go mod init github.com&#x2F;chaggle&#x2F;zinx-study并部署代码到 github.com 以及使用 go get 同步到本地 Gopath 的 github 包下！  V0.1 基">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-01-09T18:14:32.000Z">
+<meta property="article:modified_time" content="2025-03-13T07:22:08.194Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="zinx">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Zinx 框架的学习 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Zinx 框架的学习"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-01-10 02:14" pubdate>
+          2022年1月10日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          13 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Zinx 框架的学习</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>开始学习 Go 语言实现的 zinx 框架,项目地址为：<a target="_blank" rel="noopener" href="https://github.com/chaggle/zinx-study">https://github.com/chaggle/zinx-study</a></p>
+<blockquote>
+<p>使用 go mod 管理, 初始化为 go mod init github.com&#x2F;chaggle&#x2F;zinx-study<br>并部署代码到 github.com 以及使用 go get 同步到本地 Gopath 的 github 包下！</p>
+</blockquote>
+<h2 id="V0-1-基础的-server-模块"><a href="#V0-1-基础的-server-模块" class="headerlink" title="V0.1 基础的 server 模块"></a>V0.1 基础的 server 模块</h2><blockquote>
+<p>方法</p>
+<p>初始化服务器 – NewServer(name string) ziface.IServer</p>
+<p>启动服务器 – Start()</p>
+<p>停止服务器 – Stop()</p>
+<p>运行服务器 – Serve()</p>
+<p>属性</p>
+<p>名称 – name</p>
+<p>IP 版本 – IPVersion</p>
+<p>监听 IP – IP</p>
+<p>监听端口 – Port</p>
+</blockquote>
+<h2 id="V0-2-简单的链接封装和业务绑定"><a href="#V0-2-简单的链接封装和业务绑定" class="headerlink" title="V0.2 简单的链接封装和业务绑定"></a>V0.2 简单的链接封装和业务绑定</h2><blockquote>
+<p>方法</p>
+<p>启动链接 – Start()</p>
+<p>停止链接 – Stop()</p>
+<p>获取当前链接的 conn 对象 (套接字) – GetTCPConnection() *net.TCPConn</p>
+<p>得到链接 ID – GetConnID() uint32</p>
+<p>得到客户端连接的地址和端口 – RemoteAddr() net.TCPAddr</p>
+<p>发送数据的方法 – Send(data []byte) error</p>
+<p>属性<br>socket TCP 套接字 – Conn *net.TCPConn</p>
+<p>链接的 ID – ConnID uint32</p>
+<p>当前链接状态 (是否已经关闭) – isClosed bool</p>
+<p>与当前链接所绑定的处理业务与方法 – handlerAPI ziface.HandleFunc</p>
+<p>等待退出的 channel 管道 – ExitChan chan bool</p>
+</blockquote>
+<h2 id="V0-3-基础的-router-模块"><a href="#V0-3-基础的-router-模块" class="headerlink" title="V0.3 基础的 router 模块"></a>V0.3 基础的 router 模块</h2><blockquote>
+<p>Request 请求封装</p>
+<p>将链接与数据绑定一起</p>
+<p>属性<br>链接的句柄 – GetConnection() IConnection</p>
+<p>请求数据 – GetData() []byte</p>
+<p>方法<br>得到链接– func (r *Request) GetConnection() ziface.IConnection</p>
+<p>得到数据 – func (r *Request) GetData() []byte</p>
+<p>新建一个 Request 请求</p>
+<p>Router 模块</p>
+<p>抽象的 IRouter</p>
+<p>处理业务之前的方法 PreHandle(request IRequest) &#x2F;&#x2F;处理 conn 业务之前的方法</p>
+<p>处理业务的主方法 Handle(request IRequest) &#x2F;&#x2F;处理 conn 业务的主方法</p>
+<p>处理业务之后的方法 PostHandle(request IRequest) &#x2F;&#x2F;处理 conn 业务之后的方法</p>
+<p>具体的 BaseRouter</p>
+<p>处理业务之前的方法 func (br *BaseRouter) PreHandle(request ziface.IRequest)</p>
+<p>处理业务的主方法 func (br *BaseRouter) Handle(request ziface.IRequest)</p>
+<p>处理业务之后的方法 func (br *BaseRouter) PostHandle(request ziface.IRequest)</p>
+<p>zinx 集成 Router 模块</p>
+<p>IServer 增添路由功能 - AddRouter(router IRouter)</p>
+<p>Server 类增加 Router 成员 —&gt; 去掉之前的 HandAPI</p>
+<p>Connection 类绑定一个 Router 成员</p>
+<p>在 Connection 调用已经注册过的 Router 处理业务</p>
+<p>使用 zinxV0.3 版本开发服务器</p>
+<p>1、创建一个服务器句柄</p>
+<p>2、给当前的 zinx 框架加一个自定义的业务路由</p>
+<p>3、启动 server</p>
+<p>4、需要继承 BaseRouter 去实现三个接口的方法</p>
+<p>当前版本只有一个路由能使用，目前只能使用一个路由模块，在加入路由模块会使上一个路由模块方法进行重写覆盖。</p>
+</blockquote>
+<h2 id="V0-4-全局配置模块"><a href="#V0-4-全局配置模块" class="headerlink" title="V0.4 全局配置模块"></a>V0.4 全局配置模块</h2><blockquote>
+<p>路径 ：服务器项目主地址&#x2F;conf&#x2F;zinx.json (用户进行填写)</p>
+<p>创建一个 zinx 的全局配置模块 utils&#x2F;globalobj.go</p>
+<p>初始化后读取用户配置的 zinx.json —&gt; globalobj 对象中对应的 zinx 服务器句柄代码进行参数替换</p>
+<p>提供一个 GlobalObject 对象 — var GlobalObject *GlobalObj</p>
+<p>使用 zinx0.4 版本进行开发</p>
+</blockquote>
+<h2 id="V0-5-消息封装"><a href="#V0-5-消息封装" class="headerlink" title="V0.5 消息封装"></a>V0.5 消息封装</h2><blockquote>
+<p>定义消息的结构 Message</p>
+<p>属性<br>消息的 ID</p>
+<p>消息的长度</p>
+<p>消息的内容</p>
+<p>方法<br>SetMsgId(uint32) &#x2F;&#x2F;设置消息 ID</p>
+<p>SetData([]byte) &#x2F;&#x2F;设置消息内容</p>
+<p>SetDataLen(uint32) &#x2F;&#x2F;设置消息长度</p>
+<p>GetDataLen() uint32 &#x2F;&#x2F;获取消息长度</p>
+<p>GetMsgId() uint32 &#x2F;&#x2F;获取消息 ID</p>
+<p>GetData() []byte &#x2F;&#x2F;获取消息内容</p>
+<p>定义解决 TCP 粘包问题的封包拆包的模块</p>
+<p>针对 Message 进行 TLV 格式的封装 – func (dp *DataPack) Pack(msg ziface.IMessage) ([]byte, error)</p>
+<p>写 Message 的长度</p>
+<p>写 Message 的 ID</p>
+<p>写 Message 的内容</p>
+<p>针对 Message 进行 TLV 格式的拆包 – func (dp *DataPack) Unpack(binaryData []byte) (ziface.IMessage, error)</p>
+<p>先读取固定长度的 head —&gt; 消息的长度和消息的类型</p>
+<p>再根据消息内容的长度，再进行一次读写，从 conn 中读取消息的内容</p>
+<p>将消息封装机制集成到 Zinx 框架中</p>
+<p>将 Message 添加到 Request 属性字段</p>
+<p>修改连接读取数据的机制，将之前的单纯读取 byte 改成拆包形式，读取按照 TLV 形式进行读取</p>
+<p>给链接提供一个发包的机制：将发送的消息打包，再发送</p>
+<p>使用 zinxV0.5 开发</p>
+</blockquote>
+<h2 id="V0-6-多路由模式"><a href="#V0-6-多路由模式" class="headerlink" title="V0.6 多路由模式"></a>V0.6 多路由模式</h2><blockquote>
+<p>消息管理模块(支持多路由 API 调度管理)</p>
+<p>属性</p>
+<p>集合 - 消息 ID 与对应 router 的关系 - map Apis map[uint32]ziface.IRouter</p>
+<p>方法</p>
+<p> 根据 MsgId 来索引调度路由方法 func (mh *MsgHandle) DoMsgHandler(request ziface.IRequest)</p>
+<p> 添加路由方法到 map 集合中 func (mh *MsgHandle) AddRouter(msgID uint32, router ziface.IRouter)</p>
+<p>消息管理模块集成到 Zinx 框架中</p>
+<p>将 server 模块里面的 Router 属性变为 MsgHandle 属性</p>
+<p>将 server 模块中的 AddRouter 修改调用 MsgHandler 的 AddRouter</p>
+<p>将 connection 模块中的 Router 属性替换为 MsgHandle 属性</p>
+<p>将 connection 模块中的 Router 业务调度 Router 的业务改为调度 MsgHandle 调度， 并修改 StartRead 方法</p>
+<p>使用 Zinx V0.6 版本开发</p>
+</blockquote>
+<h2 id="V0-7-读写协程分离-小修改，新增一个-goroutine-即可"><a href="#V0-7-读写协程分离-小修改，新增一个-goroutine-即可" class="headerlink" title="V0.7 读写协程分离(小修改，新增一个 goroutine 即可)"></a>V0.7 读写协程分离(小修改，新增一个 goroutine 即可)</h2><blockquote>
+<p>1、添加一个 Reader 和 Writer 之间通信的 channel</p>
+<p>2、添加一个 Writer Goroutine</p>
+<p>3、Reader 由之前发送给客户端 改成 发送给 通信 Channel</p>
+<p>4、启动 Reader 和 Writer 一同工作</p>
+</blockquote>
+<h2 id="V0-8-消息队列以及多任务"><a href="#V0-8-消息队列以及多任务" class="headerlink" title="V0.8 消息队列以及多任务"></a>V0.8 消息队列以及多任务</h2><blockquote>
+<p>消息队列以及 Worker 工作池的实现</p>
+<pre><code class="hljs">创建一个消息队列 --- MsgHandler 消息管理模块
+	  消息队列 TaskQueue []chan ziface.IRequest
+	  工作池的数量 WorkPoolSize uint32
+创建多任务work工作池，并且启动
+
+​	  创建一个 worker 工作池 :func (mh *MsgHandle) StartWorkerPool() 
+​	  根据 WorkPoolSize 的数量去创建 Worker 
+  每个 worker 都应该用一个 Go 去承载
+​	  1、阻塞等待当前 worker 的对应的 channel 的消息
+​	  2、一旦有消息到来， worker 应该处理当前消息对应的业务
+​	  3、将之前的发送消息，全部改成将消息发送给消息队列和 worker 工作池处理
+
+定义一个方法，将消息发送给消息队列工作池的方法
+	   func (mh *MsgHandle) SendMsgToTaskQueue(request ziface.IRequest)
+
+将消息队列机制集成到 Zinx 框架中: 
+	1、开启并调用消息队列及 worker 工作池, 保证 workerPool 只有一个，应该在创建 Server模块时候开启(在Server listen 之前添加)
+	2、将从客户端处理的消息，发送给当前的Worker 工作池来处理，在处理完拆包，得到了 request 请求，交给工作池来处理
+
+使用 Zinx V0.8 版本开发
+</code></pre>
+</blockquote>
+<p>小型项目，具体以技术方案跟思考为主，而与需求、产品、测试、运维的沟通可以让步于项目的上线</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/go/" class="category-chain-item">go</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/zinx/" class="print-no-link">#zinx</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Zinx 框架的学习</div>
+      <div>https://chaggle.github.io/2022/01/10/go/zinx/zinx/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年1月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2025年3月13日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="ND - 禁止演绎">
+                    <i class="iconfont icon-cc-nd"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/02/10/Leetcode/707/" title="707. 设计链表">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">707. 设计链表</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/01/04/go/go-im/" title="Go语言实现的轻量级IM项目">
+                        <span class="hidden-mobile">Go语言实现的轻量级IM项目</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '13052b8a00535673a79167c65b092a6a'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.1/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

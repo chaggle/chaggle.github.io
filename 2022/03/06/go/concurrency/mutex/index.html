@@ -1,0 +1,811 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="极客时间专栏，鸟窝大佬的 Go 并发编程课程，由于大佬的课程十分精彩，领悟需要时间与精力！所以再次本文仅仅只能作为知识总结，相应具体内容与源码分析请去极客时间上购买大佬相应的课程！  Mutex​ Go 语言中的 sync 包的 mutex 的设计，有四个演变阶段。  1、初版的 Mutex 采用一个 flag 表示锁是否被持有，实现比较简单 2、之后为了照顾新来的 Goroutine(下文简称">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 语言中的 sync.Mutex 学习">
+<meta property="og:url" content="https://chaggle.github.io/2022/03/06/go/concurrency/mutex/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="极客时间专栏，鸟窝大佬的 Go 并发编程课程，由于大佬的课程十分精彩，领悟需要时间与精力！所以再次本文仅仅只能作为知识总结，相应具体内容与源码分析请去极客时间上购买大佬相应的课程！  Mutex​ Go 语言中的 sync 包的 mutex 的设计，有四个演变阶段。  1、初版的 Mutex 采用一个 flag 表示锁是否被持有，实现比较简单 2、之后为了照顾新来的 Goroutine(下文简称">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chaggle.github.io/images/go/mutex1.png">
+<meta property="og:image" content="https://chaggle.github.io/images/go/mutex2.png%22">
+<meta property="og:image" content="https://chaggle.github.io/images/go/mutex3.png">
+<meta property="article:published_time" content="2022-03-05T20:19:47.000Z">
+<meta property="article:modified_time" content="2025-03-07T02:50:09.268Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="sync">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://chaggle.github.io/images/go/mutex1.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Go 语言中的 sync.Mutex 学习 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Go 语言中的 sync.Mutex 学习"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-03-06 04:19" pubdate>
+          2022年3月6日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          10 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Go 语言中的 sync.Mutex 学习</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>极客时间专栏，鸟窝大佬的 Go 并发编程课程，由于大佬的课程十分精彩，领悟需要时间与精力！所以再次本文仅仅只能作为知识总结，相应具体内容与源码分析请去极客时间上购买大佬相应的课程！</p>
+</blockquote>
+<h2 id="Mutex"><a href="#Mutex" class="headerlink" title="Mutex"></a>Mutex</h2><p>​ Go 语言中的 sync 包的 mutex 的设计，有四个演变阶段。</p>
+<ul>
+<li>1、初版的 Mutex 采用一个 flag 表示锁是否被持有，实现比较简单</li>
+<li>2、之后为了照顾新来的 Goroutine(下文简称 G )，会让新人能够尽可能的优先获取锁，此为第二个阶段</li>
+<li>3、第三个阶段呢，是使被唤醒的 G 与新来的 G 有更多的机会竞争锁，但是这样会引发相应的饥饿问题，所以目前又加入了饥饿的解决方案</li>
+<li>4、第四个即为解决饥饿的阶段。</li>
+</ul>
+<p>如下图所示</p>
+<p><img src="/images/go/mutex1.png" srcset="/img/loading.gif" lazyload alt="go-concurrency1"></p>
+<h3 id="初版-mutex-的实现"><a href="#初版-mutex-的实现" class="headerlink" title="初版 mutex 的实现"></a>初版 mutex 的实现</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-number">2008</span> 年时候， Russ Cox 提交的第一版的 mutex 如下所示<br><br><span class="hljs-comment">//CAS 操作，当时并未抽象出 atomic 原子包</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">cas</span><span class="hljs-params">(val *<span class="hljs-type">int32</span>, old, <span class="hljs-built_in">new</span> <span class="hljs-type">int32</span>)</span></span> <span class="hljs-type">bool</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">semacquire</span><span class="hljs-params">(*<span class="hljs-type">int32</span>)</span></span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">semrelease</span><span class="hljs-params">(*<span class="hljs-type">int32</span>)</span></span><br><br><span class="hljs-keyword">type</span> Mutex <span class="hljs-keyword">struct</span> &#123;<br>    <span class="hljs-comment">//锁是否被持有</span><br>    key <span class="hljs-type">int32</span><br>    <br>    <span class="hljs-comment">//信号量专用，用于阻塞/唤醒 G </span><br>    sema <span class="hljs-type">int32</span><br>&#125;<br><br><span class="hljs-comment">//保证成功在 val 上添加 delta 的值</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">xadd</span><span class="hljs-params">(val *<span class="hljs-type">int32</span>, delta <span class="hljs-type">int32</span>)</span></span> (<span class="hljs-built_in">new</span> <span class="hljs-type">int32</span>) &#123;<br>    <span class="hljs-keyword">for</span> &#123;<br>        v := *val<br>        <span class="hljs-keyword">if</span> cas(val, v, v + delta) &#123;<br>            <span class="hljs-keyword">return</span> v + delta<br>        &#125;<br>    &#125;<br>    <span class="hljs-built_in">panic</span>(<span class="hljs-string">&quot;unreached&quot;</span>)<br>&#125;<br><br><span class="hljs-comment">//请求锁</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m *Mutex)</span></span> Lock() &#123;<br>    <span class="hljs-keyword">if</span> xadd(&amp;m.key, <span class="hljs-number">1</span>) == <span class="hljs-number">1</span> &#123; <span class="hljs-comment">// 标识加 1，如果为 1，则获取到锁</span><br>        <span class="hljs-keyword">return</span><br>    &#125;<br>    semacquire(&amp;m.sema) <span class="hljs-comment">//否则阻塞等待</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m *Mutex)</span></span> Unlock() &#123;<br>    <span class="hljs-keyword">if</span> xadd(&amp;m.key, <span class="hljs-number">-1</span>) == <span class="hljs-number">0</span> &#123;<span class="hljs-comment">// 标识减 1，如果为 0，则没有其他的等待者</span><br>        <span class="hljs-keyword">return</span><br>    &#125;<br>    semarelease(&amp;m.sema) <span class="hljs-comment">//唤醒其他的 G     </span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>· 其中，CAS 为一种指令，即将给定的值与内存地址中的值进行相比较，如果是同一个值，就用新值替换内存地址中的旧值。而且 CAS 操作指令是原子性的指令(即数据库中原子性的概念，修改不了数据，事务回滚到修改之前的数据，数据不改变)</p>
+<p><img src="/images/go/mutex2.png%22" srcset="/img/loading.gif" lazyload></p>
+<blockquote>
+<p>有趣的事情是，Unlock 方法能被任意的 G 调用释放，即使没有持有互斥锁的 G，也能进行相应的操作。</p>
+</blockquote>
+<p>所以在使用 Mutex 的时候，必须保证 G 尽可能不去释放自己未持有的锁，一定遵循 “谁申请，谁释放” 的原则。一般在使用 Mutex 的时候，Lock 与 Unlock 方法都应该在一个方法内成对出现。</p>
+<blockquote>
+<p>在1.14版本中 Go 对 defer 做了相应的优化，采取更有效的内联模式，将之前生成的 defer 对象放入 defer chain 中，所以 defer 对程序执行的影响微乎其微了。</p>
+</blockquote>
+<p>缺点：请求锁时候，G 会排队等待获取互斥锁，虽然看起来挺公平的，但是从性能上来看，并非最优的解法。如果能将锁让给正在用 CPU 时间片的 G 的话，就不需要做上下文的切换，在高并发的情况下，可能会有更好的性能。</p>
+<h3 id="“给新人机会”-阶段"><a href="#“给新人机会”-阶段" class="headerlink" title="“给新人机会” 阶段"></a>“给新人机会” 阶段</h3><p>2011 年 6 月 30 日，Go 语言开发者在 commit 中对 Mutex 做了一次大调整，调整后的 Mutex 实现如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Mutex <span class="hljs-keyword">struct</span> &#123;<br>    state <span class="hljs-type">int32</span><br>    sema <span class="hljs-type">uint32</span><br>&#125;<br><br><span class="hljs-keyword">const</span> (<br>    mutexLock = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-literal">iota</span> <span class="hljs-comment">//mutex is locked </span><br>    mutexWoken<br>    mutexWaiterShift = <span class="hljs-literal">iota</span><br>)<br></code></pre></td></tr></table></figure>
+
+<p>其中 Mutex 此版本的设计思想为将第一个 int32 类型的 state 字段，划算为二进制，按二进制的位数进行区分，如下图：</p>
+<p><img src="/images/go/mutex3.png" srcset="/img/loading.gif" lazyload></p>
+<p>这样可能以最小的内存来实现互斥锁结构，最低位表示锁是否被占有(1|0 占有|非占有)，次低位表示锁是否有被唤醒的 G，其余 30 位表示等待此锁的 G 的数量。与计算机网络的子网划分很相似的设计，一个数值，分为三部分，代表三个意义。</p>
+<p>并且因为 atomic 原子性包的添加，请求锁Lock也变复杂了，。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m *Mutex)</span></span> Lock() &#123;<br>    <span class="hljs-comment">//Fast path : 幸运 case，能够直接获取到相应的锁</span><br>    <span class="hljs-keyword">if</span> atomic.CompareAndSwapInt32(&amp;m.state, <span class="hljs-number">0</span>, mutexLocked) &#123;<br>        <span class="hljs-keyword">return</span><br>    &#125;<br>    <br>    awoke := <span class="hljs-literal">false</span><br>    <span class="hljs-keyword">for</span> &#123;<br>        old := m.state<br>        <span class="hljs-built_in">new</span> := old | mutexLocked <span class="hljs-comment">//新状态加锁</span><br>        <span class="hljs-keyword">if</span> old &amp; mutexLocked != <span class="hljs-number">0</span> &#123;<br>            <span class="hljs-built_in">new</span> = old + <span class="hljs-number">1</span> &lt;&lt; mutexWaiterShift <span class="hljs-comment">//等待者数量加一</span><br>        &#125;<br>        <br>        <span class="hljs-keyword">if</span> awoke &#123;<br>            <span class="hljs-comment">//G 是被唤醒的</span><br>            <span class="hljs-comment">//新状态清除唤醒标志</span><br>            <span class="hljs-built_in">new</span> &amp;^ = mutexWoken<br>        &#125;<br>        <br>        <span class="hljs-keyword">if</span> atomic.CompareAndSwapInt32(&amp;m.state, old, <span class="hljs-built_in">new</span>) &#123;<span class="hljs-comment">//设置新状态</span><br>            <span class="hljs-keyword">if</span> old &amp; mutexUnlocked == <span class="hljs-number">0</span> &#123; <span class="hljs-comment">//锁原状态未加锁</span><br>                <span class="hljs-keyword">break</span><br>            &#125;<br>            runtime.Semacquire(&amp;m.sema) <span class="hljs-comment">//请求信号量</span><br>            awoke = <span class="hljs-literal">true</span><br>        &#125;<br>    &#125;<br>&#125; <br>设计包含大量的位运算，要联系 Go 语言的位运算优先级进行思考。<br></code></pre></td></tr></table></figure>
+
+<h2 id="使用-mutex-的一些注意事项"><a href="#使用-mutex-的一些注意事项" class="headerlink" title="使用 mutex 的一些注意事项"></a>使用 mutex 的一些注意事项</h2><p>1、能不用 mutex, 尽量不用 mutex, 使用读写锁合适</p>
+<p>2、尽量使用 defer 释放锁，防止因为 panic 而导致锁未释放</p>
+<p>3、mutex.Lock() 后是不可重入的，写递归时候，不能调用 mutex</p>
+<p>4、尽量使用读写锁！sync.RLock&#x2F;RUnlock, sync.WLock&#x2F;WUnlock</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/go/" class="category-chain-item">go</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/sync/" class="print-no-link">#sync</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Go 语言中的 sync.Mutex 学习</div>
+      <div>https://chaggle.github.io/2022/03/06/go/concurrency/mutex/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年3月6日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2025年3月7日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="ND - 禁止演绎">
+                    <i class="iconfont icon-cc-nd"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/03/14/summary/22-3-14/" title="2022 年 11 周总结">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">2022 年 11 周总结</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/03/05/plan/" title="【置顶】未来学习计划">
+                        <span class="hidden-mobile">【置顶】未来学习计划</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '6c5dd7616281edb621d8c4ebc3d7bd6a'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.1/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
