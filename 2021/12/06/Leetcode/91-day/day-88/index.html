@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="">
   
-    <meta name="description" content="451. 根据字符出现频率排序题目1234567891011121314151617181920212223242526272829303132333435给定一个字符串，请将字符串里的字符按照出现的频率降序排列。示例 1:输入:&quot;tree&quot;输出:&quot;eert&quot;解释:&#x27;e&#x27;出现两次，&#x27;r&#x27;和&#x27;t&#x27;都只">
+    <meta name="description" content="451. 根据字符出现频率排序题目给定一个字符串，请将字符串里的字符按照出现的频率降序排列。  示例 1:  输入: &quot;tree&quot;  输出: &quot;eert&quot;  解释: &#39;e&#39;出现两次，&#39;r&#39;和&#39;t&#39;都只出现一次。 因此&#39;e&#39;必须出现在&#39;r&#39;和&#39;t&#39;之前。此外，&quot;eetr&quot;也是一个有效的答案。 示例 2:  输入: &quot;cccaaa&quot;  输出: &quot;cccaaa&quot;  解释: &#39;c&#39;和&#39;a&#39;都出现三次。此外">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day 88 451. 根据字符出现频率排序">
 <meta property="og:url" content="https://chaggle.github.io/2021/12/06/Leetcode/91-day/day-88/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="451. 根据字符出现频率排序题目1234567891011121314151617181920212223242526272829303132333435给定一个字符串，请将字符串里的字符按照出现的频率降序排列。示例 1:输入:&quot;tree&quot;输出:&quot;eert&quot;解释:&#x27;e&#x27;出现两次，&#x27;r&#x27;和&#x27;t&#x27;都只">
+<meta property="og:description" content="451. 根据字符出现频率排序题目给定一个字符串，请将字符串里的字符按照出现的频率降序排列。  示例 1:  输入: &quot;tree&quot;  输出: &quot;eert&quot;  解释: &#39;e&#39;出现两次，&#39;r&#39;和&#39;t&#39;都只出现一次。 因此&#39;e&#39;必须出现在&#39;r&#39;和&#39;t&#39;之前。此外，&quot;eetr&quot;也是一个有效的答案。 示例 2:  输入: &quot;cccaaa&quot;  输出: &quot;cccaaa&quot;  解释: &#39;c&#39;和&#39;a&#39;都出现三次。此外">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-12-06T06:06:57.000Z">
 <meta property="article:modified_time" content="2025-03-07T02:50:09.264Z">
@@ -45,6 +45,8 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -230,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          323 字
+          277 字
         
       </span>
     
@@ -302,14 +304,58 @@
             
               <div class="markdown-body">
                 
-                <h1 id="451-根据字符出现频率排序"><a href="#451-根据字符出现频率排序" class="headerlink" title="451. 根据字符出现频率排序"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/sort-characters-by-frequency/">451. 根据字符出现频率排序</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs cpp">给定一个字符串，请将字符串里的字符按照出现的频率降序排列。<br><br>示例 <span class="hljs-number">1</span>:<br><br>输入:<br><span class="hljs-string">&quot;tree&quot;</span><br><br>输出:<br><span class="hljs-string">&quot;eert&quot;</span><br><br>解释:<br><span class="hljs-string">&#x27;e&#x27;</span>出现两次，<span class="hljs-string">&#x27;r&#x27;</span>和<span class="hljs-string">&#x27;t&#x27;</span>都只出现一次。<br>因此<span class="hljs-string">&#x27;e&#x27;</span>必须出现在<span class="hljs-string">&#x27;r&#x27;</span>和<span class="hljs-string">&#x27;t&#x27;</span>之前。此外，<span class="hljs-string">&quot;eetr&quot;</span>也是一个有效的答案。<br>示例 <span class="hljs-number">2</span>:<br><br>输入:<br><span class="hljs-string">&quot;cccaaa&quot;</span><br><br>输出:<br><span class="hljs-string">&quot;cccaaa&quot;</span><br><br>解释:<br><span class="hljs-string">&#x27;c&#x27;</span>和<span class="hljs-string">&#x27;a&#x27;</span>都出现三次。此外，<span class="hljs-string">&quot;aaaccc&quot;</span>也是有效的答案。<br>注意<span class="hljs-string">&quot;cacaca&quot;</span>是不正确的，因为相同的字母必须放在一起。<br>示例 <span class="hljs-number">3</span>:<br><br>输入:<br><span class="hljs-string">&quot;Aabb&quot;</span><br><br>输出:<br><span class="hljs-string">&quot;bbAa&quot;</span><br><br>解释:<br>此外，<span class="hljs-string">&quot;bbaA&quot;</span>也是一个有效的答案，但<span class="hljs-string">&quot;Aabb&quot;</span>是不正确的。<br>注意<span class="hljs-string">&#x27;A&#x27;</span>和<span class="hljs-string">&#x27;a&#x27;</span>被认为是两种不同的字符。<br></code></pre></td></tr></table></figure>
+                <h1 id="451-根据字符出现频率排序"><a href="#451-根据字符出现频率排序" class="headerlink" title="451. 根据字符出现频率排序"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/sort-characters-by-frequency/">451. 根据字符出现频率排序</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">给定一个字符串，请将字符串里的字符按照出现的频率降序排列。
+
+示例 <span class="token number">1</span><span class="token operator">:</span>
+
+输入<span class="token operator">:</span>
+<span class="token string">"tree"</span>
+
+输出<span class="token operator">:</span>
+<span class="token string">"eert"</span>
+
+解释<span class="token operator">:</span>
+<span class="token char">'e'</span>出现两次，<span class="token char">'r'</span>和<span class="token char">'t'</span>都只出现一次。
+因此<span class="token char">'e'</span>必须出现在<span class="token char">'r'</span>和<span class="token char">'t'</span>之前。此外，<span class="token string">"eetr"</span>也是一个有效的答案。
+示例 <span class="token number">2</span><span class="token operator">:</span>
+
+输入<span class="token operator">:</span>
+<span class="token string">"cccaaa"</span>
+
+输出<span class="token operator">:</span>
+<span class="token string">"cccaaa"</span>
+
+解释<span class="token operator">:</span>
+<span class="token char">'c'</span>和<span class="token char">'a'</span>都出现三次。此外，<span class="token string">"aaaccc"</span>也是有效的答案。
+注意<span class="token string">"cacaca"</span>是不正确的，因为相同的字母必须放在一起。
+示例 <span class="token number">3</span><span class="token operator">:</span>
+
+输入<span class="token operator">:</span>
+<span class="token string">"Aabb"</span>
+
+输出<span class="token operator">:</span>
+<span class="token string">"bbAa"</span>
+
+解释<span class="token operator">:</span>
+此外，<span class="token string">"bbaA"</span>也是一个有效的答案，但<span class="token string">"Aabb"</span>是不正确的。
+注意<span class="token char">'A'</span>和<span class="token char">'a'</span>被认为是两种不同的字符。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
 <li>1、如题目所说，手写一个 cmp 函数然后按照其中排序，返回其值即可。</li>
 </ul>
 </blockquote>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">string <span class="hljs-title">frequencySort</span><span class="hljs-params">(string s)</span> </span>&#123;<br>        unordered_map&lt;<span class="hljs-type">char</span>, <span class="hljs-type">int</span>&gt; up;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> i : s) up[i]++;<br>        <span class="hljs-built_in">sort</span>(s.<span class="hljs-built_in">begin</span>(), s.<span class="hljs-built_in">end</span>(), [&amp;](<span class="hljs-type">const</span> <span class="hljs-type">char</span> &amp;a, <span class="hljs-type">const</span> <span class="hljs-type">char</span> &amp;b) &#123;<br>            <span class="hljs-keyword">return</span> up[a] == up[b] ? a &gt; b : up[a] &gt; up[b];<br>        &#125;);<br>        <span class="hljs-keyword">return</span> s;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    string <span class="token function">frequencySort</span><span class="token punctuation">(</span>string s<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        unordered_map<span class="token operator">&lt;</span><span class="token keyword">char</span><span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">></span> up<span class="token punctuation">;</span>
+        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">auto</span> i <span class="token operator">:</span> s<span class="token punctuation">)</span> up<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">++</span><span class="token punctuation">;</span>
+        <span class="token function">sort</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> s<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">&amp;</span>a<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">&amp;</span>b<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">return</span> up<span class="token punctuation">[</span>a<span class="token punctuation">]</span> <span class="token operator">==</span> up<span class="token punctuation">[</span>b<span class="token punctuation">]</span> <span class="token operator">?</span> a <span class="token operator">></span> b <span class="token operator">:</span> up<span class="token punctuation">[</span>a<span class="token punctuation">]</span> <span class="token operator">></span> up<span class="token punctuation">[</span>b<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> s<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li>时间复杂度：O(logn)</li>
@@ -715,6 +761,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

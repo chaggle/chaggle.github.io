@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="">
   
-    <meta name="description" content="513. 找树左下角的值题目12345678910111213141516171819给定一个二叉树的 根节点 root，请找出该二叉树的 最底层 最左边 节点的值。假设二叉树中至少有一个节点。示例 1:输入: root &#x3D; [2,1,3]输出: 1示例 2:输入: [1,2,3,4,null,5,6,null,null,7]输出: 7提示:二叉树的节点个数的范围是 [1,104]-231 &amp;lt">
+    <meta name="description" content="513. 找树左下角的值题目给定一个二叉树的 根节点 root，请找出该二叉树的 最底层 最左边 节点的值。  假设二叉树中至少有一个节点。  示例 1:  输入: root &#x3D; [2,1,3] 输出: 1  示例 2:  输入: [1,2,3,4,null,5,6,null,null,7] 输出: 7  提示:  二叉树的节点个数的范围是 [1,104] -231 &lt;&#x3D; Node.val">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day-16 513. 找树左下角的值">
 <meta property="og:url" content="https://chaggle.github.io/2021/09/25/Leetcode/91-day/day-16/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="513. 找树左下角的值题目12345678910111213141516171819给定一个二叉树的 根节点 root，请找出该二叉树的 最底层 最左边 节点的值。假设二叉树中至少有一个节点。示例 1:输入: root &#x3D; [2,1,3]输出: 1示例 2:输入: [1,2,3,4,null,5,6,null,null,7]输出: 7提示:二叉树的节点个数的范围是 [1,104]-231 &amp;lt">
+<meta property="og:description" content="513. 找树左下角的值题目给定一个二叉树的 根节点 root，请找出该二叉树的 最底层 最左边 节点的值。  假设二叉树中至少有一个节点。  示例 1:  输入: root &#x3D; [2,1,3] 输出: 1  示例 2:  输入: [1,2,3,4,null,5,6,null,null,7] 输出: 7  提示:  二叉树的节点个数的范围是 [1,104] -231 &lt;&#x3D; Node.val">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-09-24T23:13:58.000Z">
 <meta property="article:modified_time" content="2025-03-07T02:50:09.256Z">
@@ -45,6 +45,8 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -230,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          320 字
+          341 字
         
       </span>
     
@@ -302,12 +304,86 @@
             
               <div class="markdown-body">
                 
-                <h1 id="513-找树左下角的值"><a href="#513-找树左下角的值" class="headerlink" title="513. 找树左下角的值"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/find-bottom-left-tree-value/">513. 找树左下角的值</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs cpp">给定一个二叉树的 根节点 root，请找出该二叉树的 最底层 最左边 节点的值。<br><br>假设二叉树中至少有一个节点。<br><br>示例 <span class="hljs-number">1</span>:<br><br>输入: root = [<span class="hljs-number">2</span>,<span class="hljs-number">1</span>,<span class="hljs-number">3</span>]<br>输出: <span class="hljs-number">1</span><br><br>示例 <span class="hljs-number">2</span>:<br><br>输入: [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,null,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>,null,null,<span class="hljs-number">7</span>]<br>输出: <span class="hljs-number">7</span><br><br>提示:<br><br>二叉树的节点个数的范围是 [<span class="hljs-number">1</span>,<span class="hljs-number">104</span>]<br><span class="hljs-number">-231</span> &lt;= Node.val &lt;= <span class="hljs-number">231</span> - <span class="hljs-number">1</span> <br><br></code></pre></td></tr></table></figure>
+                <h1 id="513-找树左下角的值"><a href="#513-找树左下角的值" class="headerlink" title="513. 找树左下角的值"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/find-bottom-left-tree-value/">513. 找树左下角的值</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">给定一个二叉树的 根节点 root，请找出该二叉树的 最底层 最左边 节点的值。
+
+假设二叉树中至少有一个节点。
+
+示例 <span class="token number">1</span><span class="token operator">:</span>
+
+输入<span class="token operator">:</span> root <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">]</span>
+输出<span class="token operator">:</span> <span class="token number">1</span>
+
+示例 <span class="token number">2</span><span class="token operator">:</span>
+
+输入<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">,</span>null<span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">6</span><span class="token punctuation">,</span>null<span class="token punctuation">,</span>null<span class="token punctuation">,</span><span class="token number">7</span><span class="token punctuation">]</span>
+输出<span class="token operator">:</span> <span class="token number">7</span>
+
+提示<span class="token operator">:</span>
+
+二叉树的节点个数的范围是 <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">104</span><span class="token punctuation">]</span>
+<span class="token operator">-</span><span class="token number">231</span> <span class="token operator">&lt;=</span> Node<span class="token punctuation">.</span>val <span class="token operator">&lt;=</span> <span class="token number">231</span> <span class="token operator">-</span> <span class="token number">1</span> 
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><ul>
 <li>1、DFS 与 BFS 题目，DFS 变式多，BFS 单一，更简单。</li>
 </ul>
-<h3 id="代码块。"><a href="#代码块。" class="headerlink" title="代码块。"></a>代码块。</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Definition for a binary tree node.</span><br><span class="hljs-comment"> * struct TreeNode &#123;</span><br><span class="hljs-comment"> *     int val;</span><br><span class="hljs-comment"> *     TreeNode *left;</span><br><span class="hljs-comment"> *     TreeNode *right;</span><br><span class="hljs-comment"> *     TreeNode() : val(0), left(nullptr), right(nullptr) &#123;&#125;</span><br><span class="hljs-comment"> *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) &#123;&#125;</span><br><span class="hljs-comment"> *     TreeNode(int x, TreeNode *left, TreeNode *right) : </span><br><span class="hljs-comment">        val(x), left(left), right(right) &#123;&#125;</span><br><span class="hljs-comment"> * &#125;;</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-comment">/* int findBottomLeftValue(TreeNode* root) &#123;</span><br><span class="hljs-comment">        queue&lt;TreeNode* &gt; q;</span><br><span class="hljs-comment">        if(root != NULL) q.push(root);</span><br><span class="hljs-comment">        int result = 0;</span><br><span class="hljs-comment">        while (!q.empty())</span><br><span class="hljs-comment">        &#123;</span><br><span class="hljs-comment">            int n = q.size();</span><br><span class="hljs-comment">            for (int i = 0; i &lt; n; i++)</span><br><span class="hljs-comment">            &#123;</span><br><span class="hljs-comment">                TreeNode* node = q.front();</span><br><span class="hljs-comment">                q.pop();</span><br><span class="hljs-comment">                if(i == 0) result = node-&gt;val;</span><br><span class="hljs-comment">                if(node -&gt; left != nullptr) q.push(node -&gt; left);</span><br><span class="hljs-comment">                if(node -&gt; right != nullptr) q.push(node -&gt; right);</span><br><span class="hljs-comment">            &#125;</span><br><span class="hljs-comment">        &#125;</span><br><span class="hljs-comment">        return result; */</span><br>        <span class="hljs-type">int</span> len = INT_MIN;<br>        <span class="hljs-type">int</span> value;<br>        <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(TreeNode* root, <span class="hljs-type">int</span> deep)</span></span><br><span class="hljs-function">        </span>&#123;<br>            <span class="hljs-keyword">if</span>(root != <span class="hljs-literal">nullptr</span>)<br>            &#123;<br>                <span class="hljs-keyword">if</span>(root -&gt; left == <span class="hljs-literal">nullptr</span> &amp;&amp; root -&gt; right == <span class="hljs-literal">nullptr</span>)<br>                &#123;<br>                    <span class="hljs-keyword">if</span>(deep &gt; len)<br>                    &#123;<br>                        len = deep;<br>                        value = root -&gt; val;<br>                    &#125;<br>                    <span class="hljs-keyword">return</span>;<br>                &#125;<br>                <span class="hljs-built_in">dfs</span>(root -&gt; left, deep + <span class="hljs-number">1</span>);<br>                <span class="hljs-built_in">dfs</span>(root -&gt; right, deep + <span class="hljs-number">1</span>);<br>            &#125;<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">findBottomLeftValue</span><span class="hljs-params">(TreeNode* root)</span></span><br><span class="hljs-function">    </span>&#123;<br>        <span class="hljs-built_in">dfs</span>(root, <span class="hljs-number">0</span>);<br>        <span class="hljs-keyword">return</span> value;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<h3 id="代码块。"><a href="#代码块。" class="headerlink" title="代码块。"></a>代码块。</h3><figure><div class="code-wrapper"><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">&#x2F;**
+ * Definition for a binary tree node.
+ * struct TreeNode &#123;
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) &#123;&#125;
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) &#123;&#125;
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : 
+        val(x), left(left), right(right) &#123;&#125;
+ * &#125;;
+ *&#x2F;
+class Solution &#123;
+public:
+    &#x2F;* int findBottomLeftValue(TreeNode* root) &#123;
+        queue&lt;TreeNode* &gt; q;
+        if(root !&#x3D; NULL) q.push(root);
+        int result &#x3D; 0;
+        while (!q.empty())
+        &#123;
+            int n &#x3D; q.size();
+            for (int i &#x3D; 0; i &lt; n; i++)
+            &#123;
+                TreeNode* node &#x3D; q.front();
+                q.pop();
+                if(i &#x3D;&#x3D; 0) result &#x3D; node-&gt;val;
+                if(node -&gt; left !&#x3D; nullptr) q.push(node -&gt; left);
+                if(node -&gt; right !&#x3D; nullptr) q.push(node -&gt; right);
+            &#125;
+        &#125;
+        return result; *&#x2F;
+        int len &#x3D; INT_MIN;
+        int value;
+        void dfs(TreeNode* root, int deep)
+        &#123;
+            if(root !&#x3D; nullptr)
+            &#123;
+                if(root -&gt; left &#x3D;&#x3D; nullptr &amp;&amp; root -&gt; right &#x3D;&#x3D; nullptr)
+                &#123;
+                    if(deep &gt; len)
+                    &#123;
+                        len &#x3D; deep;
+                        value &#x3D; root -&gt; val;
+                    &#125;
+                    return;
+                &#125;
+                dfs(root -&gt; left, deep + 1);
+                dfs(root -&gt; right, deep + 1);
+            &#125;
+            return;
+        &#125;
+    int findBottomLeftValue(TreeNode* root)
+    &#123;
+        dfs(root, 0);
+        return value;
+    &#125;
+&#125;;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n)</p>
@@ -715,6 +791,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

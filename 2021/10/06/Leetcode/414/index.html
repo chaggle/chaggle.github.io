@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="">
   
-    <meta name="description" content="414. 第三大的数题目1234567891011121314151617181920212223242526272829给你一个非空数组，返回此数组中 第三大的数 。如果不存在，则返回数组中最大的数。 示例 1：输入：[3, 2, 1]输出：1解释：第三大的数是 1 。示例 2：输入：[1, 2]输出：2解释：第三大的数不存在, 所以返回最大的数 2 。示例 3：输入：[2, 2, 3, 1]输">
+    <meta name="description" content="414. 第三大的数题目给你一个非空数组，返回此数组中 第三大的数 。如果不存在，则返回数组中最大的数。     示例 1：  输入：[3, 2, 1] 输出：1 解释：第三大的数是 1 。 示例 2：  输入：[1, 2] 输出：2 解释：第三大的数不存在, 所以返回最大的数 2 。 示例 3：  输入：[2, 2, 3, 1] 输出：1 解释：注意，要求返回第三大的数，是指在所有不同数字中排第">
 <meta property="og:type" content="article">
 <meta property="og:title" content="414. 第三大的数">
 <meta property="og:url" content="https://chaggle.github.io/2021/10/06/Leetcode/414/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="414. 第三大的数题目1234567891011121314151617181920212223242526272829给你一个非空数组，返回此数组中 第三大的数 。如果不存在，则返回数组中最大的数。 示例 1：输入：[3, 2, 1]输出：1解释：第三大的数是 1 。示例 2：输入：[1, 2]输出：2解释：第三大的数不存在, 所以返回最大的数 2 。示例 3：输入：[2, 2, 3, 1]输">
+<meta property="og:description" content="414. 第三大的数题目给你一个非空数组，返回此数组中 第三大的数 。如果不存在，则返回数组中最大的数。     示例 1：  输入：[3, 2, 1] 输出：1 解释：第三大的数是 1 。 示例 2：  输入：[1, 2] 输出：2 解释：第三大的数不存在, 所以返回最大的数 2 。 示例 3：  输入：[2, 2, 3, 1] 输出：1 解释：注意，要求返回第三大的数，是指在所有不同数字中排第">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-06T00:08:55.000Z">
 <meta property="article:modified_time" content="2025-03-07T02:50:09.254Z">
@@ -45,6 +45,8 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -230,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          344 字
+          345 字
         
       </span>
     
@@ -302,14 +304,54 @@
             
               <div class="markdown-body">
                 
-                <h1 id="414-第三大的数"><a href="#414-第三大的数" class="headerlink" title="414. 第三大的数"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/third-maximum-number/">414. 第三大的数</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs cpp">给你一个非空数组，返回此数组中 第三大的数 。如果不存在，则返回数组中最大的数。<br><br> <br><br>示例 <span class="hljs-number">1</span>：<br><br>输入：[<span class="hljs-number">3</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>]<br>输出：<span class="hljs-number">1</span><br>解释：第三大的数是 <span class="hljs-number">1</span> 。<br>示例 <span class="hljs-number">2</span>：<br><br>输入：[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>]<br>输出：<span class="hljs-number">2</span><br>解释：第三大的数不存在, 所以返回最大的数 <span class="hljs-number">2</span> 。<br>示例 <span class="hljs-number">3</span>：<br><br>输入：[<span class="hljs-number">2</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">1</span>]<br>输出：<span class="hljs-number">1</span><br>解释：注意，要求返回第三大的数，是指在所有不同数字中排第三大的数。<br>此例中存在两个值为 <span class="hljs-number">2</span> 的数，它们都排第二。在所有不同数字中排第三大的数为 <span class="hljs-number">1</span> 。<br> <br><br>提示：<br><br><span class="hljs-number">1</span> &lt;= nums.length &lt;= <span class="hljs-number">104</span><br><span class="hljs-number">-231</span> &lt;= nums[i] &lt;= <span class="hljs-number">231</span> - <span class="hljs-number">1</span><br> <br><br>进阶：你能设计一个时间复杂度 <span class="hljs-built_in">O</span>(n) 的解决方案吗？<br></code></pre></td></tr></table></figure>
+                <h1 id="414-第三大的数"><a href="#414-第三大的数" class="headerlink" title="414. 第三大的数"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/third-maximum-number/">414. 第三大的数</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">给你一个非空数组，返回此数组中 第三大的数 。如果不存在，则返回数组中最大的数。
+
+ 
+
+示例 <span class="token number">1</span>：
+
+输入：<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span>
+输出：<span class="token number">1</span>
+解释：第三大的数是 <span class="token number">1</span> 。
+示例 <span class="token number">2</span>：
+
+输入：<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span>
+输出：<span class="token number">2</span>
+解释：第三大的数不存在<span class="token punctuation">,</span> 所以返回最大的数 <span class="token number">2</span> 。
+示例 <span class="token number">3</span>：
+
+输入：<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span>
+输出：<span class="token number">1</span>
+解释：注意，要求返回第三大的数，是指在所有不同数字中排第三大的数。
+此例中存在两个值为 <span class="token number">2</span> 的数，它们都排第二。在所有不同数字中排第三大的数为 <span class="token number">1</span> 。
+ 
+
+提示：
+
+<span class="token number">1</span> <span class="token operator">&lt;=</span> nums<span class="token punctuation">.</span>length <span class="token operator">&lt;=</span> <span class="token number">104</span>
+<span class="token operator">-</span><span class="token number">231</span> <span class="token operator">&lt;=</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&lt;=</span> <span class="token number">231</span> <span class="token operator">-</span> <span class="token number">1</span>
+ 
+
+进阶：你能设计一个时间复杂度 <span class="token function">O</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span> 的解决方案吗？<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
 <li>set存储唯一值，然后维护一个最多为三的set容器即可，虽然时间会慢一点，但是理解相当简单，当然也能手撕一个最大堆，由于时间关系，考研完后（明年1月1开搞）！到时候会回来更新内容</li>
 </ul>
 </blockquote>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">thirdMax</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>        set&lt;<span class="hljs-type">int</span>&gt; st;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> i : nums)<br>        &#123;<br>            st.<span class="hljs-built_in">insert</span> (i);<br>            <span class="hljs-keyword">if</span>(st.<span class="hljs-built_in">size</span>() &gt; <span class="hljs-number">3</span>) st.<span class="hljs-built_in">erase</span>(st.<span class="hljs-built_in">begin</span>());<br>        &#125;<br>        <span class="hljs-keyword">if</span>(st.<span class="hljs-built_in">size</span>() == <span class="hljs-number">3</span>) <span class="hljs-keyword">return</span> *st.<span class="hljs-built_in">begin</span>();<br>        <span class="hljs-keyword">return</span> *st.<span class="hljs-built_in">rbegin</span>();<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">class Solution &#123;
+public:
+    int thirdMax(vector&lt;int&gt;&amp; nums) &#123;
+        set&lt;int&gt; st;
+        for(auto i : nums)
+        &#123;
+            st.insert (i);
+            if(st.size() &gt; 3) st.erase(st.begin());
+        &#125;
+        if(st.size() &#x3D;&#x3D; 3) return *st.begin();
+        return *st.rbegin();
+    &#125;
+&#125;;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(nlogn)</p>
@@ -717,6 +759,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

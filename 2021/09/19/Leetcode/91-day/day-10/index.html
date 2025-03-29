@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="">
   
-    <meta name="description" content="160. 相交链表题目12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849给你两个单链表的头节点 headA 和 headB ，请你找出并返回两个单链表相交的起始节点。如果两个链表没有交点，返回 null 。图示两个链表在节点 c1 开始相交：题目数据 保证 整个链式结构中">
+    <meta name="description" content="160. 相交链表题目给你两个单链表的头节点 headA 和 headB ，  请你找出并返回两个单链表相交的起始节点。如果两个链表没有交点，返回 null 。  图示两个链表在节点 c1 开始相交：  题目数据 保证 整个链式结构中不存在环。  注意，函数返回结果后，链表必须 保持其原始结构 。  示例 1：   输入：intersectVal &#x3D; 8, listA &#x3D; [4,1,8,4,5],">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day-10 160. 相交链表">
 <meta property="og:url" content="https://chaggle.github.io/2021/09/19/Leetcode/91-day/day-10/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="160. 相交链表题目12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849给你两个单链表的头节点 headA 和 headB ，请你找出并返回两个单链表相交的起始节点。如果两个链表没有交点，返回 null 。图示两个链表在节点 c1 开始相交：题目数据 保证 整个链式结构中">
+<meta property="og:description" content="160. 相交链表题目给你两个单链表的头节点 headA 和 headB ，  请你找出并返回两个单链表相交的起始节点。如果两个链表没有交点，返回 null 。  图示两个链表在节点 c1 开始相交：  题目数据 保证 整个链式结构中不存在环。  注意，函数返回结果后，链表必须 保持其原始结构 。  示例 1：   输入：intersectVal &#x3D; 8, listA &#x3D; [4,1,8,4,5],">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-09-19T00:17:31.000Z">
 <meta property="article:modified_time" content="2025-03-07T02:50:09.255Z">
@@ -45,6 +45,8 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -230,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          717 字
+          739 字
         
       </span>
     
@@ -241,7 +243,7 @@
         
         
         
-          6 分钟
+          7 分钟
         
       </span>
     
@@ -302,14 +304,99 @@
             
               <div class="markdown-body">
                 
-                <h1 id="160-相交链表"><a href="#160-相交链表" class="headerlink" title="160. 相交链表"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/intersection-of-two-linked-lists/">160. 相交链表</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs cpp">给你两个单链表的头节点 headA 和 headB ，<br><br>请你找出并返回两个单链表相交的起始节点。如果两个链表没有交点，返回 null 。<br><br>图示两个链表在节点 c1 开始相交：<br><br>题目数据 保证 整个链式结构中不存在环。<br><br>注意，函数返回结果后，链表必须 保持其原始结构 。<br><br>示例 <span class="hljs-number">1</span>：<br><br><br>输入：intersectVal = <span class="hljs-number">8</span>, listA = [<span class="hljs-number">4</span>,<span class="hljs-number">1</span>,<span class="hljs-number">8</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>], listB = [<span class="hljs-number">5</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">8</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>], skipA = <span class="hljs-number">2</span>, skipB = <span class="hljs-number">3</span><br>输出：Intersected at <span class="hljs-string">&#x27;8&#x27;</span><br>解释：相交节点的值为 <span class="hljs-number">8</span> （注意，如果两个链表相交则不能为 <span class="hljs-number">0</span>）。<br>从各自的表头开始算起，链表 A 为 [<span class="hljs-number">4</span>,<span class="hljs-number">1</span>,<span class="hljs-number">8</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>]，链表 B 为 [<span class="hljs-number">5</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">8</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>]。<br>在 A 中，相交节点前有 <span class="hljs-number">2</span> 个节点；在 B 中，相交节点前有 <span class="hljs-number">3</span> 个节点。<br>示例 <span class="hljs-number">2</span>：<br><br><br>输入：intersectVal = <span class="hljs-number">2</span>, listA = [<span class="hljs-number">0</span>,<span class="hljs-number">9</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">4</span>], listB = [<span class="hljs-number">3</span>,<span class="hljs-number">2</span>,<span class="hljs-number">4</span>], skipA = <span class="hljs-number">3</span>, skipB = <span class="hljs-number">1</span><br>输出：Intersected at <span class="hljs-string">&#x27;2&#x27;</span><br>解释：相交节点的值为 <span class="hljs-number">2</span> （注意，如果两个链表相交则不能为 <span class="hljs-number">0</span>）。<br>从各自的表头开始算起，链表 A 为 [<span class="hljs-number">0</span>,<span class="hljs-number">9</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">4</span>]，链表 B 为 [<span class="hljs-number">3</span>,<span class="hljs-number">2</span>,<span class="hljs-number">4</span>]。<br>在 A 中，相交节点前有 <span class="hljs-number">3</span> 个节点；在 B 中，相交节点前有 <span class="hljs-number">1</span> 个节点。<br>示例 <span class="hljs-number">3</span>：<br><br><br>输入：intersectVal = <span class="hljs-number">0</span>, listA = [<span class="hljs-number">2</span>,<span class="hljs-number">6</span>,<span class="hljs-number">4</span>], listB = [<span class="hljs-number">1</span>,<span class="hljs-number">5</span>], skipA = <span class="hljs-number">3</span>, skipB = <span class="hljs-number">2</span><br>输出：null<br>解释：从各自的表头开始算起，链表 A 为 [<span class="hljs-number">2</span>,<span class="hljs-number">6</span>,<span class="hljs-number">4</span>]，链表 B 为 [<span class="hljs-number">1</span>,<span class="hljs-number">5</span>]。<br>由于这两个链表不相交，所以 intersectVal 必须为 <span class="hljs-number">0</span>，而 skipA 和 skipB 可以是任意值。<br>这两个链表不相交，因此返回 null 。<br> <br><br>提示：<br><br>listA 中节点数目为 m<br>listB 中节点数目为 n<br><span class="hljs-number">0</span> &lt;= m, n &lt;= <span class="hljs-number">3</span> * <span class="hljs-number">104</span><br><span class="hljs-number">1</span> &lt;= Node.val &lt;= <span class="hljs-number">105</span><br><span class="hljs-number">0</span> &lt;= skipA &lt;= m<br><span class="hljs-number">0</span> &lt;= skipB &lt;= n<br>如果 listA 和 listB 没有交点，intersectVal 为 <span class="hljs-number">0</span><br>如果 listA 和 listB 有交点，intersectVal == listA[skipA + <span class="hljs-number">1</span>] == listB[skipB + <span class="hljs-number">1</span>]<br> <br><br>进阶：你能否设计一个时间复杂度 <span class="hljs-built_in">O</span>(n) 、仅用 <span class="hljs-built_in">O</span>(<span class="hljs-number">1</span>) 内存的解决方案？<br></code></pre></td></tr></table></figure>
+                <h1 id="160-相交链表"><a href="#160-相交链表" class="headerlink" title="160. 相交链表"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/intersection-of-two-linked-lists/">160. 相交链表</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">给你两个单链表的头节点 headA 和 headB ，
+
+请你找出并返回两个单链表相交的起始节点。如果两个链表没有交点，返回 null 。
+
+图示两个链表在节点 c1 开始相交：
+
+题目数据 保证 整个链式结构中不存在环。
+
+注意，函数返回结果后，链表必须 保持其原始结构 。
+
+示例 <span class="token number">1</span>：
+
+
+输入：intersectVal <span class="token operator">=</span> <span class="token number">8</span><span class="token punctuation">,</span> listA <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">,</span> listB <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">,</span> skipA <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">,</span> skipB <span class="token operator">=</span> <span class="token number">3</span>
+输出：Intersected at <span class="token char">'8'</span>
+解释：相交节点的值为 <span class="token number">8</span> （注意，如果两个链表相交则不能为 <span class="token number">0</span>）。
+从各自的表头开始算起，链表 A 为 <span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">]</span>，链表 B 为 <span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">]</span>。
+在 A 中，相交节点前有 <span class="token number">2</span> 个节点；在 B 中，相交节点前有 <span class="token number">3</span> 个节点。
+示例 <span class="token number">2</span>：
+
+
+输入：intersectVal <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">,</span> listA <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">9</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">,</span> listB <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">,</span> skipA <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">,</span> skipB <span class="token operator">=</span> <span class="token number">1</span>
+输出：Intersected at <span class="token char">'2'</span>
+解释：相交节点的值为 <span class="token number">2</span> （注意，如果两个链表相交则不能为 <span class="token number">0</span>）。
+从各自的表头开始算起，链表 A 为 <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">9</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">]</span>，链表 B 为 <span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">]</span>。
+在 A 中，相交节点前有 <span class="token number">3</span> 个节点；在 B 中，相交节点前有 <span class="token number">1</span> 个节点。
+示例 <span class="token number">3</span>：
+
+
+输入：intersectVal <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> listA <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">6</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">,</span> listB <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">,</span> skipA <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">,</span> skipB <span class="token operator">=</span> <span class="token number">2</span>
+输出：null
+解释：从各自的表头开始算起，链表 A 为 <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">6</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">]</span>，链表 B 为 <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">]</span>。
+由于这两个链表不相交，所以 intersectVal 必须为 <span class="token number">0</span>，而 skipA 和 skipB 可以是任意值。
+这两个链表不相交，因此返回 null 。
+ 
+
+提示：
+
+listA 中节点数目为 m
+listB 中节点数目为 n
+<span class="token number">0</span> <span class="token operator">&lt;=</span> m<span class="token punctuation">,</span> n <span class="token operator">&lt;=</span> <span class="token number">3</span> <span class="token operator">*</span> <span class="token number">104</span>
+<span class="token number">1</span> <span class="token operator">&lt;=</span> Node<span class="token punctuation">.</span>val <span class="token operator">&lt;=</span> <span class="token number">105</span>
+<span class="token number">0</span> <span class="token operator">&lt;=</span> skipA <span class="token operator">&lt;=</span> m
+<span class="token number">0</span> <span class="token operator">&lt;=</span> skipB <span class="token operator">&lt;=</span> n
+如果 listA 和 listB 没有交点，intersectVal 为 <span class="token number">0</span>
+如果 listA 和 listB 有交点，intersectVal <span class="token operator">==</span> listA<span class="token punctuation">[</span>skipA <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">==</span> listB<span class="token punctuation">[</span>skipB <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span>
+ 
+
+进阶：你能否设计一个时间复杂度 <span class="token function">O</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span> 、仅用 <span class="token function">O</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> 内存的解决方案？<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><ul>
 <li>1、经典双指针问题，如果A、B中有一个为空，则无交点。</li>
 <li>2、如果相交则不用证明其正确信，不相交则相互遍历到最终的结果都为nullptr，经过 m + n次。</li>
 <li>3、哈希表好理解一些，当计数count函数出现q时候，即可返回相交节点值，否则返回nullptr</li>
 </ul>
-<h3 id="代码块。"><a href="#代码块。" class="headerlink" title="代码块。"></a>代码块。</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Definition for singly-linked list.</span><br><span class="hljs-comment"> * struct ListNode &#123;</span><br><span class="hljs-comment"> *     int val;</span><br><span class="hljs-comment"> *     ListNode *next;</span><br><span class="hljs-comment"> *     ListNode(int x) : val(x), next(NULL) &#123;&#125;</span><br><span class="hljs-comment"> * &#125;;</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">ListNode *<span class="hljs-title">getIntersectionNode</span><span class="hljs-params">(ListNode *headA, ListNode *headB)</span> </span>&#123;<br>        <span class="hljs-comment">/* if(headA == nullptr || headB == nullptr) return nullptr;</span><br><span class="hljs-comment">        ListNode* p = headA;</span><br><span class="hljs-comment">        ListNode* q = headB;</span><br><span class="hljs-comment">        while(p != q)</span><br><span class="hljs-comment">        &#123;</span><br><span class="hljs-comment">            p = p == nullptr ? headB : p -&gt; next; </span><br><span class="hljs-comment">            q = q == nullptr ? headA : q -&gt; next;</span><br><span class="hljs-comment">        &#125;</span><br><span class="hljs-comment">        return p; */</span><br>        <span class="hljs-keyword">if</span>(headA == <span class="hljs-literal">nullptr</span> || headB == <span class="hljs-literal">nullptr</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">nullptr</span>;<br>        unordered_set&lt;ListNode* &gt; vis;<br>        ListNode* p = headA;<br>        ListNode* q = headB;<br>        <span class="hljs-keyword">while</span>(p != <span class="hljs-literal">nullptr</span>)<br>        &#123;<br>            vis.<span class="hljs-built_in">insert</span>(p);<br>            p = p -&gt; next;<br>        &#125;<br><br>        <span class="hljs-keyword">while</span>(q != <span class="hljs-literal">nullptr</span>)<br>        &#123;<br>            <span class="hljs-keyword">if</span>(vis.<span class="hljs-built_in">count</span>(q)) <span class="hljs-keyword">return</span> q;<br>            q = q -&gt; next;<br>        &#125;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">nullptr</span>;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<h3 id="代码块。"><a href="#代码块。" class="headerlink" title="代码块。"></a>代码块。</h3><figure><div class="code-wrapper"><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">&#x2F;**
+ * Definition for singly-linked list.
+ * struct ListNode &#123;
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) &#123;&#125;
+ * &#125;;
+ *&#x2F;
+class Solution &#123;
+public:
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) &#123;
+        &#x2F;* if(headA &#x3D;&#x3D; nullptr || headB &#x3D;&#x3D; nullptr) return nullptr;
+        ListNode* p &#x3D; headA;
+        ListNode* q &#x3D; headB;
+        while(p !&#x3D; q)
+        &#123;
+            p &#x3D; p &#x3D;&#x3D; nullptr ? headB : p -&gt; next; 
+            q &#x3D; q &#x3D;&#x3D; nullptr ? headA : q -&gt; next;
+        &#125;
+        return p; *&#x2F;
+        if(headA &#x3D;&#x3D; nullptr || headB &#x3D;&#x3D; nullptr) return nullptr;
+        unordered_set&lt;ListNode* &gt; vis;
+        ListNode* p &#x3D; headA;
+        ListNode* q &#x3D; headB;
+        while(p !&#x3D; nullptr)
+        &#123;
+            vis.insert(p);
+            p &#x3D; p -&gt; next;
+        &#125;
+
+        while(q !&#x3D; nullptr)
+        &#123;
+            if(vis.count(q)) return q;
+            q &#x3D; q -&gt; next;
+        &#125;
+        return nullptr;
+    &#125;
+&#125;;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n)、哈希表也是O(n);</p>
@@ -717,6 +804,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

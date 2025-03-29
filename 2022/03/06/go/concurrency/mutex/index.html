@@ -50,6 +50,8 @@
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
 
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
 
@@ -318,7 +320,46 @@
 </ul>
 <p>如下图所示</p>
 <p><img src="/images/go/mutex1.png" srcset="/img/loading.gif" lazyload alt="go-concurrency1"></p>
-<h3 id="初版-mutex-的实现"><a href="#初版-mutex-的实现" class="headerlink" title="初版 mutex 的实现"></a>初版 mutex 的实现</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-number">2008</span> 年时候， Russ Cox 提交的第一版的 mutex 如下所示<br><br><span class="hljs-comment">//CAS 操作，当时并未抽象出 atomic 原子包</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">cas</span><span class="hljs-params">(val *<span class="hljs-type">int32</span>, old, <span class="hljs-built_in">new</span> <span class="hljs-type">int32</span>)</span></span> <span class="hljs-type">bool</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">semacquire</span><span class="hljs-params">(*<span class="hljs-type">int32</span>)</span></span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">semrelease</span><span class="hljs-params">(*<span class="hljs-type">int32</span>)</span></span><br><br><span class="hljs-keyword">type</span> Mutex <span class="hljs-keyword">struct</span> &#123;<br>    <span class="hljs-comment">//锁是否被持有</span><br>    key <span class="hljs-type">int32</span><br>    <br>    <span class="hljs-comment">//信号量专用，用于阻塞/唤醒 G </span><br>    sema <span class="hljs-type">int32</span><br>&#125;<br><br><span class="hljs-comment">//保证成功在 val 上添加 delta 的值</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">xadd</span><span class="hljs-params">(val *<span class="hljs-type">int32</span>, delta <span class="hljs-type">int32</span>)</span></span> (<span class="hljs-built_in">new</span> <span class="hljs-type">int32</span>) &#123;<br>    <span class="hljs-keyword">for</span> &#123;<br>        v := *val<br>        <span class="hljs-keyword">if</span> cas(val, v, v + delta) &#123;<br>            <span class="hljs-keyword">return</span> v + delta<br>        &#125;<br>    &#125;<br>    <span class="hljs-built_in">panic</span>(<span class="hljs-string">&quot;unreached&quot;</span>)<br>&#125;<br><br><span class="hljs-comment">//请求锁</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m *Mutex)</span></span> Lock() &#123;<br>    <span class="hljs-keyword">if</span> xadd(&amp;m.key, <span class="hljs-number">1</span>) == <span class="hljs-number">1</span> &#123; <span class="hljs-comment">// 标识加 1，如果为 1，则获取到锁</span><br>        <span class="hljs-keyword">return</span><br>    &#125;<br>    semacquire(&amp;m.sema) <span class="hljs-comment">//否则阻塞等待</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m *Mutex)</span></span> Unlock() &#123;<br>    <span class="hljs-keyword">if</span> xadd(&amp;m.key, <span class="hljs-number">-1</span>) == <span class="hljs-number">0</span> &#123;<span class="hljs-comment">// 标识减 1，如果为 0，则没有其他的等待者</span><br>        <span class="hljs-keyword">return</span><br>    &#125;<br>    semarelease(&amp;m.sema) <span class="hljs-comment">//唤醒其他的 G     </span><br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="初版-mutex-的实现"><a href="#初版-mutex-的实现" class="headerlink" title="初版 mutex 的实现"></a>初版 mutex 的实现</h3><figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token number">2008</span> 年时候， Russ Cox 提交的第一版的 mutex 如下所示
+
+<span class="token comment">//CAS 操作，当时并未抽象出 atomic 原子包</span>
+<span class="token keyword">func</span> <span class="token function">cas</span><span class="token punctuation">(</span>val <span class="token operator">*</span><span class="token builtin">int32</span><span class="token punctuation">,</span> old<span class="token punctuation">,</span> <span class="token builtin">new</span> <span class="token builtin">int32</span><span class="token punctuation">)</span> <span class="token builtin">bool</span>
+<span class="token keyword">func</span> <span class="token function">semacquire</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token builtin">int32</span><span class="token punctuation">)</span>
+<span class="token keyword">func</span> <span class="token function">semrelease</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token builtin">int32</span><span class="token punctuation">)</span>
+
+<span class="token keyword">type</span> Mutex <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">//锁是否被持有</span>
+    key <span class="token builtin">int32</span>
+    
+    <span class="token comment">//信号量专用，用于阻塞/唤醒 G </span>
+    sema <span class="token builtin">int32</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">//保证成功在 val 上添加 delta 的值</span>
+<span class="token keyword">func</span> <span class="token function">xadd</span><span class="token punctuation">(</span>val <span class="token operator">*</span><span class="token builtin">int32</span><span class="token punctuation">,</span> delta <span class="token builtin">int32</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token builtin">new</span> <span class="token builtin">int32</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
+        v <span class="token operator">:=</span> <span class="token operator">*</span>val
+        <span class="token keyword">if</span> <span class="token function">cas</span><span class="token punctuation">(</span>val<span class="token punctuation">,</span> v<span class="token punctuation">,</span> v <span class="token operator">+</span> delta<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">return</span> v <span class="token operator">+</span> delta
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token function">panic</span><span class="token punctuation">(</span><span class="token string">"unreached"</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">//请求锁</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>Mutex<span class="token punctuation">)</span> <span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token function">xadd</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>m<span class="token punctuation">.</span>key<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">1</span> <span class="token punctuation">&#123;</span> <span class="token comment">// 标识加 1，如果为 1，则获取到锁</span>
+        <span class="token keyword">return</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token function">semacquire</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>m<span class="token punctuation">.</span>sema<span class="token punctuation">)</span> <span class="token comment">//否则阻塞等待</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>Mutex<span class="token punctuation">)</span> <span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token function">xadd</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>m<span class="token punctuation">.</span>key<span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">&#123;</span><span class="token comment">// 标识减 1，如果为 0，则没有其他的等待者</span>
+        <span class="token keyword">return</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token function">semarelease</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>m<span class="token punctuation">.</span>sema<span class="token punctuation">)</span> <span class="token comment">//唤醒其他的 G     </span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>· 其中，CAS 为一种指令，即将给定的值与内存地址中的值进行相比较，如果是同一个值，就用新值替换内存地址中的旧值。而且 CAS 操作指令是原子性的指令(即数据库中原子性的概念，修改不了数据，事务回滚到修改之前的数据，数据不改变)</p>
 <p><img src="/images/go/mutex2.png%22" srcset="/img/loading.gif" lazyload></p>
@@ -331,13 +372,51 @@
 </blockquote>
 <p>缺点：请求锁时候，G 会排队等待获取互斥锁，虽然看起来挺公平的，但是从性能上来看，并非最优的解法。如果能将锁让给正在用 CPU 时间片的 G 的话，就不需要做上下文的切换，在高并发的情况下，可能会有更好的性能。</p>
 <h3 id="“给新人机会”-阶段"><a href="#“给新人机会”-阶段" class="headerlink" title="“给新人机会” 阶段"></a>“给新人机会” 阶段</h3><p>2011 年 6 月 30 日，Go 语言开发者在 commit 中对 Mutex 做了一次大调整，调整后的 Mutex 实现如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Mutex <span class="hljs-keyword">struct</span> &#123;<br>    state <span class="hljs-type">int32</span><br>    sema <span class="hljs-type">uint32</span><br>&#125;<br><br><span class="hljs-keyword">const</span> (<br>    mutexLock = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-literal">iota</span> <span class="hljs-comment">//mutex is locked </span><br>    mutexWoken<br>    mutexWaiterShift = <span class="hljs-literal">iota</span><br>)<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">type</span> Mutex <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+    state <span class="token builtin">int32</span>
+    sema <span class="token builtin">uint32</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">const</span> <span class="token punctuation">(</span>
+    mutexLock <span class="token operator">=</span> <span class="token number">1</span> <span class="token operator">&lt;&lt;</span> <span class="token boolean">iota</span> <span class="token comment">//mutex is locked </span>
+    mutexWoken
+    mutexWaiterShift <span class="token operator">=</span> <span class="token boolean">iota</span>
+<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>其中 Mutex 此版本的设计思想为将第一个 int32 类型的 state 字段，划算为二进制，按二进制的位数进行区分，如下图：</p>
 <p><img src="/images/go/mutex3.png" srcset="/img/loading.gif" lazyload></p>
 <p>这样可能以最小的内存来实现互斥锁结构，最低位表示锁是否被占有(1|0 占有|非占有)，次低位表示锁是否有被唤醒的 G，其余 30 位表示等待此锁的 G 的数量。与计算机网络的子网划分很相似的设计，一个数值，分为三部分，代表三个意义。</p>
 <p>并且因为 atomic 原子性包的添加，请求锁Lock也变复杂了，。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m *Mutex)</span></span> Lock() &#123;<br>    <span class="hljs-comment">//Fast path : 幸运 case，能够直接获取到相应的锁</span><br>    <span class="hljs-keyword">if</span> atomic.CompareAndSwapInt32(&amp;m.state, <span class="hljs-number">0</span>, mutexLocked) &#123;<br>        <span class="hljs-keyword">return</span><br>    &#125;<br>    <br>    awoke := <span class="hljs-literal">false</span><br>    <span class="hljs-keyword">for</span> &#123;<br>        old := m.state<br>        <span class="hljs-built_in">new</span> := old | mutexLocked <span class="hljs-comment">//新状态加锁</span><br>        <span class="hljs-keyword">if</span> old &amp; mutexLocked != <span class="hljs-number">0</span> &#123;<br>            <span class="hljs-built_in">new</span> = old + <span class="hljs-number">1</span> &lt;&lt; mutexWaiterShift <span class="hljs-comment">//等待者数量加一</span><br>        &#125;<br>        <br>        <span class="hljs-keyword">if</span> awoke &#123;<br>            <span class="hljs-comment">//G 是被唤醒的</span><br>            <span class="hljs-comment">//新状态清除唤醒标志</span><br>            <span class="hljs-built_in">new</span> &amp;^ = mutexWoken<br>        &#125;<br>        <br>        <span class="hljs-keyword">if</span> atomic.CompareAndSwapInt32(&amp;m.state, old, <span class="hljs-built_in">new</span>) &#123;<span class="hljs-comment">//设置新状态</span><br>            <span class="hljs-keyword">if</span> old &amp; mutexUnlocked == <span class="hljs-number">0</span> &#123; <span class="hljs-comment">//锁原状态未加锁</span><br>                <span class="hljs-keyword">break</span><br>            &#125;<br>            runtime.Semacquire(&amp;m.sema) <span class="hljs-comment">//请求信号量</span><br>            awoke = <span class="hljs-literal">true</span><br>        &#125;<br>    &#125;<br>&#125; <br>设计包含大量的位运算，要联系 Go 语言的位运算优先级进行思考。<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>Mutex<span class="token punctuation">)</span> <span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">//Fast path : 幸运 case，能够直接获取到相应的锁</span>
+    <span class="token keyword">if</span> atomic<span class="token punctuation">.</span><span class="token function">CompareAndSwapInt32</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>m<span class="token punctuation">.</span>state<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> mutexLocked<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span>
+    <span class="token punctuation">&#125;</span>
+    
+    awoke <span class="token operator">:=</span> <span class="token boolean">false</span>
+    <span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
+        old <span class="token operator">:=</span> m<span class="token punctuation">.</span>state
+        <span class="token builtin">new</span> <span class="token operator">:=</span> old <span class="token operator">|</span> mutexLocked <span class="token comment">//新状态加锁</span>
+        <span class="token keyword">if</span> old <span class="token operator">&amp;</span> mutexLocked <span class="token operator">!=</span> <span class="token number">0</span> <span class="token punctuation">&#123;</span>
+            <span class="token builtin">new</span> <span class="token operator">=</span> old <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">&lt;&lt;</span> mutexWaiterShift <span class="token comment">//等待者数量加一</span>
+        <span class="token punctuation">&#125;</span>
+        
+        <span class="token keyword">if</span> awoke <span class="token punctuation">&#123;</span>
+            <span class="token comment">//G 是被唤醒的</span>
+            <span class="token comment">//新状态清除唤醒标志</span>
+            <span class="token builtin">new</span> <span class="token operator">&amp;^</span> <span class="token operator">=</span> mutexWoken
+        <span class="token punctuation">&#125;</span>
+        
+        <span class="token keyword">if</span> atomic<span class="token punctuation">.</span><span class="token function">CompareAndSwapInt32</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>m<span class="token punctuation">.</span>state<span class="token punctuation">,</span> old<span class="token punctuation">,</span> <span class="token builtin">new</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token comment">//设置新状态</span>
+            <span class="token keyword">if</span> old <span class="token operator">&amp;</span> mutexUnlocked <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">&#123;</span> <span class="token comment">//锁原状态未加锁</span>
+                <span class="token keyword">break</span>
+            <span class="token punctuation">&#125;</span>
+            runtime<span class="token punctuation">.</span><span class="token function">Semacquire</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>m<span class="token punctuation">.</span>sema<span class="token punctuation">)</span> <span class="token comment">//请求信号量</span>
+            awoke <span class="token operator">=</span> <span class="token boolean">true</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span> 
+设计包含大量的位运算，要联系 Go 语言的位运算优先级进行思考。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="使用-mutex-的一些注意事项"><a href="#使用-mutex-的一些注意事项" class="headerlink" title="使用 mutex 的一些注意事项"></a>使用 mutex 的一些注意事项</h2><p>1、能不用 mutex, 尽量不用 mutex, 使用读写锁合适</p>
 <p>2、尽量使用 defer 释放锁，防止因为 panic 而导致锁未释放</p>
@@ -743,6 +822,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

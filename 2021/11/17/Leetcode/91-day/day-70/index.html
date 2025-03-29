@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="">
   
-    <meta name="description" content="932. 漂亮数组题目12345678910111213141516171819202122232425对于某些固定的 N，如果数组 A 是整数 1, 2, ..., N 组成的排列，使得：对于每个 i &lt; j，都不存在 k 满足 i &lt; k &lt; j 使得 A[k] * 2 &#x3D; A[i] + A[j]。那么数组 A 是漂亮数组。 给定 N，返回任意漂亮数组 A（保证存在一个）。">
+    <meta name="description" content="932. 漂亮数组题目对于某些固定的 N，如果数组 A 是整数 1, 2, ..., N 组成的排列，使得：  对于每个 i &lt; j，都不存在 k 满足 i &lt; k &lt; j 使得 A[k] * 2 &#x3D; A[i] + A[j]。  那么数组 A 是漂亮数组。     给定 N，返回任意漂亮数组 A（保证存在一个）。     示例 1：  输入：4 输出：[2,1,4,3] 示例 2">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day 70 932. 漂亮数组">
 <meta property="og:url" content="https://chaggle.github.io/2021/11/17/Leetcode/91-day/day-70/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="932. 漂亮数组题目12345678910111213141516171819202122232425对于某些固定的 N，如果数组 A 是整数 1, 2, ..., N 组成的排列，使得：对于每个 i &lt; j，都不存在 k 满足 i &lt; k &lt; j 使得 A[k] * 2 &#x3D; A[i] + A[j]。那么数组 A 是漂亮数组。 给定 N，返回任意漂亮数组 A（保证存在一个）。">
+<meta property="og:description" content="932. 漂亮数组题目对于某些固定的 N，如果数组 A 是整数 1, 2, ..., N 组成的排列，使得：  对于每个 i &lt; j，都不存在 k 满足 i &lt; k &lt; j 使得 A[k] * 2 &#x3D; A[i] + A[j]。  那么数组 A 是漂亮数组。     给定 N，返回任意漂亮数组 A（保证存在一个）。     示例 1：  输入：4 输出：[2,1,4,3] 示例 2">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-11-17T08:20:21.000Z">
 <meta property="article:modified_time" content="2025-03-07T02:50:09.261Z">
@@ -45,6 +45,8 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -230,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          196 字
+          194 字
         
       </span>
     
@@ -302,14 +304,49 @@
             
               <div class="markdown-body">
                 
-                <h1 id="932-漂亮数组"><a href="#932-漂亮数组" class="headerlink" title="932. 漂亮数组"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/beautiful-array/">932. 漂亮数组</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs cpp">对于某些固定的 N，如果数组 A 是整数 <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, ..., N 组成的排列，使得：<br><br>对于每个 i &lt; j，都不存在 k 满足 i &lt; k &lt; j 使得 A[k] * <span class="hljs-number">2</span> = A[i] + A[j]。<br><br>那么数组 A 是漂亮数组。<br><br> <br><br>给定 N，返回任意漂亮数组 A（保证存在一个）。<br><br> <br><br>示例 <span class="hljs-number">1</span>：<br><br>输入：<span class="hljs-number">4</span><br>输出：[<span class="hljs-number">2</span>,<span class="hljs-number">1</span>,<span class="hljs-number">4</span>,<span class="hljs-number">3</span>]<br>示例 <span class="hljs-number">2</span>：<br><br>输入：<span class="hljs-number">5</span><br>输出：[<span class="hljs-number">3</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">5</span>,<span class="hljs-number">4</span>]<br> <br><br>提示：<br><br><span class="hljs-number">1</span> &lt;= N &lt;= <span class="hljs-number">1000</span><br></code></pre></td></tr></table></figure>
+                <h1 id="932-漂亮数组"><a href="#932-漂亮数组" class="headerlink" title="932. 漂亮数组"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/beautiful-array/">932. 漂亮数组</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">对于某些固定的 N，如果数组 A 是整数 <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">,</span> N 组成的排列，使得：
+
+对于每个 i <span class="token operator">&lt;</span> j，都不存在 k 满足 i <span class="token operator">&lt;</span> k <span class="token operator">&lt;</span> j 使得 A<span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token number">2</span> <span class="token operator">=</span> A<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> A<span class="token punctuation">[</span>j<span class="token punctuation">]</span>。
+
+那么数组 A 是漂亮数组。
+
+ 
+
+给定 N，返回任意漂亮数组 A（保证存在一个）。
+
+ 
+
+示例 <span class="token number">1</span>：
+
+输入：<span class="token number">4</span>
+输出：<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">]</span>
+示例 <span class="token number">2</span>：
+
+输入：<span class="token number">5</span>
+输出：<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">]</span>
+ 
+
+提示：
+
+<span class="token number">1</span> <span class="token operator">&lt;=</span> N <span class="token operator">&lt;=</span> <span class="token number">1000</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
 <li>1、分治法的逻辑题目。</li>
 </ul>
 </blockquote>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">beautifulArray</span><span class="hljs-params">(<span class="hljs-type">int</span> n)</span> </span>&#123;<br>        <span class="hljs-keyword">if</span>(n == <span class="hljs-number">1</span>) <span class="hljs-keyword">return</span> &#123;<span class="hljs-number">1</span>&#125;;<br>        <span class="hljs-keyword">auto</span> l = <span class="hljs-built_in">beautifulArray</span>((n + <span class="hljs-number">1</span>) / <span class="hljs-number">2</span>);<br>        <span class="hljs-keyword">auto</span> r = <span class="hljs-built_in">beautifulArray</span>(n / <span class="hljs-number">2</span>);<br>        vector&lt;<span class="hljs-type">int</span>&gt; ans;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> x : l) ans.<span class="hljs-built_in">push_back</span>(<span class="hljs-number">2</span> * x - <span class="hljs-number">1</span>);<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> x : r) ans.<span class="hljs-built_in">push_back</span>(<span class="hljs-number">2</span> * x);<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> <span class="token function">beautifulArray</span><span class="token punctuation">(</span><span class="token keyword">int</span> n<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>n <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token punctuation">&#123;</span><span class="token number">1</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+        <span class="token keyword">auto</span> l <span class="token operator">=</span> <span class="token function">beautifulArray</span><span class="token punctuation">(</span><span class="token punctuation">(</span>n <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">auto</span> r <span class="token operator">=</span> <span class="token function">beautifulArray</span><span class="token punctuation">(</span>n <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> ans<span class="token punctuation">;</span>
+        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">auto</span> x <span class="token operator">:</span> l<span class="token punctuation">)</span> ans<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span><span class="token number">2</span> <span class="token operator">*</span> x <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">auto</span> x <span class="token operator">:</span> r<span class="token punctuation">)</span> ans<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span><span class="token number">2</span> <span class="token operator">*</span> x<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> ans<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(logn)</p>
@@ -717,6 +754,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

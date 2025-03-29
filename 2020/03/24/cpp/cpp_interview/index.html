@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="">
   
-    <meta name="description" content="记录刷题的细节内容，算法与 c++特性（等之后有空再优化）  1.static 定义静态局部变量特点全局数据区分配内存；  执行首次初始化后，之后函数调用不在初始化  无显示初始化后，自动初始化为0   2.局部变量存在于堆栈中，全局变量存在于（静态区）中，动态申请数据存在于（堆） 3.模板1234567891011121314template&lt;typename 数据类型参数标识符&gt;(">
+    <meta name="description" content="记录刷题的细节内容，算法与 c++特性（等之后有空再优化）  1.static 定义静态局部变量特点全局数据区分配内存；  执行首次初始化后，之后函数调用不在初始化  无显示初始化后，自动初始化为0   2.局部变量存在于堆栈中，全局变量存在于（静态区）中，动态申请数据存在于（堆） 3.模板template&lt;typename 数据类型参数标识符&gt;(typename 和 class 没区别)">
 <meta property="og:type" content="article">
 <meta property="og:title" content="interview">
 <meta property="og:url" content="https://chaggle.github.io/2020/03/24/cpp/cpp_interview/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="记录刷题的细节内容，算法与 c++特性（等之后有空再优化）  1.static 定义静态局部变量特点全局数据区分配内存；  执行首次初始化后，之后函数调用不在初始化  无显示初始化后，自动初始化为0   2.局部变量存在于堆栈中，全局变量存在于（静态区）中，动态申请数据存在于（堆） 3.模板1234567891011121314template&lt;typename 数据类型参数标识符&gt;(">
+<meta property="og:description" content="记录刷题的细节内容，算法与 c++特性（等之后有空再优化）  1.static 定义静态局部变量特点全局数据区分配内存；  执行首次初始化后，之后函数调用不在初始化  无显示初始化后，自动初始化为0   2.局部变量存在于堆栈中，全局变量存在于（静态区）中，动态申请数据存在于（堆） 3.模板template&lt;typename 数据类型参数标识符&gt;(typename 和 class 没区别)">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-03-24T07:53:11.000Z">
 <meta property="article:modified_time" content="2025-03-07T02:50:09.265Z">
@@ -44,6 +44,8 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -303,28 +305,65 @@
                 
                 <p>记录刷题的细节内容，算法与 c++特性（等之后有空再优化）</p>
 <hr>
-<h4 id="1-static-定义静态局部变量特点"><a href="#1-static-定义静态局部变量特点" class="headerlink" title="1.static 定义静态局部变量特点"></a>1.static 定义静态局部变量特点</h4><pre><code class="hljs">全局数据区分配内存；
+<h4 id="1-static-定义静态局部变量特点"><a href="#1-static-定义静态局部变量特点" class="headerlink" title="1.static 定义静态局部变量特点"></a>1.static 定义静态局部变量特点</h4><figure><div class="code-wrapper"><pre class="language-none"><code class="language-none">全局数据区分配内存；
 
 执行首次初始化后，之后函数调用不在初始化
 
 无显示初始化后，自动初始化为0
-</code></pre>
+</code></pre></div></figure>
 <hr>
 <h4 id="2-局部变量存在于堆栈中，全局变量存在于（静态区）中，动态申请数据存在于（堆）"><a href="#2-局部变量存在于堆栈中，全局变量存在于（静态区）中，动态申请数据存在于（堆）" class="headerlink" title="2.局部变量存在于堆栈中，全局变量存在于（静态区）中，动态申请数据存在于（堆）"></a>2.局部变量存在于堆栈中，全局变量存在于（静态区）中，动态申请数据存在于（堆）</h4><hr>
-<h4 id="3-模板"><a href="#3-模板" class="headerlink" title="3.模板"></a>3.模板</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-built_in">template</span>&lt;<span class="hljs-keyword">typename</span> 数据类型参数标识符&gt;(<span class="hljs-keyword">typename</span> 和 <span class="hljs-keyword">class</span> 没区别)<br>&lt;返回类型&gt;&lt;函数名&gt;(参数表)<br>&#123;<br>    函数体<br>&#125;<br>模板形参不能为空。一但声明了模板函数就可以用模板函数的形参名<br>声明类中的成员变量和成员函数，即可以在该函数中使用内置类型的地方<br>都可以使用模板形参名<br>example:<br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt; <span class="hljs-keyword">struct</span>&#123;<br> <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(T op1, T op2)</span></span>&#123;<br>        cout&lt;&lt;op1&lt;&lt;op2;<br>    &#125;<br>&#125;;sum &lt;<span class="hljs-type">int</span>&gt;::<span class="hljs-built_in">foo</span>(<span class="hljs-number">1</span>,<span class="hljs-number">3</span>)   <span class="hljs-comment">//一个完整的例子</span><br></code></pre></td></tr></table></figure>
+<h4 id="3-模板"><a href="#3-模板" class="headerlink" title="3.模板"></a>3.模板</h4><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token generic-function"><span class="token function">template</span><span class="token generic class-name"><span class="token operator">&lt;</span><span class="token keyword">typename</span> 数据类型参数标识符<span class="token operator">></span></span></span><span class="token punctuation">(</span><span class="token keyword">typename</span> 和 <span class="token keyword">class</span> 没区别<span class="token punctuation">)</span>
+<span class="token operator">&lt;</span>返回类型<span class="token operator">></span><span class="token operator">&lt;</span>函数名<span class="token operator">></span><span class="token punctuation">(</span>参数表<span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+    函数体
+<span class="token punctuation">&#125;</span>
+模板形参不能为空。一但声明了模板函数就可以用模板函数的形参名
+声明类中的成员变量和成员函数，即可以在该函数中使用内置类型的地方
+都可以使用模板形参名
+example<span class="token operator">:</span>
+<span class="token keyword">template</span><span class="token operator">&lt;</span><span class="token keyword">class</span> <span class="token class-name">T</span><span class="token operator">></span> <span class="token keyword">struct</span><span class="token punctuation">&#123;</span>
+ <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">foo</span><span class="token punctuation">(</span>T op1<span class="token punctuation">,</span> T op2<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        cout<span class="token operator">&lt;&lt;</span>op1<span class="token operator">&lt;&lt;</span>op2<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span class="token class-name">sum</span> <span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token double-colon punctuation">::</span><span class="token function">foo</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">)</span>   <span class="token comment">//一个完整的例子</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <hr>
 <h4 id="4-c-虚函数概念（弱点）"><a href="#4-c-虚函数概念（弱点）" class="headerlink" title="4.c++虚函数概念（弱点）"></a>4.c++虚函数概念（弱点）</h4><p>C++中的虚函数的作用主要是实现了多态的机制。基类定义虚函数，子类可以重写该函数。</p>
 <p>当子类重新定义了父类的虚函数后，<strong>当父类的指针指向子类对象的地址时</strong>，[即 B b; A a &#x3D; &b;]</p>
 <p>父类指针根据赋给它的不同子类指针，动态的调用子类的该函数，而不是父类的函数，而如果使用了<strong>virtual</strong>关键字，程序将根据引用或指针指向的 <strong>对 象 类 型</strong> 来选择方法，否则使用<strong>引用类型或指针类型</strong>来选择方法。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs cpp">B b;<br><br> A *pa;<br><br> pa = &amp;b;<br><br> A *pa2 = newA;<br><br> pa-&gt;<span class="hljs-built_in">FuncA</span>(); （ <span class="hljs-number">3</span>） pa=&amp;b动态绑定但是FuncA不是虚函数，所以FuncA called<br><br> pa-&gt;<span class="hljs-built_in">FuncB</span>(); （ <span class="hljs-number">4</span>） FuncB是虚函数所以调用B中FuncB，FuncBB called<br><br> pa2-&gt;<span class="hljs-built_in">FuncA</span>(); （ <span class="hljs-number">5</span>） pa2是A类指针，不涉及虚函数，<br> 调用的都是A中函数，所以输出 FuncA called FuncB called<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">B b<span class="token punctuation">;</span>
+
+ A <span class="token operator">*</span>pa<span class="token punctuation">;</span>
+
+ pa <span class="token operator">=</span> <span class="token operator">&amp;</span>b<span class="token punctuation">;</span>
+
+ A <span class="token operator">*</span>pa2 <span class="token operator">=</span> newA<span class="token punctuation">;</span>
+
+ pa<span class="token operator">-></span><span class="token function">FuncA</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> （ <span class="token number">3</span>） pa<span class="token operator">=</span><span class="token operator">&amp;</span>b动态绑定但是FuncA不是虚函数，所以FuncA called
+
+ pa<span class="token operator">-></span><span class="token function">FuncB</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> （ <span class="token number">4</span>） FuncB是虚函数所以调用B中FuncB，FuncBB called
+
+ pa2<span class="token operator">-></span><span class="token function">FuncA</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> （ <span class="token number">5</span>） pa2是A类指针，不涉及虚函数，
+ 调用的都是A中函数，所以输出 FuncA called FuncB called<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <hr>
 <h4 id="5-vector-的函数-erase"><a href="#5-vector-的函数-erase" class="headerlink" title="5.vector 的函数 erase()"></a>5.vector 的函数 erase()</h4><p>一次只删除一个元素，返回一个迭代器指针，指向下一个元素。</p>
 <hr>
 <h4 id="6-默认只读模式打开文件"><a href="#6-默认只读模式打开文件" class="headerlink" title="6.默认只读模式打开文件"></a>6.默认只读模式打开文件</h4><p>ios (iostream) : app 和 ios : app ｜ ios : out，是一个意思，只能输出不能输入</p>
 <hr>
-<h4 id="7-数组的定义区别理解"><a href="#7-数组的定义区别理解" class="headerlink" title="7.数组的定义区别理解"></a>7.数组的定义区别理解</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-type">int</span> *s[<span class="hljs-number">8</span>];<br>   定义一个指针数组，该数组中每个元素是一个指针，<br>   每个指针指向哪里就需要程序中后续再定义了。<br><span class="hljs-built_in">int</span> (*s)[<span class="hljs-number">8</span>];<br>   定义一个数组指针，该指针指向含<span class="hljs-number">8</span>个元素的一维数组（数组中每个元素是<span class="hljs-type">int</span>型）。<br><br>区分<span class="hljs-type">int</span> *p[n]; 和<span class="hljs-built_in">int</span> (*p)[n];<br>就要看运算符的优先级了。<br><span class="hljs-type">int</span> *p[n]; 中，运算符[ ]优先级高，先与p结合成为一个数组，<br>再由<span class="hljs-type">int</span>*说明这是一个整型指针数组。<br><span class="hljs-built_in">int</span> (*p)[n]; 中( )优先级高，<br>首先说明p是一个指针，指向一个整型的一维数组。<br></code></pre></td></tr></table></figure>
+<h4 id="7-数组的定义区别理解"><a href="#7-数组的定义区别理解" class="headerlink" title="7.数组的定义区别理解"></a>7.数组的定义区别理解</h4><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">int</span> <span class="token operator">*</span>s<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+   定义一个指针数组，该数组中每个元素是一个指针，
+   每个指针指向哪里就需要程序中后续再定义了。
+<span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>s<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+   定义一个数组指针，该指针指向含<span class="token number">8</span>个元素的一维数组（数组中每个元素是<span class="token keyword">int</span>型）。
+
+区分<span class="token keyword">int</span> <span class="token operator">*</span>p<span class="token punctuation">[</span>n<span class="token punctuation">]</span><span class="token punctuation">;</span> 和<span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>p<span class="token punctuation">)</span><span class="token punctuation">[</span>n<span class="token punctuation">]</span><span class="token punctuation">;</span>
+就要看运算符的优先级了。
+<span class="token keyword">int</span> <span class="token operator">*</span>p<span class="token punctuation">[</span>n<span class="token punctuation">]</span><span class="token punctuation">;</span> 中，运算符<span class="token punctuation">[</span> <span class="token punctuation">]</span>优先级高，先与p结合成为一个数组，
+再由<span class="token keyword">int</span><span class="token operator">*</span>说明这是一个整型指针数组。
+<span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>p<span class="token punctuation">)</span><span class="token punctuation">[</span>n<span class="token punctuation">]</span><span class="token punctuation">;</span> 中<span class="token punctuation">(</span> <span class="token punctuation">)</span>优先级高，
+首先说明p是一个指针，指向一个整型的一维数组。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <hr>
 <h4 id="8-函数模板"><a href="#8-函数模板" class="headerlink" title="8.函数模板"></a>8.函数模板</h4><p>函数模板必须由编译器根据程序员的调用类型实例化为可执行的函数。</p>
@@ -341,7 +380,14 @@
 <hr>
 <h4 id="11-unsigned"><a href="#11-unsigned" class="headerlink" title="11.unsigned"></a>11.unsigned</h4><p>unsigned 为无符号整数，取值范围位 0-255，永远不可能小于零，最好不要做控制条件。</p>
 <hr>
-<h4 id="12-派生类继承编译"><a href="#12-派生类继承编译" class="headerlink" title="12.派生类继承编译"></a>12.派生类继承编译</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs cpp">派生类继承（<span class="hljs-keyword">public</span>, <span class="hljs-keyword">private</span>）基类成员后，<br>继承的基类成员在派生类中的相应权限的改变。<br> <span class="hljs-keyword">public</span>  继承,基类的各类（<span class="hljs-keyword">public</span>, <span class="hljs-keyword">protected</span>, <span class="hljs-keyword">private</span>）成员<br> 在派生类中权限与原来在基类时保持一致;<br> <span class="hljs-keyword">private</span> 继承,基类的各类成员在派生类中权限均变为<span class="hljs-keyword">private</span>.<br>    故C类中的print调用A::<span class="hljs-built_in">print</span>()，<br>    因为A::<span class="hljs-built_in">print</span>()此时在C类中为<span class="hljs-keyword">private</span>等级,<br>    所以不能被C类任何成员所访问，故不能通过编译<br></code></pre></td></tr></table></figure>
+<h4 id="12-派生类继承编译"><a href="#12-派生类继承编译" class="headerlink" title="12.派生类继承编译"></a>12.派生类继承编译</h4><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">派生类继承（<span class="token keyword">public</span><span class="token punctuation">,</span> <span class="token keyword">private</span>）基类成员后，
+继承的基类成员在派生类中的相应权限的改变。
+ <span class="token keyword">public</span>  继承<span class="token punctuation">,</span>基类的各类（<span class="token keyword">public</span><span class="token punctuation">,</span> <span class="token keyword">protected</span><span class="token punctuation">,</span> <span class="token keyword">private</span>）成员
+ 在派生类中权限与原来在基类时保持一致<span class="token punctuation">;</span>
+ <span class="token keyword">private</span> 继承<span class="token punctuation">,</span>基类的各类成员在派生类中权限均变为<span class="token keyword">private</span><span class="token punctuation">.</span>
+    故C类中的print调用<span class="token class-name">A</span><span class="token double-colon punctuation">::</span><span class="token function">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>，
+    因为<span class="token class-name">A</span><span class="token double-colon punctuation">::</span><span class="token function">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span>此时在C类中为<span class="token keyword">private</span>等级<span class="token punctuation">,</span>
+    所以不能被C类任何成员所访问，故不能通过编译<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <hr>
 <h4 id="13-引用"><a href="#13-引用" class="headerlink" title="13.引用"></a>13.引用</h4><p>引用是一个对象的别名，引用类型引用（refer to）另外一种类型。如<code>int &amp;refVal = val;</code></p>
@@ -367,7 +413,9 @@
 <hr>
 <h4 id="18-使用非成员版本的swap是一个好习惯"><a href="#18-使用非成员版本的swap是一个好习惯" class="headerlink" title="18.使用非成员版本的swap是一个好习惯"></a>18.使用非成员版本的<code>swap</code>是一个好习惯</h4><p><code>swap(c1,c2)==c1.swap(c2)</code>，但是使用最好使用前者。</p>
 <h4 id="19-泛型算法"><a href="#19-泛型算法" class="headerlink" title="19.泛型算法"></a>19.泛型算法</h4><p>头文件<code>#include&lt;algorithm&gt; ||#include&lt;numeric&gt;</code>标准库中提供了超过 100 个算法，所以说阅读源代码非常重要。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-built_in">copy</span> (ilst.<span class="hljs-built_in">begin</span>(), ilst.<span class="hljs-built_in">end</span>(), <span class="hljs-built_in">back_inserter</span>(ivec))<br>   copy函数<br><br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token function">copy</span> <span class="token punctuation">(</span>ilst<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> ilst<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">back_inserter</span><span class="token punctuation">(</span>ivec<span class="token punctuation">)</span><span class="token punctuation">)</span>
+   copy函数
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
 
 <h4 id="20-关联容器（hash、map、set）"><a href="#20-关联容器（hash、map、set）" class="headerlink" title="20.关联容器（hash、map、set）"></a>20.关联容器（hash、map、set）</h4><ul>
 <li><code>map</code>：<code>map&lt;string, int&gt; word_count = &#123;&#123;"a", 1&#125;, &#123;"b", 2&#125;&#125;;</code></li>
@@ -400,14 +448,26 @@
 <h4 id="26-枚举变量"><a href="#26-枚举变量" class="headerlink" title="26.枚举变量"></a>26.枚举变量</h4><p><strong>枚举变量是全局变量的情况下，枚举值的缺省值是 0，不是枚举的第一个值。其他情况，其值是不定的，而且不限定于所列出的枚举值。</strong></p>
 <p><strong>全局变量时初始化为 0，局部变量时初始化为随机值。</strong></p>
 <hr>
-<h4 id="26-unsigned"><a href="#26-unsigned" class="headerlink" title="26.unsigned"></a>26.unsigned</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><br>移动的<span class="hljs-number">1</span>代表的是一个单位量<br>    <span class="hljs-type">unsigned</span><br>p1<span class="hljs-number">+5</span>=p1<span class="hljs-number">+5</span>*<span class="hljs-number">1</span>=p1<span class="hljs-number">+5</span>*<span class="hljs-built_in">sizeof</span>(<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>)<br>=p1<span class="hljs-number">+5</span>*<span class="hljs-number">1</span>=<span class="hljs-number">0x801000</span>+ox5=<span class="hljs-number">0x801005</span><br>p2<span class="hljs-number">+5</span>=p2<span class="hljs-number">+5</span>*<span class="hljs-number">1</span>=p2<span class="hljs-number">+5</span>*<span class="hljs-built_in">sizeof</span>(<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)<br>=p1<span class="hljs-number">+5</span>*<span class="hljs-number">4</span>=<span class="hljs-number">0x810000</span><span class="hljs-number">+20</span>=<span class="hljs-number">0x810000</span><span class="hljs-number">+0x14</span>=<span class="hljs-number">0x810014</span><br></code></pre></td></tr></table></figure>
+<h4 id="26-unsigned"><a href="#26-unsigned" class="headerlink" title="26.unsigned"></a>26.unsigned</h4><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">
+移动的<span class="token number">1</span>代表的是一个单位量
+    <span class="token keyword">unsigned</span>
+p1<span class="token operator">+</span><span class="token number">5</span><span class="token operator">=</span>p1<span class="token operator">+</span><span class="token number">5</span><span class="token operator">*</span><span class="token number">1</span><span class="token operator">=</span>p1<span class="token operator">+</span><span class="token number">5</span><span class="token operator">*</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span><span class="token punctuation">)</span>
+<span class="token operator">=</span>p1<span class="token operator">+</span><span class="token number">5</span><span class="token operator">*</span><span class="token number">1</span><span class="token operator">=</span><span class="token number">0x801000</span><span class="token operator">+</span>ox5<span class="token operator">=</span><span class="token number">0x801005</span>
+p2<span class="token operator">+</span><span class="token number">5</span><span class="token operator">=</span>p2<span class="token operator">+</span><span class="token number">5</span><span class="token operator">*</span><span class="token number">1</span><span class="token operator">=</span>p2<span class="token operator">+</span><span class="token number">5</span><span class="token operator">*</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">long</span><span class="token punctuation">)</span>
+<span class="token operator">=</span>p1<span class="token operator">+</span><span class="token number">5</span><span class="token operator">*</span><span class="token number">4</span><span class="token operator">=</span><span class="token number">0x810000</span><span class="token operator">+</span><span class="token number">20</span><span class="token operator">=</span><span class="token number">0x810000</span><span class="token operator">+</span><span class="token number">0x14</span><span class="token operator">=</span><span class="token number">0x810014</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <hr>
 <h4 id="27-数组、指针、字符串的长度计算"><a href="#27-数组、指针、字符串的长度计算" class="headerlink" title="27.数组、指针、字符串的长度计算"></a>27.数组、指针、字符串的长度计算</h4><p>对字符串进行<code>sizeof</code>操作的时候，会把字符串的结束符<code>\0</code>计算进去的</p>
 <p>进行<code>strlen</code>操作求字符串的长度的时候，不计算<code>\0</code>的。</p>
 <p>数组作为函数参数传递的时候，已经退化为指针了，<code>Func</code>函数的参数<code>str_arg</code>只是表示一个指针，那个<code>str_arg[]</code>括号中的数值不起任何作用。</p>
 <hr>
-<h4 id="28-强制类型转换后指针的类型"><a href="#28-强制类型转换后指针的类型" class="headerlink" title="28.强制类型转换后指针的类型"></a>28.强制类型转换后指针的类型</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-type">char</span> str[] = <span class="hljs-string">&quot;glad to test something&quot;</span>;<br><span class="hljs-type">char</span> *p = str;<br>p++;<br><span class="hljs-type">int</span> *p1 = <span class="hljs-built_in">reinterpret_cast</span>&lt;<span class="hljs-type">int</span> *&gt;(p);<br>p1++;<br>p = <span class="hljs-built_in">reinterpret_cast</span>&lt;<span class="hljs-type">char</span> *&gt;(p1);<br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;result is %s\n&quot;</span>, p);<br></code></pre></td></tr></table></figure>
+<h4 id="28-强制类型转换后指针的类型"><a href="#28-强制类型转换后指针的类型" class="headerlink" title="28.强制类型转换后指针的类型"></a>28.强制类型转换后指针的类型</h4><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">char</span> str<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"glad to test something"</span><span class="token punctuation">;</span>
+<span class="token keyword">char</span> <span class="token operator">*</span>p <span class="token operator">=</span> str<span class="token punctuation">;</span>
+p<span class="token operator">++</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> <span class="token operator">*</span>p1 <span class="token operator">=</span> <span class="token generic-function"><span class="token function">reinterpret_cast</span><span class="token generic class-name"><span class="token operator">&lt;</span><span class="token keyword">int</span> <span class="token operator">*</span><span class="token operator">></span></span></span><span class="token punctuation">(</span>p<span class="token punctuation">)</span><span class="token punctuation">;</span>
+p1<span class="token operator">++</span><span class="token punctuation">;</span>
+p <span class="token operator">=</span> <span class="token generic-function"><span class="token function">reinterpret_cast</span><span class="token generic class-name"><span class="token operator">&lt;</span><span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">></span></span></span><span class="token punctuation">(</span>p1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"result is %s\n"</span><span class="token punctuation">,</span> p<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>p 的类型为<code>char *，p++</code>后<code>p</code>指向<code>str</code>数组的第 2 个元素即字母“l”的位置。</p>
 <p>p1 的类型为<code>int *，p1++</code>后<code>p1</code>指向的位置增加 4 个字节，</p>
@@ -429,7 +489,10 @@
 <li>但是由于虚函数存在一个虚函数表，需要 4 个字节，数据成员对象如果为指针则为 4 字节，注意有字节对齐，如果为 13 字节，则进位到 16 字节空间</li>
 </ul>
 <hr>
-<h4 id="30-buffer"><a href="#30-buffer" class="headerlink" title="30.buffer"></a>30.buffer</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs cpp">函数<span class="hljs-function"><span class="hljs-type">char</span> *<span class="hljs-title">myString</span><span class="hljs-params">()</span>中没有使用<span class="hljs-keyword">new</span>或者malloc分配内存，</span><br><span class="hljs-function">所有buffer数组的内存区域在栈区</span><br><span class="hljs-function">随着<span class="hljs-type">char</span> *<span class="hljs-title">myString</span><span class="hljs-params">()</span>的结束，栈区内存释放，字符数组也就不存在了，</span><br><span class="hljs-function">所以会产生野指针，输出结果未知</span><br></code></pre></td></tr></table></figure>
+<h4 id="30-buffer"><a href="#30-buffer" class="headerlink" title="30.buffer"></a>30.buffer</h4><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">函数<span class="token keyword">char</span> <span class="token operator">*</span><span class="token function">myString</span><span class="token punctuation">(</span><span class="token punctuation">)</span>中没有使用<span class="token keyword">new</span>或者malloc分配内存，
+所有buffer数组的内存区域在栈区
+随着<span class="token keyword">char</span> <span class="token operator">*</span><span class="token function">myString</span><span class="token punctuation">(</span><span class="token punctuation">)</span>的结束，栈区内存释放，字符数组也就不存在了，
+所以会产生野指针，输出结果未知<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <hr>
 <h4 id="31-动态分配在堆区，其他的均不在堆区"><a href="#31-动态分配在堆区，其他的均不在堆区" class="headerlink" title="31.动态分配在堆区，其他的均不在堆区"></a>31.动态分配在堆区，其他的均不在堆区</h4><hr>
@@ -438,16 +501,38 @@
 <p>c. 外围设备的中断</p>
 <hr>
 <h4 id="33-函数嵌套"><a href="#33-函数嵌套" class="headerlink" title="33.函数嵌套"></a>33.函数嵌套</h4><p>若有如下函数定义，这种嵌套定义根本算不出结果，所以函数嵌套定义肯定不行</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">f</span><span class="hljs-params">(<span class="hljs-type">int</span> a)</span></span>=&#123;<span class="hljs-keyword">return</span> a+<span class="hljs-built_in">f1</span>(a);&#125;<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">f1</span><span class="hljs-params">(<span class="hljs-type">int</span> b)</span></span>=&#123;<span class="hljs-keyword">return</span> b+<span class="hljs-built_in">f</span>(b);&#125;<br>无法算出结果故定义嵌套不使用<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">int</span> <span class="token function">f</span><span class="token punctuation">(</span><span class="token keyword">int</span> a<span class="token punctuation">)</span><span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">return</span> a<span class="token operator">+</span><span class="token function">f1</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token punctuation">&#125;</span>
+<span class="token keyword">int</span> <span class="token function">f1</span><span class="token punctuation">(</span><span class="token keyword">int</span> b<span class="token punctuation">)</span><span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token keyword">return</span> b<span class="token operator">+</span><span class="token function">f</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token punctuation">&#125;</span>
+无法算出结果故定义嵌套不使用<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <hr>
 <h4 id="34-静态变量初始化"><a href="#34-静态变量初始化" class="headerlink" title="34.静态变量初始化"></a>34.静态变量初始化</h4><p>在 C++中，类的静态成员（static member）必须在类内声明，在类外初始化</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">A</span><br>&#123;<br><span class="hljs-keyword">private</span>: <span class="hljs-type">static</span> <span class="hljs-type">int</span> count ; <span class="hljs-comment">// 类内声明</span><br>&#125;;<br><span class="hljs-type">int</span> A::count = <span class="hljs-number">0</span> ; <span class="hljs-comment">// 类外初始化，不必再加static关键字</span><br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">A</span>
+<span class="token punctuation">&#123;</span>
+<span class="token keyword">private</span><span class="token operator">:</span> <span class="token keyword">static</span> <span class="token keyword">int</span> count <span class="token punctuation">;</span> <span class="token comment">// 类内声明</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> A<span class="token double-colon punctuation">::</span>count <span class="token operator">=</span> <span class="token number">0</span> <span class="token punctuation">;</span> <span class="token comment">// 类外初始化，不必再加static关键字</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>为什么？因为静态成员属于整个类，而不属于某个对象，如果在类内初始化，会导致每个对象都包含该静态成员，这是矛盾的。</p>
 <p>能在类中初始化的成员只有一种，那就是静态常量成员。</p>
 <p>这样不行</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">A</span><br>&#123;<br>  <span class="hljs-keyword">private</span>: <span class="hljs-type">static</span> <span class="hljs-type">int</span> count = <span class="hljs-number">0</span>;<br>  静态成员不能在类内初始化<br>&#125;;<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">A</span><br>&#123;<br>  <span class="hljs-keyword">private</span>: <span class="hljs-type">const</span> <span class="hljs-type">int</span> count = <span class="hljs-number">0</span>;<br>   常量成员也不能在类内初始化<br>&#125;;<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">A</span><br>&#123;<br>  <span class="hljs-keyword">private</span>: <span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> count = <span class="hljs-number">0</span>;<br>   静态常量成员可以在类内初始化<br>&#125;;<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">A</span>
+<span class="token punctuation">&#123;</span>
+  <span class="token keyword">private</span><span class="token operator">:</span> <span class="token keyword">static</span> <span class="token keyword">int</span> count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  静态成员不能在类内初始化
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">A</span>
+<span class="token punctuation">&#123;</span>
+  <span class="token keyword">private</span><span class="token operator">:</span> <span class="token keyword">const</span> <span class="token keyword">int</span> count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+   常量成员也不能在类内初始化
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">A</span>
+<span class="token punctuation">&#123;</span>
+  <span class="token keyword">private</span><span class="token operator">:</span> <span class="token keyword">static</span> <span class="token keyword">const</span> <span class="token keyword">int</span> count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+   静态常量成员可以在类内初始化
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
                 
               </div>
@@ -841,6 +926,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

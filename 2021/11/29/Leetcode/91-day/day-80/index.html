@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="">
   
-    <meta name="description" content="39. 组合总和题目1234567891011121314151617181920212223242526272829303132333435363738给定一个无重复元素的正整数数组 candidates 和一个正整数 target找出 candidates 中所有可以使数字和为目标数 target 的唯一组合。candidates 中的数字可以无限制重复被选取。如果至少一个所选数字数量不同，则">
+    <meta name="description" content="39. 组合总和题目给定一个无重复元素的正整数数组 candidates 和一个正整数 target  找出 candidates 中所有可以使数字和为目标数 target 的唯一组合。  candidates 中的数字可以无限制重复被选取。如果至少一个所选数字数量不同，则两种组合是唯一的。   对于给定的输入，保证和为 target 的唯一组合数少于 150 个。     示例 1：  输入:">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day 80 39. 组合总和">
 <meta property="og:url" content="https://chaggle.github.io/2021/11/29/Leetcode/91-day/day-80/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="39. 组合总和题目1234567891011121314151617181920212223242526272829303132333435363738给定一个无重复元素的正整数数组 candidates 和一个正整数 target找出 candidates 中所有可以使数字和为目标数 target 的唯一组合。candidates 中的数字可以无限制重复被选取。如果至少一个所选数字数量不同，则">
+<meta property="og:description" content="39. 组合总和题目给定一个无重复元素的正整数数组 candidates 和一个正整数 target  找出 candidates 中所有可以使数字和为目标数 target 的唯一组合。  candidates 中的数字可以无限制重复被选取。如果至少一个所选数字数量不同，则两种组合是唯一的。   对于给定的输入，保证和为 target 的唯一组合数少于 150 个。     示例 1：  输入:">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-11-29T01:31:34.000Z">
 <meta property="article:modified_time" content="2025-03-07T02:50:09.262Z">
@@ -45,6 +45,8 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -230,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          352 字
+          341 字
         
       </span>
     
@@ -302,14 +304,79 @@
             
               <div class="markdown-body">
                 
-                <h1 id="39-组合总和"><a href="#39-组合总和" class="headerlink" title="39. 组合总和"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/combination-sum/">39. 组合总和</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs cpp">给定一个无重复元素的正整数数组 candidates 和一个正整数 target<br><br>找出 candidates 中所有可以使数字和为目标数 target 的唯一组合。<br><br>candidates 中的数字可以无限制重复被选取。如果至少一个所选数字数量不同，则两种组合是唯一的。 <br><br>对于给定的输入，保证和为 target 的唯一组合数少于 <span class="hljs-number">150</span> 个。<br><br> <br><br>示例 <span class="hljs-number">1</span>：<br><br>输入: candidates = [<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">6</span>,<span class="hljs-number">7</span>], target = <span class="hljs-number">7</span><br>输出: [[<span class="hljs-number">7</span>],[<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>]]<br>示例 <span class="hljs-number">2</span>：<br><br>输入: candidates = [<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">5</span>], target = <span class="hljs-number">8</span><br>输出: [[<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>],[<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">3</span>],[<span class="hljs-number">3</span>,<span class="hljs-number">5</span>]]<br>示例 <span class="hljs-number">3</span>：<br><br>输入: candidates = [<span class="hljs-number">2</span>], target = <span class="hljs-number">1</span><br>输出: []<br>示例 <span class="hljs-number">4</span>：<br><br>输入: candidates = [<span class="hljs-number">1</span>], target = <span class="hljs-number">1</span><br>输出: [[<span class="hljs-number">1</span>]]<br>示例 <span class="hljs-number">5</span>：<br><br>输入: candidates = [<span class="hljs-number">1</span>], target = <span class="hljs-number">2</span><br>输出: [[<span class="hljs-number">1</span>,<span class="hljs-number">1</span>]]<br> <br><br>提示：<br><br><span class="hljs-number">1</span> &lt;= candidates.length &lt;= <span class="hljs-number">30</span><br><span class="hljs-number">1</span> &lt;= candidates[i] &lt;= <span class="hljs-number">200</span><br>candidate 中的每个元素都是独一无二的。<br><span class="hljs-number">1</span> &lt;= target &lt;= <span class="hljs-number">500</span><br></code></pre></td></tr></table></figure>
+                <h1 id="39-组合总和"><a href="#39-组合总和" class="headerlink" title="39. 组合总和"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/combination-sum/">39. 组合总和</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">给定一个无重复元素的正整数数组 candidates 和一个正整数 target
+
+找出 candidates 中所有可以使数字和为目标数 target 的唯一组合。
+
+candidates 中的数字可以无限制重复被选取。如果至少一个所选数字数量不同，则两种组合是唯一的。 
+
+对于给定的输入，保证和为 target 的唯一组合数少于 <span class="token number">150</span> 个。
+
+ 
+
+示例 <span class="token number">1</span>：
+
+输入<span class="token operator">:</span> candidates <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">6</span><span class="token punctuation">,</span><span class="token number">7</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">=</span> <span class="token number">7</span>
+输出<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+示例 <span class="token number">2</span>：
+
+输入<span class="token operator">:</span> candidates <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">=</span> <span class="token number">8</span>
+输出<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+示例 <span class="token number">3</span>：
+
+输入<span class="token operator">:</span> candidates <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">=</span> <span class="token number">1</span>
+输出<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+示例 <span class="token number">4</span>：
+
+输入<span class="token operator">:</span> candidates <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">=</span> <span class="token number">1</span>
+输出<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+示例 <span class="token number">5</span>：
+
+输入<span class="token operator">:</span> candidates <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">=</span> <span class="token number">2</span>
+输出<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+ 
+
+提示：
+
+<span class="token number">1</span> <span class="token operator">&lt;=</span> candidates<span class="token punctuation">.</span>length <span class="token operator">&lt;=</span> <span class="token number">30</span>
+<span class="token number">1</span> <span class="token operator">&lt;=</span> candidates<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&lt;=</span> <span class="token number">200</span>
+candidate 中的每个元素都是独一无二的。
+<span class="token number">1</span> <span class="token operator">&lt;=</span> target <span class="token operator">&lt;=</span> <span class="token number">500</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
 <li>1、经典递归算法</li>
 </ul>
 </blockquote>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(</span></span><br><span class="hljs-params"><span class="hljs-function">        vector&lt;<span class="hljs-type">int</span>&gt;&amp; candidates, <span class="hljs-type">int</span> target, vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt;&amp; ans, </span></span><br><span class="hljs-params"><span class="hljs-function">        vector&lt;<span class="hljs-type">int</span>&gt;&amp; combine, <span class="hljs-type">int</span> idx</span></span><br><span class="hljs-params"><span class="hljs-function">    )</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (idx == candidates.<span class="hljs-built_in">size</span>()) <span class="hljs-keyword">return</span>;<br><br>        <span class="hljs-keyword">if</span> (target == <span class="hljs-number">0</span>) &#123;<br>            ans.<span class="hljs-built_in">emplace_back</span>(combine);<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>        <br>        <span class="hljs-built_in">dfs</span>(candidates, target, ans, combine, idx + <span class="hljs-number">1</span>);<br>        <br>        <span class="hljs-keyword">if</span> (target - candidates[idx] &gt;= <span class="hljs-number">0</span>) &#123;<br>            combine.<span class="hljs-built_in">emplace_back</span>(candidates[idx]);<br>            <span class="hljs-built_in">dfs</span>(candidates, target - candidates[idx], ans, combine, idx);<br>            combine.<span class="hljs-built_in">pop_back</span>();<br>        &#125;<br>    &#125;<br><br>    vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; <span class="hljs-built_in">combinationSum</span>(vector&lt;<span class="hljs-type">int</span>&gt;&amp; candidates, <span class="hljs-type">int</span> target) &#123;<br>        vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; ans;<br>        vector&lt;<span class="hljs-type">int</span>&gt; combine;<br>        <span class="hljs-built_in">dfs</span>(candidates, target, ans, combine, <span class="hljs-number">0</span>);<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token keyword">void</span> <span class="token function">dfs</span><span class="token punctuation">(</span>
+        vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> candidates<span class="token punctuation">,</span> <span class="token keyword">int</span> target<span class="token punctuation">,</span> vector<span class="token operator">&lt;</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">>></span><span class="token operator">&amp;</span> ans<span class="token punctuation">,</span> 
+        vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> combine<span class="token punctuation">,</span> <span class="token keyword">int</span> idx
+    <span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>idx <span class="token operator">==</span> candidates<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>target <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            ans<span class="token punctuation">.</span><span class="token function">emplace_back</span><span class="token punctuation">(</span>combine<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        
+        <span class="token function">dfs</span><span class="token punctuation">(</span>candidates<span class="token punctuation">,</span> target<span class="token punctuation">,</span> ans<span class="token punctuation">,</span> combine<span class="token punctuation">,</span> idx <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>target <span class="token operator">-</span> candidates<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            combine<span class="token punctuation">.</span><span class="token function">emplace_back</span><span class="token punctuation">(</span>candidates<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">dfs</span><span class="token punctuation">(</span>candidates<span class="token punctuation">,</span> target <span class="token operator">-</span> candidates<span class="token punctuation">[</span>idx<span class="token punctuation">]</span><span class="token punctuation">,</span> ans<span class="token punctuation">,</span> combine<span class="token punctuation">,</span> idx<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            combine<span class="token punctuation">.</span><span class="token function">pop_back</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+    vector<span class="token operator">&lt;</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">>></span> <span class="token function">combinationSum</span><span class="token punctuation">(</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> candidates<span class="token punctuation">,</span> <span class="token keyword">int</span> target<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        vector<span class="token operator">&lt;</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">>></span> ans<span class="token punctuation">;</span>
+        vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> combine<span class="token punctuation">;</span>
+        <span class="token function">dfs</span><span class="token punctuation">(</span>candidates<span class="token punctuation">,</span> target<span class="token punctuation">,</span> ans<span class="token punctuation">,</span> combine<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> ans<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li>时间复杂度：O(s)</li>
@@ -715,6 +782,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

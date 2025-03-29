@@ -49,6 +49,8 @@
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
 
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
 
@@ -548,7 +550,25 @@
 <p>所以使用 watch 命令对 key 值进行监视即可。修改失败，用 unwatch 解锁，再 watch key，即可。</p>
 <h2 id="8、Go-连接操作-Redis-数据库"><a href="#8、Go-连接操作-Redis-数据库" class="headerlink" title="8、Go 连接操作 Redis 数据库"></a>8、Go 连接操作 Redis 数据库</h2><h2 id="9、Redis-Conf-配置文件"><a href="#9、Redis-Conf-配置文件" class="headerlink" title="9、Redis.Conf 配置文件"></a>9、Redis.Conf 配置文件</h2><p>redis.conf 需要重点理解一下。</p>
 <p>redis 大小写不敏感在配置文件中已经说明了。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash">daemonize  <span class="hljs-built_in">yes</span> <span class="hljs-comment"># 后台守护进程开启，默认为 no 。</span><br><br>pidfile /var/run/redis_6379.pid <span class="hljs-comment"># 后台运行的 pid 值</span><br><br>save 900 1 <span class="hljs-comment"># 快照 900s 内修改一个，就自动保存一次。</span><br>save 300 10 <br>save 60 10000<br><br><br>config get / <span class="hljs-built_in">set</span> requirepass  <span class="hljs-comment"># 设置 redis 的安全密码</span><br><br>maxmemory-policy <span class="hljs-comment"># 内存到达上限的处理政策。一般以下 6 中处理方法</span><br>1、volatile-lru : 直对设置了过期时间的 key 进行 lru <br>2、allkeys-lru<br>3、volatile-random 随机删除设置了过期时间的 key <br>4、allkeys-lru<br>5、volatile-ttl 删除即将过期的<br>6、noeviction 永不过期，返回错误<br><br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">daemonize  <span class="token function">yes</span> <span class="token comment"># 后台守护进程开启，默认为 no 。</span>
+
+pidfile /var/run/redis_6379.pid <span class="token comment"># 后台运行的 pid 值</span>
+
+save <span class="token number">900</span> <span class="token number">1</span> <span class="token comment"># 快照 900s 内修改一个，就自动保存一次。</span>
+save <span class="token number">300</span> <span class="token number">10</span> 
+save <span class="token number">60</span> <span class="token number">10000</span>
+
+
+config get / <span class="token builtin class-name">set</span> requirepass  <span class="token comment"># 设置 redis 的安全密码</span>
+
+maxmemory-policy <span class="token comment"># 内存到达上限的处理政策。一般以下 6 中处理方法</span>
+<span class="token number">1</span>、volatile-lru <span class="token builtin class-name">:</span> 直对设置了过期时间的 key 进行 lru 
+<span class="token number">2</span>、allkeys-lru
+<span class="token number">3</span>、volatile-random 随机删除设置了过期时间的 key 
+<span class="token number">4</span>、allkeys-lru
+<span class="token number">5</span>、volatile-ttl 删除即将过期的
+<span class="token number">6</span>、noeviction 永不过期，返回错误
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="10、AOF-与-RDB"><a href="#10、AOF-与-RDB" class="headerlink" title="10、AOF 与 RDB"></a>10、AOF 与 RDB</h2><p>在大部分情况下，RDB 是默认的持久化配置，大部分的情况下都够用了。</p>
 <p>一般进行数据持久化的保存操作过程一般分为五步：</p>
@@ -1020,6 +1040,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

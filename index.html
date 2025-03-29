@@ -396,7 +396,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2022/08/19/container/docker/" target="_self">
         <div>
-          docker 内环境的搭建  注意：单机环境下的容器管理使用 docker- compose 进行管理，多机环境下使用 K8S (kubernetes) 进行管理！ 1、nacos1docker run -d -p 8848:8848 -e MODE=standalone -v /opt/docker/nacos/logs:/home/nacos/logs -v /opt/docker/naco
+          docker 内环境的搭建  注意：单机环境下的容器管理使用 docker- compose 进行管理，多机环境下使用 K8S (kubernetes) 进行管理！ 1、nacos# docker 启动服务 docker run -d -p 8848:8848 &amp;&amp; \     -e MODE=standalone &amp;&amp; \     -v /opt/docker/
         </div>
       </a>
 
@@ -1060,7 +1060,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2022/04/19/go/microservice/error/" target="_self">
         <div>
-          通过模块化组件的方式，学习 Go 语言的微服务  Go 语言的错误处理Go 语言中的 error 定义如下 123type error interface &#123;    Error() string&#125;  在 Go 1.13 版本之前，我们通常使用的是 errors.New() 来进行返回一个 error 对象指针，相应的源码如下所示： 12345678func New(text
+          通过模块化组件的方式，学习 Go 语言的微服务  Go 语言的错误处理Go 语言中的 error 定义如下 type error interface &#123;     Error() string &#125;  在 Go 1.13 版本之前，我们通常使用的是 errors.New() 来进行返回一个 error 对象指针，相应的源码如下所示： func New(text string) e
         </div>
       </a>
 

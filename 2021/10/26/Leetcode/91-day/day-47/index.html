@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Number of Operations to Decrement Target to Zero题目123456789101112131415161718192021222324252627282930You are given a list of positive integers nums and an integer target.Consider an operation where we">
+    <meta name="description" content="Number of Operations to Decrement Target to Zero题目You are given a list of positive integers nums and an integer target.  Consider an operation where we remove a number v from either the front   or the">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day 47 Number of Operations to Decrement Target to Zero">
 <meta property="og:url" content="https://chaggle.github.io/2021/10/26/Leetcode/91-day/day-47/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="Number of Operations to Decrement Target to Zero题目123456789101112131415161718192021222324252627282930You are given a list of positive integers nums and an integer target.Consider an operation where we">
+<meta property="og:description" content="Number of Operations to Decrement Target to Zero题目You are given a list of positive integers nums and an integer target.  Consider an operation where we remove a number v from either the front   or the">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-26T04:04:41.000Z">
 <meta property="article:modified_time" content="2025-03-07T02:50:09.258Z">
@@ -45,6 +45,8 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -230,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          226 字
+          221 字
         
       </span>
     
@@ -302,7 +304,36 @@
             
               <div class="markdown-body">
                 
-                <h1 id="Number-of-Operations-to-Decrement-Target-to-Zero"><a href="#Number-of-Operations-to-Decrement-Target-to-Zero" class="headerlink" title="Number of Operations to Decrement Target to Zero"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Number-of-Operations-to-Decrement-Target-to-Zero">Number of Operations to Decrement Target to Zero</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs cpp">You are given a list of positive integers nums <span class="hljs-keyword">and</span> an integer target.<br><br>Consider an operation where we remove a number v from either the front <br><br><span class="hljs-keyword">or</span> the back of nums <span class="hljs-keyword">and</span> decrement target by v.<br><br>Return the minimum number of operations required to decrement target to zero. <br><br>If it<span class="hljs-string">&#x27;s not possible, return -1.</span><br><span class="hljs-string"></span><br><span class="hljs-string">Constraints</span><br><span class="hljs-string"></span><br><span class="hljs-string">n ≤ 100,000 where n is the length of nums</span><br><span class="hljs-string">Example 1</span><br><span class="hljs-string">Input</span><br><span class="hljs-string">nums = [3, 1, 1, 2, 5, 1, 1]</span><br><span class="hljs-string">target = 7</span><br><span class="hljs-string">Output</span><br><span class="hljs-string">3</span><br><span class="hljs-string">Explanation</span><br><span class="hljs-string">We can remove 1, 1 and 5 from the back to decrement target to zero.</span><br><span class="hljs-string"></span><br><span class="hljs-string">Example 2</span><br><span class="hljs-string">Input</span><br><span class="hljs-string">nums = [2, 4]</span><br><span class="hljs-string">target = 7</span><br><span class="hljs-string">Output</span><br><span class="hljs-string">-1</span><br><span class="hljs-string">Explanation</span><br><span class="hljs-string">There&#x27;</span>s no way to decrement target = <span class="hljs-number">7</span> to zero.<br></code></pre></td></tr></table></figure>
+                <h1 id="Number-of-Operations-to-Decrement-Target-to-Zero"><a href="#Number-of-Operations-to-Decrement-Target-to-Zero" class="headerlink" title="Number of Operations to Decrement Target to Zero"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Number-of-Operations-to-Decrement-Target-to-Zero">Number of Operations to Decrement Target to Zero</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">You are given a list of positive integers nums <span class="token operator">and</span> an integer target<span class="token punctuation">.</span>
+
+Consider an operation where we remove a number v from either the front 
+
+<span class="token operator">or</span> the back of nums <span class="token operator">and</span> decrement target by v<span class="token punctuation">.</span>
+
+Return the minimum number of operations required to decrement target to zero<span class="token punctuation">.</span> 
+
+If it<span class="token number">'</span>s <span class="token operator">not</span> possible<span class="token punctuation">,</span> <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1.</span>
+
+Constraints
+
+n ≤ <span class="token number">100</span><span class="token punctuation">,</span><span class="token number">000</span> where n is the length of nums
+Example <span class="token number">1</span>
+Input
+nums <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span>
+target <span class="token operator">=</span> <span class="token number">7</span>
+Output
+<span class="token number">3</span>
+Explanation
+We can remove <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span> <span class="token operator">and</span> <span class="token number">5</span> from the back to decrement target to zero<span class="token punctuation">.</span>
+
+Example <span class="token number">2</span>
+Input
+nums <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">]</span>
+target <span class="token operator">=</span> <span class="token number">7</span>
+Output
+<span class="token operator">-</span><span class="token number">1</span>
+Explanation
+There<span class="token number">'</span>s no way to decrement target <span class="token operator">=</span> <span class="token number">7</span> to zero<span class="token punctuation">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
@@ -310,7 +341,32 @@
 <li>2、不相等则减去目标值，即为最少需要去除的值，使用双指针滑动，如果大于去除值，则左指针向前滑动，相等则对比之前操作的长度，记录其中最大的移动长度，即为最小的移动区间。</li>
 </ul>
 </blockquote>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">solve</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> target)</span> </span>&#123;<br>    <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br>    <span class="hljs-type">int</span> sum;<br><br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++)<br>    &#123;<br>        sum += nums[i];<br>    &#125;<br>    <span class="hljs-keyword">if</span> (sum == target) <span class="hljs-keyword">return</span> n;<br>	sum -= target;<br><br>    <span class="hljs-type">int</span> l = <span class="hljs-number">0</span>, total = <span class="hljs-number">0</span>, pos = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> r = <span class="hljs-number">0</span>; r &lt; n; r++)<br>    &#123;<br>        total += nums[r];<br>        <span class="hljs-keyword">while</span>(total &gt; sum)<br>        &#123;<br>            total -= nums[l++];<br>        &#125;<br>        <span class="hljs-keyword">if</span> (total == sum)<br>        &#123;<br>            pos = <span class="hljs-built_in">max</span>(pos, r - l + <span class="hljs-number">1</span>);<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> pos &gt; <span class="hljs-number">0</span> ? n - pos : <span class="hljs-number">-1</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">int</span> <span class="token function">solve</span><span class="token punctuation">(</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> nums<span class="token punctuation">,</span> <span class="token keyword">int</span> target<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">int</span> n <span class="token operator">=</span> nums<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> sum<span class="token punctuation">;</span>
+
+    <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> n<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        sum <span class="token operator">+=</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>sum <span class="token operator">==</span> target<span class="token punctuation">)</span> <span class="token keyword">return</span> n<span class="token punctuation">;</span>
+	sum <span class="token operator">-=</span> target<span class="token punctuation">;</span>
+
+    <span class="token keyword">int</span> l <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> total <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> pos <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> r <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> r <span class="token operator">&lt;</span> n<span class="token punctuation">;</span> r<span class="token operator">++</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#123;</span>
+        total <span class="token operator">+=</span> nums<span class="token punctuation">[</span>r<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span><span class="token punctuation">(</span>total <span class="token operator">></span> sum<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            total <span class="token operator">-=</span> nums<span class="token punctuation">[</span>l<span class="token operator">++</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>total <span class="token operator">==</span> sum<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            pos <span class="token operator">=</span> <span class="token function">max</span><span class="token punctuation">(</span>pos<span class="token punctuation">,</span> r <span class="token operator">-</span> l <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">return</span> pos <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">?</span> n <span class="token operator">-</span> pos <span class="token operator">:</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n)</p>
@@ -718,6 +774,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

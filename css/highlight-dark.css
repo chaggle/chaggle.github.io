@@ -1,118 +1,124 @@
-pre code.hljs {
-  display: block;
-  overflow-x: auto;
-  padding: 1em
-}
-code.hljs {
-  padding: 3px 5px
-}
-/*!
-  Theme: GitHub Dark
-  Description: Dark theme as seen on github.com
-  Author: github.com
-  Maintainer: @Hirse
-  Updated: 2021-05-15
+/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
 
-  Outdated base version: https://github.com/primer/github-syntax-dark
-  Current colors taken from GitHub's CSS
-*/
-.hljs {
-  color: #c9d1d9;
-  background: #0d1117
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
 }
-.hljs-doctag,
-.hljs-keyword,
-.hljs-meta .hljs-keyword,
-.hljs-template-tag,
-.hljs-template-variable,
-.hljs-type,
-.hljs-variable.language_ {
-  /* prettylights-syntax-keyword */
-  color: #ff7b72
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
 }
-.hljs-title,
-.hljs-title.class_,
-.hljs-title.class_.inherited__,
-.hljs-title.function_ {
-  /* prettylights-syntax-entity */
-  color: #d2a8ff
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
 }
-.hljs-attr,
-.hljs-attribute,
-.hljs-literal,
-.hljs-meta,
-.hljs-number,
-.hljs-operator,
-.hljs-variable,
-.hljs-selector-attr,
-.hljs-selector-class,
-.hljs-selector-id {
-  /* prettylights-syntax-constant */
-  color: #79c0ff
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
 }
-.hljs-regexp,
-.hljs-string,
-.hljs-meta .hljs-string {
-  /* prettylights-syntax-string */
-  color: #a5d6ff
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
 }
-.hljs-built_in,
-.hljs-symbol {
-  /* prettylights-syntax-variable */
-  color: #ffa657
+
+.token.punctuation {
+	color: #f8f8f2;
 }
-.hljs-comment,
-.hljs-code,
-.hljs-formula {
-  /* prettylights-syntax-comment */
-  color: #8b949e
+
+.token.namespace {
+	opacity: .7;
 }
-.hljs-name,
-.hljs-quote,
-.hljs-selector-tag,
-.hljs-selector-pseudo {
-  /* prettylights-syntax-entity-tag */
-  color: #7ee787
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
 }
-.hljs-subst {
-  /* prettylights-syntax-storage-modifier-import */
-  color: #c9d1d9
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
 }
-.hljs-section {
-  /* prettylights-syntax-markup-heading */
-  color: #1f6feb;
-  font-weight: bold
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
 }
-.hljs-bullet {
-  /* prettylights-syntax-markup-list */
-  color: #f2cc60
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
 }
-.hljs-emphasis {
-  /* prettylights-syntax-markup-italic */
-  color: #c9d1d9;
-  font-style: italic
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
 }
-.hljs-strong {
-  /* prettylights-syntax-markup-bold */
-  color: #c9d1d9;
-  font-weight: bold
+
+.token.keyword {
+	color: #66d9ef;
 }
-.hljs-addition {
-  /* prettylights-syntax-markup-inserted */
-  color: #aff5b4;
-  background-color: #033a16
+
+.token.regex,
+.token.important {
+	color: #fd971f;
 }
-.hljs-deletion {
-  /* prettylights-syntax-markup-deleted */
-  color: #ffdcd7;
-  background-color: #67060c
+
+.token.important,
+.token.bold {
+	font-weight: bold;
 }
-.hljs-char.escape_,
-.hljs-link,
-.hljs-params,
-.hljs-property,
-.hljs-punctuation,
-.hljs-tag {
-  /* purposely ignored */
-  
+.token.italic {
+	font-style: italic;
 }
+
+.token.entity {
+	cursor: help;
+}
+

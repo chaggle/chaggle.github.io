@@ -53,6 +53,8 @@
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
 
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
 
@@ -355,7 +357,43 @@
 <p>​ 其中解析开头的 datalen为 data字段的数据长度，msgID 为相应的数据包编号。然后根据开头的 datalen 的具体数值来读取之后的 data 段的数据。至于TCP发送数据流中出现的错误，利用好 TCP 的错误重传机制就好，go 语言也有 TCP 包的实现，具体以后看底层代码来解释，本篇博客暂时不讨论此问题。</p>
 </blockquote>
 <p><img src="/images/go/TLV.jpeg" srcset="/img/loading.gif" lazyload alt="TLV"></p>
-<h2 id="6、写代码：channel"><a href="#6、写代码：channel" class="headerlink" title="6、写代码：channel"></a>6、写代码：channel</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">//多多练习一下代码能力，要脱离相应的视频项目开发，变为生产实际开发，有些东西，一段时间没用就会忘记，比如算法时间复杂度，以及相应的代码熟练度</span><br><br><span class="hljs-comment">//实现两个channel，一个 channel 输出 ping，一个channel 输出 pang，并发执行。</span><br><br><span class="hljs-comment">//22-5-13 日再回头看，发现问题很显然了，自己当时写一个经典的并发案例没写出来就是属于基础不够好，这个代码也不符合面试官需要达到的要求，只是效果达到了。</span><br><br><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span><br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	p := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-type">string</span>)<br>	q := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-type">string</span>)<br>	<br>	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>		p &lt;- <span class="hljs-string">&quot;ping&quot;</span><br>	&#125;()<br>	<br>	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>		q &lt;- <span class="hljs-string">&quot;pang&quot;</span><br>	&#125;()<br>	<br>	c := &lt;-q<br>	a := &lt;-p<br>	<br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	若没有IDE，在vim 看 c 与a 的类型要使用如下</span><br><span class="hljs-comment">	*/</span><br>	fmt.Printf(<span class="hljs-string">&quot;type of c : %T\n&quot;</span>, c)<br>	fmt.Printf(<span class="hljs-string">&quot;type of a : %T\n&quot;</span>, a)<br>	<br>	<span class="hljs-keyword">for</span> &#123;<br>		fmt.Println(a)<br>		fmt.Println(c)<br>	&#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<h2 id="6、写代码：channel"><a href="#6、写代码：channel" class="headerlink" title="6、写代码：channel"></a>6、写代码：channel</h2><figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">//多多练习一下代码能力，要脱离相应的视频项目开发，变为生产实际开发，有些东西，一段时间没用就会忘记，比如算法时间复杂度，以及相应的代码熟练度</span>
+
+<span class="token comment">//实现两个channel，一个 channel 输出 ping，一个channel 输出 pang，并发执行。</span>
+
+<span class="token comment">//22-5-13 日再回头看，发现问题很显然了，自己当时写一个经典的并发案例没写出来就是属于基础不够好，这个代码也不符合面试官需要达到的要求，只是效果达到了。</span>
+
+<span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token string">"fmt"</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	p <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">chan</span> <span class="token builtin">string</span><span class="token punctuation">)</span>
+	q <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">chan</span> <span class="token builtin">string</span><span class="token punctuation">)</span>
+	
+	<span class="token keyword">go</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		p <span class="token operator">&lt;-</span> <span class="token string">"ping"</span>
+	<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	
+	<span class="token keyword">go</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		q <span class="token operator">&lt;-</span> <span class="token string">"pang"</span>
+	<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	
+	c <span class="token operator">:=</span> <span class="token operator">&lt;-</span>q
+	a <span class="token operator">:=</span> <span class="token operator">&lt;-</span>p
+	
+	<span class="token comment">/*
+	若没有IDE，在vim 看 c 与a 的类型要使用如下
+	*/</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"type of c : %T\n"</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"type of a : %T\n"</span><span class="token punctuation">,</span> a<span class="token punctuation">)</span>
+	
+	<span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
+		fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span>
+		fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="7、Go-中-map-查询的时间复杂度为-O-1"><a href="#7、Go-中-map-查询的时间复杂度为-O-1" class="headerlink" title="7、Go 中 map 查询的时间复杂度为 O(1)"></a>7、Go 中 map 查询的时间复杂度为 O(1)</h2><blockquote>
 <p>答：查看了相应的各种博客，了解到：</p>
@@ -781,6 +819,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

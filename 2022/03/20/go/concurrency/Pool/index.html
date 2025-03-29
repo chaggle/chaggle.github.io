@@ -48,6 +48,8 @@
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
 
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
 
@@ -327,7 +329,21 @@
 <p>此方法用于将一个元素返回给 Pool, Pool 会将此元素保存在池中，而且可以复用，但是如果值是 nil，则 Pool 会忽略此值。</p>
 </blockquote>
 <h2 id="3、sync-Pool-的应用场景"><a href="#3、sync-Pool-的应用场景" class="headerlink" title="3、sync.Pool 的应用场景"></a>3、sync.Pool 的应用场景</h2><p>一般来说，很经典的场景即是 buffer 池，如 hugo 中的 bufpool，即可看到以下一段代码</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">var</span> buffers := sync.Pool &#123;<br>    New : <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> <span class="hljs-keyword">interface</span> &#123;<br>        <span class="hljs-keyword">return</span> New(bytes.Buffer)<br>    &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">GetBuffer</span><span class="hljs-params">()</span></span> *bytes.Buffer &#123;<br>    <span class="hljs-keyword">return</span> buffers.Get.(*bytes.Buffer)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">PutBuffer</span><span class="hljs-params">()</span></span> (buf *bytes.Buffer) &#123;<br>    buf.Reset()<br>    buffers.Put(buf)<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">var</span> buffers <span class="token operator">:=</span> sync<span class="token punctuation">.</span>Pool <span class="token punctuation">&#123;</span>
+    New <span class="token punctuation">:</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">interface</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token function">New</span><span class="token punctuation">(</span>bytes<span class="token punctuation">.</span>Buffer<span class="token punctuation">)</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token function">GetBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span>bytes<span class="token punctuation">.</span>Buffer <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> buffers<span class="token punctuation">.</span>Get<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">*</span>bytes<span class="token punctuation">.</span>Buffer<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token function">PutBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>buf <span class="token operator">*</span>bytes<span class="token punctuation">.</span>Buffer<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    buf<span class="token punctuation">.</span><span class="token function">Reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    buffers<span class="token punctuation">.</span><span class="token function">Put</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>然而在上述的代码，可能会导致内存泄漏的问题。</p>
 <p>因为取出 bytes.Buffer 后，在使用时，我们通常会向此 buffer 中增加大量的 byte 数据，此时的 slice 容量可能会扩大到另一个量级的维度。</p>
@@ -753,6 +769,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

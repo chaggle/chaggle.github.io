@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="">
   
-    <meta name="description" content="796. Minimum Light Radius题目12345678910111213141516171819202122You are given a list of integers numsrepresenting coordinates of houses on a 1-dimensional line. You have 3 street lights that you can put">
+    <meta name="description" content="796. Minimum Light Radius题目You are given a list of integers nums  representing coordinates of houses on a 1-dimensional line.   You have 3 street lights that you can put anywhere on the coordinate lin">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day 40 796. Minimum Light Radius">
 <meta property="og:url" content="https://chaggle.github.io/2021/10/19/Leetcode/91-day/day-40/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="796. Minimum Light Radius题目12345678910111213141516171819202122You are given a list of integers numsrepresenting coordinates of houses on a 1-dimensional line. You have 3 street lights that you can put">
+<meta property="og:description" content="796. Minimum Light Radius题目You are given a list of integers nums  representing coordinates of houses on a 1-dimensional line.   You have 3 street lights that you can put anywhere on the coordinate lin">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-19T02:03:15.000Z">
 <meta property="article:modified_time" content="2025-03-07T02:50:09.257Z">
@@ -45,6 +45,8 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -230,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          196 字
+          194 字
         
       </span>
     
@@ -302,7 +304,28 @@
             
               <div class="markdown-body">
                 
-                <h1 id="796-Minimum-Light-Radius"><a href="#796-Minimum-Light-Radius" class="headerlink" title="796. Minimum Light Radius"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Minimum-Light-Radius">796. Minimum Light Radius</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs cpp">You are given a list of integers nums<br><br>representing coordinates of houses on a <span class="hljs-number">1</span>-dimensional line. <br><br>You have <span class="hljs-number">3</span> street lights that you can put anywhere on the coordinate line <br><br><span class="hljs-keyword">and</span> a light at coordinate x lights up houses in [x - r, x + r],<br><br>inclusive. Return the smallest r required <br><br>such that we can place the <span class="hljs-number">3</span> lights <span class="hljs-keyword">and</span> all the houses are lit up.<br><br>Constraints<br><br>n ≤ <span class="hljs-number">100</span>,<span class="hljs-number">000</span> where n is the length of nums<br>Example <span class="hljs-number">1</span><br>Input<br>nums = [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>]<br>Output<br><span class="hljs-number">0.5</span><br>Explanation<br>If we place the lamps on <span class="hljs-number">3.5</span>, <span class="hljs-number">4.5</span> <span class="hljs-keyword">and</span> <span class="hljs-number">5.5</span> then with r = <span class="hljs-number">0.5</span> we can light up all <span class="hljs-number">4</span> houses.<br></code></pre></td></tr></table></figure>
+                <h1 id="796-Minimum-Light-Radius"><a href="#796-Minimum-Light-Radius" class="headerlink" title="796. Minimum Light Radius"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Minimum-Light-Radius">796. Minimum Light Radius</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">You are given a list of integers nums
+
+representing coordinates of houses on a <span class="token number">1</span><span class="token operator">-</span>dimensional line<span class="token punctuation">.</span> 
+
+You have <span class="token number">3</span> street lights that you can put anywhere on the coordinate line 
+
+<span class="token operator">and</span> a light at coordinate x lights up houses in <span class="token punctuation">[</span>x <span class="token operator">-</span> r<span class="token punctuation">,</span> x <span class="token operator">+</span> r<span class="token punctuation">]</span><span class="token punctuation">,</span>
+
+inclusive<span class="token punctuation">.</span> Return the smallest r required 
+
+such that we can place the <span class="token number">3</span> lights <span class="token operator">and</span> all the houses are lit up<span class="token punctuation">.</span>
+
+Constraints
+
+n ≤ <span class="token number">100</span><span class="token punctuation">,</span><span class="token number">000</span> where n is the length of nums
+Example <span class="token number">1</span>
+Input
+nums <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">]</span>
+Output
+<span class="token number">0.5</span>
+Explanation
+If we place the lamps on <span class="token number">3.5</span><span class="token punctuation">,</span> <span class="token number">4.5</span> <span class="token operator">and</span> <span class="token number">5.5</span> then with r <span class="token operator">=</span> <span class="token number">0.5</span> we can light up all <span class="token number">4</span> houses<span class="token punctuation">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
@@ -311,7 +334,33 @@
 <li>3、一个用来改变直径</li>
 </ul>
 </blockquote>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">isvaild</span><span class="hljs-params">(<span class="hljs-type">double</span> diameter, vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-type">double</span> l = <span class="hljs-number">0</span>, ans = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">while</span> (l &lt; n)<br>        &#123;<br>            l = <span class="hljs-built_in">upper_bound</span>(nums.<span class="hljs-built_in">begin</span>(), nums.<span class="hljs-built_in">end</span>(), nums[l] + diameter) - nums.<span class="hljs-built_in">begin</span>();<br>            ans++;<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans &lt;= <span class="hljs-number">3</span> ? <span class="hljs-number">1</span>: <span class="hljs-number">0</span>;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">double</span> <span class="hljs-title">solve</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>        <span class="hljs-built_in">sort</span>(nums.<span class="hljs-built_in">begin</span>(), nums.<span class="hljs-built_in">end</span>());<br>        <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-type">double</span> l = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">double</span> r = nums[n - <span class="hljs-number">1</span>];<br>        <span class="hljs-keyword">while</span>(l &lt; r)<br>        &#123;<br>            <span class="hljs-type">int</span> diameter = l + (r - l) / <span class="hljs-number">2</span>;<br>            <span class="hljs-keyword">if</span>(<span class="hljs-built_in">isvaild</span>(diameter, nums)) r = diameter;<br>            <span class="hljs-keyword">else</span> l = diameter + <span class="hljs-number">1</span>;<br>        &#125;<br>        <span class="hljs-keyword">return</span> l / <span class="hljs-number">2</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token keyword">bool</span> <span class="token function">isvaild</span><span class="token punctuation">(</span><span class="token keyword">double</span> diameter<span class="token punctuation">,</span> vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> nums<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">int</span> n <span class="token operator">=</span> nums<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">double</span> l <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> ans <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span>l <span class="token operator">&lt;</span> n<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            l <span class="token operator">=</span> <span class="token function">upper_bound</span><span class="token punctuation">(</span>nums<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nums<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>l<span class="token punctuation">]</span> <span class="token operator">+</span> diameter<span class="token punctuation">)</span> <span class="token operator">-</span> nums<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            ans<span class="token operator">++</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">return</span> ans <span class="token operator">&lt;=</span> <span class="token number">3</span> <span class="token operator">?</span> <span class="token number">1</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">double</span> <span class="token function">solve</span><span class="token punctuation">(</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> nums<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">sort</span><span class="token punctuation">(</span>nums<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nums<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> n <span class="token operator">=</span> nums<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">double</span> l <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">double</span> r <span class="token operator">=</span> nums<span class="token punctuation">[</span>n <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span><span class="token punctuation">(</span>l <span class="token operator">&lt;</span> r<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">int</span> diameter <span class="token operator">=</span> l <span class="token operator">+</span> <span class="token punctuation">(</span>r <span class="token operator">-</span> l<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isvaild</span><span class="token punctuation">(</span>diameter<span class="token punctuation">,</span> nums<span class="token punctuation">)</span><span class="token punctuation">)</span> r <span class="token operator">=</span> diameter<span class="token punctuation">;</span>
+            <span class="token keyword">else</span> l <span class="token operator">=</span> diameter <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">return</span> l <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(nlogn)</p>
@@ -719,6 +768,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

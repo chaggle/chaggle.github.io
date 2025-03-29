@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="">
   
-    <meta name="description" content="快排1234567891011121314151617181920212223242526272829func QuickSort(q []int, l, r int) &#123; if l &#x3D;&#x3D; r &#123;  return &#125; x :&#x3D; q[(l+r)&gt;&gt;1] i, j :&#x3D; l-1, r+1 for i &lt; j &#123;  for &#123;   i+">
+    <meta name="description" content="快排func QuickSort(q []int, l, r int) &#123;  if l &#x3D;&#x3D; r &#123;   return  &#125;   x :&#x3D; q[(l+r)&gt;&gt;1]  i, j :&#x3D; l-1, r+1   for i &lt; j &#123;   for &#123;    i++    if q[i] &gt;&#x3D; x &#123;     break    &#125;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一些刷算法的小模版">
 <meta property="og:url" content="https://chaggle.github.io/2022/02/18/Leetcode/template/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="快排1234567891011121314151617181920212223242526272829func QuickSort(q []int, l, r int) &#123; if l &#x3D;&#x3D; r &#123;  return &#125; x :&#x3D; q[(l+r)&gt;&gt;1] i, j :&#x3D; l-1, r+1 for i &lt; j &#123;  for &#123;   i+">
+<meta property="og:description" content="快排func QuickSort(q []int, l, r int) &#123;  if l &#x3D;&#x3D; r &#123;   return  &#125;   x :&#x3D; q[(l+r)&gt;&gt;1]  i, j :&#x3D; l-1, r+1   for i &lt; j &#123;   for &#123;    i++    if q[i] &gt;&#x3D; x &#123;     break    &#125;">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-02-18T02:00:36.000Z">
 <meta property="article:modified_time" content="2025-03-07T02:50:09.265Z">
@@ -45,6 +45,8 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -230,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          190 字
+          185 字
         
       </span>
     
@@ -302,9 +304,77 @@
             
               <div class="markdown-body">
                 
-                <h2 id="快排"><a href="#快排" class="headerlink" title="快排"></a>快排</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">QuickSort</span><span class="hljs-params">(q []<span class="hljs-type">int</span>, l, r <span class="hljs-type">int</span>)</span></span> &#123;<br> <span class="hljs-keyword">if</span> l == r &#123;<br>  <span class="hljs-keyword">return</span><br> &#125;<br><br> x := q[(l+r)&gt;&gt;<span class="hljs-number">1</span>]<br> i, j := l<span class="hljs-number">-1</span>, r+<span class="hljs-number">1</span><br><br> <span class="hljs-keyword">for</span> i &lt; j &#123;<br>  <span class="hljs-keyword">for</span> &#123;<br>   i++<br>   <span class="hljs-keyword">if</span> q[i] &gt;= x &#123;<br>    <span class="hljs-keyword">break</span><br>   &#125;<br>  &#125;<br>  <span class="hljs-keyword">for</span> &#123;<br>   j--<br>   <span class="hljs-keyword">if</span> q[j] &lt;= x &#123;<br>    <span class="hljs-keyword">break</span><br>   &#125;<br>  &#125;<br><br>  <span class="hljs-keyword">if</span> i &lt; j &#123;<br>   q[i], q[j] = q[j], q[i]<br>  &#125;<br> &#125;<br> QuickSort(q, l, j)<br> QuickSort(q, j+<span class="hljs-number">1</span>, r)<br>&#125; <br></code></pre></td></tr></table></figure>
+                <h2 id="快排"><a href="#快排" class="headerlink" title="快排"></a>快排</h2><figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">QuickSort</span><span class="token punctuation">(</span>q <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> l<span class="token punctuation">,</span> r <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+ <span class="token keyword">if</span> l <span class="token operator">==</span> r <span class="token punctuation">&#123;</span>
+  <span class="token keyword">return</span>
+ <span class="token punctuation">&#125;</span>
 
-<h2 id="归并排序（针对单个数组版本）"><a href="#归并排序（针对单个数组版本）" class="headerlink" title="归并排序（针对单个数组版本）"></a>归并排序（针对单个数组版本）</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">MergeSort</span><span class="hljs-params">(p, q []<span class="hljs-type">int</span>, l, r <span class="hljs-type">int</span>)</span></span> &#123;<br> <span class="hljs-keyword">if</span> l == r &#123;<br>  <span class="hljs-keyword">return</span><br> &#125;<br><br> mid := (l + r) &gt;&gt; <span class="hljs-number">1</span><br> MergeSort(p, q, l, mid)<br> MergeSort(p, q, mid+<span class="hljs-number">1</span>, r)<br><br> k, i, j := <span class="hljs-number">0</span>, l, mid+<span class="hljs-number">1</span><br><br> <span class="hljs-keyword">for</span> i &lt;= mid &amp;&amp; j &lt;= r &#123;<br>  <span class="hljs-keyword">if</span> q[i] &lt;= q[j] &#123;<br>   p[k] = q[i]<br>   k++<br>   i++<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>   p[k] = q[j]<br>   k++<br>   j++<br>  &#125;<br> &#125;<br> <span class="hljs-keyword">for</span> i &lt;= mid &#123;<br>  p[k] = q[i]<br>  k++<br>  i++<br> &#125;<br> <span class="hljs-keyword">for</span> j &lt;= r &#123;<br>  p[k] = q[j]<br>  k++<br>  j++<br> &#125;<br><br> i, j = l, <span class="hljs-number">0</span><br> <span class="hljs-keyword">for</span> i &lt; r &#123;<br>  q[i] = p[j]<br>  i++<br>  j++<br> &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+ x <span class="token operator">:=</span> q<span class="token punctuation">[</span><span class="token punctuation">(</span>l<span class="token operator">+</span>r<span class="token punctuation">)</span><span class="token operator">>></span><span class="token number">1</span><span class="token punctuation">]</span>
+ i<span class="token punctuation">,</span> j <span class="token operator">:=</span> l<span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> r<span class="token operator">+</span><span class="token number">1</span>
+
+ <span class="token keyword">for</span> i <span class="token operator">&lt;</span> j <span class="token punctuation">&#123;</span>
+  <span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
+   i<span class="token operator">++</span>
+   <span class="token keyword">if</span> q<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">>=</span> x <span class="token punctuation">&#123;</span>
+    <span class="token keyword">break</span>
+   <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+  <span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
+   j<span class="token operator">--</span>
+   <span class="token keyword">if</span> q<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">&lt;=</span> x <span class="token punctuation">&#123;</span>
+    <span class="token keyword">break</span>
+   <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">if</span> i <span class="token operator">&lt;</span> j <span class="token punctuation">&#123;</span>
+   q<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> q<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">,</span> q<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+  <span class="token punctuation">&#125;</span>
+ <span class="token punctuation">&#125;</span>
+ <span class="token function">QuickSort</span><span class="token punctuation">(</span>q<span class="token punctuation">,</span> l<span class="token punctuation">,</span> j<span class="token punctuation">)</span>
+ <span class="token function">QuickSort</span><span class="token punctuation">(</span>q<span class="token punctuation">,</span> j<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">,</span> r<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span> <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h2 id="归并排序（针对单个数组版本）"><a href="#归并排序（针对单个数组版本）" class="headerlink" title="归并排序（针对单个数组版本）"></a>归并排序（针对单个数组版本）</h2><figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">MergeSort</span><span class="token punctuation">(</span>p<span class="token punctuation">,</span> q <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> l<span class="token punctuation">,</span> r <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+ <span class="token keyword">if</span> l <span class="token operator">==</span> r <span class="token punctuation">&#123;</span>
+  <span class="token keyword">return</span>
+ <span class="token punctuation">&#125;</span>
+
+ mid <span class="token operator">:=</span> <span class="token punctuation">(</span>l <span class="token operator">+</span> r<span class="token punctuation">)</span> <span class="token operator">>></span> <span class="token number">1</span>
+ <span class="token function">MergeSort</span><span class="token punctuation">(</span>p<span class="token punctuation">,</span> q<span class="token punctuation">,</span> l<span class="token punctuation">,</span> mid<span class="token punctuation">)</span>
+ <span class="token function">MergeSort</span><span class="token punctuation">(</span>p<span class="token punctuation">,</span> q<span class="token punctuation">,</span> mid<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">,</span> r<span class="token punctuation">)</span>
+
+ k<span class="token punctuation">,</span> i<span class="token punctuation">,</span> j <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">,</span> l<span class="token punctuation">,</span> mid<span class="token operator">+</span><span class="token number">1</span>
+
+ <span class="token keyword">for</span> i <span class="token operator">&lt;=</span> mid <span class="token operator">&amp;&amp;</span> j <span class="token operator">&lt;=</span> r <span class="token punctuation">&#123;</span>
+  <span class="token keyword">if</span> q<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&lt;=</span> q<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token punctuation">&#123;</span>
+   p<span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">=</span> q<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+   k<span class="token operator">++</span>
+   i<span class="token operator">++</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+   p<span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">=</span> q<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+   k<span class="token operator">++</span>
+   j<span class="token operator">++</span>
+  <span class="token punctuation">&#125;</span>
+ <span class="token punctuation">&#125;</span>
+ <span class="token keyword">for</span> i <span class="token operator">&lt;=</span> mid <span class="token punctuation">&#123;</span>
+  p<span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">=</span> q<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+  k<span class="token operator">++</span>
+  i<span class="token operator">++</span>
+ <span class="token punctuation">&#125;</span>
+ <span class="token keyword">for</span> j <span class="token operator">&lt;=</span> r <span class="token punctuation">&#123;</span>
+  p<span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">=</span> q<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+  k<span class="token operator">++</span>
+  j<span class="token operator">++</span>
+ <span class="token punctuation">&#125;</span>
+
+ i<span class="token punctuation">,</span> j <span class="token operator">=</span> l<span class="token punctuation">,</span> <span class="token number">0</span>
+ <span class="token keyword">for</span> i <span class="token operator">&lt;</span> r <span class="token punctuation">&#123;</span>
+  q<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> p<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+  i<span class="token operator">++</span>
+  j<span class="token operator">++</span>
+ <span class="token punctuation">&#125;</span>
+
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
                 
               </div>
@@ -705,6 +775,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

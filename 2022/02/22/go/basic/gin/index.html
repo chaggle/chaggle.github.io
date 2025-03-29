@@ -48,6 +48,8 @@
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
 
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
 
@@ -232,7 +234,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          701 字
+          693 字
         
       </span>
     
@@ -310,7 +312,14 @@
 <h2 id="1、Beego-与-gin"><a href="#1、Beego-与-gin" class="headerlink" title="1、Beego 与 gin"></a>1、Beego 与 gin</h2><p>​ 首先学习框架之前，需要我们理解一个道理，学习框架的目的是首先是适应业务场景的需要，其次是有两种大类：一种是为了开发效率，另一种是为了追求运行的性能。</p>
 <p>​ 追求运行性能的框架包含的东西挺好，比如 GIN ，另一种追求开发效率的框架封装得非常好，即是 Beego 框架。</p>
 <h2 id="2、路由分组"><a href="#2、路由分组" class="headerlink" title="2、路由分组"></a>2、路由分组</h2><p>​ gin 框架的路由分组为：对 router 创建 Group 即为分组，同一分组拥有同一前缀和同一中间件。其相关的写法如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs go">r := gin.Default()<br><br>v1 := r.Group(<span class="hljs-string">&quot;v1&quot;</span>) <br>&#123;<br>    v1.POST(<span class="hljs-string">&quot;/login&quot;</span>, login)<br>    v1.POST(<span class="hljs-string">&quot;/submit&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span>)</span><br>    v1.POST(<span class="hljs-string">&quot;/read&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span>)</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go">r <span class="token operator">:=</span> gin<span class="token punctuation">.</span><span class="token function">Default</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+v1 <span class="token operator">:=</span> r<span class="token punctuation">.</span><span class="token function">Group</span><span class="token punctuation">(</span><span class="token string">"v1"</span><span class="token punctuation">)</span> 
+<span class="token punctuation">&#123;</span>
+    v1<span class="token punctuation">.</span><span class="token function">POST</span><span class="token punctuation">(</span><span class="token string">"/login"</span><span class="token punctuation">,</span> login<span class="token punctuation">)</span>
+    v1<span class="token punctuation">.</span><span class="token function">POST</span><span class="token punctuation">(</span><span class="token string">"/submit"</span><span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">)</span>
+    v1<span class="token punctuation">.</span><span class="token function">POST</span><span class="token punctuation">(</span><span class="token string">"/read"</span><span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>路由分组的目的是：使路由更加清晰，方便管理路由</p>
 <h2 id="3、中间件"><a href="#3、中间件" class="headerlink" title="3、中间件"></a>3、中间件</h2><p>​ 在请求到达路由的方法前和后进行的一系列的操作，使用中间件的时候，在路由组上进行 use 操作，后面传入中间件函数即可。中间件有概念叫做<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/279391637">洋葱中间件</a>，此处引用知乎博主的图：</p>
@@ -732,6 +741,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

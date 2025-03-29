@@ -47,6 +47,8 @@
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
 
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
 
@@ -315,19 +317,65 @@
 <li>动态内存管理：使用内存管理模型来动态管理所需要的内存空间</li>
 </ol>
 </blockquote>
-<h3 id="模版"><a href="#模版" class="headerlink" title="模版"></a>模版</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt; <span class="hljs-keyword">class</span> <span class="hljs-title class_">Key</span>,                                    <span class="hljs-comment">// unordered_map::key_type</span><br>           <span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>,                                      <span class="hljs-comment">// unordered_map::mapped_type</span><br>           <span class="hljs-keyword">class</span> <span class="hljs-title class_">Hash</span> = hash&lt;Key&gt;,                       <span class="hljs-comment">// unordered_map::hasher</span><br>           <span class="hljs-keyword">class</span> Pred = equal_to&lt;Key&gt;,                   <span class="hljs-comment">// unordered_map::key_equal</span><br>           <span class="hljs-keyword">class</span> Alloc = allocator&lt; pair&lt;<span class="hljs-type">const</span> Key,T&gt; &gt;  <span class="hljs-comment">// unordered_map::allocator_type</span><br>           &gt; <span class="hljs-keyword">class</span> unordered_map;<br></code></pre></td></tr></table></figure>
+<h3 id="模版"><a href="#模版" class="headerlink" title="模版"></a>模版</h3><figure><div class="code-wrapper"><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">template &lt; class Key,                                    &#x2F;&#x2F; unordered_map::key_type
+           class T,                                      &#x2F;&#x2F; unordered_map::mapped_type
+           class Hash &#x3D; hash&lt;Key&gt;,                       &#x2F;&#x2F; unordered_map::hasher
+           class Pred &#x3D; equal_to&lt;Key&gt;,                   &#x2F;&#x2F; unordered_map::key_equal
+           class Alloc &#x3D; allocator&lt; pair&lt;const Key,T&gt; &gt;  &#x2F;&#x2F; unordered_map::allocator_type
+           &gt; class unordered_map;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>一般只使用模板前2个参数&lt;KEY, T&gt; 即unordered_map&lt;const Key, T&gt; map;</p>
 <h3 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h3><p>unordered_map的迭代器是一个指针，指向这个元素，通过迭代器来取得它的值。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs cpp">unordered_map&lt;Key, T&gt;::iterator it;<br>(*it).first;             <span class="hljs-comment">// the key value (of type Key)</span><br>(*it).second;            <span class="hljs-comment">// the mapped value (of type T)</span><br>(*it);                   <span class="hljs-comment">// the &quot;element value&quot; (of type pair&lt;const Key,T&gt;) </span><br>   <br>it -&gt; first;  key       <span class="hljs-comment">// 它的键值分别是迭代器的first和second属性。</span><br>it -&gt; second; T              <br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">unordered_map<span class="token operator">&lt;</span>Key<span class="token punctuation">,</span> T<span class="token operator">></span><span class="token double-colon punctuation">::</span>iterator it<span class="token punctuation">;</span>
+<span class="token punctuation">(</span><span class="token operator">*</span>it<span class="token punctuation">)</span><span class="token punctuation">.</span>first<span class="token punctuation">;</span>             <span class="token comment">// the key value (of type Key)</span>
+<span class="token punctuation">(</span><span class="token operator">*</span>it<span class="token punctuation">)</span><span class="token punctuation">.</span>second<span class="token punctuation">;</span>            <span class="token comment">// the mapped value (of type T)</span>
+<span class="token punctuation">(</span><span class="token operator">*</span>it<span class="token punctuation">)</span><span class="token punctuation">;</span>                   <span class="token comment">// the "element value" (of type pair&lt;const Key,T>) </span>
+   
+it <span class="token operator">-></span> first<span class="token punctuation">;</span>  key       <span class="token comment">// 它的键值分别是迭代器的first和second属性。</span>
+it <span class="token operator">-></span> second<span class="token punctuation">;</span> T              <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h3 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h3><blockquote>
 <p>  unordered_map的构造方式有几种：<br>  - 构造空的容器<br>  - 复制构造<br>  - 范围构造<br>  - 用数组构造</p>
 </blockquote>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unordered_map&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-keyword">typedef</span> unordered_map&lt;string, string&gt; stringmap;<br><br><span class="hljs-function">stringmap <span class="hljs-title">merge</span><span class="hljs-params">(stringmap a, stringmap b)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-function">stringmap <span class="hljs-title">temp</span><span class="hljs-params">(a)</span></span>;<br>    temp.<span class="hljs-built_in">insert</span>(b.<span class="hljs-built_in">begin</span>(), b.<span class="hljs-built_in">end</span>());<br>    <span class="hljs-keyword">return</span> temp;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    stringmap first;                                                <span class="hljs-comment">// 空</span><br>    <br>    <span class="hljs-function">stringmap <span class="hljs-title">second</span><span class="hljs-params">(&#123;&#123;<span class="hljs-string">&quot;apple&quot;</span>, <span class="hljs-string">&quot;red&quot;</span>&#125;, &#123;<span class="hljs-string">&quot;lemon&quot;</span>, <span class="hljs-string">&quot;yellow&quot;</span>&#125;&#125;)</span></span>;      <span class="hljs-comment">// 用数组初始</span><br>    <br>    <span class="hljs-function">stringmap <span class="hljs-title">third</span><span class="hljs-params">(&#123;&#123;<span class="hljs-string">&quot;orange&quot;</span>, <span class="hljs-string">&quot;orange&quot;</span>&#125;, &#123;<span class="hljs-string">&quot;strawberry&quot;</span>, <span class="hljs-string">&quot;red&quot;</span>&#125;&#125;)</span></span>; <span class="hljs-comment">// 用数组初始</span><br>    <br>    <span class="hljs-function">stringmap <span class="hljs-title">fourth</span><span class="hljs-params">(second)</span></span>;                                       <span class="hljs-comment">// 复制初始化</span><br>    <br>    <span class="hljs-function">stringmap <span class="hljs-title">fifth</span><span class="hljs-params">(merge(third, fourth))</span></span>;                          <span class="hljs-comment">// 移动初始化</span><br>    <br>    <span class="hljs-function">stringmap <span class="hljs-title">sixth</span><span class="hljs-params">(fifth.begin(), fifth.end())</span></span>;                    <span class="hljs-comment">// 范围初始化</span><br><br>    cout &lt;&lt; <span class="hljs-string">&quot;sixth contains:&quot;</span>;<br>    <br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> &amp;x : sixth)<br>        cout &lt;&lt; <span class="hljs-string">&quot; &quot;</span> &lt;&lt; x.first &lt;&lt; <span class="hljs-string">&quot;:&quot;</span> &lt;&lt; x.second;<br>    cout &lt;&lt; endl;<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;unordered_map&gt;
+using namespace std;
+
+typedef unordered_map&lt;string, string&gt; stringmap;
+
+stringmap merge(stringmap a, stringmap b)
+&#123;
+    stringmap temp(a);
+    temp.insert(b.begin(), b.end());
+    return temp;
+&#125;
+
+int main()
+&#123;
+    stringmap first;                                                &#x2F;&#x2F; 空
+    
+    stringmap second(&#123;&#123;&quot;apple&quot;, &quot;red&quot;&#125;, &#123;&quot;lemon&quot;, &quot;yellow&quot;&#125;&#125;);      &#x2F;&#x2F; 用数组初始
+    
+    stringmap third(&#123;&#123;&quot;orange&quot;, &quot;orange&quot;&#125;, &#123;&quot;strawberry&quot;, &quot;red&quot;&#125;&#125;); &#x2F;&#x2F; 用数组初始
+    
+    stringmap fourth(second);                                       &#x2F;&#x2F; 复制初始化
+    
+    stringmap fifth(merge(third, fourth));                          &#x2F;&#x2F; 移动初始化
+    
+    stringmap sixth(fifth.begin(), fifth.end());                    &#x2F;&#x2F; 范围初始化
+
+    cout &lt;&lt; &quot;sixth contains:&quot;;
+    
+    for (auto &amp;x : sixth)
+        cout &lt;&lt; &quot; &quot; &lt;&lt; x.first &lt;&lt; &quot;:&quot; &lt;&lt; x.second;
+    cout &lt;&lt; endl;
+
+    return 0;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>输出结果：</p>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs applescript"><span class="hljs-keyword">sixth</span> <span class="hljs-keyword">contains</span>: apple:red lemon:yellow orange:orange strawberry:red<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">sixth contains: apple:red lemon:yellow orange:orange strawberry:red<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
 
 <h4 id="size"><a href="#size" class="headerlink" title="size()"></a>size()</h4><blockquote>
 <p>  返回unordered_map的大小</p>
@@ -360,10 +408,112 @@
 <p>void swap(unordered_map&amp; ump);</p>
 <p>交换两个unordered_map(整个交换两个map中的所有元素）</p>
 </blockquote>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unordered_map&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">display</span><span class="hljs-params">(unordered_map&lt;string, <span class="hljs-type">double</span>&gt; myrecipe, string str)</span></span><br><span class="hljs-function"></span>&#123;<br>    cout &lt;&lt; str &lt;&lt; endl;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> &amp;x : myrecipe)<br>        cout &lt;&lt; x.first &lt;&lt; <span class="hljs-string">&quot;: &quot;</span> &lt;&lt; x.second &lt;&lt; endl;<br>    cout &lt;&lt; endl;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    unordered_map&lt;string, <span class="hljs-type">double</span>&gt; myrecipe, mypantry = &#123;<br>        &#123;<span class="hljs-string">&quot;milk&quot;</span>, <span class="hljs-number">2.0</span>&#125;,                                                     		 <br>        &#123;<span class="hljs-string">&quot;flour&quot;</span>, <span class="hljs-number">1.5</span>&#125;<br>    &#125;;<br>    <br>    <span class="hljs-function">pair&lt;string, <span class="hljs-type">double</span>&gt; <span class="hljs-title">myshopping</span><span class="hljs-params">(<span class="hljs-string">&quot;baking powder&quot;</span>, <span class="hljs-number">0.3</span>)</span></span>;<br>    <br>    myrecipe.<span class="hljs-built_in">insert</span>(myshopping);                             <span class="hljs-comment">// 复制插入</span><br>    <br>    myrecipe.<span class="hljs-built_in">insert</span>(<span class="hljs-built_in">make_pair</span>&lt;string, <span class="hljs-type">double</span>&gt;(<span class="hljs-string">&quot;eggs&quot;</span>, <span class="hljs-number">6.0</span>)); <span class="hljs-comment">// 移动插入</span><br>    <br>    myrecipe.<span class="hljs-built_in">insert</span>(mypantry.<span class="hljs-built_in">begin</span>(), mypantry.<span class="hljs-built_in">end</span>());       <span class="hljs-comment">// 范围插入</span><br>    <br>    myrecipe.<span class="hljs-built_in">insert</span>(&#123;&#123;<span class="hljs-string">&quot;sugar&quot;</span>, <span class="hljs-number">0.8</span>&#125;, &#123;<span class="hljs-string">&quot;salt&quot;</span>, <span class="hljs-number">0.1</span>&#125;&#125;);        <span class="hljs-comment">// 初始化数组插入</span><br>    <br>    myrecipe[<span class="hljs-string">&quot;coffee&quot;</span>] = <span class="hljs-number">10.0</span>;                               <span class="hljs-comment">// 数组形式插入</span><br>    <br><br>    <span class="hljs-built_in">display</span>(myrecipe, <span class="hljs-string">&quot;myrecipe contains:&quot;</span>);<br><br>    <span class="hljs-comment">/****************查找*****************/</span><br>    <br>    unordered_map&lt;string, <span class="hljs-type">double</span>&gt;::const_iterator got = myrecipe.<span class="hljs-built_in">find</span>(<span class="hljs-string">&quot;coffee&quot;</span>);<br><br>    <span class="hljs-keyword">if</span> (got == myrecipe.<span class="hljs-built_in">end</span>())<br>        cout &lt;&lt; <span class="hljs-string">&quot;not found&quot;</span>;<br>    <span class="hljs-keyword">else</span><br>        cout &lt;&lt; <span class="hljs-string">&quot;found &quot;</span> &lt;&lt; got-&gt;first &lt;&lt; <span class="hljs-string">&quot; is &quot;</span> &lt;&lt; got-&gt;second &lt;&lt; <span class="hljs-string">&quot;\n\n&quot;</span>;<br>    <br>    <span class="hljs-comment">/****************修改*****************/</span><br>    <br>    myrecipe.<span class="hljs-built_in">at</span>(<span class="hljs-string">&quot;coffee&quot;</span>) = <span class="hljs-number">9.0</span>;<br>    <br>    myrecipe[<span class="hljs-string">&quot;milk&quot;</span>] = <span class="hljs-number">3.0</span>;<br>    <br>    <span class="hljs-built_in">display</span>(myrecipe, <span class="hljs-string">&quot;After modify myrecipe contains:&quot;</span>);<br><br>    <span class="hljs-comment">/****************擦除*****************/</span><br>    <br>    myrecipe.<span class="hljs-built_in">erase</span>(myrecipe.<span class="hljs-built_in">begin</span>()); <span class="hljs-comment">//通过位置</span><br>    <br>    myrecipe.<span class="hljs-built_in">erase</span>(<span class="hljs-string">&quot;milk&quot;</span>);           <span class="hljs-comment">//通过key</span><br>    <br>    <span class="hljs-built_in">display</span>(myrecipe, <span class="hljs-string">&quot;After erase myrecipe contains:&quot;</span>);<br><br>    <span class="hljs-comment">/****************交换*****************/</span><br>    <br>    myrecipe.<span class="hljs-built_in">swap</span>(mypantry);<br>    <br>    <span class="hljs-built_in">display</span>(myrecipe, <span class="hljs-string">&quot;After swap with mypantry, myrecipe contains:&quot;</span>);<br><br>    <span class="hljs-comment">/****************清空*****************/</span><br>    <br>    myrecipe.<span class="hljs-built_in">clear</span>();<br>    <span class="hljs-built_in">display</span>(myrecipe, <span class="hljs-string">&quot;After clear, myrecipe contains:&quot;</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;unordered_map&gt;
+using namespace std;
+
+void display(unordered_map&lt;string, double&gt; myrecipe, string str)
+&#123;
+    cout &lt;&lt; str &lt;&lt; endl;
+    for (auto &amp;x : myrecipe)
+        cout &lt;&lt; x.first &lt;&lt; &quot;: &quot; &lt;&lt; x.second &lt;&lt; endl;
+    cout &lt;&lt; endl;
+&#125;
+
+int main()
+&#123;
+    unordered_map&lt;string, double&gt; myrecipe, mypantry &#x3D; &#123;
+        &#123;&quot;milk&quot;, 2.0&#125;,                                                     		 
+        &#123;&quot;flour&quot;, 1.5&#125;
+    &#125;;
+    
+    pair&lt;string, double&gt; myshopping(&quot;baking powder&quot;, 0.3);
+    
+    myrecipe.insert(myshopping);                             &#x2F;&#x2F; 复制插入
+    
+    myrecipe.insert(make_pair&lt;string, double&gt;(&quot;eggs&quot;, 6.0)); &#x2F;&#x2F; 移动插入
+    
+    myrecipe.insert(mypantry.begin(), mypantry.end());       &#x2F;&#x2F; 范围插入
+    
+    myrecipe.insert(&#123;&#123;&quot;sugar&quot;, 0.8&#125;, &#123;&quot;salt&quot;, 0.1&#125;&#125;);        &#x2F;&#x2F; 初始化数组插入
+    
+    myrecipe[&quot;coffee&quot;] &#x3D; 10.0;                               &#x2F;&#x2F; 数组形式插入
+    
+
+    display(myrecipe, &quot;myrecipe contains:&quot;);
+
+    &#x2F;****************查找*****************&#x2F;
+    
+    unordered_map&lt;string, double&gt;::const_iterator got &#x3D; myrecipe.find(&quot;coffee&quot;);
+
+    if (got &#x3D;&#x3D; myrecipe.end())
+        cout &lt;&lt; &quot;not found&quot;;
+    else
+        cout &lt;&lt; &quot;found &quot; &lt;&lt; got-&gt;first &lt;&lt; &quot; is &quot; &lt;&lt; got-&gt;second &lt;&lt; &quot;\n\n&quot;;
+    
+    &#x2F;****************修改*****************&#x2F;
+    
+    myrecipe.at(&quot;coffee&quot;) &#x3D; 9.0;
+    
+    myrecipe[&quot;milk&quot;] &#x3D; 3.0;
+    
+    display(myrecipe, &quot;After modify myrecipe contains:&quot;);
+
+    &#x2F;****************擦除*****************&#x2F;
+    
+    myrecipe.erase(myrecipe.begin()); &#x2F;&#x2F;通过位置
+    
+    myrecipe.erase(&quot;milk&quot;);           &#x2F;&#x2F;通过key
+    
+    display(myrecipe, &quot;After erase myrecipe contains:&quot;);
+
+    &#x2F;****************交换*****************&#x2F;
+    
+    myrecipe.swap(mypantry);
+    
+    display(myrecipe, &quot;After swap with mypantry, myrecipe contains:&quot;);
+
+    &#x2F;****************清空*****************&#x2F;
+    
+    myrecipe.clear();
+    display(myrecipe, &quot;After clear, myrecipe contains:&quot;);
+    return 0;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>输出结果：</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">myrecipe</span> contains:<br><span class="hljs-attribute">salt</span>: <span class="hljs-number">0</span>.<span class="hljs-number">1</span><br><span class="hljs-attribute">milk</span>: <span class="hljs-number">2</span><br><span class="hljs-attribute">flour</span>: <span class="hljs-number">1</span>.<span class="hljs-number">5</span><br><span class="hljs-attribute">coffee</span>: <span class="hljs-number">10</span><br><span class="hljs-attribute">eggs</span>: <span class="hljs-number">6</span><br><span class="hljs-attribute">sugar</span>: <span class="hljs-number">0</span>.<span class="hljs-number">8</span><br><span class="hljs-attribute">baking</span> powder: <span class="hljs-number">0</span>.<span class="hljs-number">3</span><br><br><span class="hljs-attribute">found</span> coffee is <span class="hljs-number">10</span><br><br><span class="hljs-attribute">After</span> modify myrecipe contains:<br><span class="hljs-attribute">salt</span>: <span class="hljs-number">0</span>.<span class="hljs-number">1</span><br><span class="hljs-attribute">milk</span>: <span class="hljs-number">3</span><br><span class="hljs-attribute">flour</span>: <span class="hljs-number">1</span>.<span class="hljs-number">5</span><br><span class="hljs-attribute">coffee</span>: <span class="hljs-number">9</span><br><span class="hljs-attribute">eggs</span>: <span class="hljs-number">6</span><br><span class="hljs-attribute">sugar</span>: <span class="hljs-number">0</span>.<span class="hljs-number">8</span><br><span class="hljs-attribute">baking</span> powder: <span class="hljs-number">0</span>.<span class="hljs-number">3</span><br><br><span class="hljs-attribute">After</span> erase myrecipe contains:<br><span class="hljs-attribute">flour</span>: <span class="hljs-number">1</span>.<span class="hljs-number">5</span><br><span class="hljs-attribute">coffee</span>: <span class="hljs-number">9</span><br><span class="hljs-attribute">eggs</span>: <span class="hljs-number">6</span><br><span class="hljs-attribute">sugar</span>: <span class="hljs-number">0</span>.<span class="hljs-number">8</span><br><span class="hljs-attribute">baking</span> powder: <span class="hljs-number">0</span>.<span class="hljs-number">3</span><br><br><span class="hljs-attribute">After</span> swap with mypantry, myrecipe contains:<br><span class="hljs-attribute">flour</span>: <span class="hljs-number">1</span>.<span class="hljs-number">5</span><br><span class="hljs-attribute">milk</span>: <span class="hljs-number">2</span><br><br><span class="hljs-attribute">After</span> clear, myrecipe contains:<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">myrecipe contains:
+salt: 0.1
+milk: 2
+flour: 1.5
+coffee: 10
+eggs: 6
+sugar: 0.8
+baking powder: 0.3
+
+found coffee is 10
+
+After modify myrecipe contains:
+salt: 0.1
+milk: 3
+flour: 1.5
+coffee: 9
+eggs: 6
+sugar: 0.8
+baking powder: 0.3
+
+After erase myrecipe contains:
+flour: 1.5
+coffee: 9
+eggs: 6
+sugar: 0.8
+baking powder: 0.3
+
+After swap with mypantry, myrecipe contains:
+flour: 1.5
+milk: 2
+
+After clear, myrecipe contains:<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h4 id="begin"><a href="#begin" class="headerlink" title="begin()"></a>begin()</h4><blockquote>
 <p>begin() : 返回开始的迭代器</p>
@@ -384,10 +534,66 @@
 <p>返回第i个bucket的大小</p>
 <p>此位置的桶子里的元素数量，但是函数并不会判断n是否在count范围内）</p>
 </blockquote>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unordered_map&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    unordered_map&lt;string, string&gt; mymap =<br>    &#123;<br>            &#123;<span class="hljs-string">&quot;house&quot;</span>, <span class="hljs-string">&quot;maison&quot;</span>&#125;,<br>            &#123;<span class="hljs-string">&quot;apple&quot;</span>, <span class="hljs-string">&quot;pomme&quot;</span>&#125;,<br>            &#123;<span class="hljs-string">&quot;tree&quot;</span>, <span class="hljs-string">&quot;arbre&quot;</span>&#125;,<br>            &#123;<span class="hljs-string">&quot;book&quot;</span>, <span class="hljs-string">&quot;livre&quot;</span>&#125;,<br>            &#123;<span class="hljs-string">&quot;door&quot;</span>, <span class="hljs-string">&quot;porte&quot;</span>&#125;,<br>            &#123;<span class="hljs-string">&quot;grapefruit&quot;</span>, <span class="hljs-string">&quot;pamplemousse&quot;</span>&#125;<br>    &#125;;<br>    <br>    <span class="hljs-comment">/************begin和end迭代器***************/</span><br>    <br>    cout &lt;&lt; <span class="hljs-string">&quot;mymap contains:&quot;</span>;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> it = mymap.<span class="hljs-built_in">begin</span>(); it != mymap.<span class="hljs-built_in">end</span>(); ++it)<br>        cout &lt;&lt; <span class="hljs-string">&quot; &quot;</span> &lt;&lt; it-&gt;first &lt;&lt; <span class="hljs-string">&quot;:&quot;</span> &lt;&lt; it-&gt;second;<br>    cout &lt;&lt; endl;<br>    <br>    <span class="hljs-comment">/************bucket操作***************/</span><br>    <br>    <span class="hljs-type">unsigned</span> n = mymap.<span class="hljs-built_in">bucket_count</span>();<br><br>    cout &lt;&lt; <span class="hljs-string">&quot;mymap has &quot;</span> &lt;&lt; n &lt;&lt; <span class="hljs-string">&quot; buckets.\n&quot;</span>;<br><br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">unsigned</span> i = <span class="hljs-number">0</span>; i &lt; n; ++i)<br>    &#123;<br>        cout &lt;&lt; <span class="hljs-string">&quot;bucket #&quot;</span> &lt;&lt; i &lt;&lt; <span class="hljs-string">&quot;&#x27;s size:&quot;</span> <br>             &lt;&lt; mymap.<span class="hljs-built_in">bucket_size</span>(i) &lt;&lt; <span class="hljs-string">&quot; contains: &quot;</span>;<br>        <br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> it = mymap.<span class="hljs-built_in">begin</span>(i); it != mymap.<span class="hljs-built_in">end</span>(i); ++it)<br>            cout &lt;&lt; <span class="hljs-string">&quot;[&quot;</span> &lt;&lt; it-&gt;first &lt;&lt; <span class="hljs-string">&quot;:&quot;</span> &lt;&lt; it-&gt;second &lt;&lt; <span class="hljs-string">&quot;] &quot;</span>;<br>        cout &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>;<br>    &#125;<br><br>    cout &lt;&lt; <span class="hljs-string">&quot;\nkey:&#x27;apple&#x27; is in bucket #&quot;</span> &lt;&lt; mymap.<span class="hljs-built_in">bucket</span>(<span class="hljs-string">&quot;apple&quot;</span>) &lt;&lt; endl;<br>    cout &lt;&lt; <span class="hljs-string">&quot;\nkey:&#x27;computer&#x27; is in bucket #&quot;</span> &lt;&lt; mymap.<span class="hljs-built_in">bucket</span>(<span class="hljs-string">&quot;computer&quot;</span>) &lt;&lt; endl;<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;unordered_map&gt;
+using namespace std;
+
+int main()
+&#123;
+    unordered_map&lt;string, string&gt; mymap &#x3D;
+    &#123;
+            &#123;&quot;house&quot;, &quot;maison&quot;&#125;,
+            &#123;&quot;apple&quot;, &quot;pomme&quot;&#125;,
+            &#123;&quot;tree&quot;, &quot;arbre&quot;&#125;,
+            &#123;&quot;book&quot;, &quot;livre&quot;&#125;,
+            &#123;&quot;door&quot;, &quot;porte&quot;&#125;,
+            &#123;&quot;grapefruit&quot;, &quot;pamplemousse&quot;&#125;
+    &#125;;
+    
+    &#x2F;************begin和end迭代器***************&#x2F;
+    
+    cout &lt;&lt; &quot;mymap contains:&quot;;
+    for (auto it &#x3D; mymap.begin(); it !&#x3D; mymap.end(); ++it)
+        cout &lt;&lt; &quot; &quot; &lt;&lt; it-&gt;first &lt;&lt; &quot;:&quot; &lt;&lt; it-&gt;second;
+    cout &lt;&lt; endl;
+    
+    &#x2F;************bucket操作***************&#x2F;
+    
+    unsigned n &#x3D; mymap.bucket_count();
+
+    cout &lt;&lt; &quot;mymap has &quot; &lt;&lt; n &lt;&lt; &quot; buckets.\n&quot;;
+
+    for (unsigned i &#x3D; 0; i &lt; n; ++i)
+    &#123;
+        cout &lt;&lt; &quot;bucket #&quot; &lt;&lt; i &lt;&lt; &quot;&#39;s size:&quot; 
+             &lt;&lt; mymap.bucket_size(i) &lt;&lt; &quot; contains: &quot;;
+        
+        for (auto it &#x3D; mymap.begin(i); it !&#x3D; mymap.end(i); ++it)
+            cout &lt;&lt; &quot;[&quot; &lt;&lt; it-&gt;first &lt;&lt; &quot;:&quot; &lt;&lt; it-&gt;second &lt;&lt; &quot;] &quot;;
+        cout &lt;&lt; &quot;\n&quot;;
+    &#125;
+
+    cout &lt;&lt; &quot;\nkey:&#39;apple&#39; is in bucket #&quot; &lt;&lt; mymap.bucket(&quot;apple&quot;) &lt;&lt; endl;
+    cout &lt;&lt; &quot;\nkey:&#39;computer&#39; is in bucket #&quot; &lt;&lt; mymap.bucket(&quot;computer&quot;) &lt;&lt; endl;
+
+    return 0;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>输出结果：</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">mymap</span> contains: door:porte grapefruit:pamplemousse tree:arbre apple:pomme book:livre house:maison<br><span class="hljs-attribute">mymap</span> has <span class="hljs-number">7</span> buckets.<br><span class="hljs-attribute">bucket</span> #<span class="hljs-number">0</span>&#x27;s size:<span class="hljs-number">2</span> contains:<span class="hljs-meta"> [book:livre] [house:maison]</span><br><span class="hljs-attribute">bucket</span> #<span class="hljs-number">1</span>&#x27;s size:<span class="hljs-number">0</span> contains:<br><span class="hljs-attribute">bucket</span> #<span class="hljs-number">2</span>&#x27;s size:<span class="hljs-number">0</span> contains:<br><span class="hljs-attribute">bucket</span> #<span class="hljs-number">3</span>&#x27;s size:<span class="hljs-number">2</span> contains:<span class="hljs-meta"> [grapefruit:pamplemousse] [tree:arbre]</span><br><span class="hljs-attribute">bucket</span> #<span class="hljs-number">4</span>&#x27;s size:<span class="hljs-number">0</span> contains:<br><span class="hljs-attribute">bucket</span> #<span class="hljs-number">5</span>&#x27;s size:<span class="hljs-number">1</span> contains:<span class="hljs-meta"> [apple:pomme]</span><br><span class="hljs-attribute">bucket</span> #<span class="hljs-number">6</span>&#x27;s size:<span class="hljs-number">1</span> contains:<span class="hljs-meta"> [door:porte]</span><br><br><span class="hljs-attribute">key</span>:&#x27;apple&#x27; is in bucket #<span class="hljs-number">5</span><br><br><span class="hljs-attribute">key</span>:&#x27;computer&#x27; is in bucket #<span class="hljs-number">6</span><br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">mymap contains: door:porte grapefruit:pamplemousse tree:arbre apple:pomme book:livre house:maison
+mymap has 7 buckets.
+bucket #0&#39;s size:2 contains: [book:livre] [house:maison]
+bucket #1&#39;s size:0 contains:
+bucket #2&#39;s size:0 contains:
+bucket #3&#39;s size:2 contains: [grapefruit:pamplemousse] [tree:arbre]
+bucket #4&#39;s size:0 contains:
+bucket #5&#39;s size:1 contains: [apple:pomme]
+bucket #6&#39;s size:1 contains: [door:porte]
+
+key:&#39;apple&#39; is in bucket #5
+
+key:&#39;computer&#39; is in bucket #6<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
                 
               </div>
@@ -790,6 +996,8 @@
   });
 </script>
 
+
+  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 
