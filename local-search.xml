@@ -33,7 +33,7 @@
     <link href="/2025/02/28/summary/25-3-1/"/>
     <url>/2025/02/28/summary/25-3-1/</url>
     
-    <content type="html"><![CDATA[<h2 id="历年总结"><a href="#历年总结" class="headerlink" title="历年总结"></a>历年总结</h2><p>2022 年，自己完成了身份上的转变，正式开始后端的职业生涯，在公司的安排下，进入教育行业，做教育行业的需求，由于体系的问题，一方面是做 TOC 的业务应用，满足客户经理、学校客户的需求；另一方面也是做 TOB 与 TOG 的需求，满足领导、教育局对平台的期望，公司的步子迈的挺大，研发的基础设施并未能跟上公司的节奏，但是好在也坚持下来了。</p><p>2023 年于自己来说，属于思维方式上的转变，由工作的后端主业，变成逐步统筹研发、测试、产品、运维进行工作内容上的协调与沟通，从零到一搭建团队跟项目，并且出差不同的城市学习不同的业务经营方式、商业模式、研发方法等，思维上开拓了不少。</p><p>2024 年，在自己的意识形态上发生转变后，在后端研发的主职过程中，也兼任部分技术经理的工作，大大小小的研发流程问题、部门协同的工作问题也踩坑不少，总体来说对于技术的要求跟需求，都让步于业务的发展跟要求，属于不断试错的一个过程，对于自己的技术能力提升有限，但是团队的互相理解更一步加深。</p><p>2025 年，因为公司的组织架构调整离开了教育行业，前往技术中台研发一卡通平台，但由于 deepSeek AI 大模型的技术突破，以及国家政策的支持与导向，开始研发数据标注平台，完成跟算法组同事的配合与协调，从算法组同事身上也学习到不少的算法术语与调研大模型、使用大模型，简单模型的调参数能力，至于算法理论的基础，也逐步在恶补，压力比前几年都大，毕竟后端简化工作来说，只需要提供 API 的服务能力即可，对于数理逻辑的要求并没有算法组要求高。</p><h2 id="未来期望"><a href="#未来期望" class="headerlink" title="未来期望"></a>未来期望</h2><p>1、个人发展在公司的业务选择上已经到达一个瓶颈，对于自己来说，更希望自己的技术能力有所突破，能够在公司的研发中发挥更大的价值，所以未来可能会再次审视自己职业上的发展。<br>2、自己的技术栈大致规划如下：</p><ul><li>1、3 年的 java 开发经验：对于 java 底层原理有过研究，jvm、gc、锁、并发有一定自己的理解，熟悉 spring、springboot、springcloud 等常用框架的使用、配置、搭建。</li><li>2、1 年的python项目开发经验：熟悉 python、 django 框架，熟悉基础的机器学习、深度学习的一些算法；</li></ul>]]></content>
+    <content type="html"><![CDATA[<h2 id="历年总结"><a href="#历年总结" class="headerlink" title="历年总结"></a>历年总结</h2><p>2022 年，自己完成了身份上的转变，正式开始后端的职业生涯，在公司的安排下，进入教育行业，做教育行业的需求，由于体系的问题，一方面是做 TOC 的业务应用，满足客户经理、学校客户的需求；另一方面也是做 TOB 与 TOG 的需求，满足领导、教育局对平台的期望，公司的步子迈的挺大，研发的基础设施并未能跟上公司的节奏，但是好在也坚持下来了。</p><p>2023 年于自己来说，属于思维方式上的转变，由工作的后端主业，变成逐步统筹研发、测试、产品、运维进行工作内容上的协调与沟通，从零到一搭建团队跟项目，并且出差不同的城市学习不同的业务经营方式、商业模式、研发方法等，思维上开拓了不少。</p><p>2024 年，在自己的意识形态上发生转变后，在后端研发的主职过程中，也兼任部分技术经理的工作，大大小小的研发流程问题、部门协同的工作问题也踩坑不少，总体来说对于技术的要求跟需求，都让步于业务的发展跟要求，属于不断试错的一个过程，对于自己的技术能力提升有限，但是团队的互相理解更一步加深。</p><p>2025 年，因为公司的组织架构调整离开了教育行业，前往技术中台研发一卡通平台，但由于 deepSeek AI 大模型的技术突破，以及国家政策的支持与导向，开始研发数据标注平台，完成跟算法组同事的配合与协调，从算法组同事身上也学习到不少的算法术语与调研大模型、使用大模型，简单模型的调参数能力，至于算法理论的基础，也逐步在恶补，压力比前几年都大，毕竟后端简化工作来说，只需要提供 API 的服务能力即可，对于数理逻辑的要求并没有算法组要求高。</p><h2 id="未来期望"><a href="#未来期望" class="headerlink" title="未来期望"></a>未来期望</h2><p>1、个人发展在公司的业务选择上已经到达一个瓶颈，对于自己来说，更希望自己的技术能力有所突破，能够在公司的研发中发挥更大的价值，所以未来可能会再次审视自己职业上的发展。<br>2、自己的技术栈大致规划如下：</p><ul><li>1、3 年的 java 开发经验：熟悉 jvm、gc，对于锁、并发有一定自己的理解，熟悉 spring、springboot、springcloud 等常用框架的使用、配置、搭建，熟悉Spring AOC 与 IOP。</li><li>2、熟悉 git、github、gitlab 等代码工具的使用，熟悉代码规范、代码评审、代码合并等流程。</li></ul>]]></content>
     
     
     <categories>
@@ -46,56 +46,6 @@
     <tags>
       
       <tag>2025</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>微服务知识及开发</title>
-    <link href="/2022/09/01/java/SpringCloud/"/>
-    <url>/2022/09/01/java/SpringCloud/</url>
-    
-    <content type="html"><![CDATA[<blockquote><p>一个月，已经接触微服务的开发，自己先作为运维工程师去学习微服务的裸机部署，在到 K8S 容器化部署，再向开发工程师、高级工</p></blockquote><p>部署环境已经上 K8S 了，所以这几天部署好 K8S 后，好好把 K8S 知识性概念学习一遍，快速学习！</p><h2 id="Nacos"><a href="#Nacos" class="headerlink" title="Nacos"></a>Nacos</h2><p>Nacos 是致力于解决微服务中的统一配置，服务注册与发现等问题，可以帮助开发者快速进行<strong>动态服务、服务配置、服务元数据及流量管理</strong>！其中 Nacos 的关键特性有以下四点：</p><blockquote><p>1、Nacos 支持 RPC 与 DNS 协议的服务发现，并且提供对服务的实时监察，阻止其向不健康的主机或服务实例发送请求！<br>2、Nacos 支持动态配置服务（配置热更新），配置更新无需重启服务！<br>3、Nacos 支持动态 DNS 服务，可以让开发者容易实现中间层的负载均衡、更灵活的路由策略、流量控制已经数据中心的简单 DNS 解析服务！</p></blockquote>]]></content>
-    
-    
-    <categories>
-      
-      <category>Java</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>microservice</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>Jenkins CI/CD 流程</title>
-    <link href="/2022/08/21/container/jenkins/"/>
-    <url>/2022/08/21/container/jenkins/</url>
-    
-    <content type="html"><![CDATA[<blockquote><p>输出一下 Jenkins 的知识</p></blockquote><h2 id="Jenkins-发布"><a href="#Jenkins-发布" class="headerlink" title="Jenkins 发布"></a>Jenkins 发布</h2><p>通过写 Jenkins 脚本，自动化构建代码、代码打包、传送到对应的应用服务器进行发布；</p>]]></content>
-    
-    
-    <categories>
-      
-      <category>devops</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>docker</tag>
       
     </tags>
     
@@ -146,31 +96,6 @@
     <tags>
       
       <tag>GPE</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>Linux 学习</title>
-    <link href="/2022/08/15/os/linux/"/>
-    <url>/2022/08/15/os/linux/</url>
-    
-    <content type="html"><![CDATA[<blockquote><p>学习 Linux 的目的，就是为了考证，RedHat 的证明</p><p>证本身没什么用，目的就是为了学习而去考证！</p></blockquote><h2 id="认证体系"><a href="#认证体系" class="headerlink" title="认证体系"></a>认证体系</h2><p>主要考试的是公司给扶持的证：红帽认证、阿里认证，最后考 K8S 的认证！</p><p>先考红帽的三个证明：RHCSA、RHCE、RHCA。重点就是证明自己一直不断的在持续进行学习！</p><h2 id="linux-常见的排查问题"><a href="#linux-常见的排查问题" class="headerlink" title="linux 常见的排查问题"></a>linux 常见的排查问题</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs shell"><br>df -h 查看磁盘空间<br><br>find / -size +100M -ls 查看占用磁盘 &gt; 100 MB 的所有大文件。<br><br>nohup 执行命令 / 脚本文件 &gt;&gt; nohup.out(自己命名的文件) 2 &gt;&amp; 1 &amp;<br><br>dirname 在命令行中的意义不大，主要还是在 shell 脚本中执行。<br><br><br>编写自动化脚本很重要，一方面提升效率与效果，另外一方面，避免掉人工操作中的重复性工作。<br><br></code></pre></td></tr></table></figure>]]></content>
-    
-    
-    <categories>
-      
-      <category>OS</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>Linux</tag>
       
     </tags>
     
@@ -802,7 +727,7 @@
     <link href="/2022/03/05/plan/"/>
     <url>/2022/03/05/plan/</url>
     
-    <content type="html"><![CDATA[<blockquote><p>已经掌握的知识，必须要及时进行复盘与总结，并且进行文字化的输出!</p><p>这样许多的问题就能刻入自己的骨髓，不会轻易忘记！</p></blockquote><h2 id="Go-学习前言"><a href="#Go-学习前言" class="headerlink" title="Go 学习前言"></a>Go 学习前言</h2><p>Go 语言的应用场景有许多，但是语言主要的优势在以下三大块:</p><blockquote><p>1、云原生 (微服务 + DevOps + PaaS 等中间件) </p><p>2、高性能 API</p><p>3、服务器端开发</p></blockquote><p>如果职业方向是往以上几个方向发展，那么 Go 语言的学习是至关重要的，市场上初步的任职要求如下：</p><blockquote><p>编程语言:  使用 Go 独立实现一套完整的 Web 服务器</p><p>基础知识:  操作系统 &#x2F; 网络编程 &#x2F; 数据结构与算法等</p><p>常见中间件:  MySQL &#x2F; Redis &#x2F; Kafka &#x2F; Nginx等</p><p>软技能:  学习 &#x2F; 沟通 &#x2F; 抗压 &#x2F; 解决问题的能力</p></blockquote><p>而本博客，主要为梳理 Go 语言需要掌握知识的细节，以及作为一个刚入行的 Go 新人，需要积累的知识。</p><h3 id="1、目前掌握的相关知识"><a href="#1、目前掌握的相关知识" class="headerlink" title="1、目前掌握的相关知识"></a>1、目前掌握的相关知识</h3><ul><li><p>1、Go 基础: 关键字、常量、变量、数据类型、数据结构、流程控制、函数、方法、协程、通道。</p></li><li><p>2、GMP 模型基础: 包括早期的 GM 模型，以及后期的 GMP 模式设计方法、调度机制等</p></li><li><p>3、GC 基础: 包括标志清除法、三色标记法、插入写屏障、删除写屏障、混合写屏障。</p></li><li><p>4、go 语言一些常用包：net&#x2F;http、sync 等</p></li></ul><h3 id="2、目前的学习计划"><a href="#2、目前的学习计划" class="headerlink" title="2、目前的学习计划"></a>2、目前的学习计划</h3><ul><li><p>1、Go 语言并发编程(鸟窝大佬的极客时间专栏，常见的并发原语：Mutex、RWmutex、Once、Map、WaitGroup、channel 等)</p></li><li><p>2、Go 内存逃逸、GC 的优化问题、熟练使用 go trace(查频繁的 GC)、pprof(内存泄漏、CPU 过高、程序慢、锁竞争、程序阻塞)。</p></li><li><p>3、Go 技术栈常用的组件： <a href="https://github.com/grpc/grpc">grpc</a>、<a href="https://github.com/protocolbuffers/protobuf">protobuf</a>、<a href="https://github.com/prometheus/prometheus">Prometheus</a>、<a href="https://github.com/istio/istio">istio</a> 等</p></li><li><p>4、学习云原生开源组织的相应的技术分享。</p></li></ul><h3 id="3、Go-服务器开发自我总结"><a href="#3、Go-服务器开发自我总结" class="headerlink" title="3、Go 服务器开发自我总结"></a>3、Go 服务器开发自我总结</h3><h4 id="1、工具"><a href="#1、工具" class="headerlink" title="1、工具"></a>1、工具</h4><p>1）语言：Go, SQL, JS;</p><p>2）IDE：Goland、VScode;</p><p>3）版本管理工具：Git、SVN（游戏场景使用）;</p><p>4）依赖管理：go mod;</p><h4 id="2、生态"><a href="#2、生态" class="headerlink" title="2、生态"></a>2、生态</h4><p>1）消息队列：kafka、RocketMQ;</p><p>2）存储：MySQL、Redis、Mongodb、PostgreSQL;</p><p>3）web 框架：gin、goframe 等；</p><p>4）微服务：go-zero、go-mirco、go-kit 等（微服务架构上基本上是做的集成，市场上关于微服务完整的银弹方法几乎不存在）</p><h4 id="3、容器"><a href="#3、容器" class="headerlink" title="3、容器"></a>3、容器</h4><p>1）Swarm (docker);</p><p>2）K8S (基本一统江湖);</p><h4 id="4、原理"><a href="#4、原理" class="headerlink" title="4、原理"></a>4、原理</h4><p>1）通识的 Go 语言原理：GC、GMP、runtime 等;</p><p>2）中间件的原理：主要看业务需要。</p><h3 id="4、学习方式"><a href="#4、学习方式" class="headerlink" title="4、学习方式"></a>4、学习方式</h3><p>主要推荐我旁边的推荐博客：</p><p>1、基础推荐七米老师的博客</p><p>2、进阶可以看极客兔兔的博客、鸟窝大佬的博客。</p><p>3、追求硬核理解的可以看面向信仰编程作者的博客！</p><h3 id="5、技术写作规范"><a href="#5、技术写作规范" class="headerlink" title="5、技术写作规范"></a>5、技术写作规范</h3><p>详细参考<a href="https://github.com/chaggle/document-style-guide">阮一峰的写作规范</a>，个人觉得让他人拥有良好的阅读体验也是软技能之一！</p><h3 id="6、晋升分解法"><a href="#6、晋升分解法" class="headerlink" title="6、晋升分解法"></a>6、晋升分解法</h3><p>1、目前自己定级 P5（工作 1 ~ 3 年）需要别人带领自己达成任务（已于2023年达成升职）</p><p>2、下一级 P6 (工作 3 ~ 5 年) 能独立完成任务（已达到此层级，未来目标 p7）</p><p>3、需要专项提升某一项技能的能力，资深技术专家建议：持续花 6 个月时间进行专项提升。</p><p>4、比如现在主要提升 Mysql 与 PostgreSQL、Redis 与 Memcache 的技术水平。计划大致如下：</p><p>5、Mysql 与 PostgreSQL</p><blockquote><p>1、1.5 个月：（已经完毕！）学完 <a href="https://www.bilibili.com/video/BV1es411u7we">bilibili SQL进阶课程</a>、通读 High Performance Mysql。</p><p>2、3 个月：<a href="https://github.com/digoal/blog/blob/master/README.md">github 大神的 PostgreSQL 修炼手册学习</a></p><p>3、1.5 个月：实战 Mysql 与 PostgreSQL</p></blockquote><p>6、Redis 与 Memcache </p><blockquote><p>1、1.5 个月：（已经学完！）学完 <a href="https://www.bilibili.com/video/BV1S54y1R7SB">bilibili redis 基础 + 进阶课程</a>，建立一个完备的 redis 知识体系</p><p>2、3 个月：通读+学好 Redis设计与实现 （蓝书）</p><p>3、1.5 个月：实战 Redis</p></blockquote><p>7、除此之后，TDD 学习要进行 Java 的学习，除此之外，就是多用 Go + Python 语言，课程 <a href="https://coding.imooc.com/class/469.html">Go + Python 双语言开发</a> 也很好。</p><hr><h2 id="Java-学习前言"><a href="#Java-学习前言" class="headerlink" title="Java 学习前言"></a>Java 学习前言</h2><blockquote><p>因为工作后需要，开始转变方向为 Java，但是 go 的学习也不会停止！</p></blockquote><p>转方向为 Java 后，所需要学习的业务中间件远超 go 语言，相应的框架也是如此，不过 Java 技术栈更新也不会太快。</p><p>经历一段时间的工作后，自己的人生状态也发生相应的改变，首先需要将自己的业务技能锻炼强。业务能力不等于技术能力，比如业务流程、沟通流程，比纯粹技术性的学习要强很多！</p><h3 id="1、Java-基础"><a href="#1、Java-基础" class="headerlink" title="1、Java 基础"></a>1、Java 基础</h3><p>Java 基础不是语言类的基础，本次的 Java 基础主要是为了跟 SpringCloud 做区分，比如 JUC 、Spring、Mybatis、SpringMVC、SpringBoot 都是属于 Java 基础，因为这样的东西才构成了 Java 整个语言的生态体系，叫做基础。</p><p>而且 408 中有三门课程也是属于 Java 基础：数据结构、操作系统、计算机网络。都是对 Java 基础有重要的支撑作用的。</p><h3 id="2、Spring-Cloud"><a href="#2、Spring-Cloud" class="headerlink" title="2、Spring Cloud"></a>2、Spring Cloud</h3><p>首先肯定是 Java 基础，之后就是上框架 SpringBoot + SpringCloud  组成的微服务的架构，体量绝对是足够的。</p><p>Spring Cloud 也包含许多组件，不是特别需要说明的都在此处举出：</p><p>nginx、SpringCloud GateWay、nacos、RPC、oauth2 等等。</p><h3 id="3、Message-Queue"><a href="#3、Message-Queue" class="headerlink" title="3、Message Queue"></a>3、Message Queue</h3><p>ActiveMQ、RabbitMQ、RocketMQ、Kafka</p><p>目前主攻研究 RocketMQ，提升自己以及团队的研发能力！</p><h3 id="4、-ELK"><a href="#4、-ELK" class="headerlink" title="4、 ELK"></a>4、 ELK</h3><p>ElasticSearch + Logstash + Kibana 组成的经典的业务日志管理集群</p><h2 id="算法学习前言"><a href="#算法学习前言" class="headerlink" title="算法学习前言"></a>算法学习前言</h2><h3 id="1、背景介绍"><a href="#1、背景介绍" class="headerlink" title="1、背景介绍"></a>1、背景介绍</h3><p>随着deepseek 大模型的火热，算法的应用也越来越广泛，传统研发型的公司也面临着市场的考验，需要大量的人员转型算法工程师</p>]]></content>
+    <content type="html"><![CDATA[<blockquote><p>已经掌握的知识，必须要及时进行复盘与总结，并且进行文字化的输出!</p><p>这样许多的问题就能刻入自己的骨髓，不会轻易忘记！</p></blockquote><h2 id="Go-学习前言"><a href="#Go-学习前言" class="headerlink" title="Go 学习前言"></a>Go 学习前言</h2><p>Go 语言的应用场景有许多，但是语言主要的优势在以下三大块:</p><blockquote><p>1、云原生 (微服务 + DevOps + PaaS 等中间件) </p><p>2、高性能 API</p><p>3、服务器端开发</p></blockquote><p>如果职业方向是往以上几个方向发展，那么 Go 语言的学习是至关重要的，市场上初步的任职要求如下：</p><blockquote><p>编程语言:  使用 Go 独立实现一套完整的 Web 服务器</p><p>基础知识:  操作系统 &#x2F; 网络编程 &#x2F; 数据结构与算法等</p><p>常见中间件:  MySQL &#x2F; Redis &#x2F; Kafka &#x2F; Nginx等</p><p>软技能:  学习 &#x2F; 沟通 &#x2F; 抗压 &#x2F; 解决问题的能力</p></blockquote><p>而本博客，主要为梳理 Go 语言需要掌握知识的细节，以及作为一个刚入行的 Go 新人，需要积累的知识。</p><h3 id="1、目前掌握的相关知识"><a href="#1、目前掌握的相关知识" class="headerlink" title="1、目前掌握的相关知识"></a>1、目前掌握的相关知识</h3><ul><li><p>1、Go 基础: 关键字、常量、变量、数据类型、数据结构、流程控制、函数、方法、协程、通道。</p></li><li><p>2、GMP 模型基础: 包括早期的 GM 模型，以及后期的 GMP 模式设计方法、调度机制等</p></li><li><p>3、GC 基础: 包括标志清除法、三色标记法、插入写屏障、删除写屏障、混合写屏障。</p></li><li><p>4、go 语言一些常用包：net&#x2F;http、sync 等</p></li></ul><h3 id="2、目前的学习计划"><a href="#2、目前的学习计划" class="headerlink" title="2、目前的学习计划"></a>2、目前的学习计划</h3><ul><li><p>1、Go 语言并发编程(鸟窝大佬的极客时间专栏，常见的并发原语：Mutex、RWmutex、Once、Map、WaitGroup、channel 等)</p></li><li><p>2、Go 内存逃逸、GC 的优化问题、熟练使用 go trace(查频繁的 GC)、pprof(内存泄漏、CPU 过高、程序慢、锁竞争、程序阻塞)。</p></li><li><p>3、Go 技术栈常用的组件： <a href="https://github.com/grpc/grpc">grpc</a>、<a href="https://github.com/protocolbuffers/protobuf">protobuf</a>、<a href="https://github.com/prometheus/prometheus">Prometheus</a>、<a href="https://github.com/istio/istio">istio</a> 等</p></li><li><p>4、学习云原生开源组织的相应的技术分享。</p></li></ul><h3 id="3、Go-服务器开发自我总结"><a href="#3、Go-服务器开发自我总结" class="headerlink" title="3、Go 服务器开发自我总结"></a>3、Go 服务器开发自我总结</h3><h4 id="1、工具"><a href="#1、工具" class="headerlink" title="1、工具"></a>1、工具</h4><p>1）语言：Go, SQL, JS;</p><p>2）IDE：Goland、VScode;</p><p>3）版本管理工具：Git、SVN（游戏场景使用）;</p><p>4）依赖管理：go mod;</p><h4 id="2、生态"><a href="#2、生态" class="headerlink" title="2、生态"></a>2、生态</h4><p>1）消息队列：kafka、RocketMQ;</p><p>2）存储：MySQL、Redis、Mongodb、PostgreSQL;</p><p>3）web 框架：gin、goframe 等；</p><p>4）微服务：go-zero、go-mirco、go-kit 等（微服务架构上基本上是做的集成，市场上关于微服务完整的银弹方法几乎不存在）</p><h4 id="3、容器"><a href="#3、容器" class="headerlink" title="3、容器"></a>3、容器</h4><p>1）Swarm (docker);</p><p>2）K8S (基本一统江湖);</p><h4 id="4、原理"><a href="#4、原理" class="headerlink" title="4、原理"></a>4、原理</h4><p>1）通识的 Go 语言原理：GC、GMP、runtime 等;</p><p>2）中间件的原理：主要看业务需要。</p><h3 id="4、学习方式"><a href="#4、学习方式" class="headerlink" title="4、学习方式"></a>4、学习方式</h3><p>主要推荐我旁边的推荐博客：</p><p>1、基础推荐七米老师的博客</p><p>2、进阶可以看极客兔兔的博客、鸟窝大佬的博客。</p><p>3、追求硬核理解的可以看面向信仰编程作者的博客！</p><h3 id="5、技术写作规范"><a href="#5、技术写作规范" class="headerlink" title="5、技术写作规范"></a>5、技术写作规范</h3><p>详细参考<a href="https://github.com/chaggle/document-style-guide">阮一峰的写作规范</a>，个人觉得让他人拥有良好的阅读体验也是软技能之一！</p><h3 id="6、晋升分解法"><a href="#6、晋升分解法" class="headerlink" title="6、晋升分解法"></a>6、晋升分解法</h3><p>1、目前自己定级 P5（工作 1 ~ 3 年）需要别人带领自己达成任务（已于2023年达成升职）</p><p>2、下一级 P6 (工作 3 ~ 5 年) 能独立完成任务（已达到此层级，未来目标 p7）</p><p>3、需要专项提升某一项技能的能力，资深技术专家建议：持续花 6 个月时间进行专项提升。</p><p>4、比如现在主要提升 Mysql 与 PostgreSQL、Redis 与 Memcache 的技术水平。计划大致如下：</p><p>5、Mysql 与 PostgreSQL</p><blockquote><p>1、1.5 个月：（已经完毕！）学完 <a href="https://www.bilibili.com/video/BV1es411u7we">bilibili SQL进阶课程</a>、通读 High Performance Mysql。</p><p>2、3 个月：<a href="https://github.com/digoal/blog/blob/master/README.md">github 大神的 PostgreSQL 修炼手册学习</a></p><p>3、1.5 个月：实战 Mysql 与 PostgreSQL</p></blockquote><p>6、Redis 与 Memcache </p><blockquote><p>1、1.5 个月：（已经学完！）学完 <a href="https://www.bilibili.com/video/BV1S54y1R7SB">bilibili redis 基础 + 进阶课程</a>，建立一个完备的 redis 知识体系</p><p>2、3 个月：通读+学好 Redis设计与实现 （蓝书）</p><p>3、1.5 个月：实战 Redis</p></blockquote><p>7、除此之后，TDD 学习要进行 Java 的学习，除此之外，就是多用 Go + Python 语言，课程 <a href="https://coding.imooc.com/class/469.html">Go + Python 双语言开发</a> 也很好。</p><hr><h2 id="Java-学习前言"><a href="#Java-学习前言" class="headerlink" title="Java 学习前言"></a>Java 学习前言</h2><blockquote><p>因为工作后需要，开始转变方向为 Java，但是 go 的学习也不会停止！</p></blockquote><p>转方向为 Java 后，所需要学习的业务中间件远超 go 语言，相应的框架也是如此，不过 Java 技术栈更新也不会太快。</p><p>经历一段时间的工作后，自己的人生状态也发生相应的改变，首先需要将自己的业务技能锻炼强。业务能力不等于技术能力，比如业务流程、沟通流程，比纯粹技术性的学习要强很多！</p><h3 id="1、Java-基础"><a href="#1、Java-基础" class="headerlink" title="1、Java 基础"></a>1、Java 基础</h3><p>Java 基础不是语言类的基础，本次的 Java 基础主要是为了跟 SpringCloud 做区分，比如 JUC 、Spring、Mybatis、SpringMVC、SpringBoot 都是属于 Java 基础，因为这样的东西才构成了 Java 整个语言的生态体系，叫做基础。</p><p>而且 408 中有三门课程也是属于 Java 基础：数据结构、操作系统、计算机网络。</p><h3 id="2、Java-企业级开发框架"><a href="#2、Java-企业级开发框架" class="headerlink" title="2、Java 企业级开发框架"></a>2、Java 企业级开发框架</h3><p>首先肯定是 Java 基础，之后就是上框架 SpringBoot、 SpringCloud 组成的单体与微服务的架构，中小型公司基本上以此两种框架为主流。<br>当然也有 solon 等国产化的后起之秀，但是在技术选型上需要进行权衡，比如人员的学习成本、后续排查问题的成本，如使用的话需要考虑好。<br>而后需要进行理解的就是框架中使用的技术组件：jpa、mybatis、</p><p>此处也推荐 Java 社区中比较活跃的脚手架</p><ul><li>1、ruoyi-vue 脚手架，最经典的脚手架，会教会很多技术组件的使用、业务相关的理解：如权限管理、多数据源、定时任务、代码生成器等。</li><li>2、yudao-boot 脚手架，基于 ruoyi-vue 脚手架进行二次开发，会进一步理解好的企业级脚手架是如何建立，集成度较高，适合快速进行业务开发与使用。</li></ul><h3 id="3、基础设施中的中间件"><a href="#3、基础设施中的中间件" class="headerlink" title="3、基础设施中的中间件"></a>3、基础设施中的中间件</h3><p>1、负载均衡中间件：Nginx、Nacos、ApiSix、Kong、Envoy 等<br>2、数据库中间件：Mysql、PostgreSQL、Sqlite、MongoDB、TiDB、OceanBase、ElasticSearch<br>3、缓存中间件：Redis、Memcache、Tair、Codis<br>4、消息中间件：RocketMQ、Kafaka、RabbitMQ </p><p>精通与熟练都是需要时间进行打磨，高级程序员、架构师的要求也是不仅局限于使用的层次，到底层技术细节实现的理解也一直比较重要，技术能力的提升与理解都是在不断的学习中进行的，也如大厂晋升指南中体现：</p>]]></content>
     
     
     
