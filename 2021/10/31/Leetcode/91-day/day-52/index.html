@@ -75,7 +75,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"SHELL"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -211,6 +211,11 @@
           
   <div class="mt-3">
     
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
@@ -244,6 +249,15 @@
 
     
     
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
   </div>
 
 
@@ -276,10 +290,20 @@
           <article class="post-content mx-auto">
             <h1 id="seo-header">Day 52 Shortest Cycle Containing Target Node</h1>
             
+              <p id="updated-time" class="note note-success" style="display: none">
+                
+                  
+                    本文最后更新于 2025-03-07T10:50:09+08:00
+                  
+                  
+
+                
+              </p>
+            
             
               <div class="markdown-body">
                 
-                <h1 id="Shortest-Cycle-Containing-Target-Node"><a href="#Shortest-Cycle-Containing-Target-Node" class="headerlink" title="Shortest Cycle Containing Target Node"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Shortest-Cycle-Containing-Target-Node">Shortest Cycle Containing Target Node</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs cpp">You are given a two-dimensional list of integers graph <br><br>representing a directed graph as an adjacency list. <br><br>You are also given an integer target.<br><br>Return the length of a shortest cycle that contains target. <br><br>If a solution does <span class="hljs-keyword">not</span> exist, <span class="hljs-keyword">return</span> <span class="hljs-number">-1.</span><br><br>Constraints<br><br>n, m ≤ <span class="hljs-number">250</span> where n <span class="hljs-keyword">and</span> m are the number of rows <span class="hljs-keyword">and</span> columns in graph<br>Example <span class="hljs-number">1</span><br>Input<br>Visualize<br>graph = [<br>    [<span class="hljs-number">1</span>],<br>    [<span class="hljs-number">2</span>],<br>    [<span class="hljs-number">0</span>]<br>]<br>target = <span class="hljs-number">0</span><br>Output<br><span class="hljs-number">3</span><br>Explanation<br>The nodes <span class="hljs-number">0</span> -&gt; <span class="hljs-number">1</span> -&gt; <span class="hljs-number">2</span> -&gt; <span class="hljs-number">0</span> form a cycle<br><br>Example <span class="hljs-number">2</span><br>Input<br>Visualize<br>graph = [<br>    [<span class="hljs-number">1</span>],<br>    [<span class="hljs-number">2</span>],<br>    [<span class="hljs-number">4</span>],<br>    [],<br>    [<span class="hljs-number">0</span>]<br>]<br>target = <span class="hljs-number">3</span><br>Output<br><span class="hljs-number">-1</span><br></code></pre></td></tr></table></figure>
+                <h1 id="Shortest-Cycle-Containing-Target-Node"><a href="#Shortest-Cycle-Containing-Target-Node" class="headerlink" title="Shortest Cycle Containing Target Node"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Shortest-Cycle-Containing-Target-Node">Shortest Cycle Containing Target Node</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">You are given a two-dimensional list of integers graph </span><br><span class="line"></span><br><span class="line">representing a directed graph as an adjacency list. </span><br><span class="line"></span><br><span class="line">You are also given an integer target.</span><br><span class="line"></span><br><span class="line">Return the length of a shortest cycle that contains target. </span><br><span class="line"></span><br><span class="line">If a solution does <span class="keyword">not</span> exist, <span class="keyword">return</span> <span class="number">-1.</span></span><br><span class="line"></span><br><span class="line">Constraints</span><br><span class="line"></span><br><span class="line">n, m ≤ <span class="number">250</span> where n <span class="keyword">and</span> m are the number of rows <span class="keyword">and</span> columns in graph</span><br><span class="line">Example <span class="number">1</span></span><br><span class="line">Input</span><br><span class="line">Visualize</span><br><span class="line">graph = [</span><br><span class="line">    [<span class="number">1</span>],</span><br><span class="line">    [<span class="number">2</span>],</span><br><span class="line">    [<span class="number">0</span>]</span><br><span class="line">]</span><br><span class="line">target = <span class="number">0</span></span><br><span class="line">Output</span><br><span class="line"><span class="number">3</span></span><br><span class="line">Explanation</span><br><span class="line">The nodes <span class="number">0</span> -&gt; <span class="number">1</span> -&gt; <span class="number">2</span> -&gt; <span class="number">0</span> form a cycle</span><br><span class="line"></span><br><span class="line">Example <span class="number">2</span></span><br><span class="line">Input</span><br><span class="line">Visualize</span><br><span class="line">graph = [</span><br><span class="line">    [<span class="number">1</span>],</span><br><span class="line">    [<span class="number">2</span>],</span><br><span class="line">    [<span class="number">4</span>],</span><br><span class="line">    [],</span><br><span class="line">    [<span class="number">0</span>]</span><br><span class="line">]</span><br><span class="line">target = <span class="number">3</span></span><br><span class="line">Output</span><br><span class="line"><span class="number">-1</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
@@ -287,7 +311,7 @@
 <li>2、扫描整个图，然后判断每个节点跟目标 t 的关系，有直接 return true，最后找不到返回 false;</li>
 </ul>
 </blockquote>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">solve</span><span class="hljs-params">(vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt;&amp; g, <span class="hljs-type">int</span> t)</span> </span>&#123;<br>    <span class="hljs-type">int</span> n = g.<span class="hljs-built_in">size</span>();<br>    <span class="hljs-function">vector&lt;<span class="hljs-type">bool</span>&gt; <span class="hljs-title">vis</span><span class="hljs-params">(n, <span class="hljs-number">0</span>)</span></span>;<br>    queue&lt;<span class="hljs-type">int</span>&gt; q;<br>    q.<span class="hljs-built_in">push</span>(t);<br>    <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br><br>    <span class="hljs-keyword">while</span> (!q.<span class="hljs-built_in">empty</span>())<br>    &#123;<br>        ans++;<br>        <span class="hljs-type">int</span> n = q.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++)<br>        &#123;<br>            <span class="hljs-type">int</span> node = q.<span class="hljs-built_in">front</span>();q.<span class="hljs-built_in">pop</span>();<br>            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span>&amp; v : g[node])<br>            &#123;<br>                <span class="hljs-keyword">if</span>(v == t) <span class="hljs-keyword">return</span> ans;<br>                <span class="hljs-keyword">if</span>(!vis[v])  <span class="hljs-comment">//如果是未访问节点， 等价于 vis[v] == 0</span><br>                &#123;<br>                    q.<span class="hljs-built_in">push</span>(v);<br>                    vis[v] = <span class="hljs-number">1</span>;<br>                &#125;<br>            &#125;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">solve</span><span class="params">(vector&lt;vector&lt;<span class="type">int</span>&gt;&gt;&amp; g, <span class="type">int</span> t)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> n = g.<span class="built_in">size</span>();</span><br><span class="line">    <span class="function">vector&lt;<span class="type">bool</span>&gt; <span class="title">vis</span><span class="params">(n, <span class="number">0</span>)</span></span>;</span><br><span class="line">    queue&lt;<span class="type">int</span>&gt; q;</span><br><span class="line">    q.<span class="built_in">push</span>(t);</span><br><span class="line">    <span class="type">int</span> ans = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (!q.<span class="built_in">empty</span>())</span><br><span class="line">    &#123;</span><br><span class="line">        ans++;</span><br><span class="line">        <span class="type">int</span> n = q.<span class="built_in">size</span>();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="type">int</span> node = q.<span class="built_in">front</span>();q.<span class="built_in">pop</span>();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; v : g[node])</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span>(v == t) <span class="keyword">return</span> ans;</span><br><span class="line">                <span class="keyword">if</span>(!vis[v])  <span class="comment">//如果是未访问节点， 等价于 vis[v] == 0</span></span><br><span class="line">                &#123;</span><br><span class="line">                    q.<span class="built_in">push</span>(v);</span><br><span class="line">                    vis[v] = <span class="number">1</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n + e)</p>
@@ -371,15 +395,21 @@
             
               
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="BY - 署名">
                     <i class="iconfont icon-cc-by"></i>
                   </span>
                 </a>
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
                     <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
                   </span>
                 </a>
               
@@ -623,6 +653,33 @@
   
 
 
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
 
 
   

@@ -74,7 +74,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"SHELL"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -210,6 +210,11 @@
           
   <div class="mt-3">
     
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
@@ -243,6 +248,15 @@
 
     
     
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
   </div>
 
 
@@ -274,6 +288,16 @@
         <div id="board">
           <article class="post-content mx-auto">
             <h1 id="seo-header">GCC 与 GDB 的学习</h1>
+            
+              <p id="updated-time" class="note note-success" style="display: none">
+                
+                  
+                    本文最后更新于 2025-03-07T10:50:09+08:00
+                  
+                  
+
+                
+              </p>
             
             
               <div class="markdown-body">
@@ -308,9 +332,9 @@
 <p>选项名 作用<br>o  生成目标<br>c  取消链接步骤，编译源码并最后生成目标文件<br>E  只运行C预编译器（头文件，宏等展开）<br>S  生成汇编语言文件后停止编译（.s文件）<br>Wall  打开编译告警（所有）<br>g  嵌入调试信息，方便gdb调试<br>llib  链接 lib 库 （这里是小写 L ） 相当于 C++ #pragma comment(lib, “xxx.lib”)<br>Idir  增加 include 目录 (这里是大写 i ) 头文件路径<br>LDir  增加 lib 目录 （编译静态库和动态库）</p>
 </blockquote>
 <p>gdb调试实例<br>下面以一个有错误的例子程序来介绍gdb的使用：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/*bugging.c*/</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><br><span class="hljs-type">static</span> <span class="hljs-type">char</span> buff [<span class="hljs-number">256</span>];<br><span class="hljs-type">static</span> <span class="hljs-type">char</span>* <span class="hljs-built_in">string</span>;<br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span> <span class="hljs-params">()</span><br>&#123;<br>    <span class="hljs-built_in">printf</span> (<span class="hljs-string">&quot;Please input a string: &quot;</span>);<br>    gets (<span class="hljs-built_in">string</span>);<br>    <span class="hljs-built_in">printf</span> (<span class="hljs-string">&quot;\nYour string is: %s\n&quot;</span>, <span class="hljs-built_in">string</span>);<br>&#125;<br><span class="hljs-comment">//这个程序是接受用户的输入，然后将用户的输入打印出来。该程序使用了一个未经过初始化的字符串地址 string，因此，编译并运行之后，将出现 &quot;Segment Fault&quot;错误：</span><br><br></code></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*bugging.c*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">char</span> buff [<span class="number">256</span>];</span><br><span class="line"><span class="type">static</span> <span class="type">char</span>* <span class="built_in">string</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span> <span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span> (<span class="string">&quot;Please input a string: &quot;</span>);</span><br><span class="line">    gets (<span class="built_in">string</span>);</span><br><span class="line">    <span class="built_in">printf</span> (<span class="string">&quot;\nYour string is: %s\n&quot;</span>, <span class="built_in">string</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//这个程序是接受用户的输入，然后将用户的输入打印出来。该程序使用了一个未经过初始化的字符串地址 string，因此，编译并运行之后，将出现 &quot;Segment Fault&quot;错误：</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs Bash">$ gcc -o bugging -g  bugging.c<br>$ ./bugging<br><br><span class="hljs-comment"># Please input a string: asdf</span><br><span class="hljs-comment"># Segmentation fault (core dumped)</span><br><span class="hljs-comment"># 为了查找该程序中出现的问题，我们利用 gdb，并按如下的步骤进行：</span><br><br><span class="hljs-comment"># [1] 运行 “gdb bugging” ，加载 bugging 可执行文件；</span><br><span class="hljs-variable">$gdb</span> bugging <br>    <br><span class="hljs-comment">#[2] 执行装入的 bugging 命令；</span><br>(gdb) run<br>    <br><span class="hljs-comment">#[3] 使用 where 命令查看程序出错的地方；</span><br>(gdb) <span class="hljs-built_in">where</span><br>    <br><span class="hljs-comment">#[4] 利用 list 命令查看调用 gets 函数附近的代码；</span><br>(gdb) list<br>    <br><span class="hljs-comment">#[5] 在 gdb 中，我们在第 11 行处设置断点，看看是否是在第11行出错；</span><br>(gdb) <span class="hljs-built_in">break</span> 11<br>    <br><span class="hljs-comment">#[6] 程序重新运行到第 11 行处停止，这时程序正常，然后执行单步命令next；</span><br>(gdb) next<br>    <br><span class="hljs-comment">#[7] 程序确实出错，能够导致 gets 函数出错的因素就是变量 string。重新执行测试程，用 print 命令查看 string 的值；</span><br>(gdb) run<br>(gdb) <span class="hljs-built_in">print</span> string<br>(gdb) <span class="hljs-variable">$1</span>=0x0<br>    <br><span class="hljs-comment">#[8] 问题在于string指向的是一个无效指针，修改程序，在10行和11行之间增加一条语句 “string=buff; ”，重新编译程序，然后继续运行，将看到正确的程序运行结果。</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">$ gcc -o bugging -g  bugging.c</span><br><span class="line">$ ./bugging</span><br><span class="line"></span><br><span class="line"><span class="comment"># Please input a string: asdf</span></span><br><span class="line"><span class="comment"># Segmentation fault (core dumped)</span></span><br><span class="line"><span class="comment"># 为了查找该程序中出现的问题，我们利用 gdb，并按如下的步骤进行：</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># [1] 运行 “gdb bugging” ，加载 bugging 可执行文件；</span></span><br><span class="line"><span class="variable">$gdb</span> bugging </span><br><span class="line">    </span><br><span class="line"><span class="comment">#[2] 执行装入的 bugging 命令；</span></span><br><span class="line">(gdb) run</span><br><span class="line">    </span><br><span class="line"><span class="comment">#[3] 使用 where 命令查看程序出错的地方；</span></span><br><span class="line">(gdb) <span class="built_in">where</span></span><br><span class="line">    </span><br><span class="line"><span class="comment">#[4] 利用 list 命令查看调用 gets 函数附近的代码；</span></span><br><span class="line">(gdb) list</span><br><span class="line">    </span><br><span class="line"><span class="comment">#[5] 在 gdb 中，我们在第 11 行处设置断点，看看是否是在第11行出错；</span></span><br><span class="line">(gdb) <span class="built_in">break</span> 11</span><br><span class="line">    </span><br><span class="line"><span class="comment">#[6] 程序重新运行到第 11 行处停止，这时程序正常，然后执行单步命令next；</span></span><br><span class="line">(gdb) next</span><br><span class="line">    </span><br><span class="line"><span class="comment">#[7] 程序确实出错，能够导致 gets 函数出错的因素就是变量 string。重新执行测试程，用 print 命令查看 string 的值；</span></span><br><span class="line">(gdb) run</span><br><span class="line">(gdb) <span class="built_in">print</span> string</span><br><span class="line">(gdb) <span class="variable">$1</span>=0x0</span><br><span class="line">    </span><br><span class="line"><span class="comment">#[8] 问题在于string指向的是一个无效指针，修改程序，在10行和11行之间增加一条语句 “string=buff; ”，重新编译程序，然后继续运行，将看到正确的程序运行结果。</span></span><br></pre></td></tr></table></figure>
 
 <blockquote>
 <p>用gdb查看源代码可以用list命令，但是这个不够灵活。可以使用”layout src”命令，或者按Ctrl-X再按A，就会出现一个窗口可以查看源代码。也可以用使用-tui参数，这样进入gdb里面后就能直接打开代码查看窗口。其他代码窗口相关命令：</p>
@@ -391,15 +415,21 @@
             
               
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="BY - 署名">
                     <i class="iconfont icon-cc-by"></i>
                   </span>
                 </a>
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
                     <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
                   </span>
                 </a>
               
@@ -643,6 +673,33 @@
   
 
 
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
 
 
   

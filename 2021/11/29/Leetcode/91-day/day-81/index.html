@@ -74,7 +74,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"SHELL"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -210,6 +210,11 @@
           
   <div class="mt-3">
     
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
@@ -243,6 +248,15 @@
 
     
     
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
   </div>
 
 
@@ -275,17 +289,27 @@
           <article class="post-content mx-auto">
             <h1 id="seo-header">Day 81 40. 组合总和 II</h1>
             
+              <p id="updated-time" class="note note-success" style="display: none">
+                
+                  
+                    本文最后更新于 2025-03-07T10:50:09+08:00
+                  
+                  
+
+                
+              </p>
+            
             
               <div class="markdown-body">
                 
-                <h1 id="40-组合总和-II"><a href="#40-组合总和-II" class="headerlink" title="40. 组合总和 II"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/combination-sum-ii/">40. 组合总和 II</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs cpp">给定一个数组 candidates 和一个目标数 target <br><br>找出 candidates 中所有可以使数字和为 target 的组合。<br><br>candidates 中的每个数字在每个组合中只能使用一次。<br><br>注意：解集不能包含重复的组合。 <br><br> <br><br>示例 <span class="hljs-number">1</span>:<br><br>输入: candidates = [<span class="hljs-number">10</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">7</span>,<span class="hljs-number">6</span>,<span class="hljs-number">1</span>,<span class="hljs-number">5</span>], target = <span class="hljs-number">8</span>,<br>输出:<br>[<br>[<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">6</span>],<br>[<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">5</span>],<br>[<span class="hljs-number">1</span>,<span class="hljs-number">7</span>],<br>[<span class="hljs-number">2</span>,<span class="hljs-number">6</span>]<br>]<br>示例 <span class="hljs-number">2</span>:<br><br>输入: candidates = [<span class="hljs-number">2</span>,<span class="hljs-number">5</span>,<span class="hljs-number">2</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>], target = <span class="hljs-number">5</span>,<br>输出:<br>[<br>[<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>],<br>[<span class="hljs-number">5</span>]<br>]<br> <br><br>提示:<br><br><span class="hljs-number">1</span> &lt;= candidates.length &lt;= <span class="hljs-number">100</span><br><span class="hljs-number">1</span> &lt;= candidates[i] &lt;= <span class="hljs-number">50</span><br><span class="hljs-number">1</span> &lt;= target &lt;= <span class="hljs-number">30</span><br></code></pre></td></tr></table></figure>
+                <h1 id="40-组合总和-II"><a href="#40-组合总和-II" class="headerlink" title="40. 组合总和 II"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/combination-sum-ii/">40. 组合总和 II</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">给定一个数组 candidates 和一个目标数 target </span><br><span class="line"></span><br><span class="line">找出 candidates 中所有可以使数字和为 target 的组合。</span><br><span class="line"></span><br><span class="line">candidates 中的每个数字在每个组合中只能使用一次。</span><br><span class="line"></span><br><span class="line">注意：解集不能包含重复的组合。 </span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">示例 <span class="number">1</span>:</span><br><span class="line"></span><br><span class="line">输入: candidates = [<span class="number">10</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">7</span>,<span class="number">6</span>,<span class="number">1</span>,<span class="number">5</span>], target = <span class="number">8</span>,</span><br><span class="line">输出:</span><br><span class="line">[</span><br><span class="line">[<span class="number">1</span>,<span class="number">1</span>,<span class="number">6</span>],</span><br><span class="line">[<span class="number">1</span>,<span class="number">2</span>,<span class="number">5</span>],</span><br><span class="line">[<span class="number">1</span>,<span class="number">7</span>],</span><br><span class="line">[<span class="number">2</span>,<span class="number">6</span>]</span><br><span class="line">]</span><br><span class="line">示例 <span class="number">2</span>:</span><br><span class="line"></span><br><span class="line">输入: candidates = [<span class="number">2</span>,<span class="number">5</span>,<span class="number">2</span>,<span class="number">1</span>,<span class="number">2</span>], target = <span class="number">5</span>,</span><br><span class="line">输出:</span><br><span class="line">[</span><br><span class="line">[<span class="number">1</span>,<span class="number">2</span>,<span class="number">2</span>],</span><br><span class="line">[<span class="number">5</span>]</span><br><span class="line">]</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">提示:</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> &lt;= candidates.length &lt;= <span class="number">100</span></span><br><span class="line"><span class="number">1</span> &lt;= candidates[i] &lt;= <span class="number">50</span></span><br><span class="line"><span class="number">1</span> &lt;= target &lt;= <span class="number">30</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
 <li>1、同昨日一样的回溯法，看leetcode官方解答可以使用pair存储，但是其实与存储缓存过程中的数据类型 vector<int> 是一样的。</li>
 </ul>
 </blockquote>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">private</span>:<br>    vector&lt;<span class="hljs-type">int</span>&gt; res;<br>    vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; ans;<br>    vector&lt;<span class="hljs-type">int</span>&gt; tmp;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> start, <span class="hljs-type">int</span> target)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = res.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-keyword">if</span>(target == <span class="hljs-number">0</span>) &#123;<br>            ans.<span class="hljs-built_in">push_back</span>(tmp);<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = start; i &lt; n &amp;&amp; target - res[i] &gt;= <span class="hljs-number">0</span>; i++) &#123;<br>            <span class="hljs-keyword">if</span>(i &gt; start &amp;&amp; res[i] == res[i - <span class="hljs-number">1</span>]) <span class="hljs-keyword">continue</span>;<br>            tmp.<span class="hljs-built_in">push_back</span>(res[i]);<br>            <span class="hljs-built_in">dfs</span>(i + <span class="hljs-number">1</span>, target - res[i]);<br>            tmp.<span class="hljs-built_in">pop_back</span>();<br>        &#125;<br>    &#125;<br><br>    vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; <span class="hljs-built_in">combinationSum2</span>(vector&lt;<span class="hljs-type">int</span>&gt; &amp;candidates, <span class="hljs-type">int</span> target) &#123;<br>        <span class="hljs-built_in">sort</span>(candidates.<span class="hljs-built_in">begin</span>(), candidates.<span class="hljs-built_in">end</span>());<br>        <span class="hljs-keyword">this</span> -&gt; res = candidates;<br>        <span class="hljs-built_in">dfs</span>(<span class="hljs-number">0</span>, target);<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; res;</span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; ans;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; tmp;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">dfs</span><span class="params">(<span class="type">int</span> start, <span class="type">int</span> target)</span> </span>&#123;</span><br><span class="line">        <span class="type">int</span> n = res.<span class="built_in">size</span>();</span><br><span class="line">        <span class="keyword">if</span>(target == <span class="number">0</span>) &#123;</span><br><span class="line">            ans.<span class="built_in">push_back</span>(tmp);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = start; i &lt; n &amp;&amp; target - res[i] &gt;= <span class="number">0</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(i &gt; start &amp;&amp; res[i] == res[i - <span class="number">1</span>]) <span class="keyword">continue</span>;</span><br><span class="line">            tmp.<span class="built_in">push_back</span>(res[i]);</span><br><span class="line">            <span class="built_in">dfs</span>(i + <span class="number">1</span>, target - res[i]);</span><br><span class="line">            tmp.<span class="built_in">pop_back</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">combinationSum2</span>(vector&lt;<span class="type">int</span>&gt; &amp;candidates, <span class="type">int</span> target) &#123;</span><br><span class="line">        <span class="built_in">sort</span>(candidates.<span class="built_in">begin</span>(), candidates.<span class="built_in">end</span>());</span><br><span class="line">        <span class="keyword">this</span> -&gt; res = candidates;</span><br><span class="line">        <span class="built_in">dfs</span>(<span class="number">0</span>, target);</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li>时间复杂度：O($2 ^ n * n$)</li>
@@ -365,15 +389,21 @@
             
               
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="BY - 署名">
                     <i class="iconfont icon-cc-by"></i>
                   </span>
                 </a>
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
                     <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
                   </span>
                 </a>
               
@@ -617,6 +647,33 @@
   
 
 
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
 
 
   

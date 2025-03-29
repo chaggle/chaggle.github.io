@@ -74,7 +74,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"SHELL"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -210,6 +210,11 @@
           
   <div class="mt-3">
     
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
@@ -243,6 +248,15 @@
 
     
     
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
   </div>
 
 
@@ -275,10 +289,20 @@
           <article class="post-content mx-auto">
             <h1 id="seo-header">Day 47 Number of Operations to Decrement Target to Zero</h1>
             
+              <p id="updated-time" class="note note-success" style="display: none">
+                
+                  
+                    本文最后更新于 2025-03-07T10:50:09+08:00
+                  
+                  
+
+                
+              </p>
+            
             
               <div class="markdown-body">
                 
-                <h1 id="Number-of-Operations-to-Decrement-Target-to-Zero"><a href="#Number-of-Operations-to-Decrement-Target-to-Zero" class="headerlink" title="Number of Operations to Decrement Target to Zero"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Number-of-Operations-to-Decrement-Target-to-Zero">Number of Operations to Decrement Target to Zero</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs cpp">You are given a list of positive integers nums <span class="hljs-keyword">and</span> an integer target.<br><br>Consider an operation where we remove a number v from either the front <br><br><span class="hljs-keyword">or</span> the back of nums <span class="hljs-keyword">and</span> decrement target by v.<br><br>Return the minimum number of operations required to decrement target to zero. <br><br>If it<span class="hljs-string">&#x27;s not possible, return -1.</span><br><span class="hljs-string"></span><br><span class="hljs-string">Constraints</span><br><span class="hljs-string"></span><br><span class="hljs-string">n ≤ 100,000 where n is the length of nums</span><br><span class="hljs-string">Example 1</span><br><span class="hljs-string">Input</span><br><span class="hljs-string">nums = [3, 1, 1, 2, 5, 1, 1]</span><br><span class="hljs-string">target = 7</span><br><span class="hljs-string">Output</span><br><span class="hljs-string">3</span><br><span class="hljs-string">Explanation</span><br><span class="hljs-string">We can remove 1, 1 and 5 from the back to decrement target to zero.</span><br><span class="hljs-string"></span><br><span class="hljs-string">Example 2</span><br><span class="hljs-string">Input</span><br><span class="hljs-string">nums = [2, 4]</span><br><span class="hljs-string">target = 7</span><br><span class="hljs-string">Output</span><br><span class="hljs-string">-1</span><br><span class="hljs-string">Explanation</span><br><span class="hljs-string">There&#x27;</span>s no way to decrement target = <span class="hljs-number">7</span> to zero.<br></code></pre></td></tr></table></figure>
+                <h1 id="Number-of-Operations-to-Decrement-Target-to-Zero"><a href="#Number-of-Operations-to-Decrement-Target-to-Zero" class="headerlink" title="Number of Operations to Decrement Target to Zero"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Number-of-Operations-to-Decrement-Target-to-Zero">Number of Operations to Decrement Target to Zero</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">You are given a list of positive integers nums <span class="keyword">and</span> an integer target.</span><br><span class="line"></span><br><span class="line">Consider an operation where we remove a number v from either the front </span><br><span class="line"></span><br><span class="line"><span class="keyword">or</span> the back of nums <span class="keyword">and</span> decrement target by v.</span><br><span class="line"></span><br><span class="line">Return the minimum number of operations required to decrement target to zero. </span><br><span class="line"></span><br><span class="line">If it<span class="string">&#x27;s not possible, return -1.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Constraints</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">n ≤ 100,000 where n is the length of nums</span></span><br><span class="line"><span class="string">Example 1</span></span><br><span class="line"><span class="string">Input</span></span><br><span class="line"><span class="string">nums = [3, 1, 1, 2, 5, 1, 1]</span></span><br><span class="line"><span class="string">target = 7</span></span><br><span class="line"><span class="string">Output</span></span><br><span class="line"><span class="string">3</span></span><br><span class="line"><span class="string">Explanation</span></span><br><span class="line"><span class="string">We can remove 1, 1 and 5 from the back to decrement target to zero.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Example 2</span></span><br><span class="line"><span class="string">Input</span></span><br><span class="line"><span class="string">nums = [2, 4]</span></span><br><span class="line"><span class="string">target = 7</span></span><br><span class="line"><span class="string">Output</span></span><br><span class="line"><span class="string">-1</span></span><br><span class="line"><span class="string">Explanation</span></span><br><span class="line"><span class="string">There&#x27;</span>s no way to decrement target = <span class="number">7</span> to zero.</span><br></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
@@ -286,7 +310,7 @@
 <li>2、不相等则减去目标值，即为最少需要去除的值，使用双指针滑动，如果大于去除值，则左指针向前滑动，相等则对比之前操作的长度，记录其中最大的移动长度，即为最小的移动区间。</li>
 </ul>
 </blockquote>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">solve</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> target)</span> </span>&#123;<br>    <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br>    <span class="hljs-type">int</span> sum;<br><br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++)<br>    &#123;<br>        sum += nums[i];<br>    &#125;<br>    <span class="hljs-keyword">if</span> (sum == target) <span class="hljs-keyword">return</span> n;<br>	sum -= target;<br><br>    <span class="hljs-type">int</span> l = <span class="hljs-number">0</span>, total = <span class="hljs-number">0</span>, pos = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> r = <span class="hljs-number">0</span>; r &lt; n; r++)<br>    &#123;<br>        total += nums[r];<br>        <span class="hljs-keyword">while</span>(total &gt; sum)<br>        &#123;<br>            total -= nums[l++];<br>        &#125;<br>        <span class="hljs-keyword">if</span> (total == sum)<br>        &#123;<br>            pos = <span class="hljs-built_in">max</span>(pos, r - l + <span class="hljs-number">1</span>);<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> pos &gt; <span class="hljs-number">0</span> ? n - pos : <span class="hljs-number">-1</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">solve</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums, <span class="type">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> n = nums.<span class="built_in">size</span>();</span><br><span class="line">    <span class="type">int</span> sum;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        sum += nums[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (sum == target) <span class="keyword">return</span> n;</span><br><span class="line">	sum -= target;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> l = <span class="number">0</span>, total = <span class="number">0</span>, pos = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> r = <span class="number">0</span>; r &lt; n; r++)</span><br><span class="line">    &#123;</span><br><span class="line">        total += nums[r];</span><br><span class="line">        <span class="keyword">while</span>(total &gt; sum)</span><br><span class="line">        &#123;</span><br><span class="line">            total -= nums[l++];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (total == sum)</span><br><span class="line">        &#123;</span><br><span class="line">            pos = <span class="built_in">max</span>(pos, r - l + <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> pos &gt; <span class="number">0</span> ? n - pos : <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n)</p>
@@ -368,15 +392,21 @@
             
               
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="BY - 署名">
                     <i class="iconfont icon-cc-by"></i>
                   </span>
                 </a>
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
                     <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
                   </span>
                 </a>
               
@@ -620,6 +650,33 @@
   
 
 
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
 
 
   

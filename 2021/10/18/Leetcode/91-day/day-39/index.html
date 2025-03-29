@@ -74,7 +74,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"SHELL"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -210,6 +210,11 @@
           
   <div class="mt-3">
     
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
@@ -243,6 +248,15 @@
 
     
     
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
   </div>
 
 
@@ -275,17 +289,27 @@
           <article class="post-content mx-auto">
             <h1 id="seo-header">Day 39 762.Number Stream to Intervals</h1>
             
+              <p id="updated-time" class="note note-success" style="display: none">
+                
+                  
+                    本文最后更新于 2025-03-07T10:50:09+08:00
+                  
+                  
+
+                
+              </p>
+            
             
               <div class="markdown-body">
                 
-                <h1 id="762-Number-Stream-to-Intervals"><a href="#762-Number-Stream-to-Intervals" class="headerlink" title="762.Number Stream to Intervals"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Triple-Inversion">762.Number Stream to Intervals</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs cpp">Given a list of integers nums, <br><br><span class="hljs-keyword">return</span> the number of pairs i &lt; j such that nums[i] &gt; nums[j] * <span class="hljs-number">3.</span><br><br>Constraints<br><br>n ≤ <span class="hljs-number">100</span>,<span class="hljs-number">000</span> where n is the length of nums<br>Example <span class="hljs-number">1</span><br>Input<br>nums = [<span class="hljs-number">7</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>]<br>Output<br><span class="hljs-number">2</span><br>Explanation<br>We have the <span class="hljs-built_in">pairs</span> (<span class="hljs-number">7</span>, <span class="hljs-number">1</span>) <span class="hljs-built_in">and</span> (<span class="hljs-number">7</span>, <span class="hljs-number">2</span>)<br></code></pre></td></tr></table></figure>
+                <h1 id="762-Number-Stream-to-Intervals"><a href="#762-Number-Stream-to-Intervals" class="headerlink" title="762.Number Stream to Intervals"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Triple-Inversion">762.Number Stream to Intervals</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Given a list of integers nums, </span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> the number of pairs i &lt; j such that nums[i] &gt; nums[j] * <span class="number">3.</span></span><br><span class="line"></span><br><span class="line">Constraints</span><br><span class="line"></span><br><span class="line">n ≤ <span class="number">100</span>,<span class="number">000</span> where n is the length of nums</span><br><span class="line">Example <span class="number">1</span></span><br><span class="line">Input</span><br><span class="line">nums = [<span class="number">7</span>, <span class="number">1</span>, <span class="number">2</span>]</span><br><span class="line">Output</span><br><span class="line"><span class="number">2</span></span><br><span class="line">Explanation</span><br><span class="line">We have the <span class="built_in">pairs</span> (<span class="number">7</span>, <span class="number">1</span>) <span class="built_in">and</span> (<span class="number">7</span>, <span class="number">2</span>)</span><br></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
 <li>1、构造逆序对，然后返回逆序对的数量，使用归并排序比二分法更加合适，找出每个子区间中一项大于当前 num * 3 的值</li>
 </ul>
 </blockquote>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt; &amp;nums, <span class="hljs-type">int</span> i, <span class="hljs-type">int</span> mid, <span class="hljs-type">int</span> j)</span></span><br><span class="hljs-function">    </span>&#123;<br><br>        <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">ans</span><span class="hljs-params">(j - i + <span class="hljs-number">1</span>)</span></span>;<br>        <span class="hljs-type">int</span> l = i, r = mid + <span class="hljs-number">1</span>;<br>        <span class="hljs-type">int</span> cnt = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">while</span>(l &lt;= mid &amp;&amp; r &lt;= j)<br>        &#123;<br>            <span class="hljs-keyword">if</span>(nums[l] &lt;= nums[r])<br>            &#123;<br>                ans[cnt] = nums[l];<br>                l++;<br>            &#125;<br>            <span class="hljs-keyword">else</span><br>            &#123;<br>                ans[cnt] = nums[r];<br>                r++;<br>            &#125;<br>            cnt++;<br>        &#125;<br><br>        <span class="hljs-keyword">while</span>(l &lt;= mid) ans[cnt++] = nums[l++];<br>        <span class="hljs-keyword">while</span>(r &lt;= j) ans[cnt++] = nums[r++];<br><br>        cnt = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">while</span>(i &lt;= j) nums[i++] = ans[cnt++];<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">mergeSort</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt; &amp;nums, <span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r)</span></span><br><span class="hljs-function">    </span>&#123;<br>        <span class="hljs-keyword">if</span>(r &lt;= l) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> mid = (l + r) / <span class="hljs-number">2</span>;<br>        ans += <span class="hljs-built_in">mergeSort</span>(nums, l, mid);<br>        ans += <span class="hljs-built_in">mergeSort</span>(nums, mid + <span class="hljs-number">1</span>, r);<br><br>        <span class="hljs-type">int</span> p = l;<br>        <span class="hljs-type">int</span> q = mid + <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">while</span>(p &lt;= mid &amp;&amp; q &lt;= r)<br>        &#123;<br>            <span class="hljs-keyword">if</span>(nums[p] &gt; nums[q] * <span class="hljs-number">3</span>)<br>            &#123;<br>                ans += (mid - p + <span class="hljs-number">1</span>);<br>                q++;<br>            &#125;<br>            <span class="hljs-keyword">else</span> p++;<br>        &#125;<br>        <span class="hljs-built_in">merge</span>(nums, l, mid, r);<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">solve</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt; &amp;nums)</span></span><br><span class="hljs-function">    </span>&#123;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-built_in">mergeSort</span>(nums, <span class="hljs-number">0</span>, nums.<span class="hljs-built_in">size</span>() - <span class="hljs-number">1</span>);<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">merge</span><span class="params">(vector&lt;<span class="type">int</span>&gt; &amp;nums, <span class="type">int</span> i, <span class="type">int</span> mid, <span class="type">int</span> j)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">ans</span><span class="params">(j - i + <span class="number">1</span>)</span></span>;</span><br><span class="line">        <span class="type">int</span> l = i, r = mid + <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> cnt = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(l &lt;= mid &amp;&amp; r &lt;= j)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(nums[l] &lt;= nums[r])</span><br><span class="line">            &#123;</span><br><span class="line">                ans[cnt] = nums[l];</span><br><span class="line">                l++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                ans[cnt] = nums[r];</span><br><span class="line">                r++;</span><br><span class="line">            &#125;</span><br><span class="line">            cnt++;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(l &lt;= mid) ans[cnt++] = nums[l++];</span><br><span class="line">        <span class="keyword">while</span>(r &lt;= j) ans[cnt++] = nums[r++];</span><br><span class="line"></span><br><span class="line">        cnt = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(i &lt;= j) nums[i++] = ans[cnt++];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">mergeSort</span><span class="params">(vector&lt;<span class="type">int</span>&gt; &amp;nums, <span class="type">int</span> l, <span class="type">int</span> r)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(r &lt;= l) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> ans = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> mid = (l + r) / <span class="number">2</span>;</span><br><span class="line">        ans += <span class="built_in">mergeSort</span>(nums, l, mid);</span><br><span class="line">        ans += <span class="built_in">mergeSort</span>(nums, mid + <span class="number">1</span>, r);</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> p = l;</span><br><span class="line">        <span class="type">int</span> q = mid + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(p &lt;= mid &amp;&amp; q &lt;= r)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(nums[p] &gt; nums[q] * <span class="number">3</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                ans += (mid - p + <span class="number">1</span>);</span><br><span class="line">                q++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> p++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">merge</span>(nums, l, mid, r);</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">solve</span><span class="params">(vector&lt;<span class="type">int</span>&gt; &amp;nums)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="type">int</span> ans = <span class="built_in">mergeSort</span>(nums, <span class="number">0</span>, nums.<span class="built_in">size</span>() - <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(nlogn)</p>
@@ -367,15 +391,21 @@
             
               
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="BY - 署名">
                     <i class="iconfont icon-cc-by"></i>
                   </span>
                 </a>
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
                     <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
                   </span>
                 </a>
               
@@ -619,6 +649,33 @@
   
 
 
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
 
 
   

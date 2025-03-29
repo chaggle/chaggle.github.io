@@ -73,7 +73,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"SHELL"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -209,6 +209,11 @@
           
   <div class="mt-3">
     
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
@@ -242,6 +247,15 @@
 
     
     
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
   </div>
 
 
@@ -274,15 +288,25 @@
           <article class="post-content mx-auto">
             <h1 id="seo-header">187. 重复的DNA序列</h1>
             
+              <p id="updated-time" class="note note-success" style="display: none">
+                
+                  
+                    本文最后更新于 2025-03-07T10:50:09+08:00
+                  
+                  
+
+                
+              </p>
+            
             
               <div class="markdown-body">
                 
-                <h1 id="187-重复的-DNA-序列"><a href="#187-重复的-DNA-序列" class="headerlink" title="187. 重复的 DNA 序列"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/repeated-dna-sequences/">187. 重复的 DNA 序列</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs cpp">所有 DNA 都由一系列缩写为 <span class="hljs-string">&#x27;A&#x27;</span>，<span class="hljs-string">&#x27;C&#x27;</span>，<span class="hljs-string">&#x27;G&#x27;</span> 和 <span class="hljs-string">&#x27;T&#x27;</span> 的核苷酸组成，例如：<span class="hljs-string">&quot;ACGAATTCCG&quot;</span>。在研究 DNA 时，识别 DNA 中的重复序列有时会对研究非常有帮助。<br><br>编写一个函数来找出所有目标子串，目标子串的长度为 <span class="hljs-number">10</span>，且在 DNA 字符串 s 中出现次数超过一次。<br><br> <br><br>示例 <span class="hljs-number">1</span>：<br><br>输入：s = <span class="hljs-string">&quot;AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT&quot;</span><br>输出：[<span class="hljs-string">&quot;AAAAACCCCC&quot;</span>,<span class="hljs-string">&quot;CCCCCAAAAA&quot;</span>]<br>示例 <span class="hljs-number">2</span>：<br><br>输入：s = <span class="hljs-string">&quot;AAAAAAAAAAAAA&quot;</span><br>输出：[<span class="hljs-string">&quot;AAAAAAAAAA&quot;</span>]<br> <br><br>提示：<br><br><span class="hljs-number">0</span> &lt;= s.length &lt;= <span class="hljs-number">105</span><br>s[i] 为 <span class="hljs-string">&#x27;A&#x27;</span>、<span class="hljs-string">&#x27;C&#x27;</span>、<span class="hljs-string">&#x27;G&#x27;</span> 或 <span class="hljs-string">&#x27;T&#x27;</span><br></code></pre></td></tr></table></figure>
+                <h1 id="187-重复的-DNA-序列"><a href="#187-重复的-DNA-序列" class="headerlink" title="187. 重复的 DNA 序列"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/repeated-dna-sequences/">187. 重复的 DNA 序列</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">所有 DNA 都由一系列缩写为 <span class="string">&#x27;A&#x27;</span>，<span class="string">&#x27;C&#x27;</span>，<span class="string">&#x27;G&#x27;</span> 和 <span class="string">&#x27;T&#x27;</span> 的核苷酸组成，例如：<span class="string">&quot;ACGAATTCCG&quot;</span>。在研究 DNA 时，识别 DNA 中的重复序列有时会对研究非常有帮助。</span><br><span class="line"></span><br><span class="line">编写一个函数来找出所有目标子串，目标子串的长度为 <span class="number">10</span>，且在 DNA 字符串 s 中出现次数超过一次。</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">示例 <span class="number">1</span>：</span><br><span class="line"></span><br><span class="line">输入：s = <span class="string">&quot;AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT&quot;</span></span><br><span class="line">输出：[<span class="string">&quot;AAAAACCCCC&quot;</span>,<span class="string">&quot;CCCCCAAAAA&quot;</span>]</span><br><span class="line">示例 <span class="number">2</span>：</span><br><span class="line"></span><br><span class="line">输入：s = <span class="string">&quot;AAAAAAAAAAAAA&quot;</span></span><br><span class="line">输出：[<span class="string">&quot;AAAAAAAAAA&quot;</span>]</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">提示：</span><br><span class="line"></span><br><span class="line"><span class="number">0</span> &lt;= s.length &lt;= <span class="number">105</span></span><br><span class="line">s[i] 为 <span class="string">&#x27;A&#x27;</span>、<span class="string">&#x27;C&#x27;</span>、<span class="string">&#x27;G&#x27;</span> 或 <span class="string">&#x27;T&#x27;</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <p>1、滑动窗口，以 10 为值</p>
 </blockquote>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">vector&lt;string&gt; <span class="hljs-title">findRepeatedDnaSequences</span><span class="hljs-params">(string s)</span> </span>&#123;<br>        vector&lt;string&gt; ans;<br>        <span class="hljs-type">int</span> n = s.<span class="hljs-built_in">size</span>();<br>        unordered_map&lt;string, <span class="hljs-type">int</span>&gt; st;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>, j = <span class="hljs-number">9</span>; j &lt; n; j++, i++)<br>        &#123;<br>            <span class="hljs-keyword">if</span>(st[s.<span class="hljs-built_in">substr</span>(i,<span class="hljs-number">10</span>)] == <span class="hljs-number">1</span>)<br>            &#123;<br>                ans.<span class="hljs-built_in">push_back</span>(s.<span class="hljs-built_in">substr</span>(i, <span class="hljs-number">10</span>));<br>            &#125;<br>            st[s.<span class="hljs-built_in">substr</span>(i, <span class="hljs-number">10</span>)]++;<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">vector&lt;string&gt; <span class="title">findRepeatedDnaSequences</span><span class="params">(string s)</span> </span>&#123;</span><br><span class="line">        vector&lt;string&gt; ans;</span><br><span class="line">        <span class="type">int</span> n = s.<span class="built_in">size</span>();</span><br><span class="line">        unordered_map&lt;string, <span class="type">int</span>&gt; st;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>, j = <span class="number">9</span>; j &lt; n; j++, i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(st[s.<span class="built_in">substr</span>(i,<span class="number">10</span>)] == <span class="number">1</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                ans.<span class="built_in">push_back</span>(s.<span class="built_in">substr</span>(i, <span class="number">10</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            st[s.<span class="built_in">substr</span>(i, <span class="number">10</span>)]++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n*C)</p>
@@ -357,15 +381,21 @@
             
               
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="BY - 署名">
                     <i class="iconfont icon-cc-by"></i>
                   </span>
                 </a>
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
                     <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
                   </span>
                 </a>
               
@@ -609,6 +639,33 @@
   
 
 
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
 
 
   

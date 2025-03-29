@@ -74,7 +74,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"SHELL"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -210,6 +210,11 @@
           
   <div class="mt-3">
     
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
@@ -243,6 +248,15 @@
 
     
     
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
   </div>
 
 
@@ -275,10 +289,20 @@
           <article class="post-content mx-auto">
             <h1 id="seo-header">Day-04 394. 字符串解码</h1>
             
+              <p id="updated-time" class="note note-success" style="display: none">
+                
+                  
+                    本文最后更新于 2025-03-07T10:50:09+08:00
+                  
+                  
+
+                
+              </p>
+            
             
               <div class="markdown-body">
                 
-                <h1 id="394-字符串解码"><a href="#394-字符串解码" class="headerlink" title="394. 字符串解码"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/decode-string/">394. 字符串解码</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs cpp">给定一个经过编码的字符串，返回它解码后的字符串。<br><br>编码规则为: k[encoded_string]，表示其中方括号内部的 encoded_string 正好重复 k 次。<br><br>注意 k 保证为正整数。<br><br>你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。<br><br>此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 k 。<br><br>例如不会出现像 <span class="hljs-number">3</span>a 或 <span class="hljs-number">2</span>[<span class="hljs-number">4</span>] 的输入。<br><br> <br><br>示例 <span class="hljs-number">1</span>：<br><br>输入：s = <span class="hljs-string">&quot;3[a]2[bc]&quot;</span><br>输出：<span class="hljs-string">&quot;aaabcbc&quot;</span><br>示例 <span class="hljs-number">2</span>：<br><br>输入：s = <span class="hljs-string">&quot;3[a2[c]]&quot;</span><br>输出：<span class="hljs-string">&quot;accaccacc&quot;</span><br>示例 <span class="hljs-number">3</span>：<br><br>输入：s = <span class="hljs-string">&quot;2[abc]3[cd]ef&quot;</span><br>输出：<span class="hljs-string">&quot;abcabccdcdcdef&quot;</span><br>示例 <span class="hljs-number">4</span>：<br><br>输入：s = <span class="hljs-string">&quot;abc3[cd]xyz&quot;</span><br>输出：<span class="hljs-string">&quot;abccdcdcdxyz&quot;</span><br></code></pre></td></tr></table></figure>
+                <h1 id="394-字符串解码"><a href="#394-字符串解码" class="headerlink" title="394. 字符串解码"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/decode-string/">394. 字符串解码</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">给定一个经过编码的字符串，返回它解码后的字符串。</span><br><span class="line"></span><br><span class="line">编码规则为: k[encoded_string]，表示其中方括号内部的 encoded_string 正好重复 k 次。</span><br><span class="line"></span><br><span class="line">注意 k 保证为正整数。</span><br><span class="line"></span><br><span class="line">你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。</span><br><span class="line"></span><br><span class="line">此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 k 。</span><br><span class="line"></span><br><span class="line">例如不会出现像 <span class="number">3</span>a 或 <span class="number">2</span>[<span class="number">4</span>] 的输入。</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">示例 <span class="number">1</span>：</span><br><span class="line"></span><br><span class="line">输入：s = <span class="string">&quot;3[a]2[bc]&quot;</span></span><br><span class="line">输出：<span class="string">&quot;aaabcbc&quot;</span></span><br><span class="line">示例 <span class="number">2</span>：</span><br><span class="line"></span><br><span class="line">输入：s = <span class="string">&quot;3[a2[c]]&quot;</span></span><br><span class="line">输出：<span class="string">&quot;accaccacc&quot;</span></span><br><span class="line">示例 <span class="number">3</span>：</span><br><span class="line"></span><br><span class="line">输入：s = <span class="string">&quot;2[abc]3[cd]ef&quot;</span></span><br><span class="line">输出：<span class="string">&quot;abcabccdcdcdef&quot;</span></span><br><span class="line">示例 <span class="number">4</span>：</span><br><span class="line"></span><br><span class="line">输入：s = <span class="string">&quot;abc3[cd]xyz&quot;</span></span><br><span class="line">输出：<span class="string">&quot;abccdcdcdxyz&quot;</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><ul>
 <li>1、创建一个 stack<string> res 的辅助栈以及最终的返回值 string 类型的 res 初始化为空；</li>
@@ -286,7 +310,7 @@
 <li>3、字符串题有大小写的区别，所以要注意大小写</li>
 <li>4、看代码注释举例。</li>
 </ul>
-<h3 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">string <span class="hljs-title">decodeString</span><span class="hljs-params">(string s)</span> </span>&#123;<br>        stack&lt;string&gt; pos;<br>        stack&lt;<span class="hljs-type">int</span>&gt; nums;<br>        string res = <span class="hljs-string">&quot;&quot;</span>;<br>        <span class="hljs-type">int</span> sum = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; s.<span class="hljs-built_in">size</span>(); i++)<br>        &#123;<br>            <span class="hljs-keyword">if</span>(<span class="hljs-built_in">isdigit</span>(s[i]))<br>            <span class="hljs-comment">//if(s[i] &gt;= &#x27;0&#x27; &amp;&amp; s[i] &lt;= &#x27;9&#x27;)</span><br>                sum = sum * <span class="hljs-number">10</span> + s[i] - <span class="hljs-string">&#x27;0&#x27;</span>;<br>            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(<span class="hljs-built_in">isalpha</span>(s))<br>                <span class="hljs-comment">//if((s[i] &gt;= &#x27;a&#x27; &amp;&amp; s[i] &lt;= &#x27;z&#x27;)||(s[i] &gt;= &#x27;A&#x27; &amp;&amp; s[i] &lt;= &#x27;Z&#x27;))</span><br>                res += s[i]; <span class="hljs-comment">//注意大小写，之前第一次提交发现大小写也存在区分</span><br>            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(s[i] == <span class="hljs-string">&#x27;[&#x27;</span>)<br>            &#123;<br>                nums.<span class="hljs-built_in">push</span>(sum);<br>                sum = <span class="hljs-number">0</span>;    <span class="hljs-comment">//重置 0</span><br>                pos.<span class="hljs-built_in">push</span>(res);<br>                res = <span class="hljs-string">&quot;&quot;</span>;   <span class="hljs-comment">//重置为空字符串</span><br>            &#125;<br>            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(s[i] == <span class="hljs-string">&#x27;]&#x27;</span>)   <span class="hljs-comment">//此处举例3[a2[c]];</span><br>            &#123;       <span class="hljs-comment">//出现[后将3放入nums中，sum重置，res仍为&quot;&quot;</span><br>                sum = nums.<span class="hljs-built_in">top</span>();  <span class="hljs-comment">//而后再出现[，此时sum=2;res=&quot;a&quot;,存入pos</span><br>                nums.<span class="hljs-built_in">pop</span>();    <span class="hljs-comment">//第一次出现], 此时sum = nums.top() == 2</span><br>                <span class="hljs-keyword">while</span>(sum)    <span class="hljs-comment">//pos.top = a, res = &#x27;c&#x27;,输出为res = &quot;acc&quot;</span><br>                &#123;      <span class="hljs-comment">//第二次出现],sum = nums.top() == 3;</span><br>                    pos.<span class="hljs-built_in">top</span>() += res;  <span class="hljs-comment">//pos.top = &quot;&quot; 第一次存入的res, res =&quot;acc&quot;,</span><br>                    sum--;    <span class="hljs-comment">//画图更好理解，sum经历变化后的值最终始终为0</span><br>                &#125;<br>                res = pos.<span class="hljs-built_in">top</span>();<br>                pos.<span class="hljs-built_in">pop</span>();<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<h3 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">string <span class="title">decodeString</span><span class="params">(string s)</span> </span>&#123;</span><br><span class="line">        stack&lt;string&gt; pos;</span><br><span class="line">        stack&lt;<span class="type">int</span>&gt; nums;</span><br><span class="line">        string res = <span class="string">&quot;&quot;</span>;</span><br><span class="line">        <span class="type">int</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; s.<span class="built_in">size</span>(); i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(<span class="built_in">isdigit</span>(s[i]))</span><br><span class="line">            <span class="comment">//if(s[i] &gt;= &#x27;0&#x27; &amp;&amp; s[i] &lt;= &#x27;9&#x27;)</span></span><br><span class="line">                sum = sum * <span class="number">10</span> + s[i] - <span class="string">&#x27;0&#x27;</span>;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>(<span class="built_in">isalpha</span>(s))</span><br><span class="line">                <span class="comment">//if((s[i] &gt;= &#x27;a&#x27; &amp;&amp; s[i] &lt;= &#x27;z&#x27;)||(s[i] &gt;= &#x27;A&#x27; &amp;&amp; s[i] &lt;= &#x27;Z&#x27;))</span></span><br><span class="line">                res += s[i]; <span class="comment">//注意大小写，之前第一次提交发现大小写也存在区分</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>(s[i] == <span class="string">&#x27;[&#x27;</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                nums.<span class="built_in">push</span>(sum);</span><br><span class="line">                sum = <span class="number">0</span>;    <span class="comment">//重置 0</span></span><br><span class="line">                pos.<span class="built_in">push</span>(res);</span><br><span class="line">                res = <span class="string">&quot;&quot;</span>;   <span class="comment">//重置为空字符串</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>(s[i] == <span class="string">&#x27;]&#x27;</span>)   <span class="comment">//此处举例3[a2[c]];</span></span><br><span class="line">            &#123;       <span class="comment">//出现[后将3放入nums中，sum重置，res仍为&quot;&quot;</span></span><br><span class="line">                sum = nums.<span class="built_in">top</span>();  <span class="comment">//而后再出现[，此时sum=2;res=&quot;a&quot;,存入pos</span></span><br><span class="line">                nums.<span class="built_in">pop</span>();    <span class="comment">//第一次出现], 此时sum = nums.top() == 2</span></span><br><span class="line">                <span class="keyword">while</span>(sum)    <span class="comment">//pos.top = a, res = &#x27;c&#x27;,输出为res = &quot;acc&quot;</span></span><br><span class="line">                &#123;      <span class="comment">//第二次出现],sum = nums.top() == 3;</span></span><br><span class="line">                    pos.<span class="built_in">top</span>() += res;  <span class="comment">//pos.top = &quot;&quot; 第一次存入的res, res =&quot;acc&quot;,</span></span><br><span class="line">                    sum--;    <span class="comment">//画图更好理解，sum经历变化后的值最终始终为0</span></span><br><span class="line">                &#125;</span><br><span class="line">                res = pos.<span class="built_in">top</span>();</span><br><span class="line">                pos.<span class="built_in">pop</span>();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：一次遍历 O(s.size), 其中的 while 循环应该是常数级;</p>
@@ -368,15 +392,21 @@
             
               
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="BY - 署名">
                     <i class="iconfont icon-cc-by"></i>
                   </span>
                 </a>
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
                     <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
                   </span>
                 </a>
               
@@ -620,6 +650,33 @@
   
 
 
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
 
 
   

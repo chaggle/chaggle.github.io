@@ -74,7 +74,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"SHELL"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -210,6 +210,11 @@
           
   <div class="mt-3">
     
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
@@ -243,6 +248,15 @@
 
     
     
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
   </div>
 
 
@@ -275,17 +289,27 @@
           <article class="post-content mx-auto">
             <h1 id="seo-header">Day 60 464. 我能赢吗</h1>
             
+              <p id="updated-time" class="note note-success" style="display: none">
+                
+                  
+                    本文最后更新于 2025-03-07T10:50:09+08:00
+                  
+                  
+
+                
+              </p>
+            
             
               <div class="markdown-body">
                 
-                <h1 id="464-我能赢吗"><a href="#464-我能赢吗" class="headerlink" title="464. 我能赢吗"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/can-i-win/">464. 我能赢吗</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs cpp">在 <span class="hljs-string">&quot;100 game&quot;</span> 这个游戏中，两名玩家轮流选择从 <span class="hljs-number">1</span> 到 <span class="hljs-number">10</span> 的任意整数，累计整数和，<br><br>先使得累计整数和达到或超过 <span class="hljs-number">100</span> 的玩家，即为胜者。<br><br>如果我们将游戏规则改为 “玩家不能重复使用整数” 呢？<br><br>例如，两个玩家可以轮流从公共整数池中抽取从 <span class="hljs-number">1</span> 到 <span class="hljs-number">15</span> 的整数（不放回），直到累计整数和 &gt;= <span class="hljs-number">100</span>。<br><br>给定一个整数 maxChoosableInteger 和另一个整数 desiredTotal，判断先出手的玩家是否能稳赢？<br><br>你可以假设 maxChoosableInteger 不会大于 <span class="hljs-number">20</span>， desiredTotal 不会大于 <span class="hljs-number">300</span>。<br><br>示例：<br><br>输入：<br>maxChoosableInteger = <span class="hljs-number">10</span><br>desiredTotal = <span class="hljs-number">11</span><br><br>输出：<br><span class="hljs-literal">false</span><br><br>解释：<br>无论第一个玩家选择哪个整数，他都会失败。<br>第一个玩家可以选择从 <span class="hljs-number">1</span> 到 <span class="hljs-number">10</span> 的整数。<br>如果第一个玩家选择 <span class="hljs-number">1</span>，那么第二个玩家只能选择从 <span class="hljs-number">2</span> 到 <span class="hljs-number">10</span> 的整数。<br>第二个玩家可以通过选择整数 <span class="hljs-number">10</span>（那么累积和为 <span class="hljs-number">11</span> &gt;= desiredTotal），从而取得胜利.<br>同样地，第一个玩家选择任意其他整数，第二个玩家都会赢。<br></code></pre></td></tr></table></figure>
+                <h1 id="464-我能赢吗"><a href="#464-我能赢吗" class="headerlink" title="464. 我能赢吗"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/can-i-win/">464. 我能赢吗</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">在 <span class="string">&quot;100 game&quot;</span> 这个游戏中，两名玩家轮流选择从 <span class="number">1</span> 到 <span class="number">10</span> 的任意整数，累计整数和，</span><br><span class="line"></span><br><span class="line">先使得累计整数和达到或超过 <span class="number">100</span> 的玩家，即为胜者。</span><br><span class="line"></span><br><span class="line">如果我们将游戏规则改为 “玩家不能重复使用整数” 呢？</span><br><span class="line"></span><br><span class="line">例如，两个玩家可以轮流从公共整数池中抽取从 <span class="number">1</span> 到 <span class="number">15</span> 的整数（不放回），直到累计整数和 &gt;= <span class="number">100</span>。</span><br><span class="line"></span><br><span class="line">给定一个整数 maxChoosableInteger 和另一个整数 desiredTotal，判断先出手的玩家是否能稳赢？</span><br><span class="line"></span><br><span class="line">你可以假设 maxChoosableInteger 不会大于 <span class="number">20</span>， desiredTotal 不会大于 <span class="number">300</span>。</span><br><span class="line"></span><br><span class="line">示例：</span><br><span class="line"></span><br><span class="line">输入：</span><br><span class="line">maxChoosableInteger = <span class="number">10</span></span><br><span class="line">desiredTotal = <span class="number">11</span></span><br><span class="line"></span><br><span class="line">输出：</span><br><span class="line"><span class="literal">false</span></span><br><span class="line"></span><br><span class="line">解释：</span><br><span class="line">无论第一个玩家选择哪个整数，他都会失败。</span><br><span class="line">第一个玩家可以选择从 <span class="number">1</span> 到 <span class="number">10</span> 的整数。</span><br><span class="line">如果第一个玩家选择 <span class="number">1</span>，那么第二个玩家只能选择从 <span class="number">2</span> 到 <span class="number">10</span> 的整数。</span><br><span class="line">第二个玩家可以通过选择整数 <span class="number">10</span>（那么累积和为 <span class="number">11</span> &gt;= desiredTotal），从而取得胜利.</span><br><span class="line">同样地，第一个玩家选择任意其他整数，第二个玩家都会赢。</span><br></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
 <li>1、本题只有两种对立的选择，必赢和必输，就是赌博中的稳赢的选择方法。如果先手方A选择某数X可以保证后手方B无论选择其他何数都保证赢，则必赢返回True，否则A选择任意数后B均有必赢方法，返回False</li>
 </ul>
 </blockquote>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">canIWin</span><span class="hljs-params">(<span class="hljs-type">int</span> stable, <span class="hljs-type">int</span> desired)</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (stable &gt;= desired) <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br><br>        <span class="hljs-keyword">if</span> (stable * (stable + <span class="hljs-number">1</span>) / <span class="hljs-number">2</span> &lt; desired) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br><br>        unordered_map&lt;<span class="hljs-type">int</span>, <span class="hljs-type">bool</span>&gt; up;<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">canWin</span>(stable, desired, <span class="hljs-number">0</span>, up);<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> n, <span class="hljs-type">int</span> sum, <span class="hljs-type">int</span> k, unordered_map&lt;<span class="hljs-type">int</span>, <span class="hljs-type">bool</span>&gt;&amp; up)</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (up.<span class="hljs-built_in">count</span>(k)) <span class="hljs-keyword">return</span> up[k];<br><br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n; ++i) &#123;<br>            <span class="hljs-type">int</span> cur = (<span class="hljs-number">1</span> &lt;&lt; i);<br>            <span class="hljs-keyword">if</span> ((cur &amp; k) == <span class="hljs-number">0</span>)<br>            &#123;<span class="hljs-comment">//这个值没有使用过</span><br>                <span class="hljs-keyword">if</span> (sum &lt;= i + <span class="hljs-number">1</span> || !<span class="hljs-built_in">dfs</span>(n, sum - (i + <span class="hljs-number">1</span>), cur | k, up))<br>                &#123;<br>                    up[k] = <span class="hljs-literal">true</span>;<br>                    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>                &#125;<br>            &#125;<br>        &#125;<br>        up[k] = <span class="hljs-literal">false</span>;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">canIWin</span><span class="params">(<span class="type">int</span> stable, <span class="type">int</span> desired)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (stable &gt;= desired) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (stable * (stable + <span class="number">1</span>) / <span class="number">2</span> &lt; desired) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">        unordered_map&lt;<span class="type">int</span>, <span class="type">bool</span>&gt; up;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">canWin</span>(stable, desired, <span class="number">0</span>, up);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">dfs</span><span class="params">(<span class="type">int</span> n, <span class="type">int</span> sum, <span class="type">int</span> k, unordered_map&lt;<span class="type">int</span>, <span class="type">bool</span>&gt;&amp; up)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (up.<span class="built_in">count</span>(k)) <span class="keyword">return</span> up[k];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">            <span class="type">int</span> cur = (<span class="number">1</span> &lt;&lt; i);</span><br><span class="line">            <span class="keyword">if</span> ((cur &amp; k) == <span class="number">0</span>)</span><br><span class="line">            &#123;<span class="comment">//这个值没有使用过</span></span><br><span class="line">                <span class="keyword">if</span> (sum &lt;= i + <span class="number">1</span> || !<span class="built_in">dfs</span>(n, sum - (i + <span class="number">1</span>), cur | k, up))</span><br><span class="line">                &#123;</span><br><span class="line">                    up[k] = <span class="literal">true</span>;</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        up[k] = <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n ^ 2)</p>
@@ -367,15 +391,21 @@
             
               
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="BY - 署名">
                     <i class="iconfont icon-cc-by"></i>
                   </span>
                 </a>
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
                     <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
                   </span>
                 </a>
               
@@ -619,6 +649,33 @@
   
 
 
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
 
 
   

@@ -74,7 +74,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"SHELL"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -210,6 +210,11 @@
           
   <div class="mt-3">
     
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
@@ -243,6 +248,15 @@
 
     
     
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
   </div>
 
 
@@ -275,17 +289,27 @@
           <article class="post-content mx-auto">
             <h1 id="seo-header">Day 53 Top View of a Tree</h1>
             
+              <p id="updated-time" class="note note-success" style="display: none">
+                
+                  
+                    本文最后更新于 2025-03-07T10:50:09+08:00
+                  
+                  
+
+                
+              </p>
+            
             
               <div class="markdown-body">
                 
-                <h1 id="Top-View-of-a-Tree"><a href="#Top-View-of-a-Tree" class="headerlink" title="Top View of a Tree"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Top-View-of-a-Tree">Top View of a Tree</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs cpp">Given a binary tree root,<br><br> <span class="hljs-keyword">return</span> the top view of the tree, sorted left-to-right.<br><br>Constraints<br><br>n ≤ <span class="hljs-number">100</span>,<span class="hljs-number">000</span> where n is the number of nodes in root<br><br>Example <span class="hljs-number">1</span><br><br>Input<br>root = [<span class="hljs-number">1</span>, [<span class="hljs-number">2</span>, null, [<span class="hljs-number">4</span>, null, [<span class="hljs-number">5</span>, null, [<span class="hljs-number">6</span>, null, <br>       [<span class="hljs-number">7</span>, null, null]]]]], [<span class="hljs-number">3</span>, null, null]]<br><br>Output<br>[<span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">6</span>, <span class="hljs-number">7</span>]<br><br>Explanation<br><br>Note that directly above <span class="hljs-number">4</span> is <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> directly above <span class="hljs-number">5</span> is <span class="hljs-number">3</span> <br><br>so these are <span class="hljs-keyword">not</span> part of the top view.<br><br>Example <span class="hljs-number">2</span><br>Input<br>root = [<span class="hljs-number">3</span>, [<span class="hljs-number">1</span>, [<span class="hljs-number">0</span>, null, null], [<span class="hljs-number">2</span>, null, null]], [<span class="hljs-number">4</span>, null, null]]<br>Output<br>[<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>]<br></code></pre></td></tr></table></figure>
+                <h1 id="Top-View-of-a-Tree"><a href="#Top-View-of-a-Tree" class="headerlink" title="Top View of a Tree"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Top-View-of-a-Tree">Top View of a Tree</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">Given a binary tree root,</span><br><span class="line"></span><br><span class="line"> <span class="keyword">return</span> the top view of the tree, sorted left-to-right.</span><br><span class="line"></span><br><span class="line">Constraints</span><br><span class="line"></span><br><span class="line">n ≤ <span class="number">100</span>,<span class="number">000</span> where n is the number of nodes in root</span><br><span class="line"></span><br><span class="line">Example <span class="number">1</span></span><br><span class="line"></span><br><span class="line">Input</span><br><span class="line">root = [<span class="number">1</span>, [<span class="number">2</span>, null, [<span class="number">4</span>, null, [<span class="number">5</span>, null, [<span class="number">6</span>, null, </span><br><span class="line">       [<span class="number">7</span>, null, null]]]]], [<span class="number">3</span>, null, null]]</span><br><span class="line"></span><br><span class="line">Output</span><br><span class="line">[<span class="number">2</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">6</span>, <span class="number">7</span>]</span><br><span class="line"></span><br><span class="line">Explanation</span><br><span class="line"></span><br><span class="line">Note that directly above <span class="number">4</span> is <span class="number">1</span> <span class="keyword">and</span> directly above <span class="number">5</span> is <span class="number">3</span> </span><br><span class="line"></span><br><span class="line">so these are <span class="keyword">not</span> part of the top view.</span><br><span class="line"></span><br><span class="line">Example <span class="number">2</span></span><br><span class="line">Input</span><br><span class="line">root = [<span class="number">3</span>, [<span class="number">1</span>, [<span class="number">0</span>, null, null], [<span class="number">2</span>, null, null]], [<span class="number">4</span>, null, null]]</span><br><span class="line">Output</span><br><span class="line">[<span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
 <li>1、本题的意思为返回顶部的视角，即为自己左右孩子节点，覆盖自己左孩子节点的右孩子节点，自己右孩子的节点的左孩子节点看不见，即只要有相同的 y 值，同一层级只需要加入其中 x 值最大以及最小的那两个节点。</li>
 </ul>
 </blockquote>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * class Tree &#123;</span><br><span class="hljs-comment"> *     public:</span><br><span class="hljs-comment"> *         int val;</span><br><span class="hljs-comment"> *         Tree *left;</span><br><span class="hljs-comment"> *         Tree *right;</span><br><span class="hljs-comment"> * &#125;;</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(Tree* root, <span class="hljs-type">int</span> x, <span class="hljs-type">int</span> y, map&lt;<span class="hljs-type">int</span>, pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;&gt;&amp; up)</span> </span>&#123;<br>    <span class="hljs-keyword">if</span>(root == <span class="hljs-literal">nullptr</span>) <span class="hljs-keyword">return</span>;<br>    <span class="hljs-keyword">if</span>(up.<span class="hljs-built_in">find</span>(x) == up.<span class="hljs-built_in">end</span>() || up[y].first &gt; h) up[x] = &#123;h, root -&gt; val&#125;;<br>    <br>    <span class="hljs-built_in">dfs</span>(root -&gt; left, x - <span class="hljs-number">1</span>, h + <span class="hljs-number">1</span>, up); <br>    <span class="hljs-built_in">dfs</span>(root -&gt; right, x + <span class="hljs-number">1</span>, h + <span class="hljs-number">1</span>, up);<br>&#125;<br><br><span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">solve</span><span class="hljs-params">(Tree* root)</span> </span>&#123;<br>    map&lt;<span class="hljs-type">int</span>, pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;&gt; up;<br>    <span class="hljs-built_in">dfs</span>(root, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, up);<br>    vector&lt;<span class="hljs-type">int</span>&gt; ans;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> [k, v] : up) &#123;<br>        ans.<span class="hljs-built_in">push_back</span>(v.second);<br>    &#125;<br>    <span class="hljs-keyword">return</span> ans;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * class Tree &#123;</span></span><br><span class="line"><span class="comment"> *     public:</span></span><br><span class="line"><span class="comment"> *         int val;</span></span><br><span class="line"><span class="comment"> *         Tree *left;</span></span><br><span class="line"><span class="comment"> *         Tree *right;</span></span><br><span class="line"><span class="comment"> * &#125;;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">dfs</span><span class="params">(Tree* root, <span class="type">int</span> x, <span class="type">int</span> y, map&lt;<span class="type">int</span>, pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt;&amp; up)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(root == <span class="literal">nullptr</span>) <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">if</span>(up.<span class="built_in">find</span>(x) == up.<span class="built_in">end</span>() || up[y].first &gt; h) up[x] = &#123;h, root -&gt; val&#125;;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">dfs</span>(root -&gt; left, x - <span class="number">1</span>, h + <span class="number">1</span>, up); </span><br><span class="line">    <span class="built_in">dfs</span>(root -&gt; right, x + <span class="number">1</span>, h + <span class="number">1</span>, up);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">solve</span><span class="params">(Tree* root)</span> </span>&#123;</span><br><span class="line">    map&lt;<span class="type">int</span>, pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt; up;</span><br><span class="line">    <span class="built_in">dfs</span>(root, <span class="number">0</span>, <span class="number">0</span>, up);</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; ans;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> [k, v] : up) &#123;</span><br><span class="line">        ans.<span class="built_in">push_back</span>(v.second);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(nlogn)</p>
@@ -367,15 +391,21 @@
             
               
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="BY - 署名">
                     <i class="iconfont icon-cc-by"></i>
                   </span>
                 </a>
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                   <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
                     <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
                   </span>
                 </a>
               
@@ -619,6 +649,33 @@
   
 
 
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
 
 
   
