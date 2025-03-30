@@ -27,7 +27,7 @@
 <meta property="og:description" content="989. 数组形式的整数加法题目对于非负整数 X 而言，X 的数组形式是每位数字按从左到右的顺序形成的数组。  例如，如果 X &#x3D; 1231，那么其数组形式为 [1,2,3,1]。  给定非负整数 X 的数组形式 A，返回整数 X+K 的数组形式。  示例 1：  输入：A &#x3D; [1,2,0,0], K &#x3D; 34 输出：[1,2,3,4] 解释：1200 + 34 &#x3D; 1234 示例 2：  输入">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-09-09T18:12:05.000Z">
-<meta property="article:modified_time" content="2025-03-30T04:48:49.229Z">
+<meta property="article:modified_time" content="2025-03-30T16:05:51.746Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="vector">
 <meta name="twitter:card" content="summary_large_image">
@@ -232,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          550 字
+          538 字
         
       </span>
     
@@ -294,7 +294,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2025-03-30T12:48:49+08:00
+                    本文最后更新于 2025-03-31T00:05:51+08:00
                   
                   
 
@@ -346,29 +346,29 @@
 <li>4、此时需要扩展数组，由于是动态数组，直接改写类似循环中 k &#x3D; sum &#x2F; 10，此处为 k &#x2F;&#x3D; 10，直到 k 为 0 为止。</li>
 <li>4、最后逆序数组即可输出。</li>
 </ul>
-<h2 id="题目代码"><a href="#题目代码" class="headerlink" title="题目代码"></a>题目代码</h2><h3 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h3><figure><div class="code-wrapper"><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">class Solution &#123;
-public:
-    vector&lt;int&gt; addToArrayForm(vector&lt;int&gt;&amp; nums, int k) &#123;
-        vector&lt;int&gt; res;
+<h2 id="题目代码"><a href="#题目代码" class="headerlink" title="题目代码"></a>题目代码</h2><h3 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h3><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> <span class="token function">addToArrayForm</span><span class="token punctuation">(</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> nums<span class="token punctuation">,</span> <span class="token keyword">int</span> k<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> res<span class="token punctuation">;</span>
         
-        for(int i &#x3D; nums.size() - 1; i &gt;&#x3D; 0; i--)
-        &#123;
-            int sum &#x3D; nums[i] + k;
-            res.push_back(sum % 10);
-            k &#x3D; sum &#x2F; 10;
-        &#125;
+        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> nums<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">;</span> i<span class="token operator">--</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">int</span> sum <span class="token operator">=</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> k<span class="token punctuation">;</span>
+            res<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>sum <span class="token operator">%</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            k <span class="token operator">=</span> sum <span class="token operator">/</span> <span class="token number">10</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
 
-        while(k &gt; 0)
-        &#123;
-            res.push_back(k % 10);
-            k &#x2F;&#x3D; 10;
-        &#125;
+        <span class="token keyword">while</span><span class="token punctuation">(</span>k <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            res<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>k <span class="token operator">%</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            k <span class="token operator">/=</span> <span class="token number">10</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
 
-        reverse(res.begin(), res.end());
+        <span class="token function">reverse</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> res<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         
-        return res;
-    &#125;
-&#125;;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+        <span class="token keyword">return</span> res<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">addToArrayForm</span><span class="token punctuation">(</span>num <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> k <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span> <span class="token punctuation">&#123;</span>
     n <span class="token operator">:=</span> <span class="token function">len</span><span class="token punctuation">(</span>num<span class="token punctuation">)</span>
@@ -467,7 +467,7 @@ public:
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年3月30日</div>
+          <div>2025年3月31日</div>
         </div>
       
       
