@@ -19,15 +19,15 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="">
   
-    <meta name="description" content="之前的 zinx 学习，是基于 TCP&#x2F;UDP 的 socket 协议进行编写 而本次要实现的是基于 HTTP 协议开发一个 Web 服务器端与客户端！  要求服务器端要求：  1、服务端维护一个内存数据结构，所有数据进程重启丢失，不做数据持久化，不考虑内存容量问题 2、服务端实现一个网络 API 接口，客户端向该 API 发送一个网络请求，请求数据是一个 string 的信息 3、服">
+    <meta name="description" content="之前的 zinx 学习，是基于 TCP&#x2F;UDP 的 socket 协议进行编写，而本次要实现的是基于 HTTP 协议开发一个 Web 服务器端与客户端！   1、要求服务器端要求：  1、服务端维护一个内存数据结构，所有数据进程重启丢失，不做数据持久化，不考虑内存容量问题 2、服务端实现一个网络 API 接口，客户端向该 API 发送一个网络请求，请求数据是一个 string 的信息 3、服务端">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Golang 开发一个 HTTP Web 服务器&#x2F;客户端">
 <meta property="og:url" content="https://chaggle.github.io/2022/03/31/go/concurrency/HTTP/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="之前的 zinx 学习，是基于 TCP&#x2F;UDP 的 socket 协议进行编写 而本次要实现的是基于 HTTP 协议开发一个 Web 服务器端与客户端！  要求服务器端要求：  1、服务端维护一个内存数据结构，所有数据进程重启丢失，不做数据持久化，不考虑内存容量问题 2、服务端实现一个网络 API 接口，客户端向该 API 发送一个网络请求，请求数据是一个 string 的信息 3、服">
+<meta property="og:description" content="之前的 zinx 学习，是基于 TCP&#x2F;UDP 的 socket 协议进行编写，而本次要实现的是基于 HTTP 协议开发一个 Web 服务器端与客户端！   1、要求服务器端要求：  1、服务端维护一个内存数据结构，所有数据进程重启丢失，不做数据持久化，不考虑内存容量问题 2、服务端实现一个网络 API 接口，客户端向该 API 发送一个网络请求，请求数据是一个 string 的信息 3、服务端">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-03-31T05:26:07.000Z">
-<meta property="article:modified_time" content="2025-03-07T02:50:09.267Z">
+<meta property="article:modified_time" content="2025-03-30T11:54:55.204Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="HTTP">
 <meta name="twitter:card" content="summary_large_image">
@@ -232,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.5k 字
+          1.7k 字
         
       </span>
     
@@ -243,7 +243,7 @@
         
         
         
-          13 分钟
+          14 分钟
         
       </span>
     
@@ -294,7 +294,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2025-03-07T10:50:09+08:00
+                    本文最后更新于 2025-03-30T19:54:55+08:00
                   
                   
 
@@ -304,11 +304,11 @@
             
               <div class="markdown-body">
                 
-                <blockquote>
-<p>之前的 zinx 学习，是基于 TCP&#x2F;UDP 的 socket 协议进行编写</p>
-<p>而本次要实现的是基于 HTTP 协议开发一个 Web 服务器端与客户端！</p>
-</blockquote>
-<h2 id="要求"><a href="#要求" class="headerlink" title="要求"></a>要求</h2><p>服务器端要求：</p>
+                <p class="note note-primary">
+之前的 zinx 学习，是基于 TCP/UDP 的 socket 协议进行编写，而本次要实现的是基于 HTTP 协议开发一个 Web 服务器端与客户端！
+</p>
+
+<h2 id="1、要求"><a href="#1、要求" class="headerlink" title="1、要求"></a>1、要求</h2><p>服务器端要求：</p>
 <ul>
 <li>1、服务端维护一个内存数据结构，所有数据进程重启丢失，不做数据持久化，不考虑内存容量问题</li>
 <li>2、服务端实现一个网络 API 接口，客户端向该 API 发送一个网络请求，请求数据是一个 string 的信息</li>
@@ -345,13 +345,12 @@
 <li><p>5、实现应当简洁，代码可读性不能过差</p>
 </li>
 </ul>
-<h2 id="设计思路"><a href="#设计思路" class="headerlink" title="设计思路"></a>设计思路</h2><p>1、http 服务，基于 http 协议，并非 socket 进行实现</p>
+<h2 id="2、设计思路"><a href="#2、设计思路" class="headerlink" title="2、设计思路"></a>2、设计思路</h2><p>1、http 服务，基于 http 协议规则实现，并非 socket 协议规则进行实现</p>
 <p>2、web 请求，restful 标准下，采用 POST 进行客户端的 web 服务请求</p>
 <p>3、开发第一个版本时服务器维护的内存数据结构采用 sync.Map，采用 client 不设置用户名称，统一设置 token 值为 Client，返回客户端数据为 string 类型，并通过简单的空格字符串 “ “ 进行分离每一个 []string 类型的元素。</p>
-<p>4、(未完成)第二个版本客户端自设名称为 token 值，通过header 包头的 token 值来对客户端进行区分，这个token 值的维护放置于客户端，理论上为保证数据安全，应该放置于服务器。</p>
-<h2 id="开发的细节"><a href="#开发的细节" class="headerlink" title="开发的细节"></a>开发的细节</h2><p>具体内容就不再此显示，说几个开发中的细节</p>
-<blockquote>
-<p>1、Go 语言很适合使用<strong>测试驱动开发</strong>，开发过程中，首先需要进行逻辑的梳理，逻辑梳理好之后再开始代码的撰写，上来就写代码都是想到哪里写到哪里，这种习惯不好，<strong>最合适的方法是先使用注释写好相应的需求逻辑，再写代码，很实用</strong>！</p>
+<p>4、(未完成)第二个版本客户端自设名称为 token 值，通过 header 包头的 token 值来对客户端进行区分，这个 token 值的维护放置于客户端，理论上为保证数据安全，应该放置于服务器。（ 2025 年再来看，只需要服务器端针对于 token 进行校验即可，jwt 的设置即为服务器端不保存 token，由客户端自行维护，当然这里可以采用双 token 的设计方法，在服务器端进行 redis 存储，当然设计也是有安全性风险的，但是一般性企业也不会需要安全性高到此中设计程度）</p>
+<h2 id="开发的细节"><a href="#开发的细节" class="headerlink" title="开发的细节"></a>开发的细节</h2><blockquote>
+<p>1、Go 语言很适合使用<strong>测试驱动开发</strong>，在工期缩短的情况下，可能不适用TDD，而在工期充足的情况下，开发过程中，首先需要进行逻辑的梳理，逻辑梳理好之后再开始代码的撰写，上来就写代码都是想到哪里写到哪里，这种习惯不好，<strong>最合适的方法是先使用注释写好相应的需求逻辑，再写代码，对于逻辑思考很实用</strong>！</p>
 <p>2、在做 string 字符串存储成 []string 类型的切片的时候，服务器端程序也需要使用一个 []string 类型进行保存，但是服务器回显给客户端是以 io.writer 实现的 writer 接口返回 []byte 流的数据，<strong>而 []string 直接转为 []byte 流数据形式，之后客户端对于格式的处理较为麻烦</strong>，所以最好还是 []string 类型，通过拼接一个 string 传输给客户端，我选择 []string 中间分割字符为空格字符 。客户端接受到这个string类型的字符串后，使用 strings.Split() 函数，以空格字符进行分割。</p>
 <p>3、为了解决客户端先于服务器端启动时间不同，导致的客户端 Dail 服务器端发生端口拒绝错误，采用 for 循环提交POST请求，直到请求建立成功后，再 break for 循环。</p>
 <p>4、bug fix: 防止程序panic 掉，mutex.unlock 并未释放，所以采用 defer m.Unlock 合适</p>
@@ -379,6 +378,7 @@
 			<span class="token string">"http://127.0.0.1:8999/v1"</span><span class="token punctuation">,</span>
 			bytes<span class="token punctuation">.</span><span class="token function">NewReader</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token function">byte</span><span class="token punctuation">(</span>writer<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
 		<span class="token punctuation">)</span>
+		
 		req<span class="token punctuation">.</span>Header<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token string">"Token"</span><span class="token punctuation">,</span> <span class="token string">"Client"</span><span class="token punctuation">)</span>
 		req<span class="token punctuation">.</span>Header<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token string">"content-Type"</span><span class="token punctuation">,</span> <span class="token string">"text/plain"</span><span class="token punctuation">)</span>
 
@@ -414,7 +414,7 @@
 		BcjClient(scanner.Text())
 	&#125;
 &#125;*/</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>服务器端：</p>
 <figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">package</span> gohttp
@@ -528,7 +528,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年3月7日</div>
+          <div>2025年3月30日</div>
         </div>
       
       
