@@ -27,7 +27,7 @@
 <meta property="og:description" content="695. 岛屿的最大面积题目给你一个大小为 m x n 的二进制矩阵 grid 。  岛屿 是由一些相邻的 1 (代表土地) 构成的组合，  这里的「相邻」要求两个 1 必须在 水平或者竖直的四个方向上 相邻。  你可以假设 grid 的四个边缘都被 0（代表水）包围着。  岛屿的面积是岛上值为 1 的单元格的数目。  计算并返回 grid 中最大的岛屿面积。如果没有岛屿，则返回面积为 0 。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-29T06:42:28.000Z">
-<meta property="article:modified_time" content="2025-03-07T02:50:09.259Z">
+<meta property="article:modified_time" content="2025-03-30T04:48:32.988Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="traceback">
 <meta property="article:tag" content="DFS">
@@ -77,7 +77,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -205,7 +205,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Day 50 695. 岛屿的最大面积"></span>
+            <span id="subtitle">Day 50 695. 岛屿的最大面积</span>
           
         </div>
 
@@ -295,7 +295,7 @@
               <p id="updated-time" class="note note-success" style="display: none">
                 
                   
-                    本文最后更新于 2025-03-07T10:50:09+08:00
+                    本文最后更新于 2025-03-30T12:48:32+08:00
                   
                   
 
@@ -459,7 +459,7 @@ grid<span class="token punctuation">[</span>i<span class="token punctuation">]</
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年3月7日</div>
+          <div>2025年3月30日</div>
         </div>
       
       
@@ -703,21 +703,6 @@ grid<span class="token punctuation">[</span>i<span class="token punctuation">]</
 <script  src="/js/events.js" ></script>
 <script  src="/js/plugins.js" ></script>
 
-
-  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var subtitle = document.getElementById('subtitle');
-      if (!subtitle || !typing) {
-        return;
-      }
-      var text = subtitle.getAttribute('data-typed-text');
-      
-        typing(text);
-      
-    })(window, document);
-  </script>
 
 
 

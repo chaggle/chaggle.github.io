@@ -65,7 +65,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.8","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -193,7 +193,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="大布丁の博客！"></span>
+            <span id="subtitle">大布丁の博客！</span>
           
         </div>
 
@@ -224,738 +224,6 @@
               <div class="col-12 col-md-10 m-auto">
                 
 
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2022/03/31/go/concurrency/HTTP/" target="_self">
-          Golang 开发一个 HTTP Web 服务器/客户端
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/03/31/go/concurrency/HTTP/" target="_self">
-        <div>
-          之前的 zinx 学习，是基于 TCP&#x2F;UDP 的 socket 协议进行编写 而本次要实现的是基于 HTTP 协议开发一个 Web 服务器端与客户端！  要求服务器端要求：  1、服务端维护一个内存数据结构，所有数据进程重启丢失，不做数据持久化，不考虑内存容量问题 2、服务端实现一个网络 API 接口，客户端向该 API 发送一个网络请求，请求数据是一个 string 的信息 3、服
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-03-31 13:26" pubdate>
-              2022-03-31
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/go/" class="category-chain-item">go</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/HTTP/">#HTTP</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2022/03/29/middleware/mysql2/" target="_self">
-          MySQL 原理
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/03/29/middleware/mysql2/" target="_self">
-        <div>
-          理解思考项目，原理先行，实践在后  1、redo-log 与 bin-log 两种日志区别首先，redo-log 与 bin-log 两种日志是 InnoDB 数据库引擎为了满足事务的持久性与原子性引入了的，其中，redo-log 是 InnoDB 的特性，bin-log 是mysql 中 server 层的日志。 redo-log 日志 在更新一条记录时，先将其先写入 redo-log 中，然
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-03-29 01:25" pubdate>
-              2022-03-29
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/MySQL/">#MySQL</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2022/03/27/summary/22-3-28/" target="_self">
-          2022 年 12 - 13 周总结
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/03/27/summary/22-3-28/" target="_self">
-        <div>
-          上两周没写周总结，写周总结还是挺有效的，至少输入与输出能够理顺，将逻辑顺十分清晰。  12 周 1、APISIX 网关的相关知识学习 2、Redis 的面试概念学习 3、sync 包中的 Pool(协程池的学习)  令牌桶、漏桶算法的学习，包括 TDD 的了解、思考到现在的实践，都挺有收获的。 13 周 1、Docker 的复习 2、GeekingTime TDD 实践 + Learn TDD
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-03-27 15:11" pubdate>
-              2022-03-27
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/summary/" class="category-chain-item">summary</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/2022/">#2022</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2022/03/26/go/basic/go-test/" target="_self">
-          Go Test 的一个小坑
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/03/26/go/basic/go-test/" target="_self">
-        <div>
-          使用 TDD 的模式驱动自己编写测试驱动开后，使用goland 调试过程中出现的一些小问题，做一些记录  如何解决 undefined function首先在确保自己的测试代码与主干代码在同一个软件包下。最合适办法采用命令行调试，但是如果是喜欢使用 goland 调试，那么在 go test 模板需要把目录改成软件包（如下图所示），或者是把目录下文件全部添加上（不建议）。  Go mod ini
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-03-26 03:18" pubdate>
-              2022-03-26
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/go/" class="category-chain-item">go</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/go-test/">#go-test</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2022/03/25/go/TDD/TDD-1/" target="_self">
-          TDD 概念介绍与学习课程
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/03/25/go/TDD/TDD-1/" target="_self">
-        <div>
-          在接触 TDD (测试驱动开发) 之后，发现自己的确很能认同测试驱动开发的理念。所以在加上极客时间中有徐昊老师新开的一门课程，所以就开始自己的 TDD 学习之陆  前言首先推荐两个课程： 1、徐昊老师的新课：TDD 项目实战 70 讲。 2、go 语言的教程：Learn-go-with-test，建议能尽量进行英文阅读，就阅读英文原版。 推荐1、郑烨老师的专栏《软件设计之美》 2、《测试驱动开发
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-03-25 13:11" pubdate>
-              2022-03-25
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/go/" class="category-chain-item">go</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/TDD/">#TDD</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2022/03/20/go/concurrency/Pool/" target="_self">
-          Go 语言中的 sync.Pool 学习
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/03/20/go/concurrency/Pool/" target="_self">
-        <div>
-          本博客为在学习极客时间的 go 并发编程的学习笔记，具体详细内容请看极客时间官方的专栏–go 并发编程实战课  Go 语言是自带垃圾回收机制的，具体演变过程可以看博主写的另一篇博客。所以我们不用像 C&#x2F;C++ 一样，创建对象的同时，使用完需要删除&#x2F;析构对象，防止因为空指针导致的内存泄漏。 但是 Garbage Collect 机制方便方便的同时，也带来的一定的性能隐患，比如
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-03-20 04:50" pubdate>
-              2022-03-20
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/go/" class="category-chain-item">go</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/sync/">#sync</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2022/03/18/middleware/redis1/" target="_self">
-          浅谈 Redis 中间件
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/03/18/middleware/redis1/" target="_self">
-        <div>
-          本博客主要是总结自己学习 Redis 中间件的经验，教程来源于b站狂神说 java 的 redis 教程  1、Redis 概念1、Redis 是基于计算机内存的数据库，一般称为缓存数据库，由于没有固定的表结构与关系，也叫 NoSQL (Not Only SQL) 数据库。 2、为什么要使用 Redis：  1、数据的爆发增长 2、没有固定关系的数据  3、最新的版本中，官方不建议直接在 win
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-03-18 00:41" pubdate>
-              2022-03-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/redis/">#redis</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2022/03/16/go/interview/opensouce/" target="_self">
-          开源的思考
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/03/16/go/interview/opensouce/" target="_self">
-        <div>
-          本人是曾经的职业规划是，在读研后学习 NLP、CV 等领域的算法论文，而后向着算法工程师的方向进行努力。而近几年的考研难度以及行业的形式导致自己的期待与期望成了泡沫： 1、不读 985&#x2F;211，算法工程师基本做不了2、考研热门程度异常火爆，为什么考研的想法越来越困扰自己所以说，在二战也未能达到名校的分数线后，自己毅然决定，不调剂，投入社会进行学习与工作。 但是困扰自己的问题出现了，学习什
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-03-16 15:14" pubdate>
-              2022-03-16
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/go/" class="category-chain-item">go</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/open-source/">#open-source</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2022/03/14/summary/22-3-14/" target="_self">
-          2022 年 11 周总结
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/03/14/summary/22-3-14/" target="_self">
-        <div>
-          上一周没怎么写博客，第一个就是上一周杂事比较多，理论方向的学习少；第二就是跟大佬交流，发现自己存在找原因性的思维方式，需要转变自己的思维。因此，一段时间写一次总结性的博客是很有必要的。  1、关于求职首先，大佬提醒我，要建立模板化、模块化的求职思路，如面试之前需要搜集相关的资料，主要关注以下四点：  1、公司的名称 2、公司的核心产品 3、公司的产品的主要受众人群 4、公司招聘的岗位职责、经营状
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-03-14 01:05" pubdate>
-              2022-03-14
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/summary/" class="category-chain-item">summary</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/2022/">#2022</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2022/03/06/go/concurrency/mutex/" target="_self">
-          Go 语言中的 sync.Mutex 学习
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/03/06/go/concurrency/mutex/" target="_self">
-        <div>
-          极客时间专栏，鸟窝大佬的 Go 并发编程课程，由于大佬的课程十分精彩，领悟需要时间与精力！所以再次本文仅仅只能作为知识总结，相应具体内容与源码分析请去极客时间上购买大佬相应的课程！  Mutex​ Go 语言中的 sync 包的 mutex 的设计，有四个演变阶段。  1、初版的 Mutex 采用一个 flag 表示锁是否被持有，实现比较简单 2、之后为了照顾新来的 Goroutine(下文简称
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-03-06 04:19" pubdate>
-              2022-03-06
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/go/" class="category-chain-item">go</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/sync/">#sync</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2022/03/04/go/interview/direction/" target="_self">
-          Go 学习方向
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/03/04/go/interview/direction/" target="_self">
-        <div>
-          通过几次面试，来总结一些现在阶段，对于自己的职业规划的发展与思考！  ​ 经历了三四次面试，收获挺大的。面试不是目的，只是一种过程，要在不断的面试中，找到适合自己发展的领域才是面试的目的！ 1、现阶段发展的方向​ 首先，Go 语言的云原生跟云中件发展是非常迅速的，而且 Go 语言社区中，讨论最多的也是云计算的发展，docker、K8S集群、普罗米修斯，都是云中件的代表，所以去学习其中设计的思想、
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-03-04 13:41" pubdate>
-              2022-03-04
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/go/" class="category-chain-item">go</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Direction/">#Direction</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2022/03/01/go/basic/GC/" target="_self">
-          Golang 垃圾回收机制
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/03/01/go/basic/GC/" target="_self">
-        <div>
-          学习 Go 语言中的各个版本的垃圾回收的机制。  1、Go V1.3 版本之前的标记清除(mark and sweep)此版本的垃圾回收机制，一般分为以下四步：  1、暂停程序业务逻辑，找出不可达的对象以及可达的对象 2、开始标记，程序找出其所有可达的对象，并进行标记 3、标记完之后，开始清除未标记的对象 4、继续运行程序。循环以上的过程，知道程序的生命周期终止为止  但是相应的，V1.3 版本
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-03-01 04:19" pubdate>
-              2022-03-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/go/" class="category-chain-item">go</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/GC/">#GC</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
 
   <div class="row mx-auto index-card">
     
@@ -1146,130 +414,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2022/02/18/Leetcode/1791/" target="_self">
-          1791. 找出星型图的中心节点
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/02/18/Leetcode/1791/" target="_self">
-        <div>
-          1791. 找出星型图的中心节点题目有一个无向的 星型 图，由 n 个编号从 1 到 n 的节点组成。星型图有一个 中心 节点，并且恰有 n - 1 条边将中心节点与其他每个节点连接起来。  给你一个二维整数数组 edges ，其中 edges[i] = [ui, vi] 表示在节点 ui 和 vi 之间存在一条边。请你找出并返回 edges 所表示星型图的中心节点。  示例 1：   输入：ed
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-02-18 15:02" pubdate>
-              2022-02-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Leetcode/" class="category-chain-item">Leetcode</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Go/">#Go</a>
-            
-              <a href="/tags/c/">#c++</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2022/02/18/Leetcode/template/" target="_self">
-          一些刷算法的小模版
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/02/18/Leetcode/template/" target="_self">
-        <div>
-          快排func QuickSort(q []int, l, r int) &#123;  if l == r &#123;   return  &#125;   x := q[(l+r)>>1]  i, j := l-1, r+1   for i &lt; j &#123;   for &#123;    i++    if q[i] >= x &#123;     break    &#125;
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-02-18 10:00" pubdate>
-              2022-02-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Leetcode/" class="category-chain-item">Leetcode</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/template/">#template</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
         <a href="/2022/02/13/go/basic/go-study/" target="_self">
           Go 基础知识点自我总结
         </a>
@@ -1392,15 +536,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2022/02/11/Leetcode/1984/" target="_self">
-          1984. 学生分数的最小差值
+        <a href="/2022/01/10/go/zinx/zinx/" target="_self">
+          Zinx 框架的学习
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/02/11/Leetcode/1984/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/01/10/go/zinx/zinx/" target="_self">
         <div>
-          1984. 学生分数的最小差值给你一个 下标从 0 开始 的整数数组 nums ，其中 nums[i] 表示第 i 名学生的分数。另给你一个整数 k 。  从数组中选出任意 k 名学生的分数，使这 k 个分数间 最高分 和 最低分 的 差值 达到 最小化 。  返回可能的 最小差值 。  示例 1：  输入：nums = [90], k = 1 输出：0 解释：选出 1 名学生的分数，仅有 1 种
+          开始学习 Go 语言实现的 zinx 框架,项目地址为：https://github.com/chaggle/zinx-study  使用 go mod 管理, 初始化为 go mod init github.com&#x2F;chaggle&#x2F;zinx-study并部署代码到 github.com 以及使用 go get 同步到本地 Gopath 的 github 包下！  V0.1 基
         </div>
       </a>
 
@@ -1408,8 +552,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2022-02-11 02:42" pubdate>
-              2022-02-11
+            <time datetime="2022-01-10 02:14" pubdate>
+              2022-01-10
             </time>
           </div>
         
@@ -1424,7 +568,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Leetcode/" class="category-chain-item">Leetcode</a>
+  <a href="/categories/go/" class="category-chain-item">go</a>
   
   
 
@@ -1439,7 +583,552 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/sort/">#sort</a>
+              <a href="/tags/zinx/">#zinx</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2022/01/04/go/go-im/" target="_self">
+          Go语言实现的轻量级IM项目
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/01/04/go/go-im/" target="_self">
+        <div>
+          使用 go 实现的微型服务器项目地址：https://github.com/chaggle/go-im V0.1 :建立基础的 main.go server.go，相应功能如下 main 功能主要为创建服务器以及启动服务器 server 功能有： 1、创建 server 对象 2、启动 Server 服务(TCP socket 套接字) 3、处理链接的业务  V0.2 :用户上线功能 user 功
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-01-04 08:18" pubdate>
+              2022-01-04
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/go/" class="category-chain-item">go</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Instant-Messaging/">#Instant Messaging</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2021/10/15/middleware/git/" target="_self">
+          Centos 8.2 中 Git 安装
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2021/10/15/middleware/git/" target="_self">
+        <div>
+          一、安装依赖包系统为 centos8.2 版本，可能会出现系统版本不兼容等问题！ sudo yum -y install make autoconf automake cmake perl-CPAN libcurl-devel libtool gcc gcc-c++ glibc-headers zlib-devel git-lfs telnet ctags lrzsz jq expat-devel
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-10-15 12:18" pubdate>
+              2021-10-15
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/git/">#git</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2021/10/06/middleware/gcc/" target="_self">
+          GCC 与 GDB 的学习
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2021/10/06/middleware/gcc/" target="_self">
+        <div>
+          gcc 是 GUN Compiler Collection的缩写，可以支持多种语言编译，比如 C, C++, Java, pascal 等  gcc的编译过程 预处理（pre-processing）E：插入头文件，替换宏  编译（Compiling）S：编译成汇编  汇编（Assembling） c：编译成目标文件  链接 （Linking）：链接到库中，变成可执行文件    gcc -E he
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-10-06 14:56" pubdate>
+              2021-10-06
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/gcc/">#gcc</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2021/01/08/cpp/unordered_map/" target="_self">
+          unordered_map 的使用
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2021/01/08/cpp/unordered_map/" target="_self">
+        <div>
+          本文主要写法参考C++ STL函数库std::unordered_map(C++11)   unordered_map是一个关联容器，内部采用的是hash表结构，拥有快速检索的功能。  特性  关联性：通过key去检索value，而不是通过绝对地址（和顺序容器不同） 无序性：使用hash表存储，内部无序 Map : 每个值对应一个键值 键唯一性：不存在两个元素的键一样 动态内存管理：使用内存管理模
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-08 06:32" pubdate>
+              2021-01-08
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/cpp/" class="category-chain-item">cpp</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/STL/">#STL</a>
+            
+              <a href="/tags/unordered-map/">#unordered_map</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2021/01/07/cpp/unordered_set/" target="_self">
+          unordered_set 的使用方法
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2021/01/07/cpp/unordered_set/" target="_self">
+        <div>
+          本文主要写法参考C++ STL 函数库std::unordered_set(C++11) unordered_set 是一种关联容器，set 和 map 内部实现是基于 RedBlackTree，unordered_set 和 unordered_map 是基于 Hashtable。红黑树有序，而哈希表无序。  特性  不再以键值对的形式存储数据，而是直接存储数据的值(只有一个值!) 容器内部存储
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-07 09:32" pubdate>
+              2021-01-07
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/cpp/" class="category-chain-item">cpp</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/STL/">#STL</a>
+            
+              <a href="/tags/unordered-set/">#unordered_set</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2020/10/11/cpp/Map/" target="_self">
+          CPP Map container 学习
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2020/10/11/cpp/Map/" target="_self">
+        <div>
+          本文主要写法参考C++ STL函数库  map简介map是STL（中文标准模板库）的一个关联容器。   可以将任何基本类型映射到任何基本类型。如int array[100]事实上就是定义了一个int型到int型的映射。 map提供一对一的数据处理，key-value键值对，其类型可以自己定义，第一个称为关键字，第二个为关键字的值 map内部是自动排序的   map的用法必须引入包 #includ
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-10-11 02:02" pubdate>
+              2020-10-11
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/cpp/" class="category-chain-item">cpp</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/STL/">#STL</a>
+            
+              <a href="/tags/map/">#map</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2020/04/26/go/basic/go-get/" target="_self">
+          Go GET 代理
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2020/04/26/go/basic/go-get/" target="_self">
+        <div>
+          windows 下在安装 github 的东西时，一般来说建议使用修改 git 配置，使用代理连接 github。 即为打开C:\Users\Lenovo修改.gitconfg文件，加上如下图所示的相关配置 如果是 sock5 连结，把http:改为sock5:即可，127.0.0.1 为本地环路，7890 是端口号，端口号以你的代理工具使用的端口号为准 go get -u -v github.c
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-04-26 09:52" pubdate>
+              2020-04-26
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/go/" class="category-chain-item">go</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2020/03/24/cpp/cpp_interview/" target="_self">
+          interview
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2020/03/24/cpp/cpp_interview/" target="_self">
+        <div>
+          记录刷题的细节内容，算法与 c++特性（等之后有空再优化）  1.static 定义静态局部变量特点全局数据区分配内存；  执行首次初始化后，之后函数调用不在初始化  无显示初始化后，自动初始化为0   2.局部变量存在于堆栈中，全局变量存在于（静态区）中，动态申请数据存在于（堆） 3.模板template&lt;typename 数据类型参数标识符>(typename 和 class 没区别)
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-03-24 15:53" pubdate>
+              2020-03-24
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/cpp/" class="category-chain-item">cpp</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2020/01/04/cpp/queue/" target="_self">
+          priority_queue|multiset
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2020/01/04/cpp/queue/" target="_self">
+        <div>
+          c++中STL中，除了bitset、priority_queue(堆，也叫优先队列)以及AVL(平衡树相关)，其他的都可以进行短时间的手撕代码进行实现，本次博客主要是阐述一些讲一下堆与平衡树的基本用法，以及其中区别所在 priority_queue	堆/优先队列  定义：	      priority_queue&lt;T> priority_queue&lt;int> 大根堆 priority_
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-01-04 08:22" pubdate>
+              2020-01-04
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/cpp/" class="category-chain-item">cpp</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/STL/">#STL</a>
+            
+              <a href="/tags/priority-queue/">#priority_queue</a>
+            
+              <a href="/tags/multiset/">#multiset</a>
             
           </div>
         
@@ -1451,7 +1140,7 @@
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/#board">3</a><a class="page-number" href="/page/4/#board">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/#board">8</a><a class="extend next" rel="next" href="/page/3/#board"><i class="iconfont icon-arrowright"></i></a>
+      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
     </span>
   </nav>
 
@@ -1555,21 +1244,6 @@
 <script  src="/js/events.js" ></script>
 <script  src="/js/plugins.js" ></script>
 
-
-  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var subtitle = document.getElementById('subtitle');
-      if (!subtitle || !typing) {
-        return;
-      }
-      var text = subtitle.getAttribute('data-typed-text');
-      
-        typing(text);
-      
-    })(window, document);
-  </script>
 
 
 
