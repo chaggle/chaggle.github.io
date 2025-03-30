@@ -27,7 +27,7 @@
 <meta property="og:description" content="160. 相交链表题目给你两个单链表的头节点 headA 和 headB ，  请你找出并返回两个单链表相交的起始节点。如果两个链表没有交点，返回 null 。  图示两个链表在节点 c1 开始相交：  题目数据 保证 整个链式结构中不存在环。  注意，函数返回结果后，链表必须 保持其原始结构 。  示例 1：   输入：intersectVal &#x3D; 8, listA &#x3D; [4,1,8,4,5],">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-09-19T00:17:31.000Z">
-<meta property="article:modified_time" content="2025-03-30T04:48:46.092Z">
+<meta property="article:modified_time" content="2025-03-30T16:09:09.248Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="linklist">
 <meta name="twitter:card" content="summary_large_image">
@@ -232,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          739 字
+          707 字
         
       </span>
     
@@ -243,7 +243,7 @@
         
         
         
-          7 分钟
+          6 分钟
         
       </span>
     
@@ -294,7 +294,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2025-03-30T12:48:46+08:00
+                    本文最后更新于 2025-03-31T00:09:09+08:00
                   
                   
 
@@ -359,44 +359,44 @@ listB 中节点数目为 n
 <li>2、如果相交则不用证明其正确信，不相交则相互遍历到最终的结果都为nullptr，经过 m + n次。</li>
 <li>3、哈希表好理解一些，当计数count函数出现q时候，即可返回相交节点值，否则返回nullptr</li>
 </ul>
-<h3 id="代码块。"><a href="#代码块。" class="headerlink" title="代码块。"></a>代码块。</h3><figure><div class="code-wrapper"><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">&#x2F;**
+<h3 id="代码块。"><a href="#代码块。" class="headerlink" title="代码块。"></a>代码块。</h3><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token comment">/**
  * Definition for singly-linked list.
  * struct ListNode &#123;
  *     int val;
  *     ListNode *next;
  *     ListNode(int x) : val(x), next(NULL) &#123;&#125;
  * &#125;;
- *&#x2F;
-class Solution &#123;
-public:
-    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) &#123;
-        &#x2F;* if(headA &#x3D;&#x3D; nullptr || headB &#x3D;&#x3D; nullptr) return nullptr;
-        ListNode* p &#x3D; headA;
-        ListNode* q &#x3D; headB;
-        while(p !&#x3D; q)
+ */</span>
+<span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    ListNode <span class="token operator">*</span><span class="token function">getIntersectionNode</span><span class="token punctuation">(</span>ListNode <span class="token operator">*</span>headA<span class="token punctuation">,</span> ListNode <span class="token operator">*</span>headB<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">/* if(headA == nullptr || headB == nullptr) return nullptr;
+        ListNode* p = headA;
+        ListNode* q = headB;
+        while(p != q)
         &#123;
-            p &#x3D; p &#x3D;&#x3D; nullptr ? headB : p -&gt; next; 
-            q &#x3D; q &#x3D;&#x3D; nullptr ? headA : q -&gt; next;
+            p = p == nullptr ? headB : p -> next; 
+            q = q == nullptr ? headA : q -> next;
         &#125;
-        return p; *&#x2F;
-        if(headA &#x3D;&#x3D; nullptr || headB &#x3D;&#x3D; nullptr) return nullptr;
-        unordered_set&lt;ListNode* &gt; vis;
-        ListNode* p &#x3D; headA;
-        ListNode* q &#x3D; headB;
-        while(p !&#x3D; nullptr)
-        &#123;
-            vis.insert(p);
-            p &#x3D; p -&gt; next;
-        &#125;
+        return p; */</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>headA <span class="token operator">==</span> <span class="token keyword">nullptr</span> <span class="token operator">||</span> headB <span class="token operator">==</span> <span class="token keyword">nullptr</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token keyword">nullptr</span><span class="token punctuation">;</span>
+        unordered_set<span class="token operator">&lt;</span>ListNode<span class="token operator">*</span> <span class="token operator">></span> vis<span class="token punctuation">;</span>
+        ListNode<span class="token operator">*</span> p <span class="token operator">=</span> headA<span class="token punctuation">;</span>
+        ListNode<span class="token operator">*</span> q <span class="token operator">=</span> headB<span class="token punctuation">;</span>
+        <span class="token keyword">while</span><span class="token punctuation">(</span>p <span class="token operator">!=</span> <span class="token keyword">nullptr</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            vis<span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            p <span class="token operator">=</span> p <span class="token operator">-></span> next<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
 
-        while(q !&#x3D; nullptr)
-        &#123;
-            if(vis.count(q)) return q;
-            q &#x3D; q -&gt; next;
-        &#125;
-        return nullptr;
-    &#125;
-&#125;;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+        <span class="token keyword">while</span><span class="token punctuation">(</span>q <span class="token operator">!=</span> <span class="token keyword">nullptr</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span>vis<span class="token punctuation">.</span><span class="token function">count</span><span class="token punctuation">(</span>q<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">return</span> q<span class="token punctuation">;</span>
+            q <span class="token operator">=</span> q <span class="token operator">-></span> next<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">return</span> <span class="token keyword">nullptr</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n)、哈希表也是O(n);</p>
@@ -468,7 +468,7 @@ public:
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年3月30日</div>
+          <div>2025年3月31日</div>
         </div>
       
       

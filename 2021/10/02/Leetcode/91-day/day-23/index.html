@@ -27,7 +27,7 @@
 <meta property="og:description" content="30. 串联所有单词的子串题目给定一个字符串 s 和一些 长度相同 的单词 words 。  找出 s 中恰好可以由 words 中所有单词串联形成的子串的起始位置。  注意子串要与 words 中的单词完全匹配，  中间不能有其他字符 ，但不需要考虑 words 中单词串联的顺序。     示例 1：  输入：s &#x3D; &quot;barfoothefoobarman&quot;, words &#x3D; [&quot;foo&quot;,&quot;b">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-01T21:49:39.000Z">
-<meta property="article:modified_time" content="2025-03-30T04:48:41.379Z">
+<meta property="article:modified_time" content="2025-03-30T16:09:09.291Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="unordered_map">
 <meta name="twitter:card" content="summary_large_image">
@@ -232,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          751 字
+          701 字
         
       </span>
     
@@ -243,7 +243,7 @@
         
         
         
-          7 分钟
+          6 分钟
         
       </span>
     
@@ -294,7 +294,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2025-03-30T12:48:41+08:00
+                    本文最后更新于 2025-03-31T00:09:09+08:00
                   
                   
 
@@ -348,52 +348,52 @@ words<span class="token punctuation">[</span>i<span class="token punctuation">]<
 <li>5、单词在 ump 里存在，有两种清空，单词出现的次数超出 ump 中的那一个单词的次数，所以需要将左边界增大，即右移 l，如果 cnt 都满足即等于 ns，则插入 l 作为当前的答案值</li>
 </ul>
 </blockquote>
-<figure><div class="code-wrapper"><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">class Solution &#123;
-public:
-    vector&lt;int&gt; findSubstring(string s, vector&lt;string&gt;&amp; words) &#123;
-        vector&lt;int&gt; ans;
-        int n &#x3D; s.size();
-        if(n &lt;&#x3D; 0 || words.empty()) return ans;
-        int ws &#x3D; words[0].size();		&#x2F;&#x2F;words中的word的长度，为统一长度
-        int ns &#x3D; words.size();			&#x2F;&#x2F;words中的word数量
-        unordered_map&lt;string, int&gt; up; &#x2F;&#x2F;保存words中的word
-        for(auto &amp; w : words)
-        &#123;
-            up[w]++;	&#x2F;&#x2F;记录每一个单词出现的次数
-        &#125;
-        for(int i &#x3D; 0; i &lt; ws; i++)
-        &#123;
-            int l &#x3D; i, r &#x3D; i; &#x2F;&#x2F;从左开始
-            int cnt &#x3D; 0;	&#x2F;&#x2F;下文ump存放的单词总数！
-            unordered_map&lt;string, int&gt; ump;
-            while(r + ws &lt;&#x3D; n)	&#x2F;&#x2F;右边长度加每个单词长度要小于s的全长
-            &#123;
-                string res &#x3D; s.substr(r, ws); &#x2F;&#x2F;在右边界加入一个单词
-                r +&#x3D; ws;		&#x2F;&#x2F;扩展右边界
-                if(up.find(res) !&#x3D; up.end()) &#x2F;&#x2F;查看res在up中的位置
-                &#123;
-                    ump[res]++;
-                    cnt++;
-                    while(ump[res] &gt; up[res])&#x2F;&#x2F; 需要检查数量是否超过，超过则要右移left
-                    &#123;						 &#x2F;&#x2F;来缩小窗口
-                        string tmp &#x3D; s.substr(l, ws);
-                        l +&#x3D; ws;
-                        cnt--;
-                        ump[tmp]--;
-                    &#125;
-                    if(cnt &#x3D;&#x3D; ns) ans.push_back(l);
-                &#125;
-                else &#x2F;&#x2F;未出现，舍弃此单词。清空
-                &#123;
-                    l &#x3D; r;
-                    cnt &#x3D; 0;
-                    ump.clear();
-                &#125;
-            &#125;
-        &#125;
-        return ans;
-    &#125;
-&#125;;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> <span class="token function">findSubstring</span><span class="token punctuation">(</span>string s<span class="token punctuation">,</span> vector<span class="token operator">&lt;</span>string<span class="token operator">></span><span class="token operator">&amp;</span> words<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> ans<span class="token punctuation">;</span>
+        <span class="token keyword">int</span> n <span class="token operator">=</span> s<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>n <span class="token operator">&lt;=</span> <span class="token number">0</span> <span class="token operator">||</span> words<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">return</span> ans<span class="token punctuation">;</span>
+        <span class="token keyword">int</span> ws <span class="token operator">=</span> words<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>		<span class="token comment">//words中的word的长度，为统一长度</span>
+        <span class="token keyword">int</span> ns <span class="token operator">=</span> words<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>			<span class="token comment">//words中的word数量</span>
+        unordered_map<span class="token operator">&lt;</span>string<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">></span> up<span class="token punctuation">;</span> <span class="token comment">//保存words中的word</span>
+        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">auto</span> <span class="token operator">&amp;</span> w <span class="token operator">:</span> words<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            up<span class="token punctuation">[</span>w<span class="token punctuation">]</span><span class="token operator">++</span><span class="token punctuation">;</span>	<span class="token comment">//记录每一个单词出现的次数</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> ws<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">int</span> l <span class="token operator">=</span> i<span class="token punctuation">,</span> r <span class="token operator">=</span> i<span class="token punctuation">;</span> <span class="token comment">//从左开始</span>
+            <span class="token keyword">int</span> cnt <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>	<span class="token comment">//下文ump存放的单词总数！</span>
+            unordered_map<span class="token operator">&lt;</span>string<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">></span> ump<span class="token punctuation">;</span>
+            <span class="token keyword">while</span><span class="token punctuation">(</span>r <span class="token operator">+</span> ws <span class="token operator">&lt;=</span> n<span class="token punctuation">)</span>	<span class="token comment">//右边长度加每个单词长度要小于s的全长</span>
+            <span class="token punctuation">&#123;</span>
+                string res <span class="token operator">=</span> s<span class="token punctuation">.</span><span class="token function">substr</span><span class="token punctuation">(</span>r<span class="token punctuation">,</span> ws<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//在右边界加入一个单词</span>
+                r <span class="token operator">+=</span> ws<span class="token punctuation">;</span>		<span class="token comment">//扩展右边界</span>
+                <span class="token keyword">if</span><span class="token punctuation">(</span>up<span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span> <span class="token operator">!=</span> up<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">//查看res在up中的位置</span>
+                <span class="token punctuation">&#123;</span>
+                    ump<span class="token punctuation">[</span>res<span class="token punctuation">]</span><span class="token operator">++</span><span class="token punctuation">;</span>
+                    cnt<span class="token operator">++</span><span class="token punctuation">;</span>
+                    <span class="token keyword">while</span><span class="token punctuation">(</span>ump<span class="token punctuation">[</span>res<span class="token punctuation">]</span> <span class="token operator">></span> up<span class="token punctuation">[</span>res<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token comment">// 需要检查数量是否超过，超过则要右移left</span>
+                    <span class="token punctuation">&#123;</span>						 <span class="token comment">//来缩小窗口</span>
+                        string tmp <span class="token operator">=</span> s<span class="token punctuation">.</span><span class="token function">substr</span><span class="token punctuation">(</span>l<span class="token punctuation">,</span> ws<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        l <span class="token operator">+=</span> ws<span class="token punctuation">;</span>
+                        cnt<span class="token operator">--</span><span class="token punctuation">;</span>
+                        ump<span class="token punctuation">[</span>tmp<span class="token punctuation">]</span><span class="token operator">--</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">&#125;</span>
+                    <span class="token keyword">if</span><span class="token punctuation">(</span>cnt <span class="token operator">==</span> ns<span class="token punctuation">)</span> ans<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>l<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">&#125;</span>
+                <span class="token keyword">else</span> <span class="token comment">//未出现，舍弃此单词。清空</span>
+                <span class="token punctuation">&#123;</span>
+                    l <span class="token operator">=</span> r<span class="token punctuation">;</span>
+                    cnt <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+                    ump<span class="token punctuation">.</span><span class="token function">clear</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">&#125;</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">return</span> ans<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：整体复杂度为 O(ns * ws)</p>
@@ -465,7 +465,7 @@ public:
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年3月30日</div>
+          <div>2025年3月31日</div>
         </div>
       
       

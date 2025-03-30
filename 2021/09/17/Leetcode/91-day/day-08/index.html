@@ -27,7 +27,7 @@
 <meta property="og:description" content="24. 两两交换链表中的节点题目给定一个链表，两两交换其中相邻的节点，并返回交换后的链表。  你不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。  示例 1：  输入：head &#x3D; [1,2,3,4] 输出：[2,1,4,3]  示例 2：  输入：head &#x3D; [] 输出：[]  示例 3：  输入：head &#x3D; [1] 输出：[1]   提示：  链表中节点的数目在范围 [0, 1">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-09-16T23:12:01.000Z">
-<meta property="article:modified_time" content="2025-03-30T04:48:46.791Z">
+<meta property="article:modified_time" content="2025-03-30T16:09:09.474Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="linklist">
 <meta name="twitter:card" content="summary_large_image">
@@ -232,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          406 字
+          360 字
         
       </span>
     
@@ -294,7 +294,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2025-03-30T12:48:46+08:00
+                    本文最后更新于 2025-03-31T00:09:09+08:00
                   
                   
 
@@ -335,7 +335,7 @@
 <li>1、最简单的思路自然是递归的思路</li>
 <li>2、而递归调用的也是栈的实现方法，所以自然也能想到栈的相应的做法。</li>
 </ul>
-<h3 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h3><figure><div class="code-wrapper"><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">&#x2F;**
+<h3 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h3><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token comment">/**
  * Definition for singly-linked list.
  * struct ListNode &#123;
  *     int val;
@@ -344,39 +344,39 @@
  *     ListNode(int x) : val(x), next(nullptr) &#123;&#125;
  *     ListNode(int x, ListNode *next) : val(x), next(next) &#123;&#125;
  * &#125;;
- *&#x2F;
-class Solution &#123;
-public:
-    ListNode* swapPairs(ListNode* head) &#123;
-		if(head &#x3D;&#x3D; nullptr || head -&gt; next &#x3D;&#x3D; nullptr) return head;
-		stack&lt;ListNode* &gt; stk;
-		ListNode* p &#x3D; new ListNode();
-		ListNode* pos &#x3D; head;
-        head &#x3D; p;
-		while(pos !&#x3D; nullptr &amp;&amp; pos -&gt; next !&#x3D; nullptr)
-        &#123;
-			stk.push(pos);
-			stk.push(pos -&gt; next);
-			pos &#x3D; pos -&gt; next -&gt; next;
-			p -&gt; next &#x3D; stk.top();
-            stk.pop();
-			p &#x3D; p -&gt; next;
-			p -&gt; next &#x3D; stk.top();
-            stk.pop();
-			p &#x3D; p -&gt; next;
-		&#125;
-		if(pos !&#x3D; nullptr) p -&gt; next &#x3D; pos;
-	    else p -&gt; next &#x3D; nullptr;
-		return head -&gt; next;
-		&#x2F;*
-		if (head &#x3D;&#x3D; nullptr || head-&gt;next &#x3D;&#x3D; nullptr) return head;
-        ListNode* p &#x3D; head -&gt; next;
-        head -&gt; next &#x3D; swapPairs(p -&gt; next);
-        p -&gt; next &#x3D; head;
+ */</span>
+<span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    ListNode<span class="token operator">*</span> <span class="token function">swapPairs</span><span class="token punctuation">(</span>ListNode<span class="token operator">*</span> head<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">if</span><span class="token punctuation">(</span>head <span class="token operator">==</span> <span class="token keyword">nullptr</span> <span class="token operator">||</span> head <span class="token operator">-></span> next <span class="token operator">==</span> <span class="token keyword">nullptr</span><span class="token punctuation">)</span> <span class="token keyword">return</span> head<span class="token punctuation">;</span>
+		stack<span class="token operator">&lt;</span>ListNode<span class="token operator">*</span> <span class="token operator">></span> stk<span class="token punctuation">;</span>
+		ListNode<span class="token operator">*</span> p <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token function">ListNode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		ListNode<span class="token operator">*</span> pos <span class="token operator">=</span> head<span class="token punctuation">;</span>
+        head <span class="token operator">=</span> p<span class="token punctuation">;</span>
+		<span class="token keyword">while</span><span class="token punctuation">(</span>pos <span class="token operator">!=</span> <span class="token keyword">nullptr</span> <span class="token operator">&amp;&amp;</span> pos <span class="token operator">-></span> next <span class="token operator">!=</span> <span class="token keyword">nullptr</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+			stk<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>pos<span class="token punctuation">)</span><span class="token punctuation">;</span>
+			stk<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>pos <span class="token operator">-></span> next<span class="token punctuation">)</span><span class="token punctuation">;</span>
+			pos <span class="token operator">=</span> pos <span class="token operator">-></span> next <span class="token operator">-></span> next<span class="token punctuation">;</span>
+			p <span class="token operator">-></span> next <span class="token operator">=</span> stk<span class="token punctuation">.</span><span class="token function">top</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            stk<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+			p <span class="token operator">=</span> p <span class="token operator">-></span> next<span class="token punctuation">;</span>
+			p <span class="token operator">-></span> next <span class="token operator">=</span> stk<span class="token punctuation">.</span><span class="token function">top</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            stk<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+			p <span class="token operator">=</span> p <span class="token operator">-></span> next<span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token keyword">if</span><span class="token punctuation">(</span>pos <span class="token operator">!=</span> <span class="token keyword">nullptr</span><span class="token punctuation">)</span> p <span class="token operator">-></span> next <span class="token operator">=</span> pos<span class="token punctuation">;</span>
+	    <span class="token keyword">else</span> p <span class="token operator">-></span> next <span class="token operator">=</span> <span class="token keyword">nullptr</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> head <span class="token operator">-></span> next<span class="token punctuation">;</span>
+		<span class="token comment">/*
+		if (head == nullptr || head->next == nullptr) return head;
+        ListNode* p = head -> next;
+        head -> next = swapPairs(p -> next);
+        p -> next = head;
         return p;
-		*&#x2F;
-    &#125;
-&#125;;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+		*/</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n)</p>
@@ -448,7 +448,7 @@ public:
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年3月30日</div>
+          <div>2025年3月31日</div>
         </div>
       
       

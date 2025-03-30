@@ -27,7 +27,7 @@
 <meta property="og:description" content="109. 有序链表转换二叉搜索树题目给定一个单链表，其中的元素按升序排序，将其转换为高度平衡的二叉搜索树。  本题中，一个高度平衡二叉树是指一个二叉树每个节点 的左右两个子树的高度差的绝对值不超过 1。  示例:  给定的有序链表： [-10, -3, 0, 5, 9],  一个可能的答案是：[0, -3, 9, -10, null, 5], 它可以表示下面这个高度平衡二叉搜索树：">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-09-18T00:17:01.000Z">
-<meta property="article:modified_time" content="2025-03-30T04:48:46.425Z">
+<meta property="article:modified_time" content="2025-03-30T16:09:09.292Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="BST">
 <meta name="twitter:card" content="summary_large_image">
@@ -232,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          536 字
+          502 字
         
       </span>
     
@@ -294,7 +294,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2025-03-30T12:48:46+08:00
+                    本文最后更新于 2025-03-31T00:09:09+08:00
                   
                   
 
@@ -325,7 +325,7 @@
 <li>2、基于中序遍历恢复二叉搜索树，即可从任意节点出发，以节点左边的升序序列作为左子树，右边升序序列为右子树，即可得到二叉搜索树，本题要建立一个高度平衡的二叉搜索树，那么左右高度差至多为 1，故从链表的中点开始建立二叉搜索树最好。</li>
 <li>3、本题也可以用 BFS 建树，DFS 填节点值，但这样空间复杂度较高，时间复杂度跟递归链表差不多的情况下，确实不是特别优秀的解法，不过也可以用来熟悉一下 DFS 与 BFS。</li>
 </ul>
-<h3 id="代码块。"><a href="#代码块。" class="headerlink" title="代码块。"></a>代码块。</h3><figure><div class="code-wrapper"><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">&#x2F;**
+<h3 id="代码块。"><a href="#代码块。" class="headerlink" title="代码块。"></a>代码块。</h3><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token comment">/**
  * Definition for singly-linked list.
  * struct ListNode &#123;
  *     int val;
@@ -334,8 +334,8 @@
  *     ListNode(int x) : val(x), next(nullptr) &#123;&#125;
  *     ListNode(int x, ListNode *next) : val(x), next(next) &#123;&#125;
  * &#125;;
- *&#x2F;
-&#x2F;**
+ */</span>
+<span class="token comment">/**
  * Definition for a binary tree node.
  * struct TreeNode &#123;
  *     int val;
@@ -346,38 +346,38 @@
  *     TreeNode(int x, TreeNode *left, TreeNode *right) : 
         val(x), left(left), right(right) &#123;&#125;
  * &#125;;
- *&#x2F;
-class Solution &#123;
-public:
-    TreeNode* sortedListToBST(ListNode* head) &#123;
-        if(head &#x3D;&#x3D; nullptr) return nullptr;
-        if(head -&gt; next &#x3D;&#x3D; nullptr)
-        &#123;
-            TreeNode* root &#x3D; new TreeNode(head -&gt; val);
-            return root;
-        &#125;
-        ListNode* fast &#x3D; head;
-        int len &#x3D; 1;
-        while(fast -&gt; next !&#x3D; nullptr)
-        &#123;
-            fast &#x3D; fast -&gt; next;
-            len++;
-        &#125;
-        len &#x3D; len &gt;&gt; 1;
-        ListNode* slow &#x3D; head;
-        ListNode* p &#x3D; slow;
-        while(len--)
-        &#123;
-            p &#x3D; slow;
-            slow &#x3D; slow -&gt; next;
-        &#125;
-        p -&gt; next &#x3D; nullptr;
-        TreeNode* root &#x3D; new TreeNode(slow -&gt; val);
-        root -&gt; left &#x3D; sortedListToBST(head);
-        root -&gt; right &#x3D; sortedListToBST(slow -&gt; next);
-        return root;
-    &#125;
-&#125;;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+ */</span>
+<span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    TreeNode<span class="token operator">*</span> <span class="token function">sortedListToBST</span><span class="token punctuation">(</span>ListNode<span class="token operator">*</span> head<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>head <span class="token operator">==</span> <span class="token keyword">nullptr</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token keyword">nullptr</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>head <span class="token operator">-></span> next <span class="token operator">==</span> <span class="token keyword">nullptr</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            TreeNode<span class="token operator">*</span> root <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token function">TreeNode</span><span class="token punctuation">(</span>head <span class="token operator">-></span> val<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> root<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        ListNode<span class="token operator">*</span> fast <span class="token operator">=</span> head<span class="token punctuation">;</span>
+        <span class="token keyword">int</span> len <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span><span class="token punctuation">(</span>fast <span class="token operator">-></span> next <span class="token operator">!=</span> <span class="token keyword">nullptr</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            fast <span class="token operator">=</span> fast <span class="token operator">-></span> next<span class="token punctuation">;</span>
+            len<span class="token operator">++</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        len <span class="token operator">=</span> len <span class="token operator">>></span> <span class="token number">1</span><span class="token punctuation">;</span>
+        ListNode<span class="token operator">*</span> slow <span class="token operator">=</span> head<span class="token punctuation">;</span>
+        ListNode<span class="token operator">*</span> p <span class="token operator">=</span> slow<span class="token punctuation">;</span>
+        <span class="token keyword">while</span><span class="token punctuation">(</span>len<span class="token operator">--</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            p <span class="token operator">=</span> slow<span class="token punctuation">;</span>
+            slow <span class="token operator">=</span> slow <span class="token operator">-></span> next<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        p <span class="token operator">-></span> next <span class="token operator">=</span> <span class="token keyword">nullptr</span><span class="token punctuation">;</span>
+        TreeNode<span class="token operator">*</span> root <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token function">TreeNode</span><span class="token punctuation">(</span>slow <span class="token operator">-></span> val<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        root <span class="token operator">-></span> left <span class="token operator">=</span> <span class="token function">sortedListToBST</span><span class="token punctuation">(</span>head<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        root <span class="token operator">-></span> right <span class="token operator">=</span> <span class="token function">sortedListToBST</span><span class="token punctuation">(</span>slow <span class="token operator">-></span> next<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> root<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(log n)</p>
@@ -449,7 +449,7 @@ public:
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年3月30日</div>
+          <div>2025年3月31日</div>
         </div>
       
       

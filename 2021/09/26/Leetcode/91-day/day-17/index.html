@@ -27,7 +27,7 @@
 <meta property="og:description" content="297. 二叉树的序列化与反序列化题目序列化是将一个数据结构或者对象转换为连续的比特位的操作，  进而可以将转换后的数据存储在一个文件或者内存中，同时也可以通过网络传输到另一个计算机环境，  采取相反方式重构得到原数据。  请设计一个算法来实现二叉树的序列化与反序列化。  这里不限定你的序列 &#x2F; 反序列化算法执行逻辑，  你只需要保证一个二叉树可以被序列化为一个字符串并且将这个字符串反序列化为原始">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-09-26T01:00:13.000Z">
-<meta property="article:modified_time" content="2025-03-30T04:48:43.604Z">
+<meta property="article:modified_time" content="2025-03-30T16:09:09.248Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="Binary Tree">
 <meta name="twitter:card" content="summary_large_image">
@@ -232,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          780 字
+          706 字
         
       </span>
     
@@ -243,7 +243,7 @@
         
         
         
-          7 分钟
+          6 分钟
         
       </span>
     
@@ -294,7 +294,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2025-03-30T12:48:43+08:00
+                    本文最后更新于 2025-03-31T00:09:09+08:00
                   
                   
 
@@ -352,7 +352,7 @@
 <li>1、本质上还是 DFS 与 BFS 题目，但是此题目难度较大，所以花费时间较长。</li>
 <li>2、dfs 有两种形式前序 dfs，后面还有后序 dfs，后序遍历因为时间限制，暂时不去写，而中序由于无法确定根节点，所以无法形成递归形式</li>
 </ul>
-<h3 id="代码块。"><a href="#代码块。" class="headerlink" title="代码块。"></a>代码块。</h3><figure><div class="code-wrapper"><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">&#x2F;**
+<h3 id="代码块。"><a href="#代码块。" class="headerlink" title="代码块。"></a>代码块。</h3><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token comment">/**
  * Definition for a binary tree node.
  * struct TreeNode &#123;
  *     int val;
@@ -360,17 +360,17 @@
  *     TreeNode *right;
  *     TreeNode(int x) : val(x), left(NULL), right(NULL) &#123;&#125;
  * &#125;;
- *&#x2F;
-class Codec &#123;
-public:
-    &#x2F;* void predfs(TreeNode* root, string&amp; data)
+ */</span>
+<span class="token keyword">class</span> <span class="token class-name">Codec</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token comment">/* void predfs(TreeNode* root, string&amp; data)
     &#123;
-        if(root &#x3D;&#x3D; nullptr) data +&#x3D; &quot;null,&quot;;
+        if(root == nullptr) data += "null,";
         else
         &#123;
-            data +&#x3D; to_string(root -&gt; val) + &quot;,&quot;;
-            predfs(root -&gt; left, data);
-            predfs(root -&gt; right, data);
+            data += to_string(root -> val) + ",";
+            predfs(root -> left, data);
+            predfs(root -> right, data);
         &#125;
     &#125;
 
@@ -381,93 +381,93 @@ public:
         return data;
     &#125;
 
-    TreeNode* rdfs(list&lt;string&gt;&amp; str)
+    TreeNode* rdfs(list&lt;string>&amp; str)
     &#123;
-        if (str.front() &#x3D;&#x3D; &quot;null&quot;)
+        if (str.front() == "null")
         &#123;
             str.erase(str.begin());
             return nullptr;
         &#125;
-        TreeNode* root &#x3D; new TreeNode(stoi(str.front()));
+        TreeNode* root = new TreeNode(stoi(str.front()));
         str.erase(str.begin());
-        root -&gt; left &#x3D; rdfs(str);
-        root -&gt; right &#x3D; rdfs(str);
+        root -> left = rdfs(str);
+        root -> right = rdfs(str);
         return root;
     &#125;
 
     TreeNode* deserialize(string data)
     &#123;
-        list&lt;string&gt; str;
+        list&lt;string> str;
         string s;
         for (auto&amp; ch : data)
         &#123;
-            if (ch &#x3D;&#x3D; &#39;,&#39;)
+            if (ch == ',')
             &#123;
                 str.push_back(s);
                 s.clear();
             &#125;
             else s.push_back(ch);
         &#125;
-        if (s.empty() !&#x3D; 0)
+        if (s.empty() != 0)
         &#123;
             str.push_back(s);
             s.clear();
         &#125;
         return rdfs(str);
-    &#125; *&#x2F;
-    string serialize(TreeNode* root) &#123;
-        string ans;
-        queue&lt;TreeNode* &gt; q;
-        if(root &#x3D;&#x3D; nullptr) return ans;
-        else q.push(root);
-        while(!q.empty())
-        &#123;
-            int n &#x3D; q.size();
-            for(int i &#x3D; 0; i &lt; n; ++i)&#123;
-                auto node &#x3D; q.front();
-                q.pop();
-                if(node &#x3D;&#x3D; nullptr) ans +&#x3D; &quot;null,&quot;;
-                else
-                &#123;
-                    ans +&#x3D; to_string(node-&gt;val) + &quot;,&quot;;
-                    q.push(node-&gt;left);
-                    q.push(node-&gt;right);
-                &#125;
-            &#125;
-        &#125;
-        return ans;
-    &#125;
-    TreeNode* deserialize(string data) &#123;
-        if(data.empty()) return NULL;
-        vector&lt;TreeNode* &gt; ans;
-        int k &#x3D; 0;
-        int n &#x3D; data.size();
-        while(k &lt; n)
-        &#123;
-            string tmp;
-            while(data[k] !&#x3D; &#39;,&#39;)
-            &#123;
-                tmp +&#x3D; data[k];
-                k++;
-            &#125;
-            if(tmp &#x3D;&#x3D; &quot;null&quot;) ans.push_back(NULL);
-            else ans.push_back(new TreeNode(stoi(tmp)));
-            tmp.clear();
-            k++;
-        &#125;
-        int pos &#x3D; 1;
-        for(int i &#x3D; 0; i &lt; ans.size(); i++)
-        &#123;
-            if(ans[i] &#x3D;&#x3D; NULL) continue;
-            ans[i] -&gt; left &#x3D; ans[pos++];
-            ans[i] -&gt; right &#x3D; ans[pos++];
-        &#125;
-        return ans[0];
-    &#125;
-&#125;;
-&#x2F;&#x2F; Your Codec object will be instantiated and called as such:
-&#x2F;&#x2F; Codec ser, deser;
-&#x2F;&#x2F; TreeNode* ans &#x3D; deser.deserialize(ser.serialize(root));<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+    &#125; */</span>
+    string <span class="token function">serialize</span><span class="token punctuation">(</span>TreeNode<span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        string ans<span class="token punctuation">;</span>
+        queue<span class="token operator">&lt;</span>TreeNode<span class="token operator">*</span> <span class="token operator">></span> q<span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token keyword">nullptr</span><span class="token punctuation">)</span> <span class="token keyword">return</span> ans<span class="token punctuation">;</span>
+        <span class="token keyword">else</span> q<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token operator">!</span>q<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">int</span> n <span class="token operator">=</span> q<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> n<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+                <span class="token keyword">auto</span> node <span class="token operator">=</span> q<span class="token punctuation">.</span><span class="token function">front</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                q<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span><span class="token punctuation">(</span>node <span class="token operator">==</span> <span class="token keyword">nullptr</span><span class="token punctuation">)</span> ans <span class="token operator">+=</span> <span class="token string">"null,"</span><span class="token punctuation">;</span>
+                <span class="token keyword">else</span>
+                <span class="token punctuation">&#123;</span>
+                    ans <span class="token operator">+=</span> <span class="token function">to_string</span><span class="token punctuation">(</span>node<span class="token operator">-></span>val<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">","</span><span class="token punctuation">;</span>
+                    q<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>node<span class="token operator">-></span>left<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    q<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>node<span class="token operator">-></span>right<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">&#125;</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">return</span> ans<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    TreeNode<span class="token operator">*</span> <span class="token function">deserialize</span><span class="token punctuation">(</span>string data<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>data<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+        vector<span class="token operator">&lt;</span>TreeNode<span class="token operator">*</span> <span class="token operator">></span> ans<span class="token punctuation">;</span>
+        <span class="token keyword">int</span> k <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> n <span class="token operator">=</span> data<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span><span class="token punctuation">(</span>k <span class="token operator">&lt;</span> n<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            string tmp<span class="token punctuation">;</span>
+            <span class="token keyword">while</span><span class="token punctuation">(</span>data<span class="token punctuation">[</span>k<span class="token punctuation">]</span> <span class="token operator">!=</span> <span class="token char">','</span><span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                tmp <span class="token operator">+=</span> data<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token punctuation">;</span>
+                k<span class="token operator">++</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span>tmp <span class="token operator">==</span> <span class="token string">"null"</span><span class="token punctuation">)</span> ans<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">else</span> ans<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token function">TreeNode</span><span class="token punctuation">(</span><span class="token function">stoi</span><span class="token punctuation">(</span>tmp<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            tmp<span class="token punctuation">.</span><span class="token function">clear</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            k<span class="token operator">++</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">int</span> pos <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> ans<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span>ans<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">continue</span><span class="token punctuation">;</span>
+            ans<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-></span> left <span class="token operator">=</span> ans<span class="token punctuation">[</span>pos<span class="token operator">++</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+            ans<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-></span> right <span class="token operator">=</span> ans<span class="token punctuation">[</span>pos<span class="token operator">++</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">return</span> ans<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token comment">// Your Codec object will be instantiated and called as such:</span>
+<span class="token comment">// Codec ser, deser;</span>
+<span class="token comment">// TreeNode* ans = deser.deserialize(ser.serialize(root));</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n)</p>
@@ -539,7 +539,7 @@ public:
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年3月30日</div>
+          <div>2025年3月31日</div>
         </div>
       
       

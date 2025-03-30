@@ -27,7 +27,7 @@
 <meta property="og:description" content="482. 密钥格式化题目有一个密钥字符串 S ，只包含字母，数字以及 &#39;-&#39;（破折号）。其中， N 个 &#39;-&#39; 将字符串分成了 N+1 组。  给你一个数字 K，请你重新格式化字符串，使每个分组恰好包含 K 个字符。特别地，第一个分组包含的字符个数必须小于等于 K，但至少要包含 1 个字符。两个分组之间需要用 &#39;-&#39;（破折号）隔开，并且将所有的小写字母转换为大写字母。  给定非空字符串 S 和数字">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-04T00:43:00.000Z">
-<meta property="article:modified_time" content="2025-03-30T04:48:50.653Z">
+<meta property="article:modified_time" content="2025-03-30T16:09:09.248Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="string">
 <meta name="twitter:card" content="summary_large_image">
@@ -232,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          639 字
+          563 字
         
       </span>
     
@@ -243,7 +243,7 @@
         
         
         
-          6 分钟
+          5 分钟
         
       </span>
     
@@ -294,7 +294,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2025-03-30T12:48:50+08:00
+                    本文最后更新于 2025-03-31T00:09:09+08:00
                   
                   
 
@@ -336,72 +336,72 @@ S 非空<span aria-hidden="true" class="line-numbers-rows"><span></span><span></
 <li>1、简单题目，但是细节处理要处理好，也耽误自己接近半小时的时间</li>
 </ul>
 </blockquote>
-<figure><div class="code-wrapper"><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">class Solution &#123;
-public:
-    string licenseKeyFormatting(string s, int k) &#123;
-        string res &#x3D; &quot;&quot;;
+<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    string <span class="token function">licenseKeyFormatting</span><span class="token punctuation">(</span>string s<span class="token punctuation">,</span> <span class="token keyword">int</span> k<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        string res <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">;</span>
 
-        for(auto &amp; i : s)
-        &#123;
-            if(i &#x3D;&#x3D; &#39;-&#39;) continue;
-            else if(i &gt;&#x3D; &#39;a&#39; &amp;&amp; i &lt;&#x3D; &#39;z&#39;)  res +&#x3D; i - &#39;a&#39; + &#39;A&#39;;
-            else res +&#x3D; i;
-        &#125;
+        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">auto</span> <span class="token operator">&amp;</span> i <span class="token operator">:</span> s<span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span>i <span class="token operator">==</span> <span class="token char">'-'</span><span class="token punctuation">)</span> <span class="token keyword">continue</span><span class="token punctuation">;</span>
+            <span class="token keyword">else</span> <span class="token keyword">if</span><span class="token punctuation">(</span>i <span class="token operator">>=</span> <span class="token char">'a'</span> <span class="token operator">&amp;&amp;</span> i <span class="token operator">&lt;=</span> <span class="token char">'z'</span><span class="token punctuation">)</span>  res <span class="token operator">+=</span> i <span class="token operator">-</span> <span class="token char">'a'</span> <span class="token operator">+</span> <span class="token char">'A'</span><span class="token punctuation">;</span>
+            <span class="token keyword">else</span> res <span class="token operator">+=</span> i<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
 
-        if(res.size() &#x3D;&#x3D; 0) return &quot;&quot;;
+        <span class="token keyword">if</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token string">""</span><span class="token punctuation">;</span>
 
-        string ans &#x3D; &quot;&quot;;
-        int n &#x3D; res.size();
-        int per &#x3D; n &#x2F; k;    &#x2F;&#x2F;能分均分几组
-        int begin &#x3D; n % k;  &#x2F;&#x2F;第一组有多少个
+        string ans <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> n <span class="token operator">=</span> res<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> per <span class="token operator">=</span> n <span class="token operator">/</span> k<span class="token punctuation">;</span>    <span class="token comment">//能分均分几组</span>
+        <span class="token keyword">int</span> begin <span class="token operator">=</span> n <span class="token operator">%</span> k<span class="token punctuation">;</span>  <span class="token comment">//第一组有多少个</span>
 
-        if(begin &#x3D;&#x3D; 0)
+        <span class="token keyword">if</span><span class="token punctuation">(</span>begin <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> n<span class="token punctuation">;</span> i <span class="token operator">=</span> i <span class="token operator">+</span> k<span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                ans <span class="token operator">+=</span> res<span class="token punctuation">.</span><span class="token function">substr</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> k<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                ans <span class="token operator">+=</span> <span class="token char">'-'</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+            ans<span class="token punctuation">.</span><span class="token function">pop_back</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">else</span> 
+        <span class="token punctuation">&#123;</span>
+            ans <span class="token operator">+=</span> res<span class="token punctuation">.</span><span class="token function">substr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> begin<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            ans <span class="token operator">+=</span> <span class="token char">'-'</span><span class="token punctuation">;</span>
+            <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> begin<span class="token punctuation">;</span> i <span class="token operator">&lt;</span> n<span class="token punctuation">;</span> i <span class="token operator">=</span> i <span class="token operator">+</span> k<span class="token punctuation">)</span>
+            <span class="token punctuation">&#123;</span>
+                ans <span class="token operator">+=</span> res<span class="token punctuation">.</span><span class="token function">substr</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> k<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                ans <span class="token operator">+=</span> <span class="token char">'-'</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+            ans<span class="token punctuation">.</span><span class="token function">pop_back</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        <span class="token keyword">return</span> ans<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+       <span class="token comment">/*  for(auto it = s.begin(); it != s.end(); it++)
         &#123;
-            for(int i &#x3D; 0; i &lt; n; i &#x3D; i + k)
-            &#123;
-                ans +&#x3D; res.substr(i, k);
-                ans +&#x3D; &#39;-&#39;;
-            &#125;
-            ans.pop_back();
-        &#125;
-        else 
-        &#123;
-            ans +&#x3D; res.substr(0, begin);
-            ans +&#x3D; &#39;-&#39;;
-            for(int i &#x3D; begin; i &lt; n; i &#x3D; i + k)
-            &#123;
-                ans +&#x3D; res.substr(i, k);
-                ans +&#x3D; &#39;-&#39;;
-            &#125;
-            ans.pop_back();
-        &#125;
-        return ans;
-    &#125;
-       &#x2F;*  for(auto it &#x3D; s.begin(); it !&#x3D; s.end(); it++)
-        &#123;
-            if(*it &#x3D;&#x3D; &#39;-&#39;)
+            if(*it == '-')
             &#123;
                 s.erase(it);
                 it--;
             &#125;
-            else if(islower(*it)) &#x2F;&#x2F;判断是否为小写字母
+            else if(islower(*it)) //判断是否为小写字母
             &#123;
-                *it &#x3D; toupper(*it);&#x2F;&#x2F;将小写字母转换为大写字母
+                *it = toupper(*it);//将小写字母转换为大写字母
             &#125;
         &#125;
 
-        int n &#x3D; s.size();
-        int begin &#x3D; n % k;
-        string ans &#x3D; s.substr(0, begin);
+        int n = s.size();
+        int begin = n % k;
+        string ans = s.substr(0, begin);
 
-        for(int i &#x3D; begin; i &lt; n; i +&#x3D; k)
+        for(int i = begin; i &lt; n; i += k)
         &#123;
-            if(i !&#x3D; 0) ans +&#x3D; &quot;-&quot;;
-            ans +&#x3D; s.substr(i, k);
+            if(i != 0) ans += "-";
+            ans += s.substr(i, k);
         &#125;
         return ans;
-    &#125; *&#x2F;
-&#125;;
+    &#125; */</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
@@ -475,7 +475,7 @@ public:
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年3月30日</div>
+          <div>2025年3月31日</div>
         </div>
       
       
