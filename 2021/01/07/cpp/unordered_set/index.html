@@ -47,8 +47,6 @@
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
 
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
-
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
 
@@ -233,7 +231,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          563 字
+          580 字
         
       </span>
     
@@ -315,98 +313,11 @@
 <li>不会对内部存储的数据进行排序</li>
 </ol>
 </blockquote>
-<h3 id="模板"><a href="#模板" class="headerlink" title="模板"></a>模板</h3><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">template</span> <span class="token operator">&lt;</span> <span class="token keyword">class</span> <span class="token class-name">Key</span><span class="token punctuation">,</span>                        <span class="token comment">// unordered_set::key_type/value_type</span>
-           <span class="token keyword">class</span> <span class="token class-name">Hash</span> <span class="token operator">=</span> hash<span class="token operator">&lt;</span>Key<span class="token operator">></span><span class="token punctuation">,</span>           <span class="token comment">// unordered_set::hasher</span>
-           <span class="token keyword">class</span> <span class="token class-name">Pred</span> <span class="token operator">=</span> equal_to<span class="token operator">&lt;</span>Key<span class="token operator">></span><span class="token punctuation">,</span>       <span class="token comment">// unordered_set::key_equal</span>
-           <span class="token keyword">class</span> <span class="token class-name">Alloc</span> <span class="token operator">=</span> allocator<span class="token operator">&lt;</span>Key<span class="token operator">></span>      <span class="token comment">// unordered_set::allocator_type</span>
-           <span class="token operator">></span> <span class="token keyword">class</span> <span class="token class-name">unordered_set</span><span class="token punctuation">;</span>
-<span class="token comment">//一般定义使用</span>
-unordered_set<span class="token operator">&lt;</span>T<span class="token operator">></span> ans<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="模板"><a href="#模板" class="headerlink" title="模板"></a>模板</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">template</span> &lt; <span class="hljs-keyword">class</span> <span class="hljs-title class_">Key</span>,                        <span class="hljs-comment">// unordered_set::key_type/value_type</span><br>           <span class="hljs-keyword">class</span> <span class="hljs-title class_">Hash</span> = hash&lt;Key&gt;,           <span class="hljs-comment">// unordered_set::hasher</span><br>           <span class="hljs-keyword">class</span> Pred = equal_to&lt;Key&gt;,       <span class="hljs-comment">// unordered_set::key_equal</span><br>           <span class="hljs-keyword">class</span> Alloc = allocator&lt;Key&gt;      <span class="hljs-comment">// unordered_set::allocator_type</span><br>           &gt; <span class="hljs-keyword">class</span> unordered_set;<br><span class="hljs-comment">//一般定义使用</span><br>unordered_set&lt;T&gt; ans;<br></code></pre></td></tr></table></figure>
 
-<h3 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h3><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token comment">//返回头迭代器 begin()</span>
-unordered_set<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token double-colon punctuation">::</span>iterator it_begin <span class="token operator">=</span> ans<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<h3 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">//返回头迭代器 begin()</span><br>unordered_set&lt;<span class="hljs-type">int</span>&gt;::iterator it_begin = ans.<span class="hljs-built_in">begin</span>();<br><br><span class="hljs-comment">//返回尾迭代器 end()</span><br>unordered_set&lt;<span class="hljs-type">int</span>&gt;::iterator it_end = ans.<span class="hljs-built_in">end</span>();<br><br><span class="hljs-comment">//返回const头迭代器 cbegin()</span><br>unordered_set&lt;<span class="hljs-type">int</span>&gt;::const_iterator const_it_begin = ans.<span class="hljs-built_in">cbegin</span>();<br><br><span class="hljs-comment">//返回const尾迭代器 cend()</span><br>unordered_set&lt;<span class="hljs-type">int</span>&gt;::const_iterator const_it_end = ans.<span class="hljs-built_in">cend</span>();<br><br><span class="hljs-comment">//槽迭代器</span><br>unordered_set&lt;<span class="hljs-type">int</span>&gt;::local_iterator local_iter_begin = ans.<span class="hljs-built_in">begin</span>(<span class="hljs-number">1</span>);<br><br>unordered_set&lt;<span class="hljs-type">int</span>&gt;::local_iterator local_iter_end = ans.<span class="hljs-built_in">end</span>(<span class="hljs-number">1</span>);<br></code></pre></td></tr></table></figure>
 
-<span class="token comment">//返回尾迭代器 end()</span>
-unordered_set<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token double-colon punctuation">::</span>iterator it_end <span class="token operator">=</span> ans<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//返回const头迭代器 cbegin()</span>
-unordered_set<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token double-colon punctuation">::</span>const_iterator const_it_begin <span class="token operator">=</span> ans<span class="token punctuation">.</span><span class="token function">cbegin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//返回const尾迭代器 cend()</span>
-unordered_set<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token double-colon punctuation">::</span>const_iterator const_it_end <span class="token operator">=</span> ans<span class="token punctuation">.</span><span class="token function">cend</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//槽迭代器</span>
-unordered_set<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token double-colon punctuation">::</span>local_iterator local_iter_begin <span class="token operator">=</span> ans<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-unordered_set<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token double-colon punctuation">::</span>local_iterator local_iter_end <span class="token operator">=</span> ans<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<h3 id="一般操作"><a href="#一般操作" class="headerlink" title="一般操作"></a>一般操作</h3><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token comment">//查找函数 find() 通过给定主键查找元素</span>
-unordered_set<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token double-colon punctuation">::</span>iterator find_iter <span class="token operator">=</span> ans<span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//value出现的次数 count() 返回匹配给定主键的元素的个数</span>
-ans<span class="token punctuation">.</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//返回元素在哪个区域equal_range() 返回值匹配给定搜索值的元素组成的范围</span>
-pair<span class="token operator">&lt;</span>unordered_set<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token double-colon punctuation">::</span>iterator<span class="token punctuation">,</span> unordered_set<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token double-colon punctuation">::</span>iterator<span class="token operator">></span>
-    							   pair_equal_range <span class="token operator">=</span> ans<span class="token punctuation">.</span><span class="token function">equal_range</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//插入函数 emplace()</span>
-ans<span class="token punctuation">.</span><span class="token function">emplace</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//插入函数 emplace_hint() 使用迭代器</span>
-ans<span class="token punctuation">.</span><span class="token function">emplace_hint</span><span class="token punctuation">(</span>ite_begin<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//插入函数 insert()</span>
-ans<span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//删除 erase()</span>
-ans<span class="token punctuation">.</span><span class="token function">erase</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//1.迭代器 value 区域</span>
-
-<span class="token comment">//清空 clear()</span>
-ans<span class="token punctuation">.</span><span class="token function">clear</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//交换 swap()，括号内可接另外一个unordered_set</span>
-ans<span class="token punctuation">.</span><span class="token function">swap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//判断是否为空</span>
-ans<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//获取元素个数 size()</span>
-ans<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//获取最大存储量 max_size()</span>
-ans<span class="token punctuation">.</span><span class="token function">max_size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//篮子操作 篮子个数 bucket_count() 返回槽（Bucket）数</span>
-ans<span class="token punctuation">.</span><span class="token function">bucket_count</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//篮子最大数量 max_bucket_count() 返回最大槽数</span>
-ans<span class="token punctuation">.</span><span class="token function">max_bucket_count</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//篮子个数 bucket_size() 返回槽大小</span>
-ans<span class="token punctuation">.</span><span class="token function">bucket_size</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//返回篮子 bucket() 返回元素所在槽的序号</span>
-ans<span class="token punctuation">.</span><span class="token function">bucket</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//load_factor 返回载入因子，即一个元素槽（Bucket）的最大元素数</span>
-ans<span class="token punctuation">.</span><span class="token function">load_factor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//max_load_factor 返回或设置最大载入因子</span>
-ans<span class="token punctuation">.</span><span class="token function">max_load_factor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//rehash 设置槽数</span>
-ans<span class="token punctuation">.</span><span class="token function">rehash</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//reserve请求改变容器容量</span>
-ans<span class="token punctuation">.</span><span class="token function">reserve</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//hash_function() 返回与hash_func相同功能的函数指针</span>
-<span class="token keyword">auto</span> hash_func_test <span class="token operator">=</span> ans<span class="token punctuation">.</span><span class="token function">hash_function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//key_eq() 返回比较key值得函数指针</span>
-<span class="token keyword">auto</span> key_eq_test <span class="token operator">=</span> ans<span class="token punctuation">.</span><span class="token function">key_eq</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h3 id="一般操作"><a href="#一般操作" class="headerlink" title="一般操作"></a>一般操作</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">//查找函数 find() 通过给定主键查找元素</span><br>unordered_set&lt;<span class="hljs-type">int</span>&gt;::iterator find_iter = ans.<span class="hljs-built_in">find</span>(<span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//value出现的次数 count() 返回匹配给定主键的元素的个数</span><br>ans.<span class="hljs-built_in">count</span>(<span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//返回元素在哪个区域equal_range() 返回值匹配给定搜索值的元素组成的范围</span><br>pair&lt;unordered_set&lt;<span class="hljs-type">int</span>&gt;::iterator, unordered_set&lt;<span class="hljs-type">int</span>&gt;::iterator&gt;<br>    							   pair_equal_range = ans.<span class="hljs-built_in">equal_range</span>(<span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//插入函数 emplace()</span><br>ans.<span class="hljs-built_in">emplace</span>(<span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//插入函数 emplace_hint() 使用迭代器</span><br>ans.<span class="hljs-built_in">emplace_hint</span>(ite_begin, <span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//插入函数 insert()</span><br>ans.<span class="hljs-built_in">insert</span>(<span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//删除 erase()</span><br>ans.<span class="hljs-built_in">erase</span>(<span class="hljs-number">1</span>);<span class="hljs-comment">//1.迭代器 value 区域</span><br><br><span class="hljs-comment">//清空 clear()</span><br>ans.<span class="hljs-built_in">clear</span>();<br><br><span class="hljs-comment">//交换 swap()，括号内可接另外一个unordered_set</span><br>ans.<span class="hljs-built_in">swap</span>();<br><br><span class="hljs-comment">//判断是否为空</span><br>ans.<span class="hljs-built_in">empty</span>();<br><br><span class="hljs-comment">//获取元素个数 size()</span><br>ans.<span class="hljs-built_in">size</span>();<br><br><span class="hljs-comment">//获取最大存储量 max_size()</span><br>ans.<span class="hljs-built_in">max_size</span>();<br><br><span class="hljs-comment">//篮子操作 篮子个数 bucket_count() 返回槽（Bucket）数</span><br>ans.<span class="hljs-built_in">bucket_count</span>();<br><br><span class="hljs-comment">//篮子最大数量 max_bucket_count() 返回最大槽数</span><br>ans.<span class="hljs-built_in">max_bucket_count</span>();<br><br><span class="hljs-comment">//篮子个数 bucket_size() 返回槽大小</span><br>ans.<span class="hljs-built_in">bucket_size</span>(<span class="hljs-number">3</span>);<br><br><span class="hljs-comment">//返回篮子 bucket() 返回元素所在槽的序号</span><br>ans.<span class="hljs-built_in">bucket</span>(<span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//load_factor 返回载入因子，即一个元素槽（Bucket）的最大元素数</span><br>ans.<span class="hljs-built_in">load_factor</span>();<br><br><span class="hljs-comment">//max_load_factor 返回或设置最大载入因子</span><br>ans.<span class="hljs-built_in">max_load_factor</span>();<br><br><span class="hljs-comment">//rehash 设置槽数</span><br>ans.<span class="hljs-built_in">rehash</span>(<span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//reserve请求改变容器容量</span><br>ans.<span class="hljs-built_in">reserve</span>(<span class="hljs-number">1000</span>);<br><br><span class="hljs-comment">//hash_function() 返回与hash_func相同功能的函数指针</span><br><span class="hljs-keyword">auto</span> hash_func_test = ans.<span class="hljs-built_in">hash_function</span>();<br><br><span class="hljs-comment">//key_eq() 返回比较key值得函数指针</span><br><span class="hljs-keyword">auto</span> key_eq_test = ans.<span class="hljs-built_in">key_eq</span>()<br><br></code></pre></td></tr></table></figure>
 
 <p>基本上以上就是全部使用的方法</p>
 
@@ -796,8 +707,6 @@ ans<span class="token punctuation">.</span><span class="token function">reserve<
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

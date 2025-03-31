@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="轻量化复盘一下 sql 操作，以及 MySQL  1、SELECT 语句​ 数据查询为关系运算理论在 SQL 语言中的主要体现。SQL 的数据查询只一条 SELECT 语句，其使用最广泛。一个完整的 SELECT 语句包含了六个字句，前两个字句是必备的，其他字句可以省略 SELECT 完整格式：  SELECT [DISTINCT] 目标列名序列 ------ 查看的列 [distinct] 为">
+    <meta name="description" content="轻量化复盘一下 sql 操作，以及 MySQL  1、SELECT 语句​ 数据查询为关系运算理论在 SQL 语言中的主要体现。SQL 的数据查询只一条 SELECT 语句，其使用最广泛。一个完整的 SELECT 语句包含了六个字句，前两个字句是必备的，其他字句可以省略 12345678910111213SELECT 完整格式：SELECT [DISTINCT] 目标列名序列 ------ 查看">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL 与 SQL 复习">
 <meta property="og:url" content="https://chaggle.github.io/2022/02/19/middleware/mysql1/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="轻量化复盘一下 sql 操作，以及 MySQL  1、SELECT 语句​ 数据查询为关系运算理论在 SQL 语言中的主要体现。SQL 的数据查询只一条 SELECT 语句，其使用最广泛。一个完整的 SELECT 语句包含了六个字句，前两个字句是必备的，其他字句可以省略 SELECT 完整格式：  SELECT [DISTINCT] 目标列名序列 ------ 查看的列 [distinct] 为">
+<meta property="og:description" content="轻量化复盘一下 sql 操作，以及 MySQL  1、SELECT 语句​ 数据查询为关系运算理论在 SQL 语言中的主要体现。SQL 的数据查询只一条 SELECT 语句，其使用最广泛。一个完整的 SELECT 语句包含了六个字句，前两个字句是必备的，其他字句可以省略 12345678910111213SELECT 完整格式：SELECT [DISTINCT] 目标列名序列 ------ 查看">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-02-18T20:02:24.000Z">
 <meta property="article:modified_time" content="2025-03-07T02:50:09.270Z">
@@ -45,8 +45,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -308,99 +306,39 @@
 <p>轻量化复盘一下 sql 操作，以及 MySQL</p>
 </blockquote>
 <h2 id="1、SELECT-语句"><a href="#1、SELECT-语句" class="headerlink" title="1、SELECT 语句"></a>1、SELECT 语句</h2><p>​ 数据查询为关系运算理论在 SQL 语言中的主要体现。SQL 的数据查询只一条 SELECT 语句，其使用最广泛。一个完整的 SELECT 语句包含了六个字句，前两个字句是必备的，其他字句可以省略</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SELECT</span> 完整格式：
-
-<span class="token keyword">SELECT</span> <span class="token punctuation">[</span><span class="token keyword">DISTINCT</span><span class="token punctuation">]</span> 目标列名序列 <span class="token comment">------ 查看的列 [distinct] 为去重操作</span>
-
-<span class="token keyword">FROM</span> 表名或视图名 <span class="token comment">------------------- 数据来源</span>
-
-<span class="token punctuation">[</span><span class="token keyword">WHERE</span> 条件表达式<span class="token punctuation">]</span> <span class="token comment">------------------ 查询条件</span>
-
-<span class="token punctuation">[</span><span class="token keyword">GROUP</span> <span class="token keyword">BY</span> <span class="token operator">+</span> 列名<span class="token punctuation">]</span> <span class="token comment">------------------ 分组依据</span>
-
-<span class="token punctuation">[</span><span class="token keyword">HAVING</span> <span class="token operator">+</span> 组条件表达式<span class="token punctuation">]</span> <span class="token comment">------------- 分组条件</span>
-
-<span class="token punctuation">[</span><span class="token keyword">ORDER</span> <span class="token keyword">BY</span> <span class="token operator">+</span> 列名 <span class="token operator">+</span> <span class="token punctuation">[</span><span class="token keyword">ASC</span><span class="token operator">|</span><span class="token keyword">DESC</span><span class="token punctuation">]</span>序列<span class="token punctuation">]</span><span class="token comment">--- 排序依据</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> 完整格式：<br><br><span class="hljs-keyword">SELECT</span> [<span class="hljs-keyword">DISTINCT</span>] 目标列名序列 <span class="hljs-comment">------ 查看的列 [distinct] 为去重操作</span><br><br><span class="hljs-keyword">FROM</span> 表名或视图名 <span class="hljs-comment">------------------- 数据来源</span><br><br>[<span class="hljs-keyword">WHERE</span> 条件表达式] <span class="hljs-comment">------------------ 查询条件</span><br><br>[<span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> <span class="hljs-operator">+</span> 列名] <span class="hljs-comment">------------------ 分组依据</span><br><br>[<span class="hljs-keyword">HAVING</span> <span class="hljs-operator">+</span> 组条件表达式] <span class="hljs-comment">------------- 分组条件</span><br><br>[<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> <span class="hljs-operator">+</span> 列名 <span class="hljs-operator">+</span> [<span class="hljs-keyword">ASC</span><span class="hljs-operator">|</span><span class="hljs-keyword">DESC</span>]序列]<span class="hljs-comment">--- 排序依据</span><br></code></pre></td></tr></table></figure>
 
 <p>​ 其中使用 distinct 时要注意列名要在 distinct 的后面，而使用聚合函数时，则是在 count[distinct&lt;列名&gt;] 语法。</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SELECT</span> 
-	<span class="token keyword">DISTINCT</span> device_id 
-<span class="token keyword">FROM</span> usr_profile<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>	<span class="hljs-keyword">DISTINCT</span> device_id <br><span class="hljs-keyword">FROM</span> usr_profile<br></code></pre></td></tr></table></figure>
 
 <p>​ 查询列后，将列取别名操作，要使用 as ，但是也能省略</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql">列名 <span class="token operator">|</span> 表达式 <span class="token punctuation">[</span> <span class="token keyword">AS</span> <span class="token punctuation">]</span> 新列名 或 新列名＝列名 <span class="token operator">|</span> 表达式
-
-<span class="token keyword">SELECT</span> 
-	device_id <span class="token keyword">as</span> user_infos_example 
-<span class="token keyword">FROM</span> user_profile
-
-<span class="token comment"># 等同于</span>
-<span class="token keyword">SELECT</span> 
-	device_id user_infos_example 
-<span class="token keyword">FROM</span> user_profile<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs sql">列名 <span class="hljs-operator">|</span> 表达式 [ <span class="hljs-keyword">AS</span> ] 新列名 或 新列名＝列名 <span class="hljs-operator">|</span> 表达式<br><br><span class="hljs-keyword">SELECT</span> <br>	device_id <span class="hljs-keyword">as</span> user_infos_example <br><span class="hljs-keyword">FROM</span> user_profile<br><br># 等同于<br><span class="hljs-keyword">SELECT</span> <br>	device_id user_infos_example <br><span class="hljs-keyword">FROM</span> user_profile<br></code></pre></td></tr></table></figure>
 
 <h2 id="2、LIMIT-语句"><a href="#2、LIMIT-语句" class="headerlink" title="2、LIMIT 语句"></a>2、LIMIT 语句</h2><p>​ 在大表中，一般很少一次性查出所有数据，这样对数据库的压力太大，如果只是抽查一些数据，就可以使用LIMIT关键字来查询。 LIMIT 子句的使用，用于强制 SELECT 语句返回指定的记录数。其接受一个或两个数字参数，且参数必须为整型常量。</p>
 <p>​ 如果只给定一个参数，返回最大的记录行数目</p>
 <p>​ 给的两个参数，第一个参数是行数序号（从0开始表示第一行），第二个参数是数量。</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SELECT</span> 
-	<span class="token operator">*</span> 
-<span class="token keyword">FROM</span> <span class="token keyword">table</span> 
-<span class="token keyword">LIMIT</span> <span class="token number">5</span><span class="token punctuation">,</span><span class="token number">5</span> <span class="token comment"># 检索记录行6-10</span>
-
-<span class="token keyword">SELECT</span> 
-	<span class="token operator">*</span> 
-<span class="token keyword">FROM</span> <span class="token keyword">table</span> 
-<span class="token keyword">LIMIT</span> <span class="token number">10</span><span class="token punctuation">,</span><span class="token operator">-</span><span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>	<span class="hljs-operator">*</span> <br><span class="hljs-keyword">FROM</span> <span class="hljs-keyword">table</span> <br>LIMIT <span class="hljs-number">5</span>,<span class="hljs-number">5</span> # 检索记录行<span class="hljs-number">6</span><span class="hljs-number">-10</span><br><br><span class="hljs-keyword">SELECT</span> <br>	<span class="hljs-operator">*</span> <br><span class="hljs-keyword">FROM</span> <span class="hljs-keyword">table</span> <br>LIMIT <span class="hljs-number">10</span>,<span class="hljs-number">-1</span><br></code></pre></td></tr></table></figure>
 
 <p>​ 也能结合offset 一起使用：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">select</span> 
-	device_id 
-<span class="token keyword">from</span> user_profile 
-<span class="token keyword">limit</span> <span class="token number">2</span> <span class="token keyword">offset</span> <span class="token number">0</span> <span class="token comment"># 跳过0条，从第一条数据开始取，取两条数据</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <br>	device_id <br><span class="hljs-keyword">from</span> user_profile <br>limit <span class="hljs-number">2</span> <span class="hljs-keyword">offset</span> <span class="hljs-number">0</span> # 跳过<span class="hljs-number">0</span>条，从第一条数据开始取，取两条数据<br></code></pre></td></tr></table></figure>
 
 <h2 id="3、BETWEEN-语句"><a href="#3、BETWEEN-语句" class="headerlink" title="3、BETWEEN 语句"></a>3、BETWEEN 语句</h2><p>​ 当需要查询某个范围值的时候，一般使用两种语句，between and， 以及 and 语句</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-SQL" data-language="SQL"><code class="language-SQL">SELECT 
-	device_id, gender, age 
-FROM user_profile 
-where age 
-between 20 and 23
-# 等价于
-SELECT 
-	device_id, gender, age 
-FROM user_profile 
-where age &gt;&#x3D; 20 and age &lt;&#x3D; 23<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs SQL"><span class="hljs-keyword">SELECT</span> <br>	device_id, gender, age <br><span class="hljs-keyword">FROM</span> user_profile <br><span class="hljs-keyword">where</span> age <br><span class="hljs-keyword">between</span> <span class="hljs-number">20</span> <span class="hljs-keyword">and</span> <span class="hljs-number">23</span><br># 等价于<br><span class="hljs-keyword">SELECT</span> <br>	device_id, gender, age <br><span class="hljs-keyword">FROM</span> user_profile <br><span class="hljs-keyword">where</span> age <span class="hljs-operator">&gt;=</span> <span class="hljs-number">20</span> <span class="hljs-keyword">and</span> age <span class="hljs-operator">&lt;=</span> <span class="hljs-number">23</span><br></code></pre></td></tr></table></figure>
 
 <h2 id="4、NOT-IN-语句"><a href="#4、NOT-IN-语句" class="headerlink" title="4、NOT IN 语句"></a>4、NOT IN 语句</h2><p>​ 当需要查询集合中指定属性值时，使用 IN ，除此属性值之外的所有值使用 NOT IN</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-SQL" data-language="SQL"><code class="language-SQL">列名 [NOT] IN &#39;属性值&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs SQL">列名 [<span class="hljs-keyword">NOT</span>] <span class="hljs-keyword">IN</span> <span class="hljs-string">&#x27;属性值&#x27;</span><br></code></pre></td></tr></table></figure>
 
 <p>​ IN：当列中的值与IN中的某个常量值相等时，则结果为True，表明此记录为符合查询条件的记录。<br>​ NOT IN：当列中的值与某个常量值相等时，结果为False，表明此记录为不符合查询条件的记录。</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SELECT</span> 
-	<span class="token operator">*</span> 
-<span class="token keyword">FROM</span> user_profile 
-<span class="token keyword">where</span> university <span class="token operator">NOT</span> <span class="token operator">IN</span> <span class="token string">'复旦大学'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>	<span class="hljs-operator">*</span> <br><span class="hljs-keyword">FROM</span> user_profile <br><span class="hljs-keyword">where</span> university <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">IN</span> <span class="hljs-string">&#x27;复旦大学&#x27;</span><br></code></pre></td></tr></table></figure>
 
 <p>​ 当需要过滤空值时</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SELECT</span> 
-	device_id<span class="token punctuation">,</span> gender<span class="token punctuation">,</span> age<span class="token punctuation">,</span> university 
-<span class="token keyword">FROM</span> user_profile 
-<span class="token keyword">WHERE</span> age <span class="token operator">!=</span><span class="token string">''</span><span class="token punctuation">;</span> 
-<span class="token comment"># 或者</span>
-<span class="token keyword">SELECT</span> 
-	device_id<span class="token punctuation">,</span> gender<span class="token punctuation">,</span> age<span class="token punctuation">,</span> university 
-<span class="token keyword">FROM</span> user_profile 
-<span class="token keyword">WHERE</span> age <span class="token operator">is</span> <span class="token operator">NOT</span> <span class="token boolean">NULL</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>	device_id, gender, age, university <br><span class="hljs-keyword">FROM</span> user_profile <br><span class="hljs-keyword">WHERE</span> age <span class="hljs-operator">!=</span><span class="hljs-string">&#x27;&#x27;</span>; <br># 或者<br><span class="hljs-keyword">SELECT</span> <br>	device_id, gender, age, university <br><span class="hljs-keyword">FROM</span> user_profile <br><span class="hljs-keyword">WHERE</span> age <span class="hljs-keyword">is</span> <span class="hljs-keyword">NOT NULL</span><br></code></pre></td></tr></table></figure>
 
 <h2 id="5、AND-OR-语句"><a href="#5、AND-OR-语句" class="headerlink" title="5、AND OR 语句"></a>5、AND OR 语句</h2><p>​ bool 值运算关系</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SELECT</span> 
-	device_id<span class="token punctuation">,</span> gender<span class="token punctuation">,</span> age<span class="token punctuation">,</span> university<span class="token punctuation">,</span> gpa 
-<span class="token keyword">FROM</span> user_profile 
-<span class="token keyword">WHERE</span> gpa <span class="token operator">></span> <span class="token number">3.5</span> <span class="token operator">AND</span> gender <span class="token operator">=</span> <span class="token string">'male'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>	device_id, gender, age, university, gpa <br><span class="hljs-keyword">FROM</span> user_profile <br><span class="hljs-keyword">WHERE</span> gpa <span class="hljs-operator">&gt;</span> <span class="hljs-number">3.5</span> <span class="hljs-keyword">AND</span> gender <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;male&#x27;</span><br></code></pre></td></tr></table></figure>
 
 <p>​ 混合使用，AND 的优先级大于 OR</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SELECT</span> 
-	device_id<span class="token punctuation">,</span> gender<span class="token punctuation">,</span> age<span class="token punctuation">,</span> university<span class="token punctuation">,</span> gpa 
-<span class="token keyword">FROM</span> user_profile 
-<span class="token keyword">WHERE</span> <span class="token punctuation">(</span>gpa <span class="token operator">></span> <span class="token number">3.5</span> <span class="token operator">and</span> university <span class="token operator">=</span> <span class="token string">'山东大学'</span><span class="token punctuation">)</span> <span class="token operator">OR</span> <span class="token punctuation">(</span>gpa <span class="token operator">></span> <span class="token number">3.8</span> <span class="token operator">and</span> university <span class="token operator">=</span> <span class="token string">'复旦大学'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>	device_id, gender, age, university, gpa <br><span class="hljs-keyword">FROM</span> user_profile <br><span class="hljs-keyword">WHERE</span> (gpa <span class="hljs-operator">&gt;</span> <span class="hljs-number">3.5</span> <span class="hljs-keyword">and</span> university <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;山东大学&#x27;</span>) <span class="hljs-keyword">OR</span> (gpa <span class="hljs-operator">&gt;</span> <span class="hljs-number">3.8</span> <span class="hljs-keyword">and</span> university <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;复旦大学&#x27;</span>)<br></code></pre></td></tr></table></figure>
 
 <h2 id="6、模糊匹配"><a href="#6、模糊匹配" class="headerlink" title="6、模糊匹配"></a>6、模糊匹配</h2><p>​ 数据库中要进行模糊查询，主要使用以下操作</p>
 <blockquote>
@@ -411,97 +349,26 @@ where age &gt;&#x3D; 20 and age &lt;&#x3D; 23<span aria-hidden="true" class="lin
 <li>[^]: ^尖冒号 代表 非，取反的意思；不匹配中的任意一个字符。</li>
 </ol>
 </blockquote>
-<figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token operator">like</span> 模糊查询用法：
-  <span class="token string">'%北京'</span>   北京开头的
-  <span class="token string">'_北京%'</span>  第二三个字为北京 
-  <span class="token string">'%北京%'</span>  含有北京的
-
-tips: 
- 你了解哪些数据库优化技术？ 
- 答：<span class="token keyword">SQL</span>语句优化也属于数据库优化一部分，而我们的 <span class="token operator">like</span> 模糊查询会引起全表扫描，速度比较慢，应该尽量避免使用<span class="token operator">like</span>关键字进行模糊查询。
- 
-<span class="token keyword">SELECT</span> device_id<span class="token punctuation">,</span>age<span class="token punctuation">,</span>university <span class="token keyword">FROM</span> user_profile
-<span class="token keyword">WHERE</span> university <span class="token operator">LIKE</span> <span class="token string">'%北京%'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">like</span> 模糊查询用法：<br>  <span class="hljs-string">&#x27;%北京&#x27;</span>   北京开头的<br>  <span class="hljs-string">&#x27;_北京%&#x27;</span>  第二三个字为北京 <br>  <span class="hljs-string">&#x27;%北京%&#x27;</span>  含有北京的<br><br>tips: <br> 你了解哪些数据库优化技术？ <br> 答：<span class="hljs-keyword">SQL</span>语句优化也属于数据库优化一部分，而我们的 <span class="hljs-keyword">like</span> 模糊查询会引起全表扫描，速度比较慢，应该尽量避免使用<span class="hljs-keyword">like</span>关键字进行模糊查询。<br> <br><span class="hljs-keyword">SELECT</span> device_id,age,university <span class="hljs-keyword">FROM</span> user_profile<br><span class="hljs-keyword">WHERE</span> university <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;%北京%&#x27;</span><br></code></pre></td></tr></table></figure>
 
 <h2 id="7、SQL-中相应的一些函数"><a href="#7、SQL-中相应的一些函数" class="headerlink" title="7、SQL 中相应的一些函数"></a>7、SQL 中相应的一些函数</h2><p>​ 1、max</p>
 <p>​ 查找某个条件限制下的最小最大值时候，一般有两种方法：第一种为使用 最高分-降序排序，取第一一位。第二种为使用 max 函数也行</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SELECT</span> 
-    <span class="token function">max</span><span class="token punctuation">(</span>gpa<span class="token punctuation">)</span> 
-<span class="token keyword">FROM</span> user_profile 
-<span class="token keyword">WHERE</span> university <span class="token operator">=</span> <span class="token string">'复旦大学'</span>
-
-<span class="token comment"># 上为第二种，下为第一种方法</span>
-
-<span class="token keyword">SELECT</span> 
-    gpa 
-<span class="token keyword">FROM</span> user_profile 
-<span class="token keyword">WHERE</span> university <span class="token operator">=</span> <span class="token string">'复旦大学'</span> 
-<span class="token keyword">ORDER</span> <span class="token keyword">BY</span> gpa 
-<span class="token keyword">DESC</span> <span class="token keyword">limit</span> <span class="token number">1</span>
-
-<span class="token comment"># order by 为升序排列，order by desc 为降序排列</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>    <span class="hljs-built_in">max</span>(gpa) <br><span class="hljs-keyword">FROM</span> user_profile <br><span class="hljs-keyword">WHERE</span> university <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;复旦大学&#x27;</span><br><br># 上为第二种，下为第一种方法<br><br><span class="hljs-keyword">SELECT</span> <br>    gpa <br><span class="hljs-keyword">FROM</span> user_profile <br><span class="hljs-keyword">WHERE</span> university <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;复旦大学&#x27;</span> <br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> gpa <br><span class="hljs-keyword">DESC</span> limit <span class="hljs-number">1</span><br><br># <span class="hljs-keyword">order</span> <span class="hljs-keyword">by</span> 为升序排列，<span class="hljs-keyword">order</span> <span class="hljs-keyword">by</span> <span class="hljs-keyword">desc</span> 为降序排列<br></code></pre></td></tr></table></figure>
 
 <p>​ 2、count、round、avg 函数</p>
 <p>​ count 用于统计某个值的数量，round 用于保留几位小数，avg 用于求某一列的平均值</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">select</span> 
-    <span class="token function">COUNT</span><span class="token punctuation">(</span>gender<span class="token punctuation">)</span> <span class="token keyword">as</span> male_num<span class="token punctuation">,</span>
-    <span class="token function">round</span><span class="token punctuation">(</span><span class="token function">avg</span><span class="token punctuation">(</span>gpa<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token keyword">as</span> avg_gpa
-<span class="token keyword">from</span> user_profile <span class="token keyword">where</span> gender <span class="token operator">=</span> <span class="token string">'male'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <br>    <span class="hljs-built_in">COUNT</span>(gender) <span class="hljs-keyword">as</span> male_num,<br>    round(<span class="hljs-built_in">avg</span>(gpa), <span class="hljs-number">1</span>) <span class="hljs-keyword">as</span> avg_gpa<br><span class="hljs-keyword">from</span> user_profile <span class="hljs-keyword">where</span> gender <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;male&#x27;</span><br></code></pre></td></tr></table></figure>
 
 <p>​ 3、聚合函数结果作为筛选条件时，不能用where，而是用having语法，配合重命名即可；</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SELECT</span> 
-    university<span class="token punctuation">,</span>
-    <span class="token function">avg</span><span class="token punctuation">(</span>question_cnt<span class="token punctuation">)</span> <span class="token keyword">as</span> avg_question_cnt<span class="token punctuation">,</span>
-    <span class="token function">avg</span><span class="token punctuation">(</span>answer_cnt<span class="token punctuation">)</span> <span class="token keyword">as</span> avg_answer_cnt
-<span class="token keyword">FROM</span> user_profile 
-<span class="token keyword">GROUP</span> <span class="token keyword">BY</span> university
-<span class="token keyword">HAVING</span> avg_question_cnt <span class="token operator">&lt;</span> <span class="token number">5</span> <span class="token operator">OR</span> avg_answer_cnt <span class="token operator">&lt;</span> <span class="token number">20</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>    university,<br>    <span class="hljs-built_in">avg</span>(question_cnt) <span class="hljs-keyword">as</span> avg_question_cnt,<br>    <span class="hljs-built_in">avg</span>(answer_cnt) <span class="hljs-keyword">as</span> avg_answer_cnt<br><span class="hljs-keyword">FROM</span> user_profile <br><span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> university<br><span class="hljs-keyword">HAVING</span> avg_question_cnt <span class="hljs-operator">&lt;</span> <span class="hljs-number">5</span> <span class="hljs-keyword">OR</span> avg_answer_cnt <span class="hljs-operator">&lt;</span> <span class="hljs-number">20</span><br></code></pre></td></tr></table></figure>
 
 <h2 id="8、多表查询"><a href="#8、多表查询" class="headerlink" title="8、多表查询"></a>8、多表查询</h2><p>​ 若一个查询同时涉及两个或两个以上的表，则称之为连接查询。连接查询是关系数据库中最主要的查询。</p>
 <p>​ 连接查询包括：内连接、外连接、交叉连接等</p>
 <p>​ 连接查询用于连接两个表的条件称为连接条件或者连接谓词。</p>
 <p>​ 相应的语法如下：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SELECT</span> …
-<span class="token keyword">FROM</span> 表名
-<span class="token punctuation">[</span><span class="token keyword">INNER</span><span class="token punctuation">]</span> <span class="token keyword">JOIN</span> 被连接表
-<span class="token keyword">ON</span> 连接条件
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> …<br><span class="hljs-keyword">FROM</span> 表名<br>[<span class="hljs-keyword">INNER</span>] <span class="hljs-keyword">JOIN</span> 被连接表<br><span class="hljs-keyword">ON</span> 连接条件<br><br>#以上结果中会包含重复的列<br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> 学生表<br><span class="hljs-keyword">INNER</span> <span class="hljs-keyword">JOIN</span> 班级表 <span class="hljs-keyword">ON</span> 学生表.班号<span class="hljs-operator">=</span>班级表.班号<br><br>#去除重复列！<br><span class="hljs-keyword">SELECT</span> 学号, 姓名, 班级表.班号, 班名 <span class="hljs-keyword">FROM</span> 学生表 <span class="hljs-keyword">JOIN</span> 班级表 <span class="hljs-keyword">ON</span> 学生表.班号<span class="hljs-operator">=</span>班级表.班号<br><br># 举几个多表连接的例子，多体会<br><span class="hljs-keyword">select</span><br>    u.university,<br>    <span class="hljs-built_in">count</span>(q.question_id) <span class="hljs-operator">/</span> <span class="hljs-built_in">count</span>(<span class="hljs-keyword">DISTINCT</span> (q.device_id)) <span class="hljs-keyword">as</span> avg_answer_cnt <br><span class="hljs-keyword">from</span> user_profile <span class="hljs-keyword">as</span> u<br><span class="hljs-keyword">right</span> <span class="hljs-keyword">join</span> question_practice_detail <span class="hljs-keyword">as</span> q <br><span class="hljs-keyword">on</span> u.device_id <span class="hljs-operator">=</span> q.device_id<br><span class="hljs-keyword">group</span> <span class="hljs-keyword">by</span> u.university<br><br># <span class="hljs-keyword">right</span> <span class="hljs-keyword">join</span> 联结结果保留右表的全部数据<br># <span class="hljs-keyword">left</span> <span class="hljs-keyword">join</span>  联结结果保留左表的全部数据<br># <span class="hljs-keyword">inner</span> <span class="hljs-keyword">join</span> 保留两表的公共数据<br></code></pre></td></tr></table></figure>
 
-<span class="token comment">#以上结果中会包含重复的列</span>
-<span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> 学生表
-<span class="token keyword">INNER</span> <span class="token keyword">JOIN</span> 班级表 <span class="token keyword">ON</span> 学生表<span class="token punctuation">.</span>班号<span class="token operator">=</span>班级表<span class="token punctuation">.</span>班号
-
-<span class="token comment">#去除重复列！</span>
-<span class="token keyword">SELECT</span> 学号<span class="token punctuation">,</span> 姓名<span class="token punctuation">,</span> 班级表<span class="token punctuation">.</span>班号<span class="token punctuation">,</span> 班名 <span class="token keyword">FROM</span> 学生表 <span class="token keyword">JOIN</span> 班级表 <span class="token keyword">ON</span> 学生表<span class="token punctuation">.</span>班号<span class="token operator">=</span>班级表<span class="token punctuation">.</span>班号
-
-<span class="token comment"># 举几个多表连接的例子，多体会</span>
-<span class="token keyword">select</span>
-    u<span class="token punctuation">.</span>university<span class="token punctuation">,</span>
-    <span class="token function">count</span><span class="token punctuation">(</span>q<span class="token punctuation">.</span>question_id<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token keyword">DISTINCT</span> <span class="token punctuation">(</span>q<span class="token punctuation">.</span>device_id<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">as</span> avg_answer_cnt 
-<span class="token keyword">from</span> user_profile <span class="token keyword">as</span> u
-<span class="token keyword">right</span> <span class="token keyword">join</span> question_practice_detail <span class="token keyword">as</span> q 
-<span class="token keyword">on</span> u<span class="token punctuation">.</span>device_id <span class="token operator">=</span> q<span class="token punctuation">.</span>device_id
-<span class="token keyword">group</span> <span class="token keyword">by</span> u<span class="token punctuation">.</span>university
-
-<span class="token comment"># right join 联结结果保留右表的全部数据</span>
-<span class="token comment"># left join  联结结果保留左表的全部数据</span>
-<span class="token comment"># inner join 保留两表的公共数据</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<h2 id="9、组合查询"><a href="#9、组合查询" class="headerlink" title="9、组合查询"></a>9、组合查询</h2><figure><div class="code-wrapper"><pre class="line-numbers language-sql" data-language="sql"><code class="language-sql">题目：现在运营想要分别查看学校为山东大学或者性别为男性的用户的device_id、gender、age和gpa数据，请取出相应结果，结果不去重。
-
-<span class="token keyword">select</span> 
-    device_id<span class="token punctuation">,</span> gender<span class="token punctuation">,</span> age<span class="token punctuation">,</span> gpa 
-<span class="token keyword">from</span> user_profile 
-<span class="token keyword">where</span> university <span class="token operator">=</span> <span class="token string">'山东大学'</span>
-<span class="token keyword">union</span> <span class="token keyword">all</span>
-<span class="token keyword">select</span> 
-    device_id<span class="token punctuation">,</span> gender<span class="token punctuation">,</span> age<span class="token punctuation">,</span> gpa 
-<span class="token keyword">from</span> user_profile 
-<span class="token keyword">where</span> gender <span class="token operator">=</span> <span class="token string">'male'</span>
- 
-使用以下语句，会去重
-<span class="token keyword">where</span> university <span class="token operator">=</span> <span class="token string">'山东大学'</span> <span class="token operator">or</span> gender <span class="token operator">=</span> <span class="token string">'male'</span>
- 
-<span class="token keyword">union</span> 会去重， <span class="token keyword">union</span> <span class="token keyword">all</span> 不会去重<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h2 id="9、组合查询"><a href="#9、组合查询" class="headerlink" title="9、组合查询"></a>9、组合查询</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs sql">题目：现在运营想要分别查看学校为山东大学或者性别为男性的用户的device_id、gender、age和gpa数据，请取出相应结果，结果不去重。<br><br><span class="hljs-keyword">select</span> <br>    device_id, gender, age, gpa <br><span class="hljs-keyword">from</span> user_profile <br><span class="hljs-keyword">where</span> university <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;山东大学&#x27;</span><br><span class="hljs-keyword">union</span> <span class="hljs-keyword">all</span><br><span class="hljs-keyword">select</span> <br>    device_id, gender, age, gpa <br><span class="hljs-keyword">from</span> user_profile <br><span class="hljs-keyword">where</span> gender <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;male&#x27;</span><br> <br>使用以下语句，会去重<br><span class="hljs-keyword">where</span> university <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;山东大学&#x27;</span> <span class="hljs-keyword">or</span> gender <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;male&#x27;</span><br> <br><span class="hljs-keyword">union</span> 会去重， <span class="hljs-keyword">union</span> <span class="hljs-keyword">all</span> 不会去重<br></code></pre></td></tr></table></figure>
 
 
 <hr>
@@ -891,8 +758,6 @@ tips:
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

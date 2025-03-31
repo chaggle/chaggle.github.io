@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="16. 最接近的三数之和题目给你一个长度为 n 的整数数组 nums 和 一个目标值 target。  请你从 nums 中选出三个整数，使它们的和与 target 最接近。  返回这三个数的和。  假定每组输入只存在恰好一个解。     示例 1：  输入：nums &#x3D; [-1,2,1,-4], target &#x3D; 1 输出：2 解释：与 target 最接近的和是 2 (-1 + 2 + 1 &#x3D;">
+    <meta name="description" content="16. 最接近的三数之和题目1234567891011121314151617181920212223242526给你一个长度为 n 的整数数组 nums 和 一个目标值 target。请你从 nums 中选出三个整数，使它们的和与 target 最接近。返回这三个数的和。假定每组输入只存在恰好一个解。 示例 1：输入：nums &#x3D; [-1,2,1,-4], target &#x3D; 1输出：2解释：与">
 <meta property="og:type" content="article">
 <meta property="og:title" content="16. 最接近的三数之和">
 <meta property="og:url" content="https://chaggle.github.io/2021/10/08/Leetcode/16/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="16. 最接近的三数之和题目给你一个长度为 n 的整数数组 nums 和 一个目标值 target。  请你从 nums 中选出三个整数，使它们的和与 target 最接近。  返回这三个数的和。  假定每组输入只存在恰好一个解。     示例 1：  输入：nums &#x3D; [-1,2,1,-4], target &#x3D; 1 输出：2 解释：与 target 最接近的和是 2 (-1 + 2 + 1 &#x3D;">
+<meta property="og:description" content="16. 最接近的三数之和题目1234567891011121314151617181920212223242526给你一个长度为 n 的整数数组 nums 和 一个目标值 target。请你从 nums 中选出三个整数，使它们的和与 target 最接近。返回这三个数的和。假定每组输入只存在恰好一个解。 示例 1：输入：nums &#x3D; [-1,2,1,-4], target &#x3D; 1输出：2解释：与">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-07T23:47:55.000Z">
 <meta property="article:modified_time" content="2025-03-30T04:48:52.440Z">
@@ -45,8 +45,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -232,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          442 字
+          445 字
         
       </span>
     
@@ -304,86 +302,12 @@
             
               <div class="markdown-body">
                 
-                <h1 id="16-最接近的三数之和"><a href="#16-最接近的三数之和" class="headerlink" title="16. 最接近的三数之和"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/3sum-closest/">16. 最接近的三数之和</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go">给你一个长度为 n 的整数数组 nums 和 一个目标值 target。
-
-请你从 nums 中选出三个整数，使它们的和与 target 最接近。
-
-返回这三个数的和。
-
-假定每组输入只存在恰好一个解。
-
- 
-
-示例 <span class="token number">1</span>：
-
-输入：nums <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token operator">-</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">=</span> <span class="token number">1</span>
-输出：<span class="token number">2</span>
-解释：与 target 最接近的和是 <span class="token number">2</span> <span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span> <span class="token operator">+</span> <span class="token number">2</span> <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">)</span> 。
-示例 <span class="token number">2</span>：
-
-输入：nums <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">=</span> <span class="token number">1</span>
-输出：<span class="token number">0</span>
- 
-
-提示：
-
-<span class="token number">3</span> <span class="token operator">&lt;=</span> nums<span class="token punctuation">.</span>length <span class="token operator">&lt;=</span> <span class="token number">1000</span>
-<span class="token operator">-</span><span class="token number">1000</span> <span class="token operator">&lt;=</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&lt;=</span> <span class="token number">1000</span>
-<span class="token operator">-</span><span class="token number">104</span> <span class="token operator">&lt;=</span> target <span class="token operator">&lt;=</span> <span class="token number">104</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+                <h1 id="16-最接近的三数之和"><a href="#16-最接近的三数之和" class="headerlink" title="16. 最接近的三数之和"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/3sum-closest/">16. 最接近的三数之和</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs go">给你一个长度为 n 的整数数组 nums 和 一个目标值 target。<br><br>请你从 nums 中选出三个整数，使它们的和与 target 最接近。<br><br>返回这三个数的和。<br><br>假定每组输入只存在恰好一个解。<br><br> <br><br>示例 <span class="hljs-number">1</span>：<br><br>输入：nums = [<span class="hljs-number">-1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">1</span>,<span class="hljs-number">-4</span>], target = <span class="hljs-number">1</span><br>输出：<span class="hljs-number">2</span><br>解释：与 target 最接近的和是 <span class="hljs-number">2</span> (<span class="hljs-number">-1</span> + <span class="hljs-number">2</span> + <span class="hljs-number">1</span> = <span class="hljs-number">2</span>) 。<br>示例 <span class="hljs-number">2</span>：<br><br>输入：nums = [<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>], target = <span class="hljs-number">1</span><br>输出：<span class="hljs-number">0</span><br> <br><br>提示：<br><br><span class="hljs-number">3</span> &lt;= nums.length &lt;= <span class="hljs-number">1000</span><br><span class="hljs-number">-1000</span> &lt;= nums[i] &lt;= <span class="hljs-number">1000</span><br><span class="hljs-number">-104</span> &lt;= target &lt;= <span class="hljs-number">104</span><br></code></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <p>1、本题跟两数之和，三数之和都是一样的双指针解法，<br>2、首先是先对数组进行排序，然后确定第一个点，之后开始双指针遍历数组前后每一个值，由于是找最接近的数，所以如果相等，直接返回值即可。<br>3、如果三数之和 sum 大于目标值，则让右端点 r–，反之让左端点 l++；如果在 i &gt; 0 的情况下 nums[i] 跟 nums[i-1] 的值相等，那么之后遍历返回的三数之和情况也相等，所以在只返回唯一合适的值的时候可以使用 continue 直接跳过本轮循环进行优化。</p>
 </blockquote>
-<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">threeSumClosest</span><span class="token punctuation">(</span>nums <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> target <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">int</span> <span class="token punctuation">&#123;</span>
-    n <span class="token operator">:=</span> <span class="token function">len</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span>
-
-    <span class="token keyword">if</span> n <span class="token operator">==</span> <span class="token number">3</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">return</span> nums<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">+</span> nums<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">+</span> nums<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span>
-    <span class="token punctuation">&#125;</span>
-
-    sort<span class="token punctuation">.</span><span class="token function">Ints</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span>
-    min <span class="token operator">:=</span> math<span class="token punctuation">.</span>MaxInt32
-
-    update <span class="token operator">:=</span> <span class="token keyword">func</span> <span class="token punctuation">(</span>sum <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">if</span> <span class="token function">abs</span><span class="token punctuation">(</span>min <span class="token operator">-</span> target<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token function">abs</span><span class="token punctuation">(</span>sum <span class="token operator">-</span> target<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-            min <span class="token operator">=</span> sum
-        <span class="token punctuation">&#125;</span>
-    <span class="token punctuation">&#125;</span>
-
-    <span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> n <span class="token operator">-</span> <span class="token number">2</span><span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">&#123;</span>
-        
-        <span class="token keyword">if</span> i <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">==</span> nums<span class="token punctuation">[</span>i <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">&#123;</span>
-            <span class="token keyword">continue</span>
-        <span class="token punctuation">&#125;</span>
-
-        l<span class="token punctuation">,</span> r <span class="token operator">:=</span> i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> n <span class="token operator">-</span> <span class="token number">1</span>
-
-        <span class="token keyword">for</span> l <span class="token operator">&lt;</span> r <span class="token punctuation">&#123;</span>
-            sum <span class="token operator">:=</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> nums<span class="token punctuation">[</span>l<span class="token punctuation">]</span> <span class="token operator">+</span> nums<span class="token punctuation">[</span>r<span class="token punctuation">]</span>
-
-            <span class="token function">update</span><span class="token punctuation">(</span>sum<span class="token punctuation">)</span>
-
-            <span class="token keyword">if</span> sum <span class="token operator">==</span> target <span class="token punctuation">&#123;</span>
-                <span class="token keyword">return</span> sum
-            <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> sum <span class="token operator">></span> target <span class="token punctuation">&#123;</span>
-                r<span class="token operator">--</span>
-            <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> sum <span class="token operator">&lt;</span> target <span class="token punctuation">&#123;</span>
-                l<span class="token operator">++</span>
-            <span class="token punctuation">&#125;</span>
-        <span class="token punctuation">&#125;</span>
-    <span class="token punctuation">&#125;</span>
-
-    <span class="token keyword">return</span> min
-<span class="token punctuation">&#125;</span>
-
-
-<span class="token keyword">func</span> <span class="token function">abs</span><span class="token punctuation">(</span>x <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">int</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">if</span> x <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token punctuation">&#123;</span>
-        x <span class="token operator">=</span> <span class="token operator">-</span>x
-    <span class="token punctuation">&#125;</span>
-
-    <span class="token keyword">return</span> x
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">threeSumClosest</span><span class="hljs-params">(nums []<span class="hljs-type">int</span>, target <span class="hljs-type">int</span>)</span></span> <span class="hljs-type">int</span> &#123;<br>    n := <span class="hljs-built_in">len</span>(nums)<br><br>    <span class="hljs-keyword">if</span> n == <span class="hljs-number">3</span> &#123;<br>        <span class="hljs-keyword">return</span> nums[<span class="hljs-number">0</span>] + nums[<span class="hljs-number">1</span>] + nums[<span class="hljs-number">2</span>]<br>    &#125;<br><br>    sort.Ints(nums)<br>    min := math.MaxInt32<br><br>    update := <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(sum <span class="hljs-type">int</span>)</span></span> &#123;<br>        <span class="hljs-keyword">if</span> abs(min - target) &gt; abs(sum - target) &#123;<br>            min = sum<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; n - <span class="hljs-number">2</span>; i++ &#123;<br>        <br>        <span class="hljs-keyword">if</span> i &gt; <span class="hljs-number">0</span> &amp;&amp; nums[i] == nums[i - <span class="hljs-number">1</span>] &#123;<br>            <span class="hljs-keyword">continue</span><br>        &#125;<br><br>        l, r := i + <span class="hljs-number">1</span>, n - <span class="hljs-number">1</span><br><br>        <span class="hljs-keyword">for</span> l &lt; r &#123;<br>            sum := nums[i] + nums[l] + nums[r]<br><br>            update(sum)<br><br>            <span class="hljs-keyword">if</span> sum == target &#123;<br>                <span class="hljs-keyword">return</span> sum<br>            &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> sum &gt; target &#123;<br>                r--<br>            &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> sum &lt; target &#123;<br>                l++<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> min<br>&#125;<br><br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">abs</span><span class="hljs-params">(x <span class="hljs-type">int</span>)</span></span> <span class="hljs-type">int</span> &#123;<br>    <span class="hljs-keyword">if</span> x &lt; <span class="hljs-number">0</span> &#123;<br>        x = -x<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> x<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n^2)</p>
@@ -776,8 +700,6 @@
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

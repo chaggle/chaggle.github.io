@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="本文主要写法参考C++ STL函数库  map简介map是STL（中文标准模板库）的一个关联容器。   可以将任何基本类型映射到任何基本类型。如int array[100]事实上就是定义了一个int型到int型的映射。 map提供一对一的数据处理，key-value键值对，其类型可以自己定义，第一个称为关键字，第二个为关键字的值 map内部是自动排序的   map的用法必须引入包 #includ">
+    <meta name="description" content="本文主要写法参考C++ STL函数库  map简介map是STL（中文标准模板库）的一个关联容器。   可以将任何基本类型映射到任何基本类型。如int array[100]事实上就是定义了一个int型到int型的映射。 map提供一对一的数据处理，key-value键值对，其类型可以自己定义，第一个称为关键字，第二个为关键字的值 map内部是自动排序的   map的用法必须引入包 1#inclu">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CPP Map container 学习">
 <meta property="og:url" content="https://chaggle.github.io/2020/10/11/cpp/Map/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="本文主要写法参考C++ STL函数库  map简介map是STL（中文标准模板库）的一个关联容器。   可以将任何基本类型映射到任何基本类型。如int array[100]事实上就是定义了一个int型到int型的映射。 map提供一对一的数据处理，key-value键值对，其类型可以自己定义，第一个称为关键字，第二个为关键字的值 map内部是自动排序的   map的用法必须引入包 #includ">
+<meta property="og:description" content="本文主要写法参考C++ STL函数库  map简介map是STL（中文标准模板库）的一个关联容器。   可以将任何基本类型映射到任何基本类型。如int array[100]事实上就是定义了一个int型到int型的映射。 map提供一对一的数据处理，key-value键值对，其类型可以自己定义，第一个称为关键字，第二个为关键字的值 map内部是自动排序的   map的用法必须引入包 1#inclu">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-10-10T18:02:31.000Z">
 <meta property="article:modified_time" content="2025-03-07T02:50:09.265Z">
@@ -46,8 +46,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -233,7 +231,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          561 字
+          606 字
         
       </span>
     
@@ -244,7 +242,7 @@
         
         
         
-          5 分钟
+          6 分钟
         
       </span>
     
@@ -317,11 +315,11 @@
 </ol>
 </blockquote>
 <h2 id="map的用法"><a href="#map的用法" class="headerlink" title="map的用法"></a>map的用法</h2><p>必须引入包</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;map></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;map&gt;</span></span><br></code></pre></td></tr></table></figure>
 
 <p>map的定义</p>
 <p>map&lt;type1name, type2name&gt; maps;&#x2F;&#x2F;第一个是键的类型，第二个是值的类型</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">map<span class="token operator">&lt;</span>string<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">></span> maps<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">map&lt;string, <span class="hljs-type">int</span>&gt; maps;<br></code></pre></td></tr></table></figure>
 
 <p><strong>map容器内元素的访问</strong></p>
 <blockquote>
@@ -330,38 +328,13 @@
 <p>  通过迭代器进行访问</p>
 </blockquote>
 <p>map可以使用it -&gt; first来访问键，使用it -&gt; second访问值</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;map></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
-<span class="token keyword">using</span> <span class="token keyword">namespace</span> std<span class="token punctuation">;</span>
-<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token punctuation">&#123;</span>
-   map<span class="token operator">&lt;</span><span class="token keyword">char</span><span class="token punctuation">,</span><span class="token keyword">int</span><span class="token operator">></span> maps<span class="token punctuation">;</span>
-   maps<span class="token punctuation">[</span><span class="token char">'a'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">;</span>
-   maps<span class="token punctuation">[</span><span class="token char">'b'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">20</span><span class="token punctuation">;</span>
-   maps<span class="token punctuation">[</span><span class="token char">'c'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">30</span><span class="token punctuation">;</span>
-   <span class="token keyword">for</span><span class="token punctuation">(</span>map<span class="token operator">&lt;</span><span class="token keyword">char</span><span class="token punctuation">,</span><span class="token keyword">int</span><span class="token operator">></span><span class="token double-colon punctuation">::</span>iterator it<span class="token operator">=</span>mp<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> it<span class="token operator">!=</span>mp<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> it<span class="token operator">++</span><span class="token punctuation">)</span>
-   <span class="token punctuation">&#123;</span>
-       cout<span class="token operator">&lt;&lt;</span>it <span class="token operator">-></span> first<span class="token operator">&lt;&lt;</span><span class="token string">" "</span><span class="token operator">&lt;&lt;</span>it <span class="token operator">-></span> second<span class="token operator">&lt;&lt;</span>endl<span class="token punctuation">;</span>
-   <span class="token punctuation">&#125;</span>
-   <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;map&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>   map&lt;<span class="hljs-type">char</span>,<span class="hljs-type">int</span>&gt; maps;<br>   maps[<span class="hljs-string">&#x27;a&#x27;</span>] = <span class="hljs-number">10</span>;<br>   maps[<span class="hljs-string">&#x27;b&#x27;</span>] = <span class="hljs-number">20</span>;<br>   maps[<span class="hljs-string">&#x27;c&#x27;</span>] = <span class="hljs-number">30</span>;<br>   <span class="hljs-keyword">for</span>(map&lt;<span class="hljs-type">char</span>,<span class="hljs-type">int</span>&gt;::iterator it=mp.<span class="hljs-built_in">begin</span>(); it!=mp.<span class="hljs-built_in">end</span>(); it++)<br>   &#123;<br>       cout&lt;&lt;it -&gt; first&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;it -&gt; second&lt;&lt;endl;<br>   &#125;<br>   <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p><strong>map的常用用法</strong></p>
 <ul>
 <li>maps.insert() 插入</li>
 </ul>
-<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token comment">// 定义一个map对象</span>
-map<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> string<span class="token operator">></span> m<span class="token punctuation">;</span>
- 
-<span class="token comment">//用insert函数插入pair</span>
-m<span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span><span class="token generic-function"><span class="token function">pair</span><span class="token generic class-name"><span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> string<span class="token operator">></span></span></span><span class="token punctuation">(</span><span class="token number">11</span><span class="token punctuation">,</span> <span class="token string">"kk"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
- 
-<span class="token comment">// 用insert函数插入value_type数据</span>
-m<span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span><span class="token class-name">map</span><span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> string<span class="token operator">></span><span class="token double-colon punctuation">::</span><span class="token function">value_type</span><span class="token punctuation">(</span><span class="token number">22</span><span class="token punctuation">,</span> <span class="token string">"pp"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
- 
-<span class="token comment">// 用数组方式插入</span>
-m<span class="token punctuation">[</span><span class="token number">12</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"dd"</span><span class="token punctuation">;</span>
-m<span class="token punctuation">[</span><span class="token number">34</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"ff"</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// 定义一个map对象</span><br>map&lt;<span class="hljs-type">int</span>, string&gt; m;<br> <br><span class="hljs-comment">//用insert函数插入pair</span><br>m.<span class="hljs-built_in">insert</span>(<span class="hljs-built_in">pair</span>&lt;<span class="hljs-type">int</span>, string&gt;(<span class="hljs-number">11</span>, <span class="hljs-string">&quot;kk&quot;</span>));<br> <br><span class="hljs-comment">// 用insert函数插入value_type数据</span><br>m.<span class="hljs-built_in">insert</span>(map&lt;<span class="hljs-type">int</span>, string&gt;::<span class="hljs-built_in">value_type</span>(<span class="hljs-number">22</span>, <span class="hljs-string">&quot;pp&quot;</span>));<br> <br><span class="hljs-comment">// 用数组方式插入</span><br>m[<span class="hljs-number">12</span>] = <span class="hljs-string">&quot;dd&quot;</span>;<br>m[<span class="hljs-number">34</span>] = <span class="hljs-string">&quot;ff&quot;</span>;<br></code></pre></td></tr></table></figure>
 
 <ul>
 <li>maps.find()  查找一个元素</li>
@@ -375,32 +348,7 @@ m<span class="token punctuation">[</span><span class="token number">34</span><sp
 <li>maps.empty()判断其是否为空</li>
 <li>maps.swap()交换两个map</li>
 </ul>
-<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">map<span class="token operator">&lt;</span>string<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">></span><span class="token double-colon punctuation">::</span>iterator it<span class="token punctuation">;</span>
-
-it<span class="token operator">=</span>maps<span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span><span class="token string">"123"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//迭代器刪除</span>
-it <span class="token operator">=</span> maps<span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span><span class="token string">"123"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-maps<span class="token punctuation">.</span><span class="token function">erase</span><span class="token punctuation">(</span>it<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//关键字删除</span>
-<span class="token keyword">int</span> n <span class="token operator">=</span> maps<span class="token punctuation">.</span><span class="token function">erase</span><span class="token punctuation">(</span><span class="token string">"123"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//如果刪除了返回1，否则返回0</span>
-
-<span class="token comment">//用迭代器范围刪除 : 把整个map清空</span>
-maps<span class="token punctuation">.</span><span class="token function">erase</span><span class="token punctuation">(</span>maps<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> maps<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token comment">//等同于maps.clear()</span>
-
-<span class="token keyword">int</span> len <span class="token operator">=</span> maps<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>获取到map中映射的次数
-
-<span class="token comment">//迭代</span>
-map<span class="token operator">&lt;</span>string<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">></span><span class="token double-colon punctuation">::</span>iterator it<span class="token punctuation">;</span>
-<span class="token keyword">for</span><span class="token punctuation">(</span>it <span class="token operator">=</span> maps<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> it <span class="token operator">!=</span> maps<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> it<span class="token operator">++</span><span class="token punctuation">)</span>
-    cout<span class="token operator">&lt;&lt;</span> it<span class="token operator">-></span> first<span class="token operator">&lt;&lt;</span><span class="token string">" "</span><span class="token operator">&lt;&lt;</span>itr <span class="token operator">-></span> second<span class="token operator">&lt;&lt;</span>endl<span class="token punctuation">;</span><span class="token comment">//输出key 和value值</span>
-
-<span class="token comment">//反向迭代</span>
-map<span class="token operator">&lt;</span>string<span class="token punctuation">,</span><span class="token keyword">int</span><span class="token operator">></span><span class="token double-colon punctuation">::</span>reverse_iterator it<span class="token punctuation">;</span>
-<span class="token keyword">for</span><span class="token punctuation">(</span>it <span class="token operator">=</span> maps<span class="token punctuation">.</span><span class="token function">rbegin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> it <span class="token operator">!=</span> maps<span class="token punctuation">.</span><span class="token function">rend</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> it<span class="token operator">++</span><span class="token punctuation">)</span>
-    cout<span class="token operator">&lt;&lt;</span>it <span class="token operator">-></span> first<span class="token operator">&lt;&lt;</span><span class="token char">' '</span><span class="token operator">&lt;&lt;</span>it <span class="token operator">-></span> second<span class="token operator">&lt;&lt;</span>endl<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs cpp">map&lt;string, <span class="hljs-type">int</span>&gt;::iterator it;<br><br>it=maps.<span class="hljs-built_in">find</span>(<span class="hljs-string">&quot;123&quot;</span>);<br><br><span class="hljs-comment">//迭代器刪除</span><br>it = maps.<span class="hljs-built_in">find</span>(<span class="hljs-string">&quot;123&quot;</span>);<br>maps.<span class="hljs-built_in">erase</span>(it);<br><br><span class="hljs-comment">//关键字删除</span><br><span class="hljs-type">int</span> n = maps.<span class="hljs-built_in">erase</span>(<span class="hljs-string">&quot;123&quot;</span>); <span class="hljs-comment">//如果刪除了返回1，否则返回0</span><br><br><span class="hljs-comment">//用迭代器范围刪除 : 把整个map清空</span><br>maps.<span class="hljs-built_in">erase</span>(maps.<span class="hljs-built_in">begin</span>(), maps.<span class="hljs-built_in">end</span>());<br><span class="hljs-comment">//等同于maps.clear()</span><br><br><span class="hljs-type">int</span> len = maps.<span class="hljs-built_in">size</span>();获取到map中映射的次数<br><br><span class="hljs-comment">//迭代</span><br>map&lt;string, <span class="hljs-type">int</span>&gt;::iterator it;<br><span class="hljs-keyword">for</span>(it = maps.<span class="hljs-built_in">begin</span>(); it != maps.<span class="hljs-built_in">end</span>(); it++)<br>    cout&lt;&lt; it-&gt; first&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;itr -&gt; second&lt;&lt;endl;<span class="hljs-comment">//输出key 和value值</span><br><br><span class="hljs-comment">//反向迭代</span><br>map&lt;string,<span class="hljs-type">int</span>&gt;::reverse_iterator it;<br><span class="hljs-keyword">for</span>(it = maps.<span class="hljs-built_in">rbegin</span>(); it != maps.<span class="hljs-built_in">rend</span>(); it++)<br>    cout&lt;&lt;it -&gt; first&lt;&lt;<span class="hljs-string">&#x27; &#x27;</span>&lt;&lt;it -&gt; second&lt;&lt;endl;<br></code></pre></td></tr></table></figure>
 
                 
               </div>
@@ -788,8 +736,6 @@ map<span class="token operator">&lt;</span>string<span class="token punctuation"
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

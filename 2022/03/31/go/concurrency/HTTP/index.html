@@ -46,8 +46,6 @@
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
 
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
-
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
 
@@ -243,7 +241,7 @@
         
         
         
-          14 分钟
+          15 分钟
         
       </span>
     
@@ -357,113 +355,10 @@
 </blockquote>
 <h2 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h2><p>在服务器端，<strong>使用 sync.Map 数据结构对传输的字符串进行存储，防止进行并发访问与并发存储</strong>，但是由于自己在并发的能力功底不足，导致虽然设计是 sync.Map 控制，但仍存在 data race 的情况，无奈之下还是对一整段进行了加锁处理，其实也能使用全局的 channel 进行处理。但是这都与最初自己想要一步实现拒绝数据的竞争性访问的设计理念冲突，暂时也没想到很好的解决办法！等日后再对其进行优化！</p>
 <h3 id="代码附件"><a href="#代码附件" class="headerlink" title="代码附件"></a>代码附件</h3><p>客户端：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">package</span> gohttp
-
-<span class="token keyword">import</span> <span class="token punctuation">(</span>
-	<span class="token string">"bytes"</span>
-	<span class="token string">"fmt"</span>
-	<span class="token string">"io"</span>
-	<span class="token string">"io/ioutil"</span>
-	<span class="token string">"net/http"</span>
-	<span class="token string">"strings"</span>
-	<span class="token string">"time"</span>
-<span class="token punctuation">)</span>
-
-<span class="token keyword">func</span> <span class="token function">BcjClient</span><span class="token punctuation">(</span>writer <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-	<span class="token keyword">var</span> r <span class="token operator">*</span>http<span class="token punctuation">.</span>Response
-	<span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
-		client <span class="token operator">:=</span> <span class="token operator">&amp;</span>http<span class="token punctuation">.</span>Client<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
-		req<span class="token punctuation">,</span> err <span class="token operator">:=</span> http<span class="token punctuation">.</span><span class="token function">NewRequest</span><span class="token punctuation">(</span>
-			http<span class="token punctuation">.</span>MethodPost<span class="token punctuation">,</span>
-			<span class="token string">"http://127.0.0.1:8999/v1"</span><span class="token punctuation">,</span>
-			bytes<span class="token punctuation">.</span><span class="token function">NewReader</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token function">byte</span><span class="token punctuation">(</span>writer<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-		<span class="token punctuation">)</span>
-		
-		req<span class="token punctuation">.</span>Header<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token string">"Token"</span><span class="token punctuation">,</span> <span class="token string">"Client"</span><span class="token punctuation">)</span>
-		req<span class="token punctuation">.</span>Header<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token string">"content-Type"</span><span class="token punctuation">,</span> <span class="token string">"text/plain"</span><span class="token punctuation">)</span>
-
-		r<span class="token punctuation">,</span> err <span class="token operator">=</span> client<span class="token punctuation">.</span><span class="token function">Do</span><span class="token punctuation">(</span>req<span class="token punctuation">)</span>
-		<span class="token keyword">if</span> err <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
-			<span class="token keyword">break</span>
-		<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
-			fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"err: %s\n"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
-			time<span class="token punctuation">.</span><span class="token function">Sleep</span><span class="token punctuation">(</span><span class="token number">3</span> <span class="token operator">*</span> time<span class="token punctuation">.</span>Second<span class="token punctuation">)</span>
-			<span class="token keyword">continue</span>
-		<span class="token punctuation">&#125;</span>
-	<span class="token punctuation">&#125;</span>
-	<span class="token keyword">defer</span> <span class="token keyword">func</span><span class="token punctuation">(</span>Body io<span class="token punctuation">.</span>ReadCloser<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-		<span class="token boolean">_</span> <span class="token operator">=</span> Body<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-	<span class="token punctuation">&#125;</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>Body<span class="token punctuation">)</span>
-
-	content<span class="token punctuation">,</span> err <span class="token operator">:=</span> ioutil<span class="token punctuation">.</span><span class="token function">ReadAll</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>Body<span class="token punctuation">)</span>
-	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
-		<span class="token keyword">return</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> err
-	<span class="token punctuation">&#125;</span>
-
-	<span class="token comment">//将传入的字符串变成字符串切片，并除去最后的换行格式问题！</span>
-	ToVisual <span class="token operator">:=</span> strings<span class="token punctuation">.</span><span class="token function">Split</span><span class="token punctuation">(</span><span class="token function">string</span><span class="token punctuation">(</span>content<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">" "</span><span class="token punctuation">)</span>
-	ToVisual <span class="token operator">=</span> ToVisual<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token function">len</span><span class="token punctuation">(</span>ToVisual<span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
-	<span class="token comment">/*fmt.Printf("%s\n", ToVisual)*/</span>
-
-	<span class="token keyword">return</span> ToVisual<span class="token punctuation">,</span> <span class="token boolean">nil</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token comment">/*func main() &#123;
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() &#123;
-		BcjClient(scanner.Text())
-	&#125;
-&#125;*/</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> gohttp<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;bytes&quot;</span><br>	<span class="hljs-string">&quot;fmt&quot;</span><br>	<span class="hljs-string">&quot;io&quot;</span><br>	<span class="hljs-string">&quot;io/ioutil&quot;</span><br>	<span class="hljs-string">&quot;net/http&quot;</span><br>	<span class="hljs-string">&quot;strings&quot;</span><br>	<span class="hljs-string">&quot;time&quot;</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BcjClient</span><span class="hljs-params">(writer <span class="hljs-type">string</span>)</span></span> ([]<span class="hljs-type">string</span>, <span class="hljs-type">error</span>) &#123;<br>	<span class="hljs-keyword">var</span> r *http.Response<br>	<span class="hljs-keyword">for</span> &#123;<br>		client := &amp;http.Client&#123;&#125;<br>		req, err := http.NewRequest(<br>			http.MethodPost,<br>			<span class="hljs-string">&quot;http://127.0.0.1:8999/v1&quot;</span>,<br>			bytes.NewReader([]<span class="hljs-type">byte</span>(writer)),<br>		)<br>		<br>		req.Header.Add(<span class="hljs-string">&quot;Token&quot;</span>, <span class="hljs-string">&quot;Client&quot;</span>)<br>		req.Header.Add(<span class="hljs-string">&quot;content-Type&quot;</span>, <span class="hljs-string">&quot;text/plain&quot;</span>)<br><br>		r, err = client.Do(req)<br>		<span class="hljs-keyword">if</span> err == <span class="hljs-literal">nil</span> &#123;<br>			<span class="hljs-keyword">break</span><br>		&#125; <span class="hljs-keyword">else</span> &#123;<br>			fmt.Printf(<span class="hljs-string">&quot;err: %s\n&quot;</span>, err)<br>			time.Sleep(<span class="hljs-number">3</span> * time.Second)<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(Body io.ReadCloser)</span></span> &#123;<br>		_ = Body.Close()<br>	&#125;(r.Body)<br><br>	content, err := ioutil.ReadAll(r.Body)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err<br>	&#125;<br><br>	<span class="hljs-comment">//将传入的字符串变成字符串切片，并除去最后的换行格式问题！</span><br>	ToVisual := strings.Split(<span class="hljs-type">string</span>(content), <span class="hljs-string">&quot; &quot;</span>)<br>	ToVisual = ToVisual[:<span class="hljs-built_in">len</span>(ToVisual)<span class="hljs-number">-1</span>]<br>	<span class="hljs-comment">/*fmt.Printf(&quot;%s\n&quot;, ToVisual)*/</span><br><br>	<span class="hljs-keyword">return</span> ToVisual, <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-comment">/*func main() &#123;</span><br><span class="hljs-comment">	scanner := bufio.NewScanner(os.Stdin)</span><br><span class="hljs-comment">	for scanner.Scan() &#123;</span><br><span class="hljs-comment">		BcjClient(scanner.Text())</span><br><span class="hljs-comment">	&#125;</span><br><span class="hljs-comment">&#125;*/</span><br><br></code></pre></td></tr></table></figure>
 
 <p>服务器端：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">package</span> gohttp
-
-<span class="token keyword">import</span> <span class="token punctuation">(</span>
-	<span class="token string">"fmt"</span>
-	<span class="token string">"io/ioutil"</span>
-	<span class="token string">"net/http"</span>
-	<span class="token string">"sync"</span>
-<span class="token punctuation">)</span>
-
-<span class="token keyword">var</span> cache sync<span class="token punctuation">.</span>Map
-<span class="token keyword">var</span> m sync<span class="token punctuation">.</span>Mutex
-
-<span class="token keyword">func</span> <span class="token function">ClientHandler</span><span class="token punctuation">(</span>writer http<span class="token punctuation">.</span>ResponseWriter<span class="token punctuation">,</span> req <span class="token operator">*</span>http<span class="token punctuation">.</span>Request<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-
-	<span class="token keyword">if</span> req<span class="token punctuation">.</span>Method <span class="token operator">!=</span> <span class="token string">"POST"</span> <span class="token punctuation">&#123;</span>
-		<span class="token boolean">_</span><span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">=</span> fmt<span class="token punctuation">.</span><span class="token function">Fprintf</span><span class="token punctuation">(</span>writer<span class="token punctuation">,</span> <span class="token string">"Request is not POST! please send POST request!"</span><span class="token punctuation">)</span>
-		<span class="token keyword">return</span>
-	<span class="token punctuation">&#125;</span>
-
-	token <span class="token operator">:=</span> req<span class="token punctuation">.</span>Header<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">"Token"</span><span class="token punctuation">)</span>
-	body<span class="token punctuation">,</span> err <span class="token operator">:=</span> ioutil<span class="token punctuation">.</span><span class="token function">ReadAll</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>Body<span class="token punctuation">)</span>
-	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
-		<span class="token boolean">_</span><span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">=</span> fmt<span class="token punctuation">.</span><span class="token function">Fprintf</span><span class="token punctuation">(</span>writer<span class="token punctuation">,</span> <span class="token string">"read body err, %v\n"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
-		<span class="token keyword">return</span>
-	<span class="token punctuation">&#125;</span>
-
-	m<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-	<span class="token keyword">defer</span> m<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-	
-	GetFromCache<span class="token punctuation">,</span> ok <span class="token operator">:=</span> cache<span class="token punctuation">.</span><span class="token function">Load</span><span class="token punctuation">(</span>token<span class="token punctuation">)</span>
-	<span class="token keyword">if</span> ok <span class="token punctuation">&#123;</span>
-		GetFromCache <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>GetFromCache<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">&#123;</span><span class="token function">string</span><span class="token punctuation">(</span>body<span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token operator">...</span><span class="token punctuation">)</span>
-		cache<span class="token punctuation">.</span><span class="token function">Store</span><span class="token punctuation">(</span>token<span class="token punctuation">,</span> GetFromCache<span class="token punctuation">)</span>
-	<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token operator">!</span>ok <span class="token punctuation">&#123;</span>
-		cache<span class="token punctuation">.</span><span class="token function">Store</span><span class="token punctuation">(</span>token<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">&#123;</span><span class="token function">string</span><span class="token punctuation">(</span>body<span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
-		GetFromCache<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">=</span> cache<span class="token punctuation">.</span><span class="token function">Load</span><span class="token punctuation">(</span>token<span class="token punctuation">)</span>
-	<span class="token punctuation">&#125;</span>
-
-	change <span class="token operator">:=</span> GetFromCache<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">)</span>
-	<span class="token keyword">var</span> ToClient <span class="token builtin">string</span>
-	<span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> v <span class="token operator">:=</span> <span class="token keyword">range</span> change <span class="token punctuation">&#123;</span>
-		ToClient <span class="token operator">+=</span> v
-		ToClient <span class="token operator">+=</span> <span class="token string">" "</span>
-	<span class="token punctuation">&#125;</span>
-	<span class="token boolean">_</span><span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">=</span> fmt<span class="token punctuation">.</span><span class="token function">Fprintf</span><span class="token punctuation">(</span>writer<span class="token punctuation">,</span> <span class="token string">"%s\n"</span><span class="token punctuation">,</span> ToClient<span class="token punctuation">)</span>
-<span class="token punctuation">&#125;</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> gohttp<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;fmt&quot;</span><br>	<span class="hljs-string">&quot;io/ioutil&quot;</span><br>	<span class="hljs-string">&quot;net/http&quot;</span><br>	<span class="hljs-string">&quot;sync&quot;</span><br>)<br><br><span class="hljs-keyword">var</span> cache sync.Map<br><span class="hljs-keyword">var</span> m sync.Mutex<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">ClientHandler</span><span class="hljs-params">(writer http.ResponseWriter, req *http.Request)</span></span> &#123;<br><br>	<span class="hljs-keyword">if</span> req.Method != <span class="hljs-string">&quot;POST&quot;</span> &#123;<br>		_, _ = fmt.Fprintf(writer, <span class="hljs-string">&quot;Request is not POST! please send POST request!&quot;</span>)<br>		<span class="hljs-keyword">return</span><br>	&#125;<br><br>	token := req.Header.Get(<span class="hljs-string">&quot;Token&quot;</span>)<br>	body, err := ioutil.ReadAll(req.Body)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		_, _ = fmt.Fprintf(writer, <span class="hljs-string">&quot;read body err, %v\n&quot;</span>, err)<br>		<span class="hljs-keyword">return</span><br>	&#125;<br><br>	m.Lock()<br>	<span class="hljs-keyword">defer</span> m.Unlock()<br>	<br>	GetFromCache, ok := cache.Load(token)<br>	<span class="hljs-keyword">if</span> ok &#123;<br>		GetFromCache = <span class="hljs-built_in">append</span>(GetFromCache.([]<span class="hljs-type">string</span>), []<span class="hljs-type">string</span>&#123;<span class="hljs-type">string</span>(body)&#125;...)<br>		cache.Store(token, GetFromCache)<br>	&#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> !ok &#123;<br>		cache.Store(token, []<span class="hljs-type">string</span>&#123;<span class="hljs-type">string</span>(body)&#125;)<br>		GetFromCache, _ = cache.Load(token)<br>	&#125;<br><br>	change := GetFromCache.([]<span class="hljs-type">string</span>)<br>	<span class="hljs-keyword">var</span> ToClient <span class="hljs-type">string</span><br>	<span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> change &#123;<br>		ToClient += v<br>		ToClient += <span class="hljs-string">&quot; &quot;</span><br>	&#125;<br>	_, _ = fmt.Fprintf(writer, <span class="hljs-string">&quot;%s\n&quot;</span>, ToClient)<br>&#125;<br><br></code></pre></td></tr></table></figure>
 
                 
               </div>
@@ -849,8 +744,6 @@
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

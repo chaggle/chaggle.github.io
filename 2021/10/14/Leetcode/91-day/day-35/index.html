@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="1737. 满足三条件之一需改变的最少字符数题目给你两个字符串 a 和 b ，二者均由小写字母组成。一步操作中，  你可以将 a 或 b 中的 任一字符 改变为 任一小写字母 。  操作的最终目标是满足下列三个条件 之一 ：  a 中的 每个字母 在字母表中 严格小于 b 中的 每个字母 。 b 中的 每个字母 在字母表中 严格小于 a 中的 每个字母 。 a 和 b 都 由 同一个 字母组成。">
+    <meta name="description" content="1737. 满足三条件之一需改变的最少字符数题目123456789101112131415161718192021222324252627282930313233给你两个字符串 a 和 b ，二者均由小写字母组成。一步操作中，你可以将 a 或 b 中的 任一字符 改变为 任一小写字母 。操作的最终目标是满足下列三个条件 之一 ：a 中的 每个字母 在字母表中 严格小于 b 中的 每个字母 。b 中">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day 35 1737. 满足三条件之一需改变的最少字符数">
 <meta property="og:url" content="https://chaggle.github.io/2021/10/14/Leetcode/91-day/day-35/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="1737. 满足三条件之一需改变的最少字符数题目给你两个字符串 a 和 b ，二者均由小写字母组成。一步操作中，  你可以将 a 或 b 中的 任一字符 改变为 任一小写字母 。  操作的最终目标是满足下列三个条件 之一 ：  a 中的 每个字母 在字母表中 严格小于 b 中的 每个字母 。 b 中的 每个字母 在字母表中 严格小于 a 中的 每个字母 。 a 和 b 都 由 同一个 字母组成。">
+<meta property="og:description" content="1737. 满足三条件之一需改变的最少字符数题目123456789101112131415161718192021222324252627282930313233给你两个字符串 a 和 b ，二者均由小写字母组成。一步操作中，你可以将 a 或 b 中的 任一字符 改变为 任一小写字母 。操作的最终目标是满足下列三个条件 之一 ：a 中的 每个字母 在字母表中 严格小于 b 中的 每个字母 。b 中">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-14T00:34:23.000Z">
 <meta property="article:modified_time" content="2025-03-30T04:48:11.864Z">
@@ -45,8 +45,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -232,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          459 字
+          483 字
         
       </span>
     
@@ -243,7 +241,7 @@
         
         
         
-          4 分钟
+          5 分钟
         
       </span>
     
@@ -304,72 +302,14 @@
             
               <div class="markdown-body">
                 
-                <h1 id="1737-满足三条件之一需改变的最少字符数"><a href="#1737-满足三条件之一需改变的最少字符数" class="headerlink" title="1737. 满足三条件之一需改变的最少字符数"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/change-minimum-characters-to-satisfy-one-of-three-conditions/">1737. 满足三条件之一需改变的最少字符数</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">给你两个字符串 a 和 b ，二者均由小写字母组成。一步操作中，
-
-你可以将 a 或 b 中的 任一字符 改变为 任一小写字母 。
-
-操作的最终目标是满足下列三个条件 之一 ：
-
-a 中的 每个字母 在字母表中 严格小于 b 中的 每个字母 。
-b 中的 每个字母 在字母表中 严格小于 a 中的 每个字母 。
-a 和 b 都 由 同一个 字母组成。
-返回达成目标所需的 最少 操作数。
-
- 
-
-示例 <span class="token number">1</span>：
-
-输入：a <span class="token operator">=</span> <span class="token string">"aba"</span><span class="token punctuation">,</span> b <span class="token operator">=</span> <span class="token string">"caa"</span>
-输出：<span class="token number">2</span>
-解释：满足每个条件的最佳方案分别是：
-<span class="token number">1</span><span class="token punctuation">)</span> 将 b 变为 <span class="token string">"ccc"</span>，<span class="token number">2</span> 次操作，满足 a 中的每个字母都小于 b 中的每个字母；
-<span class="token number">2</span><span class="token punctuation">)</span> 将 a 变为 <span class="token string">"bbb"</span> 并将 b 变为 <span class="token string">"aaa"</span>，<span class="token number">3</span> 次操作，满足 b 中的每个字母都小于 a 中的每个字母；
-<span class="token number">3</span><span class="token punctuation">)</span> 将 a 变为 <span class="token string">"aaa"</span> 并将 b 变为 <span class="token string">"aaa"</span>，<span class="token number">2</span> 次操作，满足 a 和 b 由同一个字母组成。
-最佳的方案只需要 <span class="token number">2</span> 次操作（满足条件 <span class="token number">1</span> 或者条件 <span class="token number">3</span>）。
-示例 <span class="token number">2</span>：
-
-输入：a <span class="token operator">=</span> <span class="token string">"dabadd"</span><span class="token punctuation">,</span> b <span class="token operator">=</span> <span class="token string">"cda"</span>
-输出：<span class="token number">3</span>
-解释：满足条件 <span class="token number">1</span> 的最佳方案是将 b 变为 <span class="token string">"eee"</span> 。
- 
-
-提示：
-
-<span class="token number">1</span> <span class="token operator">&lt;=</span> a<span class="token punctuation">.</span>length<span class="token punctuation">,</span> b<span class="token punctuation">.</span>length <span class="token operator">&lt;=</span> <span class="token number">105</span>
-a 和 b 只由小写字母组成<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+                <h1 id="1737-满足三条件之一需改变的最少字符数"><a href="#1737-满足三条件之一需改变的最少字符数" class="headerlink" title="1737. 满足三条件之一需改变的最少字符数"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/change-minimum-characters-to-satisfy-one-of-three-conditions/">1737. 满足三条件之一需改变的最少字符数</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs cpp">给你两个字符串 a 和 b ，二者均由小写字母组成。一步操作中，<br><br>你可以将 a 或 b 中的 任一字符 改变为 任一小写字母 。<br><br>操作的最终目标是满足下列三个条件 之一 ：<br><br>a 中的 每个字母 在字母表中 严格小于 b 中的 每个字母 。<br>b 中的 每个字母 在字母表中 严格小于 a 中的 每个字母 。<br>a 和 b 都 由 同一个 字母组成。<br>返回达成目标所需的 最少 操作数。<br><br> <br><br>示例 <span class="hljs-number">1</span>：<br><br>输入：a = <span class="hljs-string">&quot;aba&quot;</span>, b = <span class="hljs-string">&quot;caa&quot;</span><br>输出：<span class="hljs-number">2</span><br>解释：满足每个条件的最佳方案分别是：<br><span class="hljs-number">1</span>) 将 b 变为 <span class="hljs-string">&quot;ccc&quot;</span>，<span class="hljs-number">2</span> 次操作，满足 a 中的每个字母都小于 b 中的每个字母；<br><span class="hljs-number">2</span>) 将 a 变为 <span class="hljs-string">&quot;bbb&quot;</span> 并将 b 变为 <span class="hljs-string">&quot;aaa&quot;</span>，<span class="hljs-number">3</span> 次操作，满足 b 中的每个字母都小于 a 中的每个字母；<br><span class="hljs-number">3</span>) 将 a 变为 <span class="hljs-string">&quot;aaa&quot;</span> 并将 b 变为 <span class="hljs-string">&quot;aaa&quot;</span>，<span class="hljs-number">2</span> 次操作，满足 a 和 b 由同一个字母组成。<br>最佳的方案只需要 <span class="hljs-number">2</span> 次操作（满足条件 <span class="hljs-number">1</span> 或者条件 <span class="hljs-number">3</span>）。<br>示例 <span class="hljs-number">2</span>：<br><br>输入：a = <span class="hljs-string">&quot;dabadd&quot;</span>, b = <span class="hljs-string">&quot;cda&quot;</span><br>输出：<span class="hljs-number">3</span><br>解释：满足条件 <span class="hljs-number">1</span> 的最佳方案是将 b 变为 <span class="hljs-string">&quot;eee&quot;</span> 。<br> <br><br>提示：<br><br><span class="hljs-number">1</span> &lt;= a.length, b.length &lt;= <span class="hljs-number">105</span><br>a 和 b 只由小写字母组成<br></code></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
 <li>1、前缀和以及计数的思想</li>
 </ul>
 </blockquote>
-<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
-<span class="token keyword">public</span><span class="token operator">:</span>
-    <span class="token keyword">int</span> <span class="token function">minCharacters</span><span class="token punctuation">(</span>string a<span class="token punctuation">,</span> string b<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">int</span> n <span class="token operator">=</span> a<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> m <span class="token operator">=</span> b<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">int</span> l<span class="token punctuation">[</span><span class="token number">26</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token number">0</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-        <span class="token keyword">int</span> r<span class="token punctuation">[</span><span class="token number">26</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token number">0</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">auto</span> x <span class="token operator">:</span> a<span class="token punctuation">)</span> 
-        <span class="token punctuation">&#123;</span>
-            l<span class="token punctuation">[</span>x <span class="token operator">-</span> <span class="token char">'a'</span><span class="token punctuation">]</span><span class="token operator">++</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">auto</span> x <span class="token operator">:</span> b<span class="token punctuation">)</span> 
-        <span class="token punctuation">&#123;</span>
-            r<span class="token punctuation">[</span>x <span class="token operator">-</span> <span class="token char">'a'</span><span class="token punctuation">]</span><span class="token operator">++</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-        <span class="token keyword">int</span> ls <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-        <span class="token keyword">int</span> rs <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-        <span class="token keyword">int</span> ans <span class="token operator">=</span> n <span class="token operator">+</span> m<span class="token punctuation">;</span>
-        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">25</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> 
-        <span class="token punctuation">&#123;</span>
-            ls <span class="token operator">+=</span> l<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
-            rs <span class="token operator">+=</span> r<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
-            ans <span class="token operator">=</span> <span class="token function">min</span><span class="token punctuation">(</span>ans<span class="token punctuation">,</span> <span class="token function">min</span><span class="token punctuation">(</span><span class="token function">min</span><span class="token punctuation">(</span>n <span class="token operator">+</span> m <span class="token operator">-</span> l<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-</span> r<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> n <span class="token operator">-</span> ls <span class="token operator">+</span> rs<span class="token punctuation">)</span><span class="token punctuation">,</span> m <span class="token operator">-</span> rs <span class="token operator">+</span> ls<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-        ans <span class="token operator">=</span> <span class="token function">min</span><span class="token punctuation">(</span>ans<span class="token punctuation">,</span> n <span class="token operator">+</span> m <span class="token operator">-</span> l<span class="token punctuation">[</span><span class="token number">25</span><span class="token punctuation">]</span> <span class="token operator">-</span> r<span class="token punctuation">[</span><span class="token number">25</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">return</span> ans<span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">minCharacters</span><span class="hljs-params">(string a, string b)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = a.<span class="hljs-built_in">size</span>(), m = b.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-type">int</span> l[<span class="hljs-number">26</span>] = &#123;<span class="hljs-number">0</span>&#125;;<br>        <span class="hljs-type">int</span> r[<span class="hljs-number">26</span>] = &#123;<span class="hljs-number">0</span>&#125;;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> x : a) <br>        &#123;<br>            l[x - <span class="hljs-string">&#x27;a&#x27;</span>]++;<br>        &#125;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> x : b) <br>        &#123;<br>            r[x - <span class="hljs-string">&#x27;a&#x27;</span>]++;<br>        &#125;<br>        <span class="hljs-type">int</span> ls = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> rs = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> ans = n + m;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">25</span>; ++i) <br>        &#123;<br>            ls += l[i];<br>            rs += r[i];<br>            ans = <span class="hljs-built_in">min</span>(ans, <span class="hljs-built_in">min</span>(<span class="hljs-built_in">min</span>(n + m - l[i] - r[i], n - ls + rs), m - rs + ls));<br>        &#125;<br>        ans = <span class="hljs-built_in">min</span>(ans, n + m - l[<span class="hljs-number">25</span>] - r[<span class="hljs-number">25</span>]);<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n)</p>
@@ -762,8 +702,6 @@ a 和 b 只由小写字母组成<span aria-hidden="true" class="line-numbers-row
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

@@ -1,141 +1,90 @@
-/**
- * prism.js default theme for JavaScript, CSS and HTML
- * Based on dabblet (http://dabblet.com)
- * @author Lea Verou
- */
-
-code[class*="language-"],
-pre[class*="language-"] {
-	color: black;
-	background: none;
-	text-shadow: 0 1px white;
-	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-	font-size: 1em;
-	text-align: left;
-	white-space: pre;
-	word-spacing: normal;
-	word-break: normal;
-	word-wrap: normal;
-	line-height: 1.5;
-
-	-moz-tab-size: 4;
-	-o-tab-size: 4;
-	tab-size: 4;
-
-	-webkit-hyphens: none;
-	-moz-hyphens: none;
-	-ms-hyphens: none;
-	hyphens: none;
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
 }
-
-pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
-code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
-	text-shadow: none;
-	background: #b3d4fc;
+code.hljs {
+  padding: 3px 5px
 }
+/*
 
-pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
-code[class*="language-"]::selection, code[class*="language-"] ::selection {
-	text-shadow: none;
-	background: #b3d4fc;
-}
+XCode style (c) Angel Garcia <angelgarcia.mail@gmail.com>
 
-@media print {
-	code[class*="language-"],
-	pre[class*="language-"] {
-		text-shadow: none;
-	}
+*/
+.hljs {
+  background: #fff;
+  color: black
 }
-
-/* Code blocks */
-pre[class*="language-"] {
-	padding: 1em;
-	margin: .5em 0;
-	overflow: auto;
+/* Gray DOCTYPE selectors like WebKit */
+.xml .hljs-meta {
+  color: #c0c0c0
 }
-
-:not(pre) > code[class*="language-"],
-pre[class*="language-"] {
-	background: #f5f2f0;
+.hljs-comment,
+.hljs-quote {
+  color: #007400
 }
-
-/* Inline code */
-:not(pre) > code[class*="language-"] {
-	padding: .1em;
-	border-radius: .3em;
-	white-space: normal;
+.hljs-tag,
+.hljs-attribute,
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-name {
+  color: #aa0d91
 }
-
-.token.comment,
-.token.prolog,
-.token.doctype,
-.token.cdata {
-	color: slategray;
+.hljs-variable,
+.hljs-template-variable {
+  color: #3F6E74
 }
-
-.token.punctuation {
-	color: #999;
+.hljs-code,
+.hljs-string,
+.hljs-meta .hljs-string {
+  color: #c41a16
 }
-
-.token.namespace {
-	opacity: .7;
+.hljs-regexp,
+.hljs-link {
+  color: #0E0EFF
 }
-
-.token.property,
-.token.tag,
-.token.boolean,
-.token.number,
-.token.constant,
-.token.symbol,
-.token.deleted {
-	color: #905;
+.hljs-title,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-number {
+  color: #1c00cf
 }
-
-.token.selector,
-.token.attr-name,
-.token.string,
-.token.char,
-.token.builtin,
-.token.inserted {
-	color: #690;
+.hljs-section,
+.hljs-meta {
+  color: #643820
 }
-
-.token.operator,
-.token.entity,
-.token.url,
-.language-css .token.string,
-.style .token.string {
-	color: #9a6e3a;
-	/* This background color was intended by the author of this theme. */
-	background: hsla(0, 0%, 100%, .5);
+.hljs-title.class_,
+.hljs-class .hljs-title,
+.hljs-type,
+.hljs-built_in,
+.hljs-params {
+  color: #5c2699
 }
-
-.token.atrule,
-.token.attr-value,
-.token.keyword {
-	color: #07a;
+.hljs-attr {
+  color: #836C28
 }
-
-.token.function,
-.token.class-name {
-	color: #DD4A68;
+.hljs-subst {
+  color: #000
 }
-
-.token.regex,
-.token.important,
-.token.variable {
-	color: #e90;
+.hljs-formula {
+  background-color: #eee;
+  font-style: italic
 }
-
-.token.important,
-.token.bold {
-	font-weight: bold;
+.hljs-addition {
+  background-color: #baeeba
 }
-.token.italic {
-	font-style: italic;
+.hljs-deletion {
+  background-color: #ffc8bd
 }
-
-.token.entity {
-	cursor: help;
+.hljs-selector-id,
+.hljs-selector-class {
+  color: #9b703f
 }
-
+.hljs-doctag,
+.hljs-strong {
+  font-weight: bold
+}
+.hljs-emphasis {
+  font-style: italic
+}

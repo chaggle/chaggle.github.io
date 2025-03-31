@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="1054. 距离相等的条形码题目在一个仓库里，有一排条形码，其中第 i 个条形码为 barcodes[i]。  请你重新排列这些条形码，使其中两个相邻的条形码 不能相等。   你可以返回任何满足该要求的答案，此题保证存在答案。     示例 1：  输入：[1,1,1,2,2,2] 输出：[2,1,2,1,2,1] 示例 2：  输入：[1,1,1,1,2,2,3,3] 输出：[1,3,1,3,2">
+    <meta name="description" content="1054. 距离相等的条形码题目12345678910111213141516171819202122在一个仓库里，有一排条形码，其中第 i 个条形码为 barcodes[i]。请你重新排列这些条形码，使其中两个相邻的条形码 不能相等。 你可以返回任何满足该要求的答案，此题保证存在答案。 示例 1：输入：[1,1,1,2,2,2]输出：[2,1,2,1,2,1]示例 2：输入：[1,1,1,1,2">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day 90 1054. 距离相等的条形码">
 <meta property="og:url" content="https://chaggle.github.io/2021/12/08/Leetcode/91-day/day-90/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="1054. 距离相等的条形码题目在一个仓库里，有一排条形码，其中第 i 个条形码为 barcodes[i]。  请你重新排列这些条形码，使其中两个相邻的条形码 不能相等。   你可以返回任何满足该要求的答案，此题保证存在答案。     示例 1：  输入：[1,1,1,2,2,2] 输出：[2,1,2,1,2,1] 示例 2：  输入：[1,1,1,1,2,2,3,3] 输出：[1,3,1,3,2">
+<meta property="og:description" content="1054. 距离相等的条形码题目12345678910111213141516171819202122在一个仓库里，有一排条形码，其中第 i 个条形码为 barcodes[i]。请你重新排列这些条形码，使其中两个相邻的条形码 不能相等。 你可以返回任何满足该要求的答案，此题保证存在答案。 示例 1：输入：[1,1,1,2,2,2]输出：[2,1,2,1,2,1]示例 2：输入：[1,1,1,1,2">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-12-07T23:28:10.000Z">
 <meta property="article:modified_time" content="2025-03-30T04:48:08.740Z">
@@ -45,8 +45,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -232,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          352 字
+          364 字
         
       </span>
     
@@ -243,7 +241,7 @@
         
         
         
-          3 分钟
+          4 分钟
         
       </span>
     
@@ -304,28 +302,7 @@
             
               <div class="markdown-body">
                 
-                <h1 id="1054-距离相等的条形码"><a href="#1054-距离相等的条形码" class="headerlink" title="1054. 距离相等的条形码"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/distant-barcodes/">1054. 距离相等的条形码</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">在一个仓库里，有一排条形码，其中第 i 个条形码为 barcodes<span class="token punctuation">[</span>i<span class="token punctuation">]</span>。
-
-请你重新排列这些条形码，使其中两个相邻的条形码 不能相等。 
-
-你可以返回任何满足该要求的答案，此题保证存在答案。
-
- 
-
-示例 <span class="token number">1</span>：
-
-输入：<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">]</span>
-输出：<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span>
-示例 <span class="token number">2</span>：
-
-输入：<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">]</span>
-输出：<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span>
- 
-
-提示：
-
-<span class="token number">1</span> <span class="token operator">&lt;=</span> barcodes<span class="token punctuation">.</span>length <span class="token operator">&lt;=</span> <span class="token number">10000</span>
-<span class="token number">1</span> <span class="token operator">&lt;=</span> barcodes<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&lt;=</span> <span class="token number">10000</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+                <h1 id="1054-距离相等的条形码"><a href="#1054-距离相等的条形码" class="headerlink" title="1054. 距离相等的条形码"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/distant-barcodes/">1054. 距离相等的条形码</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs cpp">在一个仓库里，有一排条形码，其中第 i 个条形码为 barcodes[i]。<br><br>请你重新排列这些条形码，使其中两个相邻的条形码 不能相等。 <br><br>你可以返回任何满足该要求的答案，此题保证存在答案。<br><br> <br><br>示例 <span class="hljs-number">1</span>：<br><br>输入：[<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>]<br>输出：[<span class="hljs-number">2</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">1</span>]<br>示例 <span class="hljs-number">2</span>：<br><br>输入：[<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">3</span>]<br>输出：[<span class="hljs-number">1</span>,<span class="hljs-number">3</span>,<span class="hljs-number">1</span>,<span class="hljs-number">3</span>,<span class="hljs-number">2</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">1</span>]<br> <br><br>提示：<br><br><span class="hljs-number">1</span> &lt;= barcodes.length &lt;= <span class="hljs-number">10000</span><br><span class="hljs-number">1</span> &lt;= barcodes[i] &lt;= <span class="hljs-number">10000</span><br></code></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
@@ -333,35 +310,7 @@
 <li>2、最后两日了，明天打卡 91 日后，要考试了，所以停止更新。直到 12 月 30 日开始，重头复盘 91 日，每日复盘 4 题左右，顺便开始阅读相应的论文，并展开研究型的工作。</li>
 </ul>
 </blockquote>
-<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
-<span class="token keyword">public</span><span class="token operator">:</span>
-    vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> <span class="token function">rearrangeBarcodes</span><span class="token punctuation">(</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> barcodes<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">int</span> n <span class="token operator">=</span> barcodes<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        unordered_map<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">></span> up<span class="token punctuation">;</span>
-        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">:</span> barcodes<span class="token punctuation">)</span> up<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">++</span><span class="token punctuation">;</span>
-        vector<span class="token operator">&lt;</span>pair<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span><span class="token keyword">int</span><span class="token operator">>></span> ans<span class="token punctuation">;</span>
-        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">auto</span> <span class="token punctuation">[</span>x<span class="token punctuation">,</span> fx<span class="token punctuation">]</span> <span class="token operator">:</span> up<span class="token punctuation">)</span> ans<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>pair<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">></span><span class="token punctuation">&#123;</span>x<span class="token punctuation">,</span> fx<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token function">sort</span><span class="token punctuation">(</span>ans<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> ans<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> 
-        <span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> pair<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">></span> <span class="token operator">&amp;</span>a<span class="token punctuation">,</span> <span class="token keyword">const</span> pair<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">></span> <span class="token operator">&amp;</span>b<span class="token punctuation">)</span>
-        <span class="token punctuation">&#123;</span>
-            <span class="token keyword">return</span> a<span class="token punctuation">.</span>second <span class="token operator">></span> b<span class="token punctuation">.</span>second<span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> <span class="token function">res</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">int</span> m <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">auto</span> <span class="token punctuation">[</span>x<span class="token punctuation">,</span> fx<span class="token punctuation">]</span> <span class="token operator">:</span> ans<span class="token punctuation">)</span>
-        <span class="token punctuation">&#123;</span>
-            <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span> <span class="token punctuation">;</span> i <span class="token operator">&lt;</span> fx<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
-            <span class="token punctuation">&#123;</span>
-                <span class="token keyword">if</span> <span class="token punctuation">(</span>m <span class="token operator">>=</span> n<span class="token punctuation">)</span> m <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
-                res<span class="token punctuation">[</span>m<span class="token punctuation">]</span> <span class="token operator">=</span> x<span class="token punctuation">;</span>
-                m <span class="token operator">+=</span> <span class="token number">2</span><span class="token punctuation">;</span>
-            <span class="token punctuation">&#125;</span>
-        <span class="token punctuation">&#125;</span>
-        <span class="token keyword">return</span> res<span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">rearrangeBarcodes</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; barcodes)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = barcodes.<span class="hljs-built_in">size</span>();<br>        unordered_map&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt; up;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i : barcodes) up[i]++;<br>        vector&lt;pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;&gt; ans;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> [x, fx] : up) ans.<span class="hljs-built_in">push_back</span>(pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;&#123;x, fx&#125;);<br><br>        <span class="hljs-built_in">sort</span>(ans.<span class="hljs-built_in">begin</span>(), ans.<span class="hljs-built_in">end</span>(), <br>        [&amp;](<span class="hljs-type">const</span> pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt; &amp;a, <span class="hljs-type">const</span> pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt; &amp;b)<br>        &#123;<br>            <span class="hljs-keyword">return</span> a.second &gt; b.second;<br>        &#125;);<br><br>        <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">res</span><span class="hljs-params">(n)</span></span>;<br>        <span class="hljs-type">int</span> m = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> [x, fx] : ans)<br>        &#123;<br>            <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span> ; i &lt; fx; i++)<br>            &#123;<br>                <span class="hljs-keyword">if</span> (m &gt;= n) m = <span class="hljs-number">1</span>;<br>                res[m] = x;<br>                m += <span class="hljs-number">2</span>;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li>时间复杂度：O(nlogn)</li>
@@ -752,8 +701,6 @@
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

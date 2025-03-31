@@ -46,8 +46,6 @@
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
 
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
-
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
 
@@ -417,7 +415,7 @@
 </blockquote>
 <h2 id="V0-8-消息队列以及多任务"><a href="#V0-8-消息队列以及多任务" class="headerlink" title="V0.8 消息队列以及多任务"></a>V0.8 消息队列以及多任务</h2><blockquote>
 <p>消息队列以及 Worker 工作池的实现</p>
-<figure><div class="code-wrapper"><pre class="language-none"><code class="language-none">创建一个消息队列 --- MsgHandler 消息管理模块
+<pre><code class="hljs">创建一个消息队列 --- MsgHandler 消息管理模块
 	  消息队列 TaskQueue []chan ziface.IRequest
 	  工作池的数量 WorkPoolSize uint32
 创建多任务work工作池，并且启动
@@ -437,7 +435,7 @@
 	2、将从客户端处理的消息，发送给当前的Worker 工作池来处理，在处理完拆包，得到了 request 请求，交给工作池来处理
 
 使用 Zinx V0.8 版本开发
-</code></pre></div></figure>
+</code></pre>
 </blockquote>
 <p>小型项目，具体以技术方案跟思考为主，而与需求、产品、测试、运维的沟通可以让步于项目的上线</p>
 
@@ -825,8 +823,6 @@
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

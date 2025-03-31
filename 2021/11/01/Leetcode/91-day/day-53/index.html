@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="Top View of a Tree题目Given a binary tree root,   return the top view of the tree, sorted left-to-right.  Constraints  n ≤ 100,000 where n is the number of nodes in root  Example 1  Input root &#x3D; [1, [2,">
+    <meta name="description" content="Top View of a Tree题目12345678910111213141516171819202122232425262728Given a binary tree root, return the top view of the tree, sorted left-to-right.Constraintsn ≤ 100,000 where n is the number of nodes">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day 53 Top View of a Tree">
 <meta property="og:url" content="https://chaggle.github.io/2021/11/01/Leetcode/91-day/day-53/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="Top View of a Tree题目Given a binary tree root,   return the top view of the tree, sorted left-to-right.  Constraints  n ≤ 100,000 where n is the number of nodes in root  Example 1  Input root &#x3D; [1, [2,">
+<meta property="og:description" content="Top View of a Tree题目12345678910111213141516171819202122232425262728Given a binary tree root, return the top view of the tree, sorted left-to-right.Constraintsn ≤ 100,000 where n is the number of nodes">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-11-01T01:29:48.000Z">
 <meta property="article:modified_time" content="2025-03-30T04:48:31.911Z">
@@ -45,8 +45,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -232,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          259 字
+          270 字
         
       </span>
     
@@ -304,65 +302,14 @@
             
               <div class="markdown-body">
                 
-                <h1 id="Top-View-of-a-Tree"><a href="#Top-View-of-a-Tree" class="headerlink" title="Top View of a Tree"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Top-View-of-a-Tree">Top View of a Tree</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">Given a binary tree root<span class="token punctuation">,</span>
-
- <span class="token keyword">return</span> the top view of the tree<span class="token punctuation">,</span> sorted left<span class="token operator">-</span>to<span class="token operator">-</span>right<span class="token punctuation">.</span>
-
-Constraints
-
-n ≤ <span class="token number">100</span><span class="token punctuation">,</span><span class="token number">000</span> where n is the number of nodes in root
-
-Example <span class="token number">1</span>
-
-Input
-root <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> null<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">,</span> null<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span> null<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">6</span><span class="token punctuation">,</span> null<span class="token punctuation">,</span> 
-       <span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">,</span> null<span class="token punctuation">,</span> null<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">,</span> null<span class="token punctuation">,</span> null<span class="token punctuation">]</span><span class="token punctuation">]</span>
-
-Output
-<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">]</span>
-
-Explanation
-
-Note that directly above <span class="token number">4</span> is <span class="token number">1</span> <span class="token operator">and</span> directly above <span class="token number">5</span> is <span class="token number">3</span> 
-
-so these are <span class="token operator">not</span> part of the top view<span class="token punctuation">.</span>
-
-Example <span class="token number">2</span>
-Input
-root <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> null<span class="token punctuation">,</span> null<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> null<span class="token punctuation">,</span> null<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">,</span> null<span class="token punctuation">,</span> null<span class="token punctuation">]</span><span class="token punctuation">]</span>
-Output
-<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+                <h1 id="Top-View-of-a-Tree"><a href="#Top-View-of-a-Tree" class="headerlink" title="Top View of a Tree"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Top-View-of-a-Tree">Top View of a Tree</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs cpp">Given a binary tree root,<br><br> <span class="hljs-keyword">return</span> the top view of the tree, sorted left-to-right.<br><br>Constraints<br><br>n ≤ <span class="hljs-number">100</span>,<span class="hljs-number">000</span> where n is the number of nodes in root<br><br>Example <span class="hljs-number">1</span><br><br>Input<br>root = [<span class="hljs-number">1</span>, [<span class="hljs-number">2</span>, null, [<span class="hljs-number">4</span>, null, [<span class="hljs-number">5</span>, null, [<span class="hljs-number">6</span>, null, <br>       [<span class="hljs-number">7</span>, null, null]]]]], [<span class="hljs-number">3</span>, null, null]]<br><br>Output<br>[<span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">6</span>, <span class="hljs-number">7</span>]<br><br>Explanation<br><br>Note that directly above <span class="hljs-number">4</span> is <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> directly above <span class="hljs-number">5</span> is <span class="hljs-number">3</span> <br><br>so these are <span class="hljs-keyword">not</span> part of the top view.<br><br>Example <span class="hljs-number">2</span><br>Input<br>root = [<span class="hljs-number">3</span>, [<span class="hljs-number">1</span>, [<span class="hljs-number">0</span>, null, null], [<span class="hljs-number">2</span>, null, null]], [<span class="hljs-number">4</span>, null, null]]<br>Output<br>[<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>]<br></code></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
 <li>1、本题的意思为返回顶部的视角，即为自己左右孩子节点，覆盖自己左孩子节点的右孩子节点，自己右孩子的节点的左孩子节点看不见，即只要有相同的 y 值，同一层级只需要加入其中 x 值最大以及最小的那两个节点。</li>
 </ul>
 </blockquote>
-<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token comment">/**
- * class Tree &#123;
- *     public:
- *         int val;
- *         Tree *left;
- *         Tree *right;
- * &#125;;
- */</span>
-<span class="token keyword">void</span> <span class="token function">dfs</span><span class="token punctuation">(</span>Tree<span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">int</span> x<span class="token punctuation">,</span> <span class="token keyword">int</span> y<span class="token punctuation">,</span> map<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> pair<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">>></span><span class="token operator">&amp;</span> up<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token keyword">nullptr</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span>up<span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span> <span class="token operator">==</span> up<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> up<span class="token punctuation">[</span>y<span class="token punctuation">]</span><span class="token punctuation">.</span>first <span class="token operator">></span> h<span class="token punctuation">)</span> up<span class="token punctuation">[</span>x<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span>h<span class="token punctuation">,</span> root <span class="token operator">-></span> val<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-    
-    <span class="token function">dfs</span><span class="token punctuation">(</span>root <span class="token operator">-></span> left<span class="token punctuation">,</span> x <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> h <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> up<span class="token punctuation">)</span><span class="token punctuation">;</span> 
-    <span class="token function">dfs</span><span class="token punctuation">(</span>root <span class="token operator">-></span> right<span class="token punctuation">,</span> x <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> h <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> up<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> <span class="token function">solve</span><span class="token punctuation">(</span>Tree<span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    map<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> pair<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">>></span> up<span class="token punctuation">;</span>
-    <span class="token function">dfs</span><span class="token punctuation">(</span>root<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> up<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> ans<span class="token punctuation">;</span>
-    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">auto</span> <span class="token punctuation">[</span>k<span class="token punctuation">,</span> v<span class="token punctuation">]</span> <span class="token operator">:</span> up<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        ans<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>v<span class="token punctuation">.</span>second<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-    <span class="token keyword">return</span> ans<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * class Tree &#123;</span><br><span class="hljs-comment"> *     public:</span><br><span class="hljs-comment"> *         int val;</span><br><span class="hljs-comment"> *         Tree *left;</span><br><span class="hljs-comment"> *         Tree *right;</span><br><span class="hljs-comment"> * &#125;;</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(Tree* root, <span class="hljs-type">int</span> x, <span class="hljs-type">int</span> y, map&lt;<span class="hljs-type">int</span>, pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;&gt;&amp; up)</span> </span>&#123;<br>    <span class="hljs-keyword">if</span>(root == <span class="hljs-literal">nullptr</span>) <span class="hljs-keyword">return</span>;<br>    <span class="hljs-keyword">if</span>(up.<span class="hljs-built_in">find</span>(x) == up.<span class="hljs-built_in">end</span>() || up[y].first &gt; h) up[x] = &#123;h, root -&gt; val&#125;;<br>    <br>    <span class="hljs-built_in">dfs</span>(root -&gt; left, x - <span class="hljs-number">1</span>, h + <span class="hljs-number">1</span>, up); <br>    <span class="hljs-built_in">dfs</span>(root -&gt; right, x + <span class="hljs-number">1</span>, h + <span class="hljs-number">1</span>, up);<br>&#125;<br><br><span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">solve</span><span class="hljs-params">(Tree* root)</span> </span>&#123;<br>    map&lt;<span class="hljs-type">int</span>, pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;&gt; up;<br>    <span class="hljs-built_in">dfs</span>(root, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, up);<br>    vector&lt;<span class="hljs-type">int</span>&gt; ans;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> [k, v] : up) &#123;<br>        ans.<span class="hljs-built_in">push_back</span>(v.second);<br>    &#125;<br>    <span class="hljs-keyword">return</span> ans;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(nlogn)</p>
@@ -755,8 +702,6 @@ vector<span class="token operator">&lt;</span><span class="token keyword">int</s
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

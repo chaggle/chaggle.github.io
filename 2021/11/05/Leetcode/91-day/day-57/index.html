@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="1143. 最长公共子序列题目给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。  如果不存在 公共子序列 ，返回 0 。  一个字符串的 子序列 是指这样一个新的字符串：  它是由原字符串在不改变字符的相对顺序的情况下删除某些字符后组成的新字符串。  例如，&quot;ace&quot; 是 &quot;abcde&quot; 的子序列，但 &quot;aec&quot; 不是 &quot;abcde&quot; 的子序列。  两个字符">
+    <meta name="description" content="1143. 最长公共子序列题目1234567891011121314151617181920212223242526272829303132333435给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。如果不存在 公共子序列 ，返回 0 。一个字符串的 子序列 是指这样一个新的字符串：它是由原字符串在不改变字符的相对顺序的情况下删除某些字符后组成的新字符串。例">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day 57 1143. 最长公共子序列">
 <meta property="og:url" content="https://chaggle.github.io/2021/11/05/Leetcode/91-day/day-57/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="1143. 最长公共子序列题目给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。  如果不存在 公共子序列 ，返回 0 。  一个字符串的 子序列 是指这样一个新的字符串：  它是由原字符串在不改变字符的相对顺序的情况下删除某些字符后组成的新字符串。  例如，&quot;ace&quot; 是 &quot;abcde&quot; 的子序列，但 &quot;aec&quot; 不是 &quot;abcde&quot; 的子序列。  两个字符">
+<meta property="og:description" content="1143. 最长公共子序列题目1234567891011121314151617181920212223242526272829303132333435给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。如果不存在 公共子序列 ，返回 0 。一个字符串的 子序列 是指这样一个新的字符串：它是由原字符串在不改变字符的相对顺序的情况下删除某些字符后组成的新字符串。例">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-11-04T23:47:17.000Z">
 <meta property="article:modified_time" content="2025-03-30T04:48:30.367Z">
@@ -45,8 +45,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -232,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          602 字
+          633 字
         
       </span>
     
@@ -304,41 +302,7 @@
             
               <div class="markdown-body">
                 
-                <h1 id="1143-最长公共子序列"><a href="#1143-最长公共子序列" class="headerlink" title="1143. 最长公共子序列"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/longest-common-subsequence/">1143. 最长公共子序列</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。
-
-如果不存在 公共子序列 ，返回 <span class="token number">0</span> 。
-
-一个字符串的 子序列 是指这样一个新的字符串：
-
-它是由原字符串在不改变字符的相对顺序的情况下删除某些字符后组成的新字符串。
-
-例如，<span class="token string">"ace"</span> 是 <span class="token string">"abcde"</span> 的子序列，但 <span class="token string">"aec"</span> 不是 <span class="token string">"abcde"</span> 的子序列。
-
-两个字符串的 公共子序列 是这两个字符串所共同拥有的子序列。
-
- 
-
-示例 <span class="token number">1</span>：
-
-输入：text1 <span class="token operator">=</span> <span class="token string">"abcde"</span><span class="token punctuation">,</span> text2 <span class="token operator">=</span> <span class="token string">"ace"</span>
-输出：<span class="token number">3</span>
-解释：最长公共子序列是 <span class="token string">"ace"</span> ，它的长度为 <span class="token number">3</span> 。
-示例 <span class="token number">2</span>：
-
-输入：text1 <span class="token operator">=</span> <span class="token string">"abc"</span><span class="token punctuation">,</span> text2 <span class="token operator">=</span> <span class="token string">"abc"</span>
-输出：<span class="token number">3</span>
-解释：最长公共子序列是 <span class="token string">"abc"</span> ，它的长度为 <span class="token number">3</span> 。
-示例 <span class="token number">3</span>：
-
-输入：text1 <span class="token operator">=</span> <span class="token string">"abc"</span><span class="token punctuation">,</span> text2 <span class="token operator">=</span> <span class="token string">"def"</span>
-输出：<span class="token number">0</span>
-解释：两个字符串没有公共子序列，返回 <span class="token number">0</span> 。
- 
-
-提示：
-
-<span class="token number">1</span> <span class="token operator">&lt;=</span> text1<span class="token punctuation">.</span>length<span class="token punctuation">,</span> text2<span class="token punctuation">.</span>length <span class="token operator">&lt;=</span> <span class="token number">1000</span>
-text1 和 text2 仅由小写英文字符组成。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+                <h1 id="1143-最长公共子序列"><a href="#1143-最长公共子序列" class="headerlink" title="1143. 最长公共子序列"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/longest-common-subsequence/">1143. 最长公共子序列</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs cpp">给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。<br><br>如果不存在 公共子序列 ，返回 <span class="hljs-number">0</span> 。<br><br>一个字符串的 子序列 是指这样一个新的字符串：<br><br>它是由原字符串在不改变字符的相对顺序的情况下删除某些字符后组成的新字符串。<br><br>例如，<span class="hljs-string">&quot;ace&quot;</span> 是 <span class="hljs-string">&quot;abcde&quot;</span> 的子序列，但 <span class="hljs-string">&quot;aec&quot;</span> 不是 <span class="hljs-string">&quot;abcde&quot;</span> 的子序列。<br><br>两个字符串的 公共子序列 是这两个字符串所共同拥有的子序列。<br><br> <br><br>示例 <span class="hljs-number">1</span>：<br><br>输入：text1 = <span class="hljs-string">&quot;abcde&quot;</span>, text2 = <span class="hljs-string">&quot;ace&quot;</span><br>输出：<span class="hljs-number">3</span><br>解释：最长公共子序列是 <span class="hljs-string">&quot;ace&quot;</span> ，它的长度为 <span class="hljs-number">3</span> 。<br>示例 <span class="hljs-number">2</span>：<br><br>输入：text1 = <span class="hljs-string">&quot;abc&quot;</span>, text2 = <span class="hljs-string">&quot;abc&quot;</span><br>输出：<span class="hljs-number">3</span><br>解释：最长公共子序列是 <span class="hljs-string">&quot;abc&quot;</span> ，它的长度为 <span class="hljs-number">3</span> 。<br>示例 <span class="hljs-number">3</span>：<br><br>输入：text1 = <span class="hljs-string">&quot;abc&quot;</span>, text2 = <span class="hljs-string">&quot;def&quot;</span><br>输出：<span class="hljs-number">0</span><br>解释：两个字符串没有公共子序列，返回 <span class="hljs-number">0</span> 。<br> <br><br>提示：<br><br><span class="hljs-number">1</span> &lt;= text<span class="hljs-number">1.l</span>ength, text<span class="hljs-number">2.l</span>ength &lt;= <span class="hljs-number">1000</span><br>text1 和 text2 仅由小写英文字符组成。<br></code></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
@@ -353,34 +317,7 @@ text1 和 text2 仅由小写英文字符组成。<span aria-hidden="true" class=
 </li>
 </ul>
 </blockquote>
-<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
-<span class="token keyword">public</span><span class="token operator">:</span>
-    <span class="token keyword">int</span> <span class="token function">longestCommonSubsequence</span><span class="token punctuation">(</span>string text1<span class="token punctuation">,</span> string text2<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">int</span> n <span class="token operator">=</span> text1<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> m <span class="token operator">=</span> text2<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    	text1 <span class="token operator">=</span> <span class="token string">" "</span> <span class="token operator">+</span> text1<span class="token punctuation">;</span>
-        text2 <span class="token operator">=</span> <span class="token string">" "</span> <span class="token operator">+</span> text2<span class="token punctuation">;</span>
-        vector<span class="token operator">&lt;</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">>></span> <span class="token function">ans</span><span class="token punctuation">(</span>n <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token generic-function"><span class="token function">vector</span><span class="token generic class-name"><span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span></span></span><span class="token punctuation">(</span>m <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    	<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> n<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> ans<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
-    	<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> j <span class="token operator">&lt;=</span> m<span class="token punctuation">;</span> j<span class="token operator">++</span><span class="token punctuation">)</span> ans<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
-
-    	<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> n<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
-        <span class="token punctuation">&#123;</span>
-    		<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> j <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span> j <span class="token operator">&lt;=</span> m<span class="token punctuation">;</span> j<span class="token operator">++</span><span class="token punctuation">)</span>
-            <span class="token punctuation">&#123;</span>
-    			<span class="token keyword">if</span><span class="token punctuation">(</span>text1<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">==</span> text2<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span>  
-				<span class="token punctuation">&#123;</span>
-					ans<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">max</span><span class="token punctuation">(</span>
-						ans<span class="token punctuation">[</span>i <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span>j <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> 
-						<span class="token function">max</span><span class="token punctuation">(</span>ans<span class="token punctuation">[</span>i <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">,</span> ans<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-					<span class="token punctuation">)</span><span class="token punctuation">;</span>
-				<span class="token punctuation">&#125;</span>
-    			<span class="token keyword">else</span> ans<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">max</span><span class="token punctuation">(</span>ans<span class="token punctuation">[</span>i <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">,</span> ans<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    		<span class="token punctuation">&#125;</span>
-    	<span class="token punctuation">&#125;</span>
-    	<span class="token keyword">return</span> ans<span class="token punctuation">[</span>n<span class="token punctuation">]</span><span class="token punctuation">[</span>m<span class="token punctuation">]</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">longestCommonSubsequence</span><span class="hljs-params">(string text1, string text2)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = text<span class="hljs-number">1.</span><span class="hljs-built_in">size</span>(), m = text<span class="hljs-number">2.</span><span class="hljs-built_in">size</span>();<br>    	text1 = <span class="hljs-string">&quot; &quot;</span> + text1;<br>        text2 = <span class="hljs-string">&quot; &quot;</span> + text2;<br>        vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; <span class="hljs-built_in">ans</span>(n + <span class="hljs-number">1</span>, <span class="hljs-built_in">vector</span>&lt;<span class="hljs-type">int</span>&gt;(m + <span class="hljs-number">1</span>, <span class="hljs-number">0</span>));<br><br>    	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt;= n; i++) ans[i][<span class="hljs-number">0</span>] = <span class="hljs-number">1</span>;<br>    	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = <span class="hljs-number">0</span>; j &lt;= m; j++) ans[<span class="hljs-number">0</span>][j] = <span class="hljs-number">1</span>;<br><br>    	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++)<br>        &#123;<br>    		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = <span class="hljs-number">1</span>; j &lt;= m; j++)<br>            &#123;<br>    			<span class="hljs-keyword">if</span>(text1[i] == text2[j])  <br>				&#123;<br>					ans[i][j] = <span class="hljs-built_in">max</span>(<br>						ans[i - <span class="hljs-number">1</span>][j - <span class="hljs-number">1</span>] + <span class="hljs-number">1</span>, <br>						<span class="hljs-built_in">max</span>(ans[i - <span class="hljs-number">1</span>][j], ans[i][j - <span class="hljs-number">1</span>])<br>					);<br>				&#125;<br>    			<span class="hljs-keyword">else</span> ans[i][j] = <span class="hljs-built_in">max</span>(ans[i - <span class="hljs-number">1</span>][j], ans[i][j - <span class="hljs-number">1</span>]);<br>    		&#125;<br>    	&#125;<br>    	<span class="hljs-keyword">return</span> ans[n][m] - <span class="hljs-number">1</span>;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n * m)</p>
@@ -773,8 +710,6 @@ text1 和 text2 仅由小写英文字符组成。<span aria-hidden="true" class=
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

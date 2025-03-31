@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="822. Kth-Pair-Distance题目Given a list of integers nums and an integer k,  return the k-th smallest abs(x - y) for every pair of elements (x, y) in nums.   Note that (x, y) and (y, x) are considered the">
+    <meta name="description" content="822. Kth-Pair-Distance题目12345678910111213141516171819202122232425Given a list of integers nums and an integer k,return the k-th smallest abs(x - y) for every pair of elements (x, y) in nums. Note that">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day 41 822. Kth-Pair-Distance">
 <meta property="og:url" content="https://chaggle.github.io/2021/10/20/Leetcode/91-day/day-41/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="822. Kth-Pair-Distance题目Given a list of integers nums and an integer k,  return the k-th smallest abs(x - y) for every pair of elements (x, y) in nums.   Note that (x, y) and (y, x) are considered the">
+<meta property="og:description" content="822. Kth-Pair-Distance题目12345678910111213141516171819202122232425Given a list of integers nums and an integer k,return the k-th smallest abs(x - y) for every pair of elements (x, y) in nums. Note that">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-20T04:22:16.000Z">
 <meta property="article:modified_time" content="2025-03-30T04:48:36.147Z">
@@ -45,8 +45,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -232,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          352 字
+          355 字
         
       </span>
     
@@ -304,31 +302,7 @@
             
               <div class="markdown-body">
                 
-                <h1 id="822-Kth-Pair-Distance"><a href="#822-Kth-Pair-Distance" class="headerlink" title="822. Kth-Pair-Distance"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Kth-Pair-Distance">822. Kth-Pair-Distance</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">Given a list of integers nums <span class="token operator">and</span> an integer k<span class="token punctuation">,</span>
-
-<span class="token keyword">return</span> the k<span class="token operator">-</span>th smallest <span class="token function">abs</span><span class="token punctuation">(</span>x <span class="token operator">-</span> y<span class="token punctuation">)</span> <span class="token keyword">for</span> every pair of <span class="token function">elements</span> <span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">)</span> in nums<span class="token punctuation">.</span>
- 
-Note <span class="token function">that</span> <span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">)</span> <span class="token function">and</span> <span class="token punctuation">(</span>y<span class="token punctuation">,</span> x<span class="token punctuation">)</span> are considered the same pair<span class="token punctuation">.</span>
-
-Constraints
-
-n ≤ <span class="token number">100</span><span class="token punctuation">,</span><span class="token number">000</span> where n is the length of nums
-Example <span class="token number">1</span>
-Input
-nums <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span>
-k <span class="token operator">=</span> <span class="token number">3</span>
-Output
-<span class="token number">2</span>
-Explanation
-Here are all the pair distances<span class="token operator">:</span>
-
-<span class="token function">abs</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> <span class="token number">5</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token number">4</span>
-<span class="token function">abs</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> <span class="token number">3</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token number">2</span>
-<span class="token function">abs</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token number">1</span>
-<span class="token function">abs</span><span class="token punctuation">(</span><span class="token number">5</span> <span class="token operator">-</span> <span class="token number">3</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token number">2</span>
-<span class="token function">abs</span><span class="token punctuation">(</span><span class="token number">5</span> <span class="token operator">-</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token number">3</span>
-<span class="token function">abs</span><span class="token punctuation">(</span><span class="token number">3</span> <span class="token operator">-</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token number">1</span>
-Sorted in ascending order we have <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+                <h1 id="822-Kth-Pair-Distance"><a href="#822-Kth-Pair-Distance" class="headerlink" title="822. Kth-Pair-Distance"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Kth-Pair-Distance">822. Kth-Pair-Distance</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs cpp">Given a list of integers nums <span class="hljs-keyword">and</span> an integer k,<br><br><span class="hljs-keyword">return</span> the k-th smallest <span class="hljs-built_in">abs</span>(x - y) <span class="hljs-keyword">for</span> every pair of <span class="hljs-built_in">elements</span> (x, y) in nums.<br> <br>Note <span class="hljs-built_in">that</span> (x, y) <span class="hljs-built_in">and</span> (y, x) are considered the same pair.<br><br>Constraints<br><br>n ≤ <span class="hljs-number">100</span>,<span class="hljs-number">000</span> where n is the length of nums<br>Example <span class="hljs-number">1</span><br>Input<br>nums = [<span class="hljs-number">1</span>, <span class="hljs-number">5</span>, <span class="hljs-number">3</span>, <span class="hljs-number">2</span>]<br>k = <span class="hljs-number">3</span><br>Output<br><span class="hljs-number">2</span><br>Explanation<br>Here are all the pair distances:<br><br><span class="hljs-built_in">abs</span>(<span class="hljs-number">1</span> - <span class="hljs-number">5</span>) = <span class="hljs-number">4</span><br><span class="hljs-built_in">abs</span>(<span class="hljs-number">1</span> - <span class="hljs-number">3</span>) = <span class="hljs-number">2</span><br><span class="hljs-built_in">abs</span>(<span class="hljs-number">1</span> - <span class="hljs-number">2</span>) = <span class="hljs-number">1</span><br><span class="hljs-built_in">abs</span>(<span class="hljs-number">5</span> - <span class="hljs-number">3</span>) = <span class="hljs-number">2</span><br><span class="hljs-built_in">abs</span>(<span class="hljs-number">5</span> - <span class="hljs-number">2</span>) = <span class="hljs-number">3</span><br><span class="hljs-built_in">abs</span>(<span class="hljs-number">3</span> - <span class="hljs-number">2</span>) = <span class="hljs-number">1</span><br>Sorted in ascending order we have [<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>].<br></code></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
@@ -337,36 +311,7 @@ Sorted in ascending order we have <span class="token punctuation">[</span><span 
 <li>3、本题目也可以使用数学的思想去考虑，所有的距离对为一共有$n(n-1)$，所以只要大于mid距离的对数有$n(n-1)$ - k，即为不合理。（还是有些东西没想明白，先放着）</li>
 </ul>
 </blockquote>
-<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
-<span class="token keyword">public</span><span class="token operator">:</span>
-    <span class="token keyword">bool</span> <span class="token function">isvaild</span><span class="token punctuation">(</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> nums<span class="token punctuation">,</span> <span class="token keyword">int</span> dis<span class="token punctuation">,</span> <span class="token keyword">int</span> k<span class="token punctuation">)</span>
-    <span class="token punctuation">&#123;</span> 
-        <span class="token keyword">int</span> n <span class="token operator">=</span> nums<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token keyword">long</span> <span class="token keyword">long</span> <span class="token keyword">int</span> count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-        <span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-        <span class="token keyword">while</span> <span class="token punctuation">(</span>i <span class="token operator">&lt;</span> n <span class="token operator">||</span> j <span class="token operator">&lt;</span> n<span class="token punctuation">)</span>
-        <span class="token punctuation">&#123;</span>
-            <span class="token keyword">while</span> <span class="token punctuation">(</span>j <span class="token operator">&lt;</span> n <span class="token operator">&amp;&amp;</span> nums<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">-</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&lt;=</span> dis<span class="token punctuation">)</span> j<span class="token operator">++</span><span class="token punctuation">;</span>
-            count <span class="token operator">+=</span> j <span class="token operator">-</span> i <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
-            i<span class="token operator">++</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-        <span class="token keyword">return</span> count <span class="token operator">>=</span> k<span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-    
-    <span class="token keyword">int</span> <span class="token function">solve</span><span class="token punctuation">(</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> nums<span class="token punctuation">,</span> <span class="token keyword">int</span> k<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">int</span> n <span class="token operator">=</span> nums<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        k<span class="token operator">++</span><span class="token punctuation">;</span>
-        <span class="token function">sort</span><span class="token punctuation">(</span>nums<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nums<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">int</span> l <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> r <span class="token operator">=</span> nums<span class="token punctuation">[</span>n <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">-</span> nums<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span> 
-        <span class="token keyword">while</span><span class="token punctuation">(</span>l <span class="token operator">&lt;</span> r<span class="token punctuation">)</span> 
-        <span class="token punctuation">&#123;</span>
-            <span class="token keyword">int</span> mid <span class="token operator">=</span> l <span class="token operator">+</span> <span class="token punctuation">(</span>r <span class="token operator">-</span> l<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">;</span>
-            <span class="token keyword">int</span> count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> left <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-            <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isvaild</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span> mid<span class="token punctuation">,</span> k<span class="token punctuation">)</span><span class="token punctuation">)</span> r <span class="token operator">=</span> mid<span class="token punctuation">;</span>
-            <span class="token keyword">else</span> l <span class="token operator">=</span> mid <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-        <span class="token keyword">return</span> l<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">isvaild</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> dis, <span class="hljs-type">int</span> k)</span></span><br><span class="hljs-function">    </span>&#123; <br>        <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>()<br>        <span class="hljs-type">long</span> <span class="hljs-type">long</span> <span class="hljs-type">int</span> count = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> i = <span class="hljs-number">0</span>, j = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">while</span> (i &lt; n || j &lt; n)<br>        &#123;<br>            <span class="hljs-keyword">while</span> (j &lt; n &amp;&amp; nums[j] - nums[i] &lt;= dis) j++;<br>            count += j - i - <span class="hljs-number">1</span>;<br>            i++;<br>        &#125;<br>        <span class="hljs-keyword">return</span> count &gt;= k;<br>    &#125;;<br>    <br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">solve</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br>        k++;<br>        <span class="hljs-built_in">sort</span>(nums.<span class="hljs-built_in">begin</span>(), nums.<span class="hljs-built_in">end</span>());<br>        <span class="hljs-type">int</span> l = <span class="hljs-number">0</span>, r = nums[n - <span class="hljs-number">1</span>] - nums[<span class="hljs-number">0</span>]; <br>        <span class="hljs-keyword">while</span>(l &lt; r) <br>        &#123;<br>            <span class="hljs-type">int</span> mid = l + (r - l) / <span class="hljs-number">2</span>;<br>            <span class="hljs-type">int</span> count = <span class="hljs-number">0</span>, left = <span class="hljs-number">0</span>;<br>            <span class="hljs-keyword">if</span>(<span class="hljs-built_in">isvaild</span>(nums, mid, k)) r = mid;<br>            <span class="hljs-keyword">else</span> l = mid + <span class="hljs-number">1</span>;<br>        &#125;<br>        <span class="hljs-keyword">return</span> l;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(nlogn)</p>
@@ -759,8 +704,6 @@ Sorted in ascending order we have <span class="token punctuation">[</span><span 
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

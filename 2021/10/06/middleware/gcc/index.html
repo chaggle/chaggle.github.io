@@ -19,15 +19,15 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="gcc 是 GUN Compiler Collection的缩写，可以支持多种语言编译，比如 C, C++, Java, pascal 等  gcc的编译过程 预处理（pre-processing）E：插入头文件，替换宏  编译（Compiling）S：编译成汇编  汇编（Assembling） c：编译成目标文件  链接 （Linking）：链接到库中，变成可执行文件    gcc -E he">
+    <meta name="description" content="gcc 是 GUN Compiler Collection的缩写，可以支持多种语言编译，比如 C, C++, Java, pascal 等             gcc的编译过程 预处理（pre-processing）E：插入头文件，替换宏  编译（Compiling）S：编译成汇编  汇编（Assembling） c：编译成目标文件  链接 （Linking）：链接到">
 <meta property="og:type" content="article">
 <meta property="og:title" content="GCC 与 GDB 的学习">
 <meta property="og:url" content="https://chaggle.github.io/2021/10/06/middleware/gcc/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="gcc 是 GUN Compiler Collection的缩写，可以支持多种语言编译，比如 C, C++, Java, pascal 等  gcc的编译过程 预处理（pre-processing）E：插入头文件，替换宏  编译（Compiling）S：编译成汇编  汇编（Assembling） c：编译成目标文件  链接 （Linking）：链接到库中，变成可执行文件    gcc -E he">
+<meta property="og:description" content="gcc 是 GUN Compiler Collection的缩写，可以支持多种语言编译，比如 C, C++, Java, pascal 等             gcc的编译过程 预处理（pre-processing）E：插入头文件，替换宏  编译（Compiling）S：编译成汇编  汇编（Assembling） c：编译成目标文件  链接 （Linking）：链接到">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-06T06:56:50.000Z">
-<meta property="article:modified_time" content="2025-03-07T02:50:09.269Z">
+<meta property="article:modified_time" content="2025-03-31T01:40:47.552Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="gcc">
 <meta name="twitter:card" content="summary_large_image">
@@ -45,8 +45,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -232,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          859 字
+          867 字
         
       </span>
     
@@ -294,7 +292,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2025-03-07T10:50:09+08:00
+                    本文最后更新于 2025-03-31T09:40:47+08:00
                   
                   
 
@@ -304,9 +302,10 @@
             
               <div class="markdown-body">
                 
-                <blockquote>
-<p>gcc 是 GUN Compiler Collection的缩写，可以支持多种语言编译，比如 C, C++, Java, pascal 等</p>
-</blockquote>
+                <div class="note note-primary">
+            <p>gcc 是 GUN Compiler Collection的缩写，可以支持多种语言编译，比如 C, C++, Java, pascal 等</p>
+          </div>
+
 <h2 id="gcc的编译过程"><a href="#gcc的编译过程" class="headerlink" title="gcc的编译过程"></a>gcc的编译过程</h2><ul>
 <li><p>预处理（pre-processing）E：插入头文件，替换宏</p>
 </li>
@@ -317,75 +316,125 @@
 <li><p>链接 （Linking）：链接到库中，变成可执行文件</p>
 </li>
 </ul>
-<blockquote>
-<p>gcc -E hello.c -o hello.i</p>
-<p>gcc -S hello.i –o hello.s</p>
-<p>gcc –c hello.s –o hello.o</p>
-<p>gcc hello.s –o hello 链接，生成可执行文件</p>
-<p>.&#x2F;hello 运行</p>
-</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">gcc -E hello.c -o hello.i<br><br>gcc -S hello.i –o hello.s<br><br>gcc –c hello.s –o hello.o<br><br>gcc hello.s –o hello 链接，生成可执行文件<br><br>./hello 运行<br></code></pre></td></tr></table></figure>
+
 <p>也可以一次性完成:</p>
-<blockquote>
-<p>gcc hello.c –o hello</p>
-</blockquote>
+<p><code>gcc hello.c –o hello</code></p>
 <p>但一般情况下生成.o文件比较好，可以重定位文件，让别人使用</p>
-<p>gcc常用选项</p>
-<blockquote>
-<p>选项名 作用<br>o  生成目标<br>c  取消链接步骤，编译源码并最后生成目标文件<br>E  只运行C预编译器（头文件，宏等展开）<br>S  生成汇编语言文件后停止编译（.s文件）<br>Wall  打开编译告警（所有）<br>g  嵌入调试信息，方便gdb调试<br>llib  链接 lib 库 （这里是小写 L ） 相当于 C++ #pragma comment(lib, “xxx.lib”)<br>Idir  增加 include 目录 (这里是大写 i ) 头文件路径<br>LDir  增加 lib 目录 （编译静态库和动态库）</p>
-</blockquote>
-<p>gdb调试实例<br>下面以一个有错误的例子程序来介绍gdb的使用：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/*bugging.c*/</span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
+<h2 id="gcc常用选项"><a href="#gcc常用选项" class="headerlink" title="gcc常用选项"></a>gcc常用选项</h2><table>
+<thead>
+<tr>
+<th align="center">选项名</th>
+<th align="center">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">-c</td>
+<td align="center">编译或汇编源文件，但不链接，生成目标文件</td>
+</tr>
+<tr>
+<td align="center">-o</td>
+<td align="center">指定输出文件</td>
+</tr>
+<tr>
+<td align="center">-E</td>
+<td align="center">只运行C预编译器（头文件，宏等展开）</td>
+</tr>
+<tr>
+<td align="center">-S</td>
+<td align="center">生成汇编语言文件后停止编译（.s文件）</td>
+</tr>
+<tr>
+<td align="center">-Wall</td>
+<td align="center">打开编译告警（所有）</td>
+</tr>
+<tr>
+<td align="center">-g</td>
+<td align="center">嵌入调试信息，方便gdb调试</td>
+</tr>
+<tr>
+<td align="center">-llib</td>
+<td align="center">链接 lib 库 （这里是小写 L ） 相当于 C++ #pragma comment(lib, “xxx.lib”)</td>
+</tr>
+<tr>
+<td align="center">-Idir</td>
+<td align="center">增加 include 目录 (这里是大写 i ) 头文件路径</td>
+</tr>
+<tr>
+<td align="center">-LDir</td>
+<td align="center">增加 lib 目录 （编译静态库和动态库）</td>
+</tr>
+</tbody></table>
+<h2 id="gdb调试实例"><a href="#gdb调试实例" class="headerlink" title="gdb调试实例"></a>gdb调试实例</h2><p>下面以一个有错误的例子程序来介绍gdb的使用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/*bugging.c*/</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><br><span class="hljs-type">static</span> <span class="hljs-type">char</span> buff [<span class="hljs-number">256</span>];<br><span class="hljs-type">static</span> <span class="hljs-type">char</span>* <span class="hljs-built_in">string</span>;<br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span> <span class="hljs-params">()</span><br>&#123;<br>    <span class="hljs-built_in">printf</span> (<span class="hljs-string">&quot;Please input a string: &quot;</span>);<br>    gets (<span class="hljs-built_in">string</span>);<br>    <span class="hljs-built_in">printf</span> (<span class="hljs-string">&quot;\nYour string is: %s\n&quot;</span>, <span class="hljs-built_in">string</span>);<br>&#125;<br><span class="hljs-comment">//这个程序是接受用户的输入，然后将用户的输入打印出来。该程序使用了一个未经过初始化的字符串地址 string，因此，编译并运行之后，将出现 &quot;Segment Fault&quot;错误：</span><br><br></code></pre></td></tr></table></figure>
 
-<span class="token keyword">static</span> <span class="token keyword">char</span> buff <span class="token punctuation">[</span><span class="token number">256</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token keyword">static</span> <span class="token keyword">char</span><span class="token operator">*</span> string<span class="token punctuation">;</span>
-<span class="token keyword">int</span> <span class="token function">main</span> <span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token punctuation">&#123;</span>
-    <span class="token function">printf</span> <span class="token punctuation">(</span><span class="token string">"Please input a string: "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">gets</span> <span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">printf</span> <span class="token punctuation">(</span><span class="token string">"\nYour string is: %s\n"</span><span class="token punctuation">,</span> string<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-<span class="token comment">//这个程序是接受用户的输入，然后将用户的输入打印出来。该程序使用了一个未经过初始化的字符串地址 string，因此，编译并运行之后，将出现 "Segment Fault"错误：</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ gcc -o bugging -g  bugging.c<br>$ ./bugging<br><br><span class="hljs-comment"># Please input a string: asdf</span><br><span class="hljs-comment"># Segmentation fault (core dumped)</span><br><span class="hljs-comment"># 为了查找该程序中出现的问题，我们利用 gdb，并按如下的步骤进行：</span><br><br><span class="hljs-comment"># [1] 运行 “gdb bugging” ，加载 bugging 可执行文件；</span><br><span class="hljs-variable">$gdb</span> bugging <br>    <br><span class="hljs-comment">#[2] 执行装入的 bugging 命令；</span><br>(gdb) run<br>    <br><span class="hljs-comment">#[3] 使用 where 命令查看程序出错的地方；</span><br>(gdb) <span class="hljs-built_in">where</span><br>    <br><span class="hljs-comment">#[4] 利用 list 命令查看调用 gets 函数附近的代码；</span><br>(gdb) list<br>    <br><span class="hljs-comment">#[5] 在 gdb 中，我们在第 11 行处设置断点，看看是否是在第11行出错；</span><br>(gdb) <span class="hljs-built_in">break</span> 11<br>    <br><span class="hljs-comment">#[6] 程序重新运行到第 11 行处停止，这时程序正常，然后执行单步命令next；</span><br>(gdb) next<br>    <br><span class="hljs-comment">#[7] 程序确实出错，能够导致 gets 函数出错的因素就是变量 string。重新执行测试程，用 print 命令查看 string 的值；</span><br>(gdb) run<br>(gdb) <span class="hljs-built_in">print</span> string<br>(gdb) <span class="hljs-variable">$1</span>=0x0<br>    <br><span class="hljs-comment">#[8] 问题在于string指向的是一个无效指针，修改程序，在10行和11行之间增加一条语句 “string=buff; ”，重新编译程序，然后继续运行，将看到正确的程序运行结果。</span><br></code></pre></td></tr></table></figure>
 
-<figure><div class="code-wrapper"><pre class="line-numbers language-Bash" data-language="Bash"><code class="language-Bash">$ gcc -o bugging -g  bugging.c
-$ .&#x2F;bugging
-
-# Please input a string: asdf
-# Segmentation fault (core dumped)
-# 为了查找该程序中出现的问题，我们利用 gdb，并按如下的步骤进行：
-
-# [1] 运行 “gdb bugging” ，加载 bugging 可执行文件；
-$gdb bugging 
-    
-#[2] 执行装入的 bugging 命令；
-(gdb) run
-    
-#[3] 使用 where 命令查看程序出错的地方；
-(gdb) where
-    
-#[4] 利用 list 命令查看调用 gets 函数附近的代码；
-(gdb) list
-    
-#[5] 在 gdb 中，我们在第 11 行处设置断点，看看是否是在第11行出错；
-(gdb) break 11
-    
-#[6] 程序重新运行到第 11 行处停止，这时程序正常，然后执行单步命令next；
-(gdb) next
-    
-#[7] 程序确实出错，能够导致 gets 函数出错的因素就是变量 string。重新执行测试程，用 print 命令查看 string 的值；
-(gdb) run
-(gdb) print string
-(gdb) $1&#x3D;0x0
-    
-#[8] 问题在于string指向的是一个无效指针，修改程序，在10行和11行之间增加一条语句 “string&#x3D;buff; ”，重新编译程序，然后继续运行，将看到正确的程序运行结果。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<blockquote>
 <p>用gdb查看源代码可以用list命令，但是这个不够灵活。可以使用”layout src”命令，或者按Ctrl-X再按A，就会出现一个窗口可以查看源代码。也可以用使用-tui参数，这样进入gdb里面后就能直接打开代码查看窗口。其他代码窗口相关命令：</p>
-<p>info win 显示窗口的大小<br>layout next 切换到下一个布局模式<br>layout prev 切换到上一个布局模式<br>layout src 只显示源代码<br>layout asm 只显示汇编代码<br>layout split 显示源代码和汇编代码<br>layout regs 增加寄存器内容显示<br>focus cmd&#x2F;src&#x2F;asm&#x2F;regs&#x2F;next&#x2F;prev 切换当前窗口<br>refresh 刷新所有窗口<br>tui reg next 显示下一组寄存器<br>tui reg system 显示系统寄存器<br>update 更新源代码窗口和当前执行点<br>winheight name +&#x2F;- line 调整name窗口的高度<br>tabset nchar 设置tab为nchar个字符</p>
-</blockquote>
-<hr>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">info win</td>
+<td align="center">显示窗口的大小</td>
+</tr>
+<tr>
+<td align="center">layout next</td>
+<td align="center">切换到下一个布局模式</td>
+</tr>
+<tr>
+<td align="center">layout prev</td>
+<td align="center">切换到上一个布局模式</td>
+</tr>
+<tr>
+<td align="center">layout src</td>
+<td align="center">只显示源代码</td>
+</tr>
+<tr>
+<td align="center">layout asm</td>
+<td align="center">只显示汇编代码</td>
+</tr>
+<tr>
+<td align="center">layout split</td>
+<td align="center">显示源代码和汇编代码</td>
+</tr>
+<tr>
+<td align="center">layout regs</td>
+<td align="center">增加寄存器内容显示</td>
+</tr>
+<tr>
+<td align="center">focus</td>
+<td align="center">focus cmd&#x2F;src&#x2F;asm&#x2F;regs&#x2F;next&#x2F;prev</td>
+</tr>
+<tr>
+<td align="center">refresh</td>
+<td align="center">刷新所有窗口</td>
+</tr>
+<tr>
+<td align="center">tui reg next</td>
+<td align="center">显示下一组寄存器</td>
+</tr>
+<tr>
+<td align="center">tui reg system</td>
+<td align="center">显示系统寄存器</td>
+</tr>
+<tr>
+<td align="center">update</td>
+<td align="center">更新源代码窗口和当前执行点</td>
+</tr>
+<tr>
+<td align="center">winheight name +&#x2F;- line</td>
+<td align="center">调整name窗口的高度</td>
+</tr>
+<tr>
+<td align="center">tabset nchar</td>
+<td align="center">设置tab为nchar个字符</td>
+</tr>
+</tbody></table>
 
                 
               </div>
@@ -450,7 +499,7 @@ $gdb bugging
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年3月7日</div>
+          <div>2025年3月31日</div>
         </div>
       
       
@@ -771,8 +820,6 @@ $gdb bugging
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

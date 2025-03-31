@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="284. 顶端迭代器题目请你设计一个迭代器，除了支持 hasNext 和 next 操作外，还支持 peek 操作。  实现 PeekingIterator 类：  PeekingIterator(int[] nums) 使用指定整数数组 nums 初始化迭代器。 int next() 返回数组中的下一个元素，并将指针移动到下个元素处。 bool hasNext() 如果数组中存在下一个元素，返回">
+    <meta name="description" content="284. 顶端迭代器题目123456789101112131415161718192021222324252627282930313233请你设计一个迭代器，除了支持 hasNext 和 next 操作外，还支持 peek 操作。实现 PeekingIterator 类：PeekingIterator(int[] nums) 使用指定整数数组 nums 初始化迭代器。int next() 返回数组">
 <meta property="og:type" content="article">
 <meta property="og:title" content="284. 顶端迭代器">
 <meta property="og:url" content="https://chaggle.github.io/2021/10/05/Leetcode/284/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="284. 顶端迭代器题目请你设计一个迭代器，除了支持 hasNext 和 next 操作外，还支持 peek 操作。  实现 PeekingIterator 类：  PeekingIterator(int[] nums) 使用指定整数数组 nums 初始化迭代器。 int next() 返回数组中的下一个元素，并将指针移动到下个元素处。 bool hasNext() 如果数组中存在下一个元素，返回">
+<meta property="og:description" content="284. 顶端迭代器题目123456789101112131415161718192021222324252627282930313233请你设计一个迭代器，除了支持 hasNext 和 next 操作外，还支持 peek 操作。实现 PeekingIterator 类：PeekingIterator(int[] nums) 使用指定整数数组 nums 初始化迭代器。int next() 返回数组">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-05T00:23:28.000Z">
 <meta property="article:modified_time" content="2025-03-30T16:09:09.248Z">
@@ -45,8 +45,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -232,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          465 字
+          481 字
         
       </span>
     
@@ -243,7 +241,7 @@
         
         
         
-          4 分钟
+          5 分钟
         
       </span>
     
@@ -304,39 +302,7 @@
             
               <div class="markdown-body">
                 
-                <h1 id="284-顶端迭代器"><a href="#284-顶端迭代器" class="headerlink" title="284. 顶端迭代器"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/peeking-iterator/">284. 顶端迭代器</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">请你设计一个迭代器，除了支持 hasNext 和 next 操作外，还支持 peek 操作。
-
-实现 PeekingIterator 类：
-
-<span class="token function">PeekingIterator</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">[</span><span class="token punctuation">]</span> nums<span class="token punctuation">)</span> 使用指定整数数组 nums 初始化迭代器。
-<span class="token keyword">int</span> <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span> 返回数组中的下一个元素，并将指针移动到下个元素处。
-<span class="token keyword">bool</span> <span class="token function">hasNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span> 如果数组中存在下一个元素，返回 <span class="token boolean">true</span> ；否则，返回 <span class="token boolean">false</span> 。
-<span class="token keyword">int</span> <span class="token function">peek</span><span class="token punctuation">(</span><span class="token punctuation">)</span> 返回数组中的下一个元素，但 不 移动指针。
- 
-
-示例：
-
-输入：
-<span class="token punctuation">[</span><span class="token string">"PeekingIterator"</span><span class="token punctuation">,</span> <span class="token string">"next"</span><span class="token punctuation">,</span> <span class="token string">"peek"</span><span class="token punctuation">,</span> <span class="token string">"next"</span><span class="token punctuation">,</span> <span class="token string">"next"</span><span class="token punctuation">,</span> <span class="token string">"hasNext"</span><span class="token punctuation">]</span>
-<span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
-输出：
-<span class="token punctuation">[</span>null<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">]</span>
-
-解释：
-PeekingIterator peekingIterator <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token function">PeekingIterator</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// [1,2,3]</span>
-peekingIterator<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment">// 返回 1 ，指针移动到下一个元素 [1,2,3]</span>
-peekingIterator<span class="token punctuation">.</span><span class="token function">peek</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment">// 返回 2 ，指针未发生移动 [1,2,3]</span>
-peekingIterator<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment">// 返回 2 ，指针移动到下一个元素 [1,2,3]</span>
-peekingIterator<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment">// 返回 3 ，指针移动到下一个元素 [1,2,3]</span>
-peekingIterator<span class="token punctuation">.</span><span class="token function">hasNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 返回 False</span>
- 
-
-提示：
-
-<span class="token number">1</span> <span class="token operator">&lt;=</span> nums<span class="token punctuation">.</span>length <span class="token operator">&lt;=</span> <span class="token number">1000</span>
-<span class="token number">1</span> <span class="token operator">&lt;=</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&lt;=</span> <span class="token number">1000</span>
-对 next 和 peek 的调用均有效
-next、hasNext 和 peek 最多调用  <span class="token number">1000</span> 次<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+                <h1 id="284-顶端迭代器"><a href="#284-顶端迭代器" class="headerlink" title="284. 顶端迭代器"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/peeking-iterator/">284. 顶端迭代器</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs cpp">请你设计一个迭代器，除了支持 hasNext 和 next 操作外，还支持 peek 操作。<br><br>实现 PeekingIterator 类：<br><br><span class="hljs-built_in">PeekingIterator</span>(<span class="hljs-type">int</span>[] nums) 使用指定整数数组 nums 初始化迭代器。<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">next</span><span class="hljs-params">()</span> 返回数组中的下一个元素，并将指针移动到下个元素处。</span><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">hasNext</span><span class="hljs-params">()</span> 如果数组中存在下一个元素，返回 <span class="hljs-literal">true</span> ；否则，返回 <span class="hljs-literal">false</span> 。</span><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">peek</span><span class="hljs-params">()</span> 返回数组中的下一个元素，但 不 移动指针。</span><br><span class="hljs-function"> </span><br><span class="hljs-function"></span><br><span class="hljs-function">示例：</span><br><span class="hljs-function"></span><br><span class="hljs-function">输入：</span><br><span class="hljs-function">[&quot;PeekingIterator&quot;, &quot;next&quot;, &quot;peek&quot;, &quot;next&quot;, &quot;next&quot;, &quot;hasNext&quot;]</span><br><span class="hljs-function">[[[1, 2, 3]], [], [], [], [], []]</span><br><span class="hljs-function">输出：</span><br><span class="hljs-function">[null, 1, 2, 2, 3, <span class="hljs-literal">false</span>]</span><br><span class="hljs-function"></span><br><span class="hljs-function">解释：</span><br><span class="hljs-function">PeekingIterator peekingIterator </span>= <span class="hljs-keyword">new</span> <span class="hljs-built_in">PeekingIterator</span>([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]); <span class="hljs-comment">// [1,2,3]</span><br>peekingIterator.<span class="hljs-built_in">next</span>();    <span class="hljs-comment">// 返回 1 ，指针移动到下一个元素 [1,2,3]</span><br>peekingIterator.<span class="hljs-built_in">peek</span>();    <span class="hljs-comment">// 返回 2 ，指针未发生移动 [1,2,3]</span><br>peekingIterator.<span class="hljs-built_in">next</span>();    <span class="hljs-comment">// 返回 2 ，指针移动到下一个元素 [1,2,3]</span><br>peekingIterator.<span class="hljs-built_in">next</span>();    <span class="hljs-comment">// 返回 3 ，指针移动到下一个元素 [1,2,3]</span><br>peekingIterator.<span class="hljs-built_in">hasNext</span>(); <span class="hljs-comment">// 返回 False</span><br> <br><br>提示：<br><br><span class="hljs-number">1</span> &lt;= nums.length &lt;= <span class="hljs-number">1000</span><br><span class="hljs-number">1</span> &lt;= nums[i] &lt;= <span class="hljs-number">1000</span><br>对 next 和 peek 的调用均有效<br>next、hasNext 和 peek 最多调用  <span class="hljs-number">1000</span> 次<br></code></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
@@ -345,57 +311,7 @@ next、hasNext 和 peek 最多调用  <span class="token number">1000</span> 次
 <li>next() 操作：返回下一元素（当不存在下一元素时，返回 null）。实现上，就是返回游标指向的元素，并让游标后移。</li>
 </ul>
 </blockquote>
-<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token comment">/*
- * Below is the interface for Iterator, which is already defined for you.
- * **DO NOT** modify the interface for Iterator.
- *
- *  class Iterator &#123;
- *  struct Data;
- *   Data* data;
- *  public:
- *  Iterator(const vector&lt;int>&amp; nums);
- *   Iterator(const Iterator&amp; iter);
- *
- *   // Returns the next element in the iteration.
- *  int next();
- *
- *  // Returns true if the iteration has more elements.
- *  bool hasNext() const;
- * &#125;;
- */</span>
-
-<span class="token keyword">class</span> <span class="token class-name">PeekingIterator</span> <span class="token operator">:</span> <span class="token base-clause"><span class="token keyword">public</span> <span class="token class-name">Iterator</span></span> <span class="token punctuation">&#123;</span>
-<span class="token keyword">private</span><span class="token operator">:</span>
-    <span class="token keyword">int</span> _next<span class="token punctuation">;</span>
-    <span class="token keyword">bool</span> _hasNext<span class="token punctuation">;</span>
-    
-<span class="token keyword">public</span><span class="token operator">:</span>
- <span class="token function">PeekingIterator</span><span class="token punctuation">(</span><span class="token keyword">const</span> vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> nums<span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">Iterator</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-     <span class="token comment">// Initialize any member here.</span>
-     <span class="token comment">// **DO NOT** save a copy of nums and manipulate it directly.</span>
-     <span class="token comment">// You should only use the Iterator interface methods.</span>
-     _hasNext <span class="token operator">=</span> <span class="token class-name">Iterator</span><span class="token double-colon punctuation">::</span><span class="token function">hasNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span>_hasNext<span class="token punctuation">)</span> _next <span class="token operator">=</span> <span class="token class-name">Iterator</span><span class="token double-colon punctuation">::</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
- <span class="token punctuation">&#125;</span>
- 
-    <span class="token comment">// Returns the next element in the iteration without advancing the iterator.</span>
- <span class="token keyword">int</span> <span class="token function">peek</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">return</span> _next<span class="token punctuation">;</span>
- <span class="token punctuation">&#125;</span>
- 
- <span class="token comment">// hasNext() and next() should behave the same as in the Iterator interface.</span>
- <span class="token comment">// Override them if needed.</span>
- <span class="token keyword">int</span> <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-     <span class="token keyword">int</span> dummy <span class="token operator">=</span> _next<span class="token punctuation">;</span>
-        _hasNext <span class="token operator">=</span> <span class="token class-name">Iterator</span><span class="token double-colon punctuation">::</span><span class="token function">hasNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span>_hasNext<span class="token punctuation">)</span> _next <span class="token operator">=</span> <span class="token class-name">Iterator</span><span class="token double-colon punctuation">::</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">return</span> dummy<span class="token punctuation">;</span>
- <span class="token punctuation">&#125;</span>
- 
- <span class="token keyword">bool</span> <span class="token function">hasNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">const</span> <span class="token punctuation">&#123;</span>
-     <span class="token keyword">return</span> _hasNext<span class="token punctuation">;</span>
- <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * Below is the interface for Iterator, which is already defined for you.</span><br><span class="hljs-comment"> * **DO NOT** modify the interface for Iterator.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> *  class Iterator &#123;</span><br><span class="hljs-comment"> *  struct Data;</span><br><span class="hljs-comment"> *   Data* data;</span><br><span class="hljs-comment"> *  public:</span><br><span class="hljs-comment"> *  Iterator(const vector&lt;int&gt;&amp; nums);</span><br><span class="hljs-comment"> *   Iterator(const Iterator&amp; iter);</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> *   // Returns the next element in the iteration.</span><br><span class="hljs-comment"> *  int next();</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> *  // Returns true if the iteration has more elements.</span><br><span class="hljs-comment"> *  bool hasNext() const;</span><br><span class="hljs-comment"> * &#125;;</span><br><span class="hljs-comment"> */</span><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">PeekingIterator</span> : <span class="hljs-keyword">public</span> Iterator &#123;<br><span class="hljs-keyword">private</span>:<br>    <span class="hljs-type">int</span> _next;<br>    <span class="hljs-type">bool</span> _hasNext;<br>    <br><span class="hljs-keyword">public</span>:<br> <span class="hljs-built_in">PeekingIterator</span>(<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums) : <span class="hljs-built_in">Iterator</span>(nums) &#123;<br>     <span class="hljs-comment">// Initialize any member here.</span><br>     <span class="hljs-comment">// **DO NOT** save a copy of nums and manipulate it directly.</span><br>     <span class="hljs-comment">// You should only use the Iterator interface methods.</span><br>     _hasNext = Iterator::<span class="hljs-built_in">hasNext</span>();<br>        <span class="hljs-keyword">if</span>(_hasNext) _next = Iterator::<span class="hljs-built_in">next</span>();<br> &#125;<br> <br>    <span class="hljs-comment">// Returns the next element in the iteration without advancing the iterator.</span><br> <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">peek</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> _next;<br> &#125;<br> <br> <span class="hljs-comment">// hasNext() and next() should behave the same as in the Iterator interface.</span><br> <span class="hljs-comment">// Override them if needed.</span><br> <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">next</span><span class="hljs-params">()</span> </span>&#123;<br>     <span class="hljs-type">int</span> dummy = _next;<br>        _hasNext = Iterator::<span class="hljs-built_in">hasNext</span>();<br>        <span class="hljs-keyword">if</span>(_hasNext) _next = Iterator::<span class="hljs-built_in">next</span>();<br>        <span class="hljs-keyword">return</span> dummy;<br> &#125;<br> <br> <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">hasNext</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;<br>     <span class="hljs-keyword">return</span> _hasNext;<br> &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n)</p>
@@ -789,8 +705,6 @@ next、hasNext 和 peek 最多调用  <span class="token number">1000</span> 次
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

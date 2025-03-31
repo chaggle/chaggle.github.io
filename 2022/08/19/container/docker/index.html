@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="docker 内环境的搭建  注意：单机环境下的容器管理使用 docker- compose 进行管理，多机环境下使用 K8S (kubernetes) 进行管理！ 1、nacos# docker 启动服务 docker run -d -p 8848:8848 &amp;&amp; \     -e MODE&#x3D;standalone &amp;&amp; \     -v &#x2F;opt&#x2F;docker&#x2F;">
+    <meta name="description" content="docker 内环境的搭建  注意：单机环境下的容器管理使用 docker- compose 进行管理，多机环境下使用 K8S (kubernetes) 进行管理！ 1、nacos123456# docker 启动服务docker run -d -p 8848:8848 &amp;&amp; \    -e MODE&#x3D;standalone &amp;&amp; \    -v &#x2F;opt&#x2F;dock">
 <meta property="og:type" content="article">
 <meta property="og:title" content="容器化环境搭建">
 <meta property="og:url" content="https://chaggle.github.io/2022/08/19/container/docker/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="docker 内环境的搭建  注意：单机环境下的容器管理使用 docker- compose 进行管理，多机环境下使用 K8S (kubernetes) 进行管理！ 1、nacos# docker 启动服务 docker run -d -p 8848:8848 &amp;&amp; \     -e MODE&#x3D;standalone &amp;&amp; \     -v &#x2F;opt&#x2F;docker&#x2F;">
+<meta property="og:description" content="docker 内环境的搭建  注意：单机环境下的容器管理使用 docker- compose 进行管理，多机环境下使用 K8S (kubernetes) 进行管理！ 1、nacos123456# docker 启动服务docker run -d -p 8848:8848 &amp;&amp; \    -e MODE&#x3D;standalone &amp;&amp; \    -v &#x2F;opt&#x2F;dock">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-08-18T16:48:36.000Z">
 <meta property="article:modified_time" content="2025-03-29T19:17:33.640Z">
@@ -45,8 +45,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -308,19 +306,9 @@
 <p>docker 内环境的搭建</p>
 </blockquote>
 <p>注意：单机环境下的容器管理使用 docker- compose 进行管理，多机环境下使用 K8S (kubernetes) 进行管理！</p>
-<h2 id="1、nacos"><a href="#1、nacos" class="headerlink" title="1、nacos"></a>1、nacos</h2><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># docker 启动服务</span>
-<span class="token function">docker</span> run <span class="token parameter variable">-d</span> <span class="token parameter variable">-p</span> <span class="token number">8848</span>:8848 <span class="token operator">&amp;&amp;</span> <span class="token punctuation">\</span>
-    <span class="token parameter variable">-e</span> <span class="token assign-left variable">MODE</span><span class="token operator">=</span>standalone <span class="token operator">&amp;&amp;</span> <span class="token punctuation">\</span>
-    <span class="token parameter variable">-v</span> /opt/docker/nacos/logs:/home/nacos/logs <span class="token operator">&amp;&amp;</span> <span class="token punctuation">\</span>
-    <span class="token parameter variable">-v</span> /opt/docker/nacos/init.d/custom.properties:/home/nacos/init.d/custom.properties <span class="token operator">&amp;&amp;</span> <span class="token punctuation">\</span>
-    <span class="token parameter variable">--name</span> nacos nacos/nacos-server <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h2 id="1、nacos"><a href="#1、nacos" class="headerlink" title="1、nacos"></a>1、nacos</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">docker 启动服务</span><br>docker run -d -p 8848:8848 &amp;&amp; \<br>    -e MODE=standalone &amp;&amp; \<br>    -v /opt/docker/nacos/logs:/home/nacos/logs &amp;&amp; \<br>    -v /opt/docker/nacos/init.d/custom.properties:/home/nacos/init.d/custom.properties &amp;&amp; \<br>    --name nacos nacos/nacos-server <br></code></pre></td></tr></table></figure>
 
-<h2 id="2、mysql"><a href="#2、mysql" class="headerlink" title="2、mysql"></a>2、mysql</h2><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> run <span class="token parameter variable">--restart</span><span class="token operator">=</span>always <span class="token parameter variable">-p</span> <span class="token number">3306</span>:3306 <span class="token operator">&amp;&amp;</span><span class="token punctuation">\</span>
-    <span class="token parameter variable">--name</span> mysql <span class="token parameter variable">-v</span> /opt/docker/mysql/conf:/etc/mysql/conf.d <span class="token operator">&amp;&amp;</span> <span class="token punctuation">\</span>
-    <span class="token parameter variable">-v</span> /opt/docker/mysql/logs:/var/log/mysql <span class="token operator">&amp;&amp;</span> <span class="token punctuation">\</span>
-    <span class="token parameter variable">-v</span> /opt/docker/mysql/data:/var/lib/mysql <span class="token operator">&amp;&amp;</span> <span class="token punctuation">\</span>
-    <span class="token parameter variable">-e</span> <span class="token assign-left variable">MYSQL_ROOT_PASSWORD</span><span class="token operator">=</span><span class="token number">123456</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">\</span>
-    <span class="token parameter variable">-d</span> mysql <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<h2 id="2、mysql"><a href="#2、mysql" class="headerlink" title="2、mysql"></a>2、mysql</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker run --restart=always -p 3306:3306 &amp;&amp;\<br>    --name mysql -v /opt/docker/mysql/conf:/etc/mysql/conf.d &amp;&amp; \<br>    -v /opt/docker/mysql/logs:/var/log/mysql &amp;&amp; \<br>    -v /opt/docker/mysql/data:/var/lib/mysql &amp;&amp; \<br>    -e MYSQL_ROOT_PASSWORD=123456 &amp;&amp; \<br>    -d mysql <br></code></pre></td></tr></table></figure>
 
 
                 
@@ -707,8 +695,6 @@
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

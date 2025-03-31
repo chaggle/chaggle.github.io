@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="76. 最小覆盖子串题目给你一个字符串 s 、一个字符串 t 。  返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 &quot;&quot; 。     注意：  对于 t 中重复字符，我们寻找的子字符串中该字符数量必须不少于 t 中该字符数量。 如果 s 中存在这样的子串，我们保证它是唯一的答案。    示例 1：  输入：s &#x3D; &quot;ADOBECODEBANC&quot;">
+    <meta name="description" content="76. 最小覆盖子串题目1234567891011121314151617181920212223242526272829303132333435给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 &quot;&quot; 。 注意：对于 t 中重复字符，我们寻找的子字符串中该字符数量必须不少于 t 中该字符">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day 46 76. 最小覆盖子串">
 <meta property="og:url" content="https://chaggle.github.io/2021/10/25/Leetcode/91-day/day-46/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="76. 最小覆盖子串题目给你一个字符串 s 、一个字符串 t 。  返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 &quot;&quot; 。     注意：  对于 t 中重复字符，我们寻找的子字符串中该字符数量必须不少于 t 中该字符数量。 如果 s 中存在这样的子串，我们保证它是唯一的答案。    示例 1：  输入：s &#x3D; &quot;ADOBECODEBANC&quot;">
+<meta property="og:description" content="76. 最小覆盖子串题目1234567891011121314151617181920212223242526272829303132333435给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 &quot;&quot; 。 注意：对于 t 中重复字符，我们寻找的子字符串中该字符数量必须不少于 t 中该字符">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-25T05:36:54.000Z">
 <meta property="article:modified_time" content="2025-03-30T04:48:34.430Z">
@@ -46,8 +46,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -233,7 +231,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          428 字
+          452 字
         
       </span>
     
@@ -305,41 +303,7 @@
             
               <div class="markdown-body">
                 
-                <h1 id="76-最小覆盖子串"><a href="#76-最小覆盖子串" class="headerlink" title="76. 最小覆盖子串"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/minimum-window-substring/">76. 最小覆盖子串</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">给你一个字符串 s 、一个字符串 t 。
-
-返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 <span class="token string">""</span> 。
-
- 
-
-注意：
-
-对于 t 中重复字符，我们寻找的子字符串中该字符数量必须不少于 t 中该字符数量。
-如果 s 中存在这样的子串，我们保证它是唯一的答案。
- 
-
-示例 <span class="token number">1</span>：
-
-输入：s <span class="token operator">=</span> <span class="token string">"ADOBECODEBANC"</span><span class="token punctuation">,</span> t <span class="token operator">=</span> <span class="token string">"ABC"</span>
-输出：<span class="token string">"BANC"</span>
-示例 <span class="token number">2</span>：
-
-输入：s <span class="token operator">=</span> <span class="token string">"a"</span><span class="token punctuation">,</span> t <span class="token operator">=</span> <span class="token string">"a"</span>
-输出：<span class="token string">"a"</span>
-示例 <span class="token number">3</span><span class="token operator">:</span>
-
-输入<span class="token operator">:</span> s <span class="token operator">=</span> <span class="token string">"a"</span><span class="token punctuation">,</span> t <span class="token operator">=</span> <span class="token string">"aa"</span>
-输出<span class="token operator">:</span> <span class="token string">""</span>
-解释<span class="token operator">:</span> t 中两个字符 <span class="token char">'a'</span> 均应包含在 s 的子串中，
-因此没有符合条件的子字符串，返回空字符串。
- 
-
-提示：
-
-<span class="token number">1</span> <span class="token operator">&lt;=</span> s<span class="token punctuation">.</span>length<span class="token punctuation">,</span> t<span class="token punctuation">.</span>length <span class="token operator">&lt;=</span> <span class="token number">105</span>
-s 和 t 由英文字母组成
- 
-
-进阶：你能设计一个在 <span class="token function">o</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span> 时间内解决此问题的算法吗？<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+                <h1 id="76-最小覆盖子串"><a href="#76-最小覆盖子串" class="headerlink" title="76. 最小覆盖子串"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/minimum-window-substring/">76. 最小覆盖子串</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs cpp">给你一个字符串 s 、一个字符串 t 。<br><br>返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 <span class="hljs-string">&quot;&quot;</span> 。<br><br> <br><br>注意：<br><br>对于 t 中重复字符，我们寻找的子字符串中该字符数量必须不少于 t 中该字符数量。<br>如果 s 中存在这样的子串，我们保证它是唯一的答案。<br> <br><br>示例 <span class="hljs-number">1</span>：<br><br>输入：s = <span class="hljs-string">&quot;ADOBECODEBANC&quot;</span>, t = <span class="hljs-string">&quot;ABC&quot;</span><br>输出：<span class="hljs-string">&quot;BANC&quot;</span><br>示例 <span class="hljs-number">2</span>：<br><br>输入：s = <span class="hljs-string">&quot;a&quot;</span>, t = <span class="hljs-string">&quot;a&quot;</span><br>输出：<span class="hljs-string">&quot;a&quot;</span><br>示例 <span class="hljs-number">3</span>:<br><br>输入: s = <span class="hljs-string">&quot;a&quot;</span>, t = <span class="hljs-string">&quot;aa&quot;</span><br>输出: <span class="hljs-string">&quot;&quot;</span><br>解释: t 中两个字符 <span class="hljs-string">&#x27;a&#x27;</span> 均应包含在 s 的子串中，<br>因此没有符合条件的子字符串，返回空字符串。<br> <br><br>提示：<br><br><span class="hljs-number">1</span> &lt;= s.length, t.length &lt;= <span class="hljs-number">105</span><br>s 和 t 由英文字母组成<br> <br><br>进阶：你能设计一个在 <span class="hljs-built_in">o</span>(n) 时间内解决此问题的算法吗？<br></code></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
@@ -347,33 +311,7 @@ s 和 t 由英文字母组成
 <li>2、与昨日题目一样，本题使用两个哈希表代替两个数组。</li>
 </ul>
 </blockquote>
-<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
-<span class="token keyword">public</span><span class="token operator">:</span>
-    string <span class="token function">minWindow</span><span class="token punctuation">(</span>string s<span class="token punctuation">,</span> string t<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">int</span> n <span class="token operator">=</span> s<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> m <span class="token operator">=</span> t<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        unordered_map<span class="token operator">&lt;</span><span class="token keyword">char</span><span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">></span> wins<span class="token punctuation">,</span> wint<span class="token punctuation">;</span>
-        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">auto</span> ch<span class="token operator">:</span> t<span class="token punctuation">)</span> 
-        <span class="token punctuation">&#123;</span>
-            wint<span class="token punctuation">[</span>ch<span class="token punctuation">]</span><span class="token operator">++</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-        string res<span class="token punctuation">;</span>
-        <span class="token keyword">int</span> count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> n<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> 
-        <span class="token punctuation">&#123;</span>
-            wins<span class="token punctuation">[</span>s<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">++</span> <span class="token punctuation">;</span>
-            <span class="token keyword">if</span><span class="token punctuation">(</span>wins<span class="token punctuation">[</span>s<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">&lt;=</span> wint<span class="token punctuation">[</span>s<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span> count<span class="token operator">++</span> <span class="token punctuation">;</span>
-            <span class="token keyword">while</span><span class="token punctuation">(</span>wins<span class="token punctuation">[</span>s<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">></span> wint<span class="token punctuation">[</span>s<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span> wins<span class="token punctuation">[</span>s<span class="token punctuation">[</span>j<span class="token operator">++</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token operator">--</span><span class="token punctuation">;</span>
-            <span class="token keyword">if</span><span class="token punctuation">(</span>count <span class="token operator">==</span> m<span class="token punctuation">)</span> 
-            <span class="token punctuation">&#123;</span>
-                <span class="token keyword">if</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> i <span class="token operator">-</span> j <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">&lt;</span> res<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> 
-                <span class="token punctuation">&#123;</span>
-                    res <span class="token operator">=</span> s<span class="token punctuation">.</span><span class="token function">substr</span><span class="token punctuation">(</span>j<span class="token punctuation">,</span> i <span class="token operator">-</span> j <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                <span class="token punctuation">&#125;</span>
-            <span class="token punctuation">&#125;</span>
-        <span class="token punctuation">&#125;</span>
-        <span class="token keyword">return</span> res<span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">string <span class="hljs-title">minWindow</span><span class="hljs-params">(string s, string t)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = s.<span class="hljs-built_in">size</span>(), m = t.<span class="hljs-built_in">size</span>();<br>        unordered_map&lt;<span class="hljs-type">char</span>, <span class="hljs-type">int</span>&gt; wins, wint;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> ch: t) <br>        &#123;<br>            wint[ch]++;<br>        &#125;<br>        string res;<br>        <span class="hljs-type">int</span> count = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>, j = <span class="hljs-number">0</span>; i &lt; n; i++) <br>        &#123;<br>            wins[s[i]] ++ ;<br>            <span class="hljs-keyword">if</span>(wins[s[i]] &lt;= wint[s[i]]) count++ ;<br>            <span class="hljs-keyword">while</span>(wins[s[j]] &gt; wint[s[j]]) wins[s[j++]]--;<br>            <span class="hljs-keyword">if</span>(count == m) <br>            &#123;<br>                <span class="hljs-keyword">if</span>(res.<span class="hljs-built_in">empty</span>() || i - j + <span class="hljs-number">1</span> &lt; res.<span class="hljs-built_in">size</span>()) <br>                &#123;<br>                    res = s.<span class="hljs-built_in">substr</span>(j, i - j + <span class="hljs-number">1</span>);<br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n)</p>
@@ -768,8 +706,6 @@ s 和 t 由英文字母组成
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

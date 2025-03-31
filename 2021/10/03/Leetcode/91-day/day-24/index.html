@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="924. 删除子列表以使总和可被 K 整除题目You are given a list of positive integers nums   and a positive integer k.   Return the length of the shortest sublist (can be empty sublist )   you can delete such that the res">
+    <meta name="description" content="924. 删除子列表以使总和可被 K 整除题目12345678910111213141516171819202122232425You are given a list of positive integers nums and a positive integer k. Return the length of the shortest sublist (can be empty sublist">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day 24 924. 删除子列表以使总和可被 K 整除">
 <meta property="og:url" content="https://chaggle.github.io/2021/10/03/Leetcode/91-day/day-24/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="924. 删除子列表以使总和可被 K 整除题目You are given a list of positive integers nums   and a positive integer k.   Return the length of the shortest sublist (can be empty sublist )   you can delete such that the res">
+<meta property="og:description" content="924. 删除子列表以使总和可被 K 整除题目12345678910111213141516171819202122232425You are given a list of positive integers nums and a positive integer k. Return the length of the shortest sublist (can be empty sublist">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-03T00:23:38.000Z">
 <meta property="article:modified_time" content="2025-03-30T16:09:09.248Z">
@@ -45,8 +45,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -232,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          164 字
+          168 字
         
       </span>
     
@@ -304,62 +302,14 @@
             
               <div class="markdown-body">
                 
-                <h1 id="924-删除子列表以使总和可被-K-整除"><a href="#924-删除子列表以使总和可被-K-整除" class="headerlink" title="924. 删除子列表以使总和可被 K 整除"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Delete-Sublist-to-Make-Sum-Divisible-By-K">924. 删除子列表以使总和可被 K 整除</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">You are given a list of positive integers nums 
-
-<span class="token operator">and</span> a positive integer k<span class="token punctuation">.</span> 
-
-Return the length of the shortest <span class="token function">sublist</span> <span class="token punctuation">(</span>can be empty sublist <span class="token punctuation">)</span> 
-
-you can <span class="token keyword">delete</span> such that the resulting list<span class="token number">'</span>s sum is divisible by k<span class="token punctuation">.</span>
-
- You cannot <span class="token keyword">delete</span> the entire list<span class="token punctuation">.</span> 
-
-If it<span class="token number">'</span>s <span class="token operator">not</span> possible<span class="token punctuation">,</span> <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1.</span>
-
-Constraints
-
-<span class="token number">1</span> ≤ n ≤ <span class="token number">100</span><span class="token punctuation">,</span><span class="token number">000</span> where n is the length of nums
-Example <span class="token number">1</span>
-Input
-nums <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">]</span>
-k <span class="token operator">=</span> <span class="token number">7</span>
-Output
-<span class="token number">2</span>
-Explanation
-We can remove the sublist <span class="token punctuation">[</span><span class="token number">6</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">]</span> to get <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">]</span> 
-
-which sums to <span class="token number">14</span> <span class="token operator">and</span> is divisible by <span class="token number">7.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+                <h1 id="924-删除子列表以使总和可被-K-整除"><a href="#924-删除子列表以使总和可被-K-整除" class="headerlink" title="924. 删除子列表以使总和可被 K 整除"></a><strong><a target="_blank" rel="noopener" href="https://binarysearch.com/problems/Delete-Sublist-to-Make-Sum-Divisible-By-K">924. 删除子列表以使总和可被 K 整除</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs cpp">You are given a list of positive integers nums <br><br><span class="hljs-keyword">and</span> a positive integer k. <br><br><span class="hljs-function">Return the length of the shortest <span class="hljs-title">sublist</span> <span class="hljs-params">(can be empty sublist )</span> </span><br><span class="hljs-function"></span><br><span class="hljs-function">you can <span class="hljs-keyword">delete</span> such that the resulting list&#x27;s sum is divisible by k.</span><br><span class="hljs-function"></span><br><span class="hljs-function"> You cannot <span class="hljs-keyword">delete</span> the entire list. </span><br><span class="hljs-function"></span><br><span class="hljs-function">If it&#x27;s <span class="hljs-keyword">not</span> possible, <span class="hljs-keyword">return</span> -1.</span><br><span class="hljs-function"></span><br><span class="hljs-function">Constraints</span><br><span class="hljs-function"></span><br><span class="hljs-function">1 ≤ n ≤ 100,000 where n is the length of nums</span><br><span class="hljs-function">Example 1</span><br><span class="hljs-function">Input</span><br><span class="hljs-function">nums </span>= [<span class="hljs-number">1</span>, <span class="hljs-number">8</span>, <span class="hljs-number">6</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>]<br>k = <span class="hljs-number">7</span><br>Output<br><span class="hljs-number">2</span><br>Explanation<br>We can remove the sublist [<span class="hljs-number">6</span>, <span class="hljs-number">4</span>] to get [<span class="hljs-number">1</span>, <span class="hljs-number">8</span>, <span class="hljs-number">5</span>] <br><br>which sums to <span class="hljs-number">14</span> <span class="hljs-keyword">and</span> is divisible by <span class="hljs-number">7.</span><br></code></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
 <li>1、数学中的同余定理，以及前缀和的思路！</li>
 </ul>
 </blockquote>
-<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
-<span class="token keyword">public</span><span class="token operator">:</span>
-    <span class="token keyword">int</span> <span class="token function">solve</span><span class="token punctuation">(</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> nums<span class="token punctuation">,</span> <span class="token keyword">int</span> k<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">int</span> sum <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">auto</span> i <span class="token operator">:</span> nums<span class="token punctuation">)</span> 
-        <span class="token punctuation">&#123;</span>
-            sum <span class="token operator">+=</span> i<span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-        sum <span class="token operator">=</span> sum <span class="token operator">%</span> k<span class="token punctuation">;</span>
-        map<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">></span> up<span class="token punctuation">;</span>
-        up<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
-        <span class="token keyword">int</span> pre <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> n <span class="token operator">=</span> nums<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">int</span> ans <span class="token operator">=</span> nums<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> n<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> 
-        <span class="token punctuation">&#123;</span>
-            pre <span class="token operator">+=</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
-            <span class="token keyword">int</span> re <span class="token operator">=</span> pre <span class="token operator">%</span> k<span class="token punctuation">;</span>
-            up<span class="token punctuation">[</span>re<span class="token punctuation">]</span> <span class="token operator">=</span> i<span class="token punctuation">;</span>
-            <span class="token keyword">int</span> x <span class="token operator">=</span> pre <span class="token operator">-</span> sum<span class="token punctuation">;</span>
-            <span class="token keyword">int</span> m <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>x <span class="token operator">%</span> k<span class="token punctuation">)</span> <span class="token operator">+</span> k<span class="token punctuation">)</span> <span class="token operator">%</span> k<span class="token punctuation">;</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span>up<span class="token punctuation">.</span><span class="token function">count</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">)</span> ans <span class="token operator">=</span> <span class="token function">min</span><span class="token punctuation">(</span>ans<span class="token punctuation">,</span> i <span class="token operator">-</span> up<span class="token punctuation">[</span>m<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-        <span class="token keyword">return</span> ans <span class="token operator">==</span> nums<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token operator">-</span><span class="token number">1</span> <span class="token operator">:</span> ans<span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">solve</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> sum = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> i : nums) <br>        &#123;<br>            sum += i;<br>        &#125;<br>        sum = sum % k;<br>        map&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt; up;<br>        up[<span class="hljs-number">0</span>] = <span class="hljs-number">-1</span>;<br>        <span class="hljs-type">int</span> pre = <span class="hljs-number">0</span>, n = nums.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-type">int</span> ans = nums.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++) <br>        &#123;<br>            pre += nums[i];<br>            <span class="hljs-type">int</span> re = pre % k;<br>            up[re] = i;<br>            <span class="hljs-type">int</span> x = pre - sum;<br>            <span class="hljs-type">int</span> m = ((x % k) + k) % k;<br>            <span class="hljs-keyword">if</span> (up.<span class="hljs-built_in">count</span>(m)) ans = <span class="hljs-built_in">min</span>(ans, i - up[m]);<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans == nums.<span class="hljs-built_in">size</span>() ? <span class="hljs-number">-1</span> : ans;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(n)</p>
@@ -752,8 +702,6 @@ which sums to <span class="token number">14</span> <span class="token operator">
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 

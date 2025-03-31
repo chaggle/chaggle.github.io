@@ -228,128 +228,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2022/02/24/go/concurrency/GMP/" target="_self">
-          GMP 模型分析
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/02/24/go/concurrency/GMP/" target="_self">
-        <div>
-          ​ 关于 GMP 模型的一些理解，G 为 goroutine, M 为 thread(内核级线程)、P 为 Processor(处理器)。 1、Golang 早期调度器的由来​ 在讲述早期调度器之前，让我们先聊一下早期的操作系统。 ​ 在没有多核 CPU 之前，操作系统以单进程的任务执行，计算机在只能一个任务一个任务完整的执行的情况。在此情况下，操作系统不仅存在工作效率低下的问题，而且一旦正在执行
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-02-24 13:08" pubdate>
-              2022-02-24
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/go/" class="category-chain-item">go</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/GMP/">#GMP</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2022/02/22/go/basic/gin/" target="_self">
-          Go web 的相关知识复习
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/02/22/go/basic/gin/" target="_self">
-        <div>
-          开始动手学习一些框架的基本样例，抛开学习底层的设计不谈，主要还是参考文档进行相应的组件开发。参考文档见文末  1、Beego 与 gin​ 首先学习框架之前，需要我们理解一个道理，学习框架的目的是首先是适应业务场景的需要，其次是有两种大类：一种是为了开发效率，另一种是为了追求运行的性能。 ​ 追求运行性能的框架包含的东西挺好，比如 GIN ，另一种追求开发效率的框架封装得非常好，即是 Beego
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-02-22 04:35" pubdate>
-              2022-02-22
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/go/" class="category-chain-item">go</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/gin/">#gin</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
         <a href="/2022/02/19/middleware/mysql1/" target="_self">
           MySQL 与 SQL 复习
         </a>
@@ -358,7 +236,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2022/02/19/middleware/mysql1/" target="_self">
         <div>
-          轻量化复盘一下 sql 操作，以及 MySQL  1、SELECT 语句​ 数据查询为关系运算理论在 SQL 语言中的主要体现。SQL 的数据查询只一条 SELECT 语句，其使用最广泛。一个完整的 SELECT 语句包含了六个字句，前两个字句是必备的，其他字句可以省略 SELECT 完整格式：  SELECT [DISTINCT] 目标列名序列 ------ 查看的列 [distinct] 为
+          轻量化复盘一下 sql 操作，以及 MySQL  1、SELECT 语句​ 数据查询为关系运算理论在 SQL 语言中的主要体现。SQL 的数据查询只一条 SELECT 语句，其使用最广泛。一个完整的 SELECT 语句包含了六个字句，前两个字句是必备的，其他字句可以省略 12345678910111213SELECT 完整格式：SELECT [DISTINCT] 目标列名序列 ------ 查看
         </div>
       </a>
 
@@ -419,7 +297,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2022/02/13/go/basic/go-study/" target="_self">
         <div>
-          tips: 总结知识点一定要自己动手，这样知识点才能牢记！ ​比如开源社区有雨痕大佬的 Go 语言笔记，但是光看几个用法，而不进行代码的编写，代码能力提升不明显，能看懂，但是做不到，形成一种眼高手低的习惯。更何况，以后的工作本来就是写需求的代码，所以，各种基础知识点，快速过完！  1、保留字与预定义字//保留字有 25 个 break  continue  func  interface  se
+          tips: 总结知识点一定要自己动手，这样知识点才能牢记！ ​比如开源社区有雨痕大佬的 Go 语言笔记，但是光看几个用法，而不进行代码的编写，代码能力提升不明显，能看懂，但是做不到，形成一种眼高手低的习惯。更何况，以后的工作本来就是写需求的代码，所以，各种基础知识点，快速过完！  1、保留字与预定义字1234567891011121314151617181920//保留字有 25 个break
         </div>
       </a>
 
@@ -663,7 +541,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2021/10/15/middleware/git/" target="_self">
         <div>
-          一、安装依赖包系统为 centos8.2 版本，可能会出现系统版本不兼容等问题！ sudo yum -y install make autoconf automake cmake perl-CPAN libcurl-devel libtool gcc gcc-c++ glibc-headers zlib-devel git-lfs telnet ctags lrzsz jq expat-devel
+          一、安装依赖包12系统为 centos8.2 版本，可能会出现系统版本不兼容等问题！sudo yum -y install make autoconf automake cmake perl-CPAN libcurl-devel libtool gcc gcc-c++ glibc-headers zlib-devel git-lfs telnet ctags lrzsz jq expat-deve
         </div>
       </a>
 
@@ -724,7 +602,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2021/10/06/middleware/gcc/" target="_self">
         <div>
-          gcc 是 GUN Compiler Collection的缩写，可以支持多种语言编译，比如 C, C++, Java, pascal 等  gcc的编译过程 预处理（pre-processing）E：插入头文件，替换宏  编译（Compiling）S：编译成汇编  汇编（Assembling） c：编译成目标文件  链接 （Linking）：链接到库中，变成可执行文件    gcc -E he
+          gcc 是 GUN Compiler Collection的缩写，可以支持多种语言编译，比如 C, C++, Java, pascal 等             gcc的编译过程 预处理（pre-processing）E：插入头文件，替换宏  编译（Compiling）S：编译成汇编  汇编（Assembling） c：编译成目标文件  链接 （Linking）：链接到
         </div>
       </a>
 
@@ -911,7 +789,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2020/10/11/cpp/Map/" target="_self">
         <div>
-          本文主要写法参考C++ STL函数库  map简介map是STL（中文标准模板库）的一个关联容器。   可以将任何基本类型映射到任何基本类型。如int array[100]事实上就是定义了一个int型到int型的映射。 map提供一对一的数据处理，key-value键值对，其类型可以自己定义，第一个称为关键字，第二个为关键字的值 map内部是自动排序的   map的用法必须引入包 #includ
+          本文主要写法参考C++ STL函数库  map简介map是STL（中文标准模板库）的一个关联容器。   可以将任何基本类型映射到任何基本类型。如int array[100]事实上就是定义了一个int型到int型的映射。 map提供一对一的数据处理，key-value键值对，其类型可以自己定义，第一个称为关键字，第二个为关键字的值 map内部是自动排序的   map的用法必须引入包 1#inclu
         </div>
       </a>
 
@@ -1028,7 +906,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2020/03/24/cpp/cpp_interview/" target="_self">
         <div>
-          记录刷题的细节内容，算法与 c++特性（等之后有空再优化）  1.static 定义静态局部变量特点全局数据区分配内存；  执行首次初始化后，之后函数调用不在初始化  无显示初始化后，自动初始化为0   2.局部变量存在于堆栈中，全局变量存在于（静态区）中，动态申请数据存在于（堆） 3.模板template&lt;typename 数据类型参数标识符>(typename 和 class 没区别)
+          记录刷题的细节内容，算法与 c++特性（等之后有空再优化）  1.static 定义静态局部变量特点全局数据区分配内存；  执行首次初始化后，之后函数调用不在初始化  无显示初始化后，自动初始化为0   2.局部变量存在于堆栈中，全局变量存在于（静态区）中，动态申请数据存在于（堆） 3.模板1234567891011121314template&lt;typename 数据类型参数标识符&gt;(
         </div>
       </a>
 
@@ -1082,7 +960,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2020/01/04/cpp/queue/" target="_self">
         <div>
-          c++中STL中，除了bitset、priority_queue(堆，也叫优先队列)以及AVL(平衡树相关)，其他的都可以进行短时间的手撕代码进行实现，本次博客主要是阐述一些讲一下堆与平衡树的基本用法，以及其中区别所在 priority_queue	堆/优先队列  定义：	      priority_queue&lt;T> priority_queue&lt;int> 大根堆 priority_
+          c++中STL中，除了bitset、priority_queue(堆，也叫优先队列)以及AVL(平衡树相关)，其他的都可以进行短时间的手撕代码进行实现，本次博客主要是阐述一些讲一下堆与平衡树的基本用法，以及其中区别所在 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495
         </div>
       </a>
 

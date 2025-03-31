@@ -19,12 +19,12 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="912. 排序数组题目给你一个整数数组 nums，请你将该数组升序排列。     示例 1：  输入：nums &#x3D; [5,2,3,1] 输出：[1,2,3,5] 示例 2：  输入：nums &#x3D; [5,1,1,2,0,0] 输出：[0,0,1,1,2,5]    提示：  1 &lt;&#x3D; nums.length &lt;&#x3D; 50000 -50000 &lt;&#x3D; nums[i] &lt;&#x3D; 5000">
+    <meta name="description" content="912. 排序数组题目123456789101112131415161718给你一个整数数组 nums，请你将该数组升序排列。 示例 1：输入：nums &#x3D; [5,2,3,1]输出：[1,2,3,5]示例 2：输入：nums &#x3D; [5,1,1,2,0,0]输出：[0,0,1,1,2,5] 提示：1 &lt;&#x3D; nums.length &lt;&#x3D; 50000-50000 &lt;&#x3D; nums[i]">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Day 36 912. 排序数组">
 <meta property="og:url" content="https://chaggle.github.io/2021/10/15/Leetcode/91-day/day-36/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="912. 排序数组题目给你一个整数数组 nums，请你将该数组升序排列。     示例 1：  输入：nums &#x3D; [5,2,3,1] 输出：[1,2,3,5] 示例 2：  输入：nums &#x3D; [5,1,1,2,0,0] 输出：[0,0,1,1,2,5]    提示：  1 &lt;&#x3D; nums.length &lt;&#x3D; 50000 -50000 &lt;&#x3D; nums[i] &lt;&#x3D; 5000">
+<meta property="og:description" content="912. 排序数组题目123456789101112131415161718给你一个整数数组 nums，请你将该数组升序排列。 示例 1：输入：nums &#x3D; [5,2,3,1]输出：[1,2,3,5]示例 2：输入：nums &#x3D; [5,1,1,2,0,0]输出：[0,0,1,1,2,5] 提示：1 &lt;&#x3D; nums.length &lt;&#x3D; 50000-50000 &lt;&#x3D; nums[i]">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-15T04:25:16.000Z">
 <meta property="article:modified_time" content="2025-03-30T04:48:11.240Z">
@@ -45,8 +45,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
@@ -232,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          545 字
+          560 字
         
       </span>
     
@@ -304,134 +302,14 @@
             
               <div class="markdown-body">
                 
-                <h1 id="912-排序数组"><a href="#912-排序数组" class="headerlink" title="912. 排序数组"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/sort-an-array/">912. 排序数组</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">给你一个整数数组 nums，请你将该数组升序排列。
-
- 
-
-示例 <span class="token number">1</span>：
-
-输入：nums <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span>
-输出：<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">]</span>
-示例 <span class="token number">2</span>：
-
-输入：nums <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">]</span>
-输出：<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">]</span>
- 
-
-提示：
-
-<span class="token number">1</span> <span class="token operator">&lt;=</span> nums<span class="token punctuation">.</span>length <span class="token operator">&lt;=</span> <span class="token number">50000</span>
-<span class="token operator">-</span><span class="token number">50000</span> <span class="token operator">&lt;=</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&lt;=</span> <span class="token number">50000</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+                <h1 id="912-排序数组"><a href="#912-排序数组" class="headerlink" title="912. 排序数组"></a><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/sort-an-array/">912. 排序数组</a></strong></h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs cpp">给你一个整数数组 nums，请你将该数组升序排列。<br><br> <br><br>示例 <span class="hljs-number">1</span>：<br><br>输入：nums = [<span class="hljs-number">5</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">1</span>]<br>输出：[<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">5</span>]<br>示例 <span class="hljs-number">2</span>：<br><br>输入：nums = [<span class="hljs-number">5</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>]<br>输出：[<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">5</span>]<br> <br><br>提示：<br><br><span class="hljs-number">1</span> &lt;= nums.length &lt;= <span class="hljs-number">50000</span><br><span class="hljs-number">-50000</span> &lt;= nums[i] &lt;= <span class="hljs-number">50000</span><br></code></pre></td></tr></table></figure>
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><blockquote>
 <ul>
 <li>1、最简单的是调用库函数，但这样的写法显然没有任何意义，所以此处复现所有的排序算法，刚好也能练习以防止考研过程中出现相应的问题。</li>
 </ul>
 </blockquote>
-<figure><div class="code-wrapper"><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">&#123;</span>
-<span class="token keyword">public</span><span class="token operator">:</span>
-    vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> <span class="token function">sortArray</span><span class="token punctuation">(</span>vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span><span class="token operator">&amp;</span> nums<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token comment">//sort(nums.begin(), nums.end());</span>
-        <span class="token comment">//return nums;</span>
-        <span class="token keyword">int</span> n <span class="token operator">=</span> nums<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token comment">//冒泡排序 超时</span>
-        <span class="token comment">/* for(int i = 0; i &lt; n; i++)
-        &#123;
-            bool flag = false;
-            for(int j = n - 2; j >= i; j--)
-            &#123;
-                if(nums[j] > nums[j + 1])
-                &#123;
-                    swap(nums[j], nums[j + 1]);
-                    flag = true;
-                &#125;
-            &#125;
-            if(flag == false)break;
-        &#125; */</span>
-
-        <span class="token comment">//插入排序 超时</span>
-        <span class="token comment">/* for(int i = 0; i &lt; n - 1; i++)
-        &#123;
-            int min = i;
-            for(int j = i + 1; j &lt; n; j++)
-            &#123;
-                if(nums[min] > nums[j]) min = j;
-            &#125;
-            if(min != i) swap(nums[i], nums[min]);
-        &#125; */</span>
-
-        <span class="token comment">//快排 失败</span>
-        <span class="token comment">/* dfs(0, n - 1, nums); */</span>
-
-        <span class="token comment">//堆排序</span>
-        <span class="token comment">/* for(int i = 0; i &lt; n; i++)
-        &#123;
-            int pos = i;
-            int mid = (pos - 1)/2;
-            while(nums[pos] > nums[mid])
-            &#123;
-                swap(nums[pos], nums[mid]);
-                pos = mid;
-                mid = (pos - 1) / 2;
-            &#125;
-        &#125;
-        for(int j = n - 1; j >= 0; j--)
-        &#123;
-            swap(nums[0], nums[j]);
-            heapsort(nums,0,j);
-        &#125; */</span>
-
-        <span class="token comment">//计数排序</span>
-        <span class="token keyword">int</span> minn <span class="token operator">=</span> <span class="token operator">*</span><span class="token function">min_element</span><span class="token punctuation">(</span>nums<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nums<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">int</span> maxn <span class="token operator">=</span> <span class="token operator">*</span><span class="token function">max_element</span><span class="token punctuation">(</span>nums<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nums<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        vector<span class="token operator">&lt;</span><span class="token keyword">int</span><span class="token operator">></span> <span class="token function">ans</span><span class="token punctuation">(</span>maxn <span class="token operator">-</span> minn <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">auto</span> i <span class="token operator">:</span> nums<span class="token punctuation">)</span>
-        <span class="token punctuation">&#123;</span>
-            ans<span class="token punctuation">[</span>i <span class="token operator">-</span> minn<span class="token punctuation">]</span><span class="token operator">++</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-        <span class="token keyword">int</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-        <span class="token keyword">while</span><span class="token punctuation">(</span>i <span class="token operator">&lt;</span> ans<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-        <span class="token punctuation">&#123;</span>
-            <span class="token keyword">while</span><span class="token punctuation">(</span>ans<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
-            <span class="token punctuation">&#123;</span>
-                nums<span class="token punctuation">[</span>j<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> i <span class="token operator">+</span> minn<span class="token punctuation">;</span>
-                ans<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">--</span><span class="token punctuation">;</span>
-            <span class="token punctuation">&#125;</span>
-            i<span class="token operator">++</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-        <span class="token keyword">return</span> nums<span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-
-    <span class="token comment">/* void dfs(int start, int end, vector&lt;int>&amp; nums) &#123;
-        if(start > end) return;
-        int i = start, j = end;
-        while(i &lt; j)
-        &#123;
-            while(nums[j] >= nums[start] &amp;&amp; i &lt; j) j--;
-            while(nums[i] &lt;= nums[start] &amp;&amp; i &lt; j) i++;
-            if(i &lt; j) swap(nums[i], nums[j]);
-        &#125;
-        swap(nums[start], nums[i]);
-        dfs(start, i - 1, nums);
-        dfs(i + 1, end, nums);
-    &#125; */</span>
-
-   <span class="token comment">/*  void heapsort(vector&lt;int>&amp; nums, int pos, int n)
-    &#123;
-        int l = pos * 2 + 1, r = pos * 2 + 2;
-        while(l &lt; n)
-        &#123;
-            int big = pos;
-            if(l &lt; n &amp;&amp; nums[l] > nums[big]) big = l;
-            if(r &lt; n &amp;&amp; nums[r] > nums[big]) big = r;
-            if(big == pos) break;
-            swap(nums[pos], nums[big]);
-            pos = big;
-            l = pos * 2 + 1, r = pos * 2 + 2;
-        &#125;
-    &#125; */</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">sortArray</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>        <span class="hljs-comment">//sort(nums.begin(), nums.end());</span><br>        <span class="hljs-comment">//return nums;</span><br>        <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br><br>        <span class="hljs-comment">//冒泡排序 超时</span><br>        <span class="hljs-comment">/* for(int i = 0; i &lt; n; i++)</span><br><span class="hljs-comment">        &#123;</span><br><span class="hljs-comment">            bool flag = false;</span><br><span class="hljs-comment">            for(int j = n - 2; j &gt;= i; j--)</span><br><span class="hljs-comment">            &#123;</span><br><span class="hljs-comment">                if(nums[j] &gt; nums[j + 1])</span><br><span class="hljs-comment">                &#123;</span><br><span class="hljs-comment">                    swap(nums[j], nums[j + 1]);</span><br><span class="hljs-comment">                    flag = true;</span><br><span class="hljs-comment">                &#125;</span><br><span class="hljs-comment">            &#125;</span><br><span class="hljs-comment">            if(flag == false)break;</span><br><span class="hljs-comment">        &#125; */</span><br><br>        <span class="hljs-comment">//插入排序 超时</span><br>        <span class="hljs-comment">/* for(int i = 0; i &lt; n - 1; i++)</span><br><span class="hljs-comment">        &#123;</span><br><span class="hljs-comment">            int min = i;</span><br><span class="hljs-comment">            for(int j = i + 1; j &lt; n; j++)</span><br><span class="hljs-comment">            &#123;</span><br><span class="hljs-comment">                if(nums[min] &gt; nums[j]) min = j;</span><br><span class="hljs-comment">            &#125;</span><br><span class="hljs-comment">            if(min != i) swap(nums[i], nums[min]);</span><br><span class="hljs-comment">        &#125; */</span><br><br>        <span class="hljs-comment">//快排 失败</span><br>        <span class="hljs-comment">/* dfs(0, n - 1, nums); */</span><br><br>        <span class="hljs-comment">//堆排序</span><br>        <span class="hljs-comment">/* for(int i = 0; i &lt; n; i++)</span><br><span class="hljs-comment">        &#123;</span><br><span class="hljs-comment">            int pos = i;</span><br><span class="hljs-comment">            int mid = (pos - 1)/2;</span><br><span class="hljs-comment">            while(nums[pos] &gt; nums[mid])</span><br><span class="hljs-comment">            &#123;</span><br><span class="hljs-comment">                swap(nums[pos], nums[mid]);</span><br><span class="hljs-comment">                pos = mid;</span><br><span class="hljs-comment">                mid = (pos - 1) / 2;</span><br><span class="hljs-comment">            &#125;</span><br><span class="hljs-comment">        &#125;</span><br><span class="hljs-comment">        for(int j = n - 1; j &gt;= 0; j--)</span><br><span class="hljs-comment">        &#123;</span><br><span class="hljs-comment">            swap(nums[0], nums[j]);</span><br><span class="hljs-comment">            heapsort(nums,0,j);</span><br><span class="hljs-comment">        &#125; */</span><br><br>        <span class="hljs-comment">//计数排序</span><br>        <span class="hljs-type">int</span> minn = *<span class="hljs-built_in">min_element</span>(nums.<span class="hljs-built_in">begin</span>(), nums.<span class="hljs-built_in">end</span>());<br>        <span class="hljs-type">int</span> maxn = *<span class="hljs-built_in">max_element</span>(nums.<span class="hljs-built_in">begin</span>(), nums.<span class="hljs-built_in">end</span>());<br>        <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">ans</span><span class="hljs-params">(maxn - minn + <span class="hljs-number">1</span>)</span></span>;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> i : nums)<br>        &#123;<br>            ans[i - minn]++;<br>        &#125;<br>        <span class="hljs-type">int</span> j = <span class="hljs-number">0</span>, i = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">while</span>(i &lt; ans.<span class="hljs-built_in">size</span>())<br>        &#123;<br>            <span class="hljs-keyword">while</span>(ans[i] &gt; <span class="hljs-number">0</span>)<br>            &#123;<br>                nums[j++] = i + minn;<br>                ans[i]--;<br>            &#125;<br>            i++;<br>        &#125;<br>        <span class="hljs-keyword">return</span> nums;<br>    &#125;<br><br>    <span class="hljs-comment">/* void dfs(int start, int end, vector&lt;int&gt;&amp; nums) &#123;</span><br><span class="hljs-comment">        if(start &gt; end) return;</span><br><span class="hljs-comment">        int i = start, j = end;</span><br><span class="hljs-comment">        while(i &lt; j)</span><br><span class="hljs-comment">        &#123;</span><br><span class="hljs-comment">            while(nums[j] &gt;= nums[start] &amp;&amp; i &lt; j) j--;</span><br><span class="hljs-comment">            while(nums[i] &lt;= nums[start] &amp;&amp; i &lt; j) i++;</span><br><span class="hljs-comment">            if(i &lt; j) swap(nums[i], nums[j]);</span><br><span class="hljs-comment">        &#125;</span><br><span class="hljs-comment">        swap(nums[start], nums[i]);</span><br><span class="hljs-comment">        dfs(start, i - 1, nums);</span><br><span class="hljs-comment">        dfs(i + 1, end, nums);</span><br><span class="hljs-comment">    &#125; */</span><br><br>   <span class="hljs-comment">/*  void heapsort(vector&lt;int&gt;&amp; nums, int pos, int n)</span><br><span class="hljs-comment">    &#123;</span><br><span class="hljs-comment">        int l = pos * 2 + 1, r = pos * 2 + 2;</span><br><span class="hljs-comment">        while(l &lt; n)</span><br><span class="hljs-comment">        &#123;</span><br><span class="hljs-comment">            int big = pos;</span><br><span class="hljs-comment">            if(l &lt; n &amp;&amp; nums[l] &gt; nums[big]) big = l;</span><br><span class="hljs-comment">            if(r &lt; n &amp;&amp; nums[r] &gt; nums[big]) big = r;</span><br><span class="hljs-comment">            if(big == pos) break;</span><br><span class="hljs-comment">            swap(nums[pos], nums[big]);</span><br><span class="hljs-comment">            pos = big;</span><br><span class="hljs-comment">            l = pos * 2 + 1, r = pos * 2 + 2;</span><br><span class="hljs-comment">        &#125;</span><br><span class="hljs-comment">    &#125; */</span><br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><ul>
 <li><p>时间复杂度：O(nlogn) 堆排序</p>
@@ -826,8 +704,6 @@
   });
 </script>
 
-
-  <script  src="https://lib.baomitu.com/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
 
   <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
 
