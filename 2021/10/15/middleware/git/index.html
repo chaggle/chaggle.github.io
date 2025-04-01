@@ -27,7 +27,7 @@
 <meta property="og:description" content="一、安装依赖包12系统为 centos8.2 版本，可能会出现系统版本不兼容等问题！sudo yum -y install make autoconf automake cmake perl-CPAN libcurl-devel libtool gcc gcc-c++ glibc-headers zlib-devel git-lfs telnet ctags lrzsz jq expat-deve">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-15T04:18:42.000Z">
-<meta property="article:modified_time" content="2025-03-13T07:19:01.784Z">
+<meta property="article:modified_time" content="2025-04-01T06:19:34.134Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="git">
 <meta name="twitter:card" content="summary_large_image">
@@ -292,7 +292,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2025-03-13T15:19:01+08:00
+                    本文最后更新于 2025-04-01T14:19:34+08:00
                   
                   
 
@@ -302,14 +302,14 @@
             
               <div class="markdown-body">
                 
-                <h2 id="一、安装依赖包"><a href="#一、安装依赖包" class="headerlink" title="一、安装依赖包"></a>一、安装依赖包</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">系统为 centos8.2 版本，可能会出现系统版本不兼容等问题！<br>sudo yum -y install make autoconf automake cmake perl-CPAN libcurl-devel libtool gcc gcc-c++ glibc-headers zlib-devel git-lfs telnet ctags lrzsz jq expat-devel openssl-devel<br></code></pre></td></tr></table></figure>
+                <h2 id="一、安装依赖包"><a href="#一、安装依赖包" class="headerlink" title="一、安装依赖包"></a>一、安装依赖包</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">系统为 centos8.2 版本，可能会出现系统版本不兼容等问题！<br><span class="hljs-built_in">sudo</span> yum -y install make autoconf automake cmake perl-CPAN libcurl-devel libtool gcc gcc-c++ glibc-headers zlib-devel git-lfs telnet ctags lrzsz jq expat-devel openssl-devel<br></code></pre></td></tr></table></figure>
 
-<h2 id="二、安装新版git包"><a href="#二、安装新版git包" class="headerlink" title="二、安装新版git包"></a>二、安装新版git包</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd /tmp<br>wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.30.2.tar.gz<br>tar -xvzf git-2.30.2.tar.gz<br>cd git-2.30.2/<br>./configure<br>make<br>sudo make install<br>git --version          # 输出 git 版本号，说明安装成功<br>git version 2.30.2<br></code></pre></td></tr></table></figure>
+<h2 id="二、安装新版git包"><a href="#二、安装新版git包" class="headerlink" title="二、安装新版git包"></a>二、安装新版git包</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /tmp<br>wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.30.2.tar.gz<br>tar -xvzf git-2.30.2.tar.gz<br><span class="hljs-built_in">cd</span> git-2.30.2/<br>./configure<br>make<br><span class="hljs-built_in">sudo</span> make install<br>git --version          <span class="hljs-comment"># 输出 git 版本号，说明安装成功</span><br>git version 2.30.2<br></code></pre></td></tr></table></figure>
 
 <h2 id="三、"><a href="#三、" class="headerlink" title="三、"></a>三、</h2><h2 id="一些操作"><a href="#一些操作" class="headerlink" title="一些操作"></a>一些操作</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs sh"> git config --global user.name <span class="hljs-string">&quot;chaggle&quot;</span>  用户名改成自己的<br> git config --global user.email <span class="hljs-string">&quot;chaggle@foxmail.com&quot;</span> 邮箱改成自己的<br> git config --global credential.helper store <br> git config --global core.longpaths <span class="hljs-literal">true</span><br> <br><span class="hljs-comment"># 在 Git 中，我们会把非 ASCII 字符叫做 Unusual 字符。这类字符在 Git 输出到终端的时候默认是用 8 进制转义字符输出的（以防乱码），但现在的终端多数都支持直接显示非 ASCII 字符，所以我们可以关闭掉这个特性</span><br>git config --global core.quotepath off<br><br><span class="hljs-comment"># 访问 github.com 太慢，可以通过国内 GitHub 镜像网站来访问</span><br>git config --global url.<span class="hljs-string">&quot;https://gitclone.com/&quot;</span>.insteadOf <span class="hljs-string">&quot;https://&quot;</span><br><br><span class="hljs-comment"># GitHub 限制最大只能克隆 100M 的单个文件，为了能够克隆大于 100M 的文件，我们还需要安装 Git Large File Storage</span><br>git lfs install --skip-repo<br></code></pre></td></tr></table></figure>
 
 <h2 id="四、Github-代理配置"><a href="#四、Github-代理配置" class="headerlink" title="四、Github 代理配置"></a>四、Github 代理配置</h2><p>这里博主为了稳定性考虑，只推荐 <a target="_blank" rel="noopener" href="https://gitclone.com/">https://gitclone.com</a> 网站，其余的代理都容易失效</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">原地址</span><br>git clone https://github.com/kubernetes/kubernetes.git<br><span class="hljs-meta prompt_">#</span><span class="language-bash">改为</span><br>git clone https://gitclone.com/github.com/kubernetes/kubernetes.git<br></code></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#原地址</span><br>git <span class="hljs-built_in">clone</span> https://github.com/kubernetes/kubernetes.git<br><span class="hljs-comment">#改为</span><br>git <span class="hljs-built_in">clone</span> https://gitclone.com/github.com/kubernetes/kubernetes.git<br></code></pre></td></tr></table></figure>
 
 <p>但是提交git仓储时候，需要将代理地址进行还原，否则就会上传到代理地址的 git 地址！</p>
 <h2 id="五、关于-HTTPS-与-SSH-git-clone-稳定性问题"><a href="#五、关于-HTTPS-与-SSH-git-clone-稳定性问题" class="headerlink" title="五、关于 HTTPS 与 SSH git clone 稳定性问题"></a>五、关于 HTTPS 与 SSH git clone 稳定性问题</h2><p>一般建议网络环境友好的情况下，使用 HTTPS 协议，配置简单，而网络环境差的情况下使用 SSH 协议，因为 SSH 建立的传输链接不容易丢失。</p>
@@ -377,7 +377,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年3月13日</div>
+          <div>2025年4月1日</div>
         </div>
       
       

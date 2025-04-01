@@ -27,9 +27,9 @@
 <meta property="og:description" content="989. 数组形式的整数加法题目12345678910111213141516171819202122232425262728293031323334对于非负整数 X 而言，X 的数组形式是每位数字按从左到右的顺序形成的数组。例如，如果 X &#x3D; 1231，那么其数组形式为 [1,2,3,1]。给定非负整数 X 的数组形式 A，返回整数 X+K 的数组形式。示例 1：输入：A &#x3D; [1,2,0,0]">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-09-09T18:12:05.000Z">
-<meta property="article:modified_time" content="2025-03-30T16:09:09.248Z">
+<meta property="article:modified_time" content="2025-03-31T06:23:53.880Z">
 <meta property="article:author" content="chaggle">
-<meta property="article:tag" content="vector">
+<meta property="article:tag" content="List">
 <meta name="twitter:card" content="summary_large_image">
   
   
@@ -230,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          546 字
+          700 字
         
       </span>
     
@@ -241,7 +241,7 @@
         
         
         
-          5 分钟
+          6 分钟
         
       </span>
     
@@ -292,7 +292,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2025-03-31T00:09:09+08:00
+                    本文最后更新于 2025-03-31T14:23:53+08:00
                   
                   
 
@@ -306,12 +306,14 @@
 
 <h2 id="题目思路"><a href="#题目思路" class="headerlink" title="题目思路"></a>题目思路</h2><ul>
 <li>1、建立一个 res 的动态数组，以位数的形式来存储最后的结果值；</li>
-<li>2、从后往前与 k 相加，然后对相加得到的值对 10 进行求余数；</li>
+<li>2、可以通过取 k 取 10 的模值进行加减，也可以从后往前与 k 相加，然后对相加得到的值对 10 再进行取模都行；</li>
 <li>3、如果 k 的位数大于 nums 数组所给的位数时候，必然导致 k 在循环内除以 10 后余留的值大于 0。</li>
 <li>4、此时需要扩展数组，由于是动态数组，直接改写类似循环中 k &#x3D; sum &#x2F; 10，此处为 k &#x2F;&#x3D; 10，直到 k 为 0 为止。</li>
 <li>4、最后逆序数组即可输出。</li>
 </ul>
-<h2 id="题目代码"><a href="#题目代码" class="headerlink" title="题目代码"></a>题目代码</h2><h3 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">addToArrayForm</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        vector&lt;<span class="hljs-type">int</span>&gt; res;<br>        <br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = nums.<span class="hljs-built_in">size</span>() - <span class="hljs-number">1</span>; i &gt;= <span class="hljs-number">0</span>; i--)<br>        &#123;<br>            <span class="hljs-type">int</span> sum = nums[i] + k;<br>            res.<span class="hljs-built_in">push_back</span>(sum % <span class="hljs-number">10</span>);<br>            k = sum / <span class="hljs-number">10</span>;<br>        &#125;<br><br>        <span class="hljs-keyword">while</span>(k &gt; <span class="hljs-number">0</span>)<br>        &#123;<br>            res.<span class="hljs-built_in">push_back</span>(k % <span class="hljs-number">10</span>);<br>            k /= <span class="hljs-number">10</span>;<br>        &#125;<br><br>        <span class="hljs-built_in">reverse</span>(res.<span class="hljs-built_in">begin</span>(), res.<span class="hljs-built_in">end</span>());<br>        <br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<h2 id="题目代码"><a href="#题目代码" class="headerlink" title="题目代码"></a>题目代码</h2><h3 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> List&lt;Integer&gt; <span class="hljs-title function_">addToArrayForm</span><span class="hljs-params">(<span class="hljs-type">int</span>[] num, <span class="hljs-type">int</span> k)</span> &#123;<br>        List&lt;Integer&gt; res = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();<br>        <span class="hljs-type">int</span> <span class="hljs-variable">n</span> <span class="hljs-operator">=</span> num.length;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> num.length - <span class="hljs-number">1</span>; i &gt;= <span class="hljs-number">0</span>; i--) &#123;<br>            <span class="hljs-type">int</span> <span class="hljs-variable">sum</span> <span class="hljs-operator">=</span> num[i] + k % <span class="hljs-number">10</span>;<br>            k /= <span class="hljs-number">10</span>;<br>            <span class="hljs-keyword">if</span>(sum &gt;= <span class="hljs-number">10</span>) &#123;<br>                k++;<br>                sum -= <span class="hljs-number">10</span>;<br>            &#125;<br>            res.add(sum);<br>        &#125;<br>        <span class="hljs-keyword">for</span>(; k &gt; <span class="hljs-number">0</span>; k /= <span class="hljs-number">10</span>) &#123;<br>            res.add(k % <span class="hljs-number">10</span>);<br>        &#125;<br>        <span class="hljs-comment">// Collections.reverse 源码中会判断对存储的数据结构进行判断，如果支持随机存储的数据结构，默认使用的是 swap 交换元素，而如果是链表，那么默认使用的是头插法进行逆序</span><br>        Collections.reverse(res);<br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">addToArrayForm</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        vector&lt;<span class="hljs-type">int</span>&gt; res;<br>        <br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = nums.<span class="hljs-built_in">size</span>() - <span class="hljs-number">1</span>; i &gt;= <span class="hljs-number">0</span>; i--)<br>        &#123;<br>            <span class="hljs-type">int</span> sum = nums[i] + k;<br>            res.<span class="hljs-built_in">push_back</span>(sum % <span class="hljs-number">10</span>);<br>            k = sum / <span class="hljs-number">10</span>;<br>        &#125;<br><br>        <span class="hljs-keyword">while</span>(k &gt; <span class="hljs-number">0</span>)<br>        &#123;<br>            res.<span class="hljs-built_in">push_back</span>(k % <span class="hljs-number">10</span>);<br>            k /= <span class="hljs-number">10</span>;<br>        &#125;<br><br>        <span class="hljs-built_in">reverse</span>(res.<span class="hljs-built_in">begin</span>(), res.<span class="hljs-built_in">end</span>());<br>        <br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">addToArrayForm</span><span class="hljs-params">(num []<span class="hljs-type">int</span>, k <span class="hljs-type">int</span>)</span></span> []<span class="hljs-type">int</span> &#123;<br>    n := <span class="hljs-built_in">len</span>(num)<br>    ans := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>)<br>  <br>    <span class="hljs-keyword">for</span> i := n - <span class="hljs-number">1</span>; i &gt;= <span class="hljs-number">0</span>; i-- &#123;<br>        v := num[i] + k;<br>        ans = <span class="hljs-built_in">append</span>(ans, v % <span class="hljs-number">10</span>)<br>        k = v / <span class="hljs-number">10</span><br><br>    &#125;<br><br>    <span class="hljs-keyword">for</span> k &gt; <span class="hljs-number">0</span> &#123;<br>        ans = <span class="hljs-built_in">append</span>(ans, k % <span class="hljs-number">10</span>)<br>        k = k / <span class="hljs-number">10</span><br>    &#125;<br>    <br>    <span class="hljs-keyword">return</span> reverse(ans)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">reverse</span><span class="hljs-params">(num []<span class="hljs-type">int</span>)</span></span> []<span class="hljs-type">int</span> &#123;<br>    <span class="hljs-keyword">for</span> i, j := <span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(num) - <span class="hljs-number">1</span>; i &lt;= j; &#123;<br>        num[i], num[j] = num[j], num[i]<br>        i++<br>        j--<br>    &#125;<br>    <br>    <span class="hljs-keyword">return</span> num;<br>&#125;<br></code></pre></td></tr></table></figure>
 
@@ -352,7 +354,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/vector/" class="print-no-link">#vector</a>
+        <a href="/tags/List/" class="print-no-link">#List</a>
       
     </div>
   
