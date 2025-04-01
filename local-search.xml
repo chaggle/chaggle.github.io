@@ -54,31 +54,6 @@
   
   
   <entry>
-    <title>容器化环境搭建</title>
-    <link href="/2022/08/19/container/docker/"/>
-    <url>/2022/08/19/container/docker/</url>
-    
-    <content type="html"><![CDATA[<div class="note note-primary">            <p>docker 内环境的搭建</p>          </div><p>注意：单机环境下的容器管理使用 docker- compose 进行管理，多机环境下使用 K8S (kubernetes) 进行管理！</p><h2 id="1、nacos"><a href="#1、nacos" class="headerlink" title="1、nacos"></a>1、nacos</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># docker 启动服务</span><br>docker run -d -p 8848:8848 &amp;&amp; \<br>    -e MODE=standalone &amp;&amp; \<br>    -v /opt/docker/nacos/logs:/home/nacos/logs &amp;&amp; \<br>    -v /opt/docker/nacos/init.d/custom.properties:/home/nacos/init.d/custom.properties &amp;&amp; \<br>    --name nacos nacos/nacos-server <br></code></pre></td></tr></table></figure><h2 id="2、mysql"><a href="#2、mysql" class="headerlink" title="2、mysql"></a>2、mysql</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">docker run --restart=always -p 3306:3306 &amp;&amp;\<br>    --name mysql -v /opt/docker/mysql/conf:/etc/mysql/conf.d &amp;&amp; \<br>    -v /opt/docker/mysql/logs:/var/log/mysql &amp;&amp; \<br>    -v /opt/docker/mysql/data:/var/lib/mysql &amp;&amp; \<br>    -e MYSQL_ROOT_PASSWORD=123456 &amp;&amp; \<br>    -d mysql <br></code></pre></td></tr></table></figure>]]></content>
-    
-    
-    <categories>
-      
-      <category>devops</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>docker</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>GPE 监控系统分析与搭建</title>
     <link href="/2022/08/19/middleware/GPE/"/>
     <url>/2022/08/19/middleware/GPE/</url>
@@ -96,6 +71,31 @@
     <tags>
       
       <tag>GPE</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>容器化环境搭建</title>
+    <link href="/2022/08/19/container/docker/"/>
+    <url>/2022/08/19/container/docker/</url>
+    
+    <content type="html"><![CDATA[<div class="note note-primary">            <p>docker 内环境的搭建</p>          </div><p>注意：单机环境下的容器管理使用 docker- compose 进行管理，多机环境下使用 K8S (kubernetes) 进行管理！</p><h2 id="1、nacos"><a href="#1、nacos" class="headerlink" title="1、nacos"></a>1、nacos</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># docker 启动服务</span><br>docker run -d -p 8848:8848 &amp;&amp; \<br>    -e MODE=standalone &amp;&amp; \<br>    -v /opt/docker/nacos/logs:/home/nacos/logs &amp;&amp; \<br>    -v /opt/docker/nacos/init.d/custom.properties:/home/nacos/init.d/custom.properties &amp;&amp; \<br>    --name nacos nacos/nacos-server <br></code></pre></td></tr></table></figure><h2 id="2、mysql"><a href="#2、mysql" class="headerlink" title="2、mysql"></a>2、mysql</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">docker run --restart=always -p 3306:3306 &amp;&amp;\<br>    --name mysql -v /opt/docker/mysql/conf:/etc/mysql/conf.d &amp;&amp; \<br>    -v /opt/docker/mysql/logs:/var/log/mysql &amp;&amp; \<br>    -v /opt/docker/mysql/data:/var/lib/mysql &amp;&amp; \<br>    -e MYSQL_ROOT_PASSWORD=123456 &amp;&amp; \<br>    -d mysql <br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>devops</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>docker</tag>
       
     </tags>
     
