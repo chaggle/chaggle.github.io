@@ -19,15 +19,15 @@
   <meta name="author" content="chaggle">
   <meta name="keywords" content="chaggle">
   
-    <meta name="description" content="本文将详细介绍如何在 Linux 环境下配置 Clash，以实现全局网络代理。 同时使用 proxy-group 与 rule-providers，来实现机场链接和规则的自动订阅。   下载 Clash从以下备份库下载 Clash Premium: 由于 Clash Premium 的主库已被删除，我们将使用备份库来获取: Clash-premium-backup 如果备份库失效则可以百度搜索c">
+    <meta name="description" content="本文将详细介绍如何在 Linux 环境下配置 Clash，以实现全局网络代理。同时使用 proxy-group 与 rule-providers，来实现机场链接和规则的自动订阅。             下载 Clash从以下备份库下载 Clash Premium，由于 Clash Premium 的主库已被删除，我们将使用备份库来获取: Clash-premium-ba">
 <meta property="og:type" content="article">
 <meta property="og:title" content="在 Linux 下使用 Clash 进行全局上网代理及自动订阅代理和规则">
 <meta property="og:url" content="https://chaggle.github.io/2025/03/21/linux/clash/index.html">
 <meta property="og:site_name" content="大布丁的博客">
-<meta property="og:description" content="本文将详细介绍如何在 Linux 环境下配置 Clash，以实现全局网络代理。 同时使用 proxy-group 与 rule-providers，来实现机场链接和规则的自动订阅。   下载 Clash从以下备份库下载 Clash Premium: 由于 Clash Premium 的主库已被删除，我们将使用备份库来获取: Clash-premium-backup 如果备份库失效则可以百度搜索c">
+<meta property="og:description" content="本文将详细介绍如何在 Linux 环境下配置 Clash，以实现全局网络代理。同时使用 proxy-group 与 rule-providers，来实现机场链接和规则的自动订阅。             下载 Clash从以下备份库下载 Clash Premium，由于 Clash Premium 的主库已被删除，我们将使用备份库来获取: Clash-premium-ba">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-03-20T23:47:55.000Z">
-<meta property="article:modified_time" content="2025-03-31T01:17:16.391Z">
+<meta property="article:modified_time" content="2025-04-01T07:31:43.149Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="clash">
 <meta name="twitter:card" content="summary_large_image">
@@ -292,7 +292,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2025-03-31T09:17:16+08:00
+                    本文最后更新于 2025-04-01T15:31:43+08:00
                   
                   
 
@@ -302,14 +302,11 @@
             
               <div class="markdown-body">
                 
-                <p class="note note-primary">
-本文将详细介绍如何在 Linux 环境下配置 Clash，以实现全局网络代理。
-同时使用 proxy-group 与 rule-providers，来实现机场链接和规则的自动订阅。
-</p>
+                <div class="note note-primary">
+            <p>本文将详细介绍如何在 Linux 环境下配置 Clash，以实现全局网络代理。<br>同时使用 proxy-group 与 rule-providers，来实现机场链接和规则的自动订阅。</p>
+          </div>
 
-<h2 id="下载-Clash"><a href="#下载-Clash" class="headerlink" title="下载 Clash"></a>下载 Clash</h2><p>从以下备份库下载 Clash Premium:</p>
-<p>由于 Clash Premium 的主库已被删除，我们将使用备份库来获取: <a target="_blank" rel="noopener" href="https://github.com/zhongfly/Clash-premium-backup/releases/download/2023-09-05-gdcc8d87/clash-linux-amd64-n2023-09-05-gdcc8d87.gz">Clash-premium-backup</a></p>
-<p>如果备份库失效则可以百度搜索clash for linux 进行下载</p>
+<h2 id="下载-Clash"><a href="#下载-Clash" class="headerlink" title="下载 Clash"></a>下载 Clash</h2><p>从以下备份库下载 Clash Premium，由于 Clash Premium 的主库已被删除，我们将使用备份库来获取: <a target="_blank" rel="noopener" href="https://github.com/zhongfly/Clash-premium-backup/releases/download/2023-09-05-gdcc8d87/clash-linux-amd64-n2023-09-05-gdcc8d87.gz">Clash-premium-backup</a>。如果备份库失效则可以百度搜索clash for linux 进行下载</p>
 <h2 id="解压-Clash"><a href="#解压-Clash" class="headerlink" title="解压 Clash"></a>解压 Clash</h2><p>解压下载的文件：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">gzip -d clash-linux-amd64-n2023-09-05-gdcc8d87.gz<br><span class="hljs-built_in">chmod</span> +x clash-linux-amd64<br><span class="hljs-built_in">mv</span> clash-linux-amd64 clash<br></code></pre></td></tr></table></figure>
 
@@ -341,8 +338,10 @@
 <p>此时，clash 基本安装完毕，但是可能还是无法访问外网，因为 clash 默认配置是 DIRECT 直连，需要修改配置文件，将direct直连修改为proxy代理</p>
 <h3 id="切换配置"><a href="#切换配置" class="headerlink" title="切换配置"></a>切换配置</h3><p>安装jq工具，用于解析JSON字符串</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> apt install jq<br></code></pre></td></tr></table></figure>
+
 <p>利用curl命令，打印当前配置文件</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 此处的端口在 external-controller 已经配置</span><br>curl --request GET --url http://127.0.0.1:9091/proxies<br></code></pre></td></tr></table></figure>
+
 <p>配置文件信息太长，只看节点选择策略组选中的节点</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl --request GET --url http://127.0.0.1:9091/proxies | jq <span class="hljs-string">&#x27;.proxies.&quot;🚀 节点选择&quot;.now&#x27;</span><br></code></pre></td></tr></table></figure>
 
@@ -419,7 +418,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年3月31日</div>
+          <div>2025年4月1日</div>
         </div>
       
       
