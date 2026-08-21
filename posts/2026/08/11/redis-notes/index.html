@@ -1,0 +1,633 @@
+<!DOCTYPE html><html lang="zh-CN" class="bg-[var(--page-bg)] transition text-[14px] md:text-[16px]" data-overlayscrollbars-initialize data-astro-cid-sckkx6r4 style="--bannerOffset: 15vh;--banner-height-home: 65vh;--banner-height: 35vh;--configHue: 230;--page-width: 75rem;"> <head><title>Redis 学习笔记：概念、持久化与底层 - 大布丁的博客</title><meta charset="UTF-8"><meta name="description" content="Redis 学习笔记：概念、持久化与底层 - 大布丁的博客"><meta name="author" content="chaggle"><meta property="og:site_name" content="大布丁的博客"><meta property="og:url" content="https://chaggle.github.io/posts/2026/08/11/redis-notes/"><meta property="og:title" content="Redis 学习笔记：概念、持久化与底层 - 大布丁的博客"><meta property="og:description" content="Redis 学习笔记：概念、持久化与底层 - 大布丁的博客"><meta property="og:type" content="article"><meta name="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://chaggle.github.io/posts/2026/08/11/redis-notes/"><meta name="twitter:title" content="Redis 学习笔记：概念、持久化与底层 - 大布丁的博客"><meta name="twitter:description" content="Redis 学习笔记：概念、持久化与底层 - 大布丁的博客"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v5.13.10"><link rel="icon" href="/img/chaggle.png"><!-- Set the theme before the page is rendered to avoid a flash --><script>(function(){const DEFAULT_THEME = "auto";
+const LIGHT_MODE = "light";
+const DARK_MODE = "dark";
+const AUTO_MODE = "auto";
+const BANNER_HEIGHT_EXTEND = 30;
+const PAGE_WIDTH = 75;
+const configHue = 230;
+
+			// Load the theme from local storage
+			const theme = localStorage.getItem('theme') || DEFAULT_THEME;
+			switch (theme) {
+				case LIGHT_MODE:
+					document.documentElement.classList.remove('dark');
+					break
+				case DARK_MODE:
+					document.documentElement.classList.add('dark');
+					break
+				case AUTO_MODE:
+					if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+						document.documentElement.classList.add('dark');
+					} else {
+						document.documentElement.classList.remove('dark');
+					}
+			}
+
+			// Load the hue from local storage
+			const hue = localStorage.getItem('hue') || configHue;
+			document.documentElement.style.setProperty('--hue', hue);
+
+			// calculate the --banner-height-extend, which needs to be a multiple of 4 to avoid blurry text
+			let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));
+			offset = offset - offset % 4;
+			document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
+		})();</script><!-- defines global css variables. This will be applied to <html> <body> and some other elements idk why --><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Redis 学习笔记：概念、持久化与底层","description":"Redis 学习笔记：概念、持久化与底层","keywords":["2026","redis","middleware"],"author":{"@type":"Person","name":"chaggle","url":"https://chaggle.github.io/"},"datePublished":"2026-08-10","inLanguage":"zh-CN"}</script><link rel="alternate" type="application/rss+xml" title="chaggle" href="https://chaggle.github.io/rss.xml"><link rel="stylesheet" href="/_astro/Layout.DSulWsr7.css">
+<link rel="stylesheet" href="/_astro/Layout.y4KPJ9hc.css">
+<link rel="stylesheet" href="/_astro/_page_.CmMtgdrT.css">
+<link rel="stylesheet" href="/_astro/_page_.ZlghMKVQ.css">
+<link rel="stylesheet" href="/_astro/about.BtniRLn_.css">
+<style>input.svelte-1wah7ro:focus{outline:0}.search-panel.svelte-1wah7ro{max-height:calc(100vh - 100px);overflow-y:auto}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k){-webkit-appearance:none;height:1.5rem;background-image:var(--color-selection-bar);transition:background-image .15s ease-in-out}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-webkit-slider-thumb{-webkit-appearance:none;height:1rem;width:.5rem;border-radius:.125rem;background:#ffffffb3;box-shadow:none}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-webkit-slider-thumb:hover{background:#fffc}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-webkit-slider-thumb:active{background:#fff9}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-moz-range-thumb{-webkit-appearance:none;height:1rem;width:.5rem;border-radius:.125rem;border-width:0;background:#ffffffb3;box-shadow:none}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-moz-range-thumb:hover{background:#fffc}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-moz-range-thumb:active{background:#fff9}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-ms-thumb{-webkit-appearance:none;height:1rem;width:.5rem;border-radius:.125rem;background:#ffffffb3;box-shadow:none}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-ms-thumb:hover{background:#fffc}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-ms-thumb:active{background:#fff9}
+</style><script type="module" src="/_astro/page.Z8IJTFqj.js"></script></head> <body class=" min-h-screen transition " data-overlayscrollbars-initialize data-astro-cid-sckkx6r4 style="--bannerOffset: 15vh;--banner-height-home: 65vh;--banner-height: 35vh;--configHue: 230;--page-width: 75rem;"> <div id="config-carrier" data-hue="230"></div>    <div id="top-row" class="z-50 pointer-events-none relative transition-all duration-700 max-w-[var(--page-width)] px-0 md:px-4 mx-auto"> <div id="navbar-wrapper" class="pointer-events-auto sticky top-0 transition-all"> <div id="navbar" class="z-50 onload-animation"> <div class="absolute h-8 left-0 right-0 -top-8 bg-[var(--card-bg)] transition"></div> <!-- used for onload animation --> <div class="card-base !overflow-visible max-w-[var(--page-width)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4"> <a href="/" class="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95"> <div class="flex flex-row text-[var(--primary)] items-center text-md"> <svg width="1em" height="1em" class="text-[1.75rem] mb-1 mr-2" data-icon="material-symbols:home-outline-rounded">   <symbol id="ai:material-symbols:home-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M6 19h3v-5q0-.425.288-.712T10 13h4q.425 0 .713.288T15 14v5h3v-9l-6-4.5L6 10zm-2 0v-9q0-.475.213-.9t.587-.7l6-4.5q.525-.4 1.2-.4t1.2.4l6 4.5q.375.275.588.7T20 10v9q0 .825-.588 1.413T18 21h-4q-.425 0-.712-.288T13 20v-5h-2v5q0 .425-.288.713T10 21H6q-.825 0-1.412-.587T4 19m8-6.75"/></symbol><use href="#ai:material-symbols:home-outline-rounded"></use>  </svg> 大布丁的博客 </div> </a> <div class="hidden md:flex"> <a aria-label="主页" href="/" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> 主页  </div> </a><a aria-label="归档" href="/archive/" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> 归档  </div> </a><a aria-label="关于" href="/about/" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> 关于  </div> </a><a aria-label="GitHub" href="https://github.com/chaggle" target="_blank" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> GitHub <svg width="1em" height="1em" class="text-[0.875rem] transition -translate-y-[1px] ml-1 text-black/[0.2] dark:text-white/[0.2]" data-icon="fa6-solid:arrow-up-right-from-square">   <symbol id="ai:fa6-solid:arrow-up-right-from-square" viewBox="0 0 512 512"><path fill="currentColor" d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32h82.7L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3V192c0 17.7 14.3 32 32 32s32-14.3 32-32V32c0-17.7-14.3-32-32-32zM80 32C35.8 32 0 67.8 0 112v320c0 44.2 35.8 80 80 80h320c44.2 0 80-35.8 80-80V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v112c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16h112c17.7 0 32-14.3 32-32s-14.3-32-32-32z"/></symbol><use href="#ai:fa6-solid:arrow-up-right-from-square"></use>  </svg> </div> </a> </div> <div class="flex"> <!--<SearchPanel client:load>--> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).only=e;window.dispatchEvent(new Event("astro:only"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="1JbbOA" component-url="/_astro/Search.Dyki_PZ4.js" component-export="default" renderer-url="/_astro/client.svelte.BtEbdPyR.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;Search&quot;,&quot;value&quot;:&quot;svelte&quot;}"></astro-island> <button aria-label="Display Settings" class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" id="display-settings-switch"> <svg width="1em" height="1em" class="text-[1.25rem]" data-icon="material-symbols:palette-outline">   <symbol id="ai:material-symbols:palette-outline" viewBox="0 0 24 24"><path fill="currentColor" d="M12 22q-2.05 0-3.875-.788t-3.187-2.15t-2.15-3.187T2 12q0-2.075.813-3.9t2.2-3.175T8.25 2.788T12.2 2q2 0 3.775.688t3.113 1.9t2.125 2.875T22 11.05q0 2.875-1.75 4.413T16 17h-1.85q-.225 0-.312.125t-.088.275q0 .3.375.863t.375 1.287q0 1.25-.687 1.85T12 22m-5.5-9q.65 0 1.075-.425T8 11.5t-.425-1.075T6.5 10t-1.075.425T5 11.5t.425 1.075T6.5 13m3-4q.65 0 1.075-.425T11 7.5t-.425-1.075T9.5 6t-1.075.425T8 7.5t.425 1.075T9.5 9m5 0q.65 0 1.075-.425T16 7.5t-.425-1.075T14.5 6t-1.075.425T13 7.5t.425 1.075T14.5 9m3 4q.65 0 1.075-.425T19 11.5t-.425-1.075T17.5 10t-1.075.425T16 11.5t.425 1.075T17.5 13M12 20q.225 0 .363-.125t.137-.325q0-.35-.375-.825T11.75 17.3q0-1.05.725-1.675T14.25 15H16q1.65 0 2.825-.962T20 11.05q0-3.025-2.312-5.038T12.2 4Q8.8 4 6.4 6.325T4 12q0 3.325 2.338 5.663T12 20"/></symbol><use href="#ai:material-symbols:palette-outline"></use>  </svg> </button> <astro-island uid="17pPOe" component-url="/_astro/LightDarkSwitch.BSapTNdP.js" component-export="default" renderer-url="/_astro/client.svelte.BtEbdPyR.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;LightDarkSwitch&quot;,&quot;value&quot;:&quot;svelte&quot;}"></astro-island> <button aria-label="Menu" name="Nav Menu" class="btn-plain scale-animation rounded-lg w-11 h-11 active:scale-90 md:!hidden" id="nav-menu-switch"> <svg width="1em" height="1em" class="text-[1.25rem]" data-icon="material-symbols:menu-rounded">   <symbol id="ai:material-symbols:menu-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M4 18q-.425 0-.712-.288T3 17t.288-.712T4 16h16q.425 0 .713.288T21 17t-.288.713T20 18zm0-5q-.425 0-.712-.288T3 12t.288-.712T4 11h16q.425 0 .713.288T21 12t-.288.713T20 13zm0-5q-.425 0-.712-.288T3 7t.288-.712T4 6h16q.425 0 .713.288T21 7t-.288.713T20 8z"/></symbol><use href="#ai:material-symbols:menu-rounded"></use>  </svg> </button> </div> <div id="nav-menu-panel" class="float-panel float-panel-closed absolute transition-all fixed right-4 px-2 py-2"> <a href="/" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        "> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> 主页 </div> <svg width="1em" height="1em" class="transition text-[1.25rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <symbol id="ai:material-symbols:chevron-right-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M12.6 12L8.7 8.1q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.6 4.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.6 4.6q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7z"/></symbol><use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg>  </a><a href="/archive/" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        "> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> 归档 </div> <svg width="1em" height="1em" viewBox="0 0 24 24" class="transition text-[1.25rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg>  </a><a href="/about/" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        "> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> 关于 </div> <svg width="1em" height="1em" viewBox="0 0 24 24" class="transition text-[1.25rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg>  </a><a href="https://github.com/chaggle" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        " target="_blank"> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> GitHub </div>  <svg width="1em" height="1em" viewBox="0 0 512 512" class="transition text-[0.75rem] text-black/25 dark:text-white/25 -translate-x-1" data-icon="fa6-solid:arrow-up-right-from-square">   <use href="#ai:fa6-solid:arrow-up-right-from-square"></use>  </svg> </a> </div> <astro-island uid="Z24jrlb" component-url="/_astro/DisplaySettings.CcQr5-8Z.js" component-export="default" renderer-url="/_astro/client.svelte.BtEbdPyR.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;DisplaySettings&quot;,&quot;value&quot;:&quot;svelte&quot;}"></astro-island> </div> </div> <script type="module">function c(){localStorage.theme==="dark"?(document.documentElement.classList.remove("dark"),localStorage.theme="light"):(document.documentElement.classList.add("dark"),localStorage.theme="dark")}function o(){let t=document.getElementById("scheme-switch");t&&(t.onclick=function(){c()});let n=document.getElementById("display-settings-switch");n&&(n.onclick=function(){let e=document.getElementById("display-setting");e&&e.classList.toggle("float-panel-closed")});let l=document.getElementById("nav-menu-switch");l&&(l.onclick=function(){let e=document.getElementById("nav-menu-panel");e&&e.classList.toggle("float-panel-closed")})}o();</script> <script>(function(){const scriptUrl = "/pagefind/pagefind.js";
+
+async function loadPagefind() {
+    try {
+        const response = await fetch(scriptUrl, { method: 'HEAD' });
+        if (!response.ok) {
+            throw new Error(`Pagefind script not found: ${response.status}`);
+        }
+
+        const pagefind = await import(scriptUrl);
+
+        await pagefind.options({
+            excerptLength: 20
+        });
+
+        window.pagefind = pagefind;
+
+        document.dispatchEvent(new CustomEvent('pagefindready'));
+        console.log('Pagefind loaded and initialized successfully, event dispatched.');
+    } catch (error) {
+        console.error('Failed to load Pagefind:', error);
+        window.pagefind = {
+            search: () => Promise.resolve({ results: [] }),
+            options: () => Promise.resolve(),
+        };
+        document.dispatchEvent(new CustomEvent('pagefindloaderror'));
+        console.log('Pagefind load error, event dispatched.');
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadPagefind);
+} else {
+    loadPagefind();
+}
+})();</script> </div> </div>   <div class="absolute w-full z-30 pointer-events-none" style="top: 5.5rem"> <!-- The pointer-events-none here prevent blocking the click event of the TOC --> <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto"> <div id="main-grid" class="transition duration-700 w-full left-0 right-0 grid grid-cols-[17.5rem_auto] grid-rows-[auto_1fr_auto] lg:grid-rows-[auto]
+    mx-auto gap-4 px-0 md:px-4"> <!-- Banner image credit -->  <div id="sidebar" class="mb-4 row-start-2 row-end-3 col-span-2 lg:row-start-1 lg:row-end-2 lg:col-span-1 lg:max-w-[17.5rem] onload-animation w-full"> <div class="flex flex-col w-full gap-4 mb-4"> <div class="card-base p-3"> <a aria-label="Go to About Page" href="/about/" class="group block relative mx-auto mt-1 lg:mx-0 lg:mt-0 mb-3
+       max-w-[12rem] lg:max-w-none overflow-hidden rounded-xl active:scale-95"> <div class="absolute transition pointer-events-none group-hover:bg-black/30 group-active:bg-black/50
+        w-full h-full z-50 flex items-center justify-center"> <svg width="1.13em" height="1em" class="transition opacity-0 scale-90 group-hover:scale-100 group-hover:opacity-100 text-white text-5xl" data-icon="fa6-regular:address-card">   <symbol id="ai:fa6-regular:address-card" viewBox="0 0 576 512"><path fill="currentColor" d="M512 80c8.8 0 16 7.2 16 16v320c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V96c0-8.8 7.2-16 16-16zM64 32C28.7 32 0 60.7 0 96v320c0 35.3 28.7 64 64 64h448c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64zm144 224a64 64 0 1 0 0-128a64 64 0 1 0 0 128m-32 32c-44.2 0-80 35.8-80 80c0 8.8 7.2 16 16 16h192c8.8 0 16-7.2 16-16c0-44.2-35.8-80-80-80zm200-144c-13.3 0-24 10.7-24 24s10.7 24 24 24h80c13.3 0 24-10.7 24-24s-10.7-24-24-24zm0 96c-13.3 0-24 10.7-24 24s10.7 24 24 24h80c13.3 0 24-10.7 24-24s-10.7-24-24-24z"/></symbol><use href="#ai:fa6-regular:address-card"></use>  </svg> </div> <div class="mx-auto lg:w-full h-full lg:mt-0  overflow-hidden relative"> <div class="transition absolute inset-0 dark:bg-black/10 bg-opacity-50 pointer-events-none"></div>  <img src="/img/chaggle.png" alt="Profile Image of the Author" class="w-full h-full object-cover" style="object-position: center"> </div> </a> <div class="px-2"> <div class="font-bold text-xl text-center mb-1 dark:text-neutral-50 transition">chaggle</div> <div class="h-1 w-5 bg-[var(--primary)] mx-auto rounded-full mb-2 transition"></div> <div class="text-center text-neutral-400 mb-2.5 transition">人格的容纳之地——从后端开发走到技术管理，再走向数据架构与 AI Agent。</div> <div class="flex flex-wrap gap-2 justify-center mb-1">  <a rel="me" aria-label="GitHub" href="https://github.com/chaggle" target="_blank" class="btn-regular rounded-lg h-10 gap-2 px-3 font-bold active:scale-95"> <svg width="0.97em" height="1em" class="text-[1.5rem]" data-icon="fa6-brands:github">   <symbol id="ai:fa6-brands:github" viewBox="0 0 496 512"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6c-3.3.3-5.6-1.3-5.6-3.6c0-2 2.3-3.6 5.2-3.6c3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9c2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9c.3 2 2.9 3.3 5.9 2.6c2.9-.7 4.9-2.6 4.6-4.6c-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2c12.8 2.3 17.3-5.6 17.3-12.1c0-6.2-.3-40.4-.3-61.4c0 0-70 15-84.7-29.8c0 0-11.4-29.1-27.8-36.6c0 0-22.9-15.7 1.6-15.4c0 0 24.9 2 38.6 25.8c21.9 38.6 58.6 27.5 72.9 20.9c2.3-16 8.8-27.1 16-33.7c-55.9-6.2-112.3-14.3-112.3-110.5c0-27.5 7.6-41.3 23.6-58.9c-2.6-6.5-11.1-33.3 2.6-67.9c20.9-6.5 69 27 69 27c20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27c13.7 34.7 5.2 61.4 2.6 67.9c16 17.7 25.8 31.5 25.8 58.9c0 96.5-58.9 104.2-114.8 110.5c9.2 7.9 17 22.9 17 46.4c0 33.7-.3 75.4-.3 83.6c0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252C496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2c1.6 1.6 3.9 2.3 5.2 1c1.3-1 1-3.3-.7-5.2c-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9c1.6 1 3.6.7 4.3-.7c.7-1.3-.3-2.9-2.3-3.9c-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2c2.3 2.3 5.2 2.6 6.5 1c1.3-1.3.7-4.3-1.3-6.2c-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2c-1.4-2.3-4-3.3-5.6-2"/></symbol><use href="#ai:fa6-brands:github"></use>  </svg> GitHub </a> </div> </div> </div> </div> <div id="sidebar-sticky" class="transition-all duration-700 flex flex-col w-full gap-4 top-4 sticky top-4"> <widget-layout data-id="categories" data-is-collapsed="true" class="pb-4 card-base onload-animation" style="animation-delay: 150ms; --collapsedHeight: 7.5rem;" data-astro-cid-ucso7hve="true"> <div class="font-bold transition text-lg text-neutral-900 dark:text-neutral-100 relative ml-8 mt-4 mb-2
+        before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
+        before:absolute before:left-[-16px] before:top-[5.5px]" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;">分类</div> <div id="categories" class="collapse-wrapper px-4 overflow-hidden collapsed" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <a href="/archive/?category=AI" aria-label="View all posts in the AI category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> AI </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 7 </div> </div> </button> </a><a href="/archive/?category=bigdata" aria-label="View all posts in the bigdata category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> bigdata </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 28 </div> </div> </button> </a><a href="/archive/?category=cpp" aria-label="View all posts in the cpp category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> cpp </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 2 </div> </div> </button> </a><a href="/archive/?category=go" aria-label="View all posts in the go category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> go </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 3 </div> </div> </button> </a><a href="/archive/?category=invest" aria-label="View all posts in the invest category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> invest </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 11 </div> </div> </button> </a><a href="/archive/?category=leetcode" aria-label="View all posts in the leetcode category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> leetcode </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 99 </div> </div> </button> </a><a href="/archive/?category=linux" aria-label="View all posts in the linux category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> linux </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 4 </div> </div> </button> </a><a href="/archive/?category=middleware" aria-label="View all posts in the middleware category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> middleware </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 19 </div> </div> </button> </a><a href="/archive/?category=powershell" aria-label="View all posts in the powershell category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> powershell </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 1 </div> </div> </button> </a><a href="/archive/?category=summary" aria-label="View all posts in the summary category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> summary </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 8 </div> </div> </button> </a><a href="/archive/?category=windows" aria-label="View all posts in the windows category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> windows </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 1 </div> </div> </button> </a> </div> <div class="expand-btn px-4 -mb-2" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <button class="btn-plain rounded-lg w-full h-9" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <div class="text-[var(--primary)] flex items-center justify-center gap-2 -translate-x-2" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <svg width="1em" height="1em" class="text-[1.75rem]" data-astro-cid-ucso7hve="true" data-icon="material-symbols:more-horiz">   <symbol id="ai:material-symbols:more-horiz" viewBox="0 0 24 24"><path fill="currentColor" d="M6 14q-.825 0-1.412-.587T4 12t.588-1.412T6 10t1.413.588T8 12t-.587 1.413T6 14m6 0q-.825 0-1.412-.587T10 12t.588-1.412T12 10t1.413.588T14 12t-.587 1.413T12 14m6 0q-.825 0-1.412-.587T16 12t.588-1.412T18 10t1.413.588T20 12t-.587 1.413T18 14"/></symbol><use href="#ai:material-symbols:more-horiz"></use>  </svg> 更多 </div> </button> </div> </widget-layout>  <script type="module">class d extends HTMLElement{constructor(){if(super(),this.dataset.isCollapsed!=="true")return;const e=this.dataset.id,t=this.querySelector(".expand-btn"),s=this.querySelector(`#${e}`);t.addEventListener("click",()=>{s.classList.remove("collapsed"),t.classList.add("hidden")})}}customElements.get("widget-layout")||customElements.define("widget-layout",d);</script> <widget-layout data-id="tags" data-is-collapsed="true" class="pb-4 card-base onload-animation" style="animation-delay: 200ms; --collapsedHeight: 7.5rem;" data-astro-cid-ucso7hve="true"> <div class="font-bold transition text-lg text-neutral-900 dark:text-neutral-100 relative ml-8 mt-4 mb-2
+        before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
+        before:absolute before:left-[-16px] before:top-[5.5px]" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;">标签</div> <div id="tags" class="collapse-wrapper px-4 overflow-hidden collapsed" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;">  <div class="flex gap-2 flex-wrap"> <a href="/archive/?tag=2021" aria-label="View all posts with the 2021 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  2021 </a><a href="/archive/?tag=2022" aria-label="View all posts with the 2022 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  2022 </a><a href="/archive/?tag=2025" aria-label="View all posts with the 2025 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  2025 </a><a href="/archive/?tag=2026" aria-label="View all posts with the 2026 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  2026 </a><a href="/archive/?tag=%E5%8D%8A%E5%AF%BC%E4%BD%93" aria-label="View all posts with the 半导体 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  半导体 </a><a href="/archive/?tag=%E5%A4%87%E4%BB%BD" aria-label="View all posts with the 备份 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  备份 </a><a href="/archive/?tag=%E9%83%A8%E7%BD%B2" aria-label="View all posts with the 部署 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  部署 </a><a href="/archive/?tag=%E8%B8%A9%E5%9D%91" aria-label="View all posts with the 踩坑 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  踩坑 </a><a href="/archive/?tag=%E5%AD%98%E5%82%A8" aria-label="View all posts with the 存储 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  存储 </a><a href="/archive/?tag=%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86" aria-label="View all posts with the 错误处理 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  错误处理 </a><a href="/archive/?tag=%E8%B0%83%E4%BC%98" aria-label="View all posts with the 调优 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  调优 </a><a href="/archive/?tag=%E5%A4%9A%E6%99%BA%E8%83%BD%E4%BD%93" aria-label="View all posts with the 多智能体 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  多智能体 </a><a href="/archive/?tag=%E8%A7%84%E8%8C%83" aria-label="View all posts with the 规范 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  规范 </a><a href="/archive/?tag=%E6%B9%96%E4%BB%93" aria-label="View all posts with the 湖仓 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  湖仓 </a><a href="/archive/?tag=%E6%9E%B6%E6%9E%84" aria-label="View all posts with the 架构 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  架构 </a><a href="/archive/?tag=%E8%84%9A%E6%9C%AC" aria-label="View all posts with the 脚本 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  脚本 </a><a href="/archive/?tag=%E7%A7%91%E6%8A%80" aria-label="View all posts with the 科技 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  科技 </a><a href="/archive/?tag=%E9%9D%A2%E8%AF%95" aria-label="View all posts with the 面试 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  面试 </a><a href="/archive/?tag=%E6%B1%82%E8%81%8C" aria-label="View all posts with the 求职 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  求职 </a><a href="/archive/?tag=%E5%AE%B9%E5%99%A8" aria-label="View all posts with the 容器 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  容器 </a><a href="/archive/?tag=%E4%B8%89%E6%98%9F" aria-label="View all posts with the 三星 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  三星 </a><a href="/archive/?tag=%E5%8D%87%E7%BA%A7" aria-label="View all posts with the 升级 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  升级 </a><a href="/archive/?tag=%E7%B3%BB%E7%BB%9F%E9%87%8D%E8%A3%85" aria-label="View all posts with the 系统重装 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  系统重装 </a><a href="/archive/?tag=%E5%86%99%E4%BD%9C" aria-label="View all posts with the 写作 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  写作 </a><a href="/archive/?tag=%E5%BA%94%E7%94%A8" aria-label="View all posts with the 应用 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  应用 </a><a href="/archive/?tag=%E5%85%83%E6%95%B0%E6%8D%AE" aria-label="View all posts with the 元数据 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  元数据 </a><a href="/archive/?tag=%E8%BD%AC%E5%9E%8B" aria-label="View all posts with the 转型 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  转型 </a><a href="/archive/?tag=%E8%BD%AC%E8%BD%BD" aria-label="View all posts with the 转载 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  转载 </a><a href="/archive/?tag=%E6%80%BB%E7%BB%93" aria-label="View all posts with the 总结 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  总结 </a><a href="/archive/?tag=Agent" aria-label="View all posts with the Agent tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Agent </a><a href="/archive/?tag=AI" aria-label="View all posts with the AI tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  AI </a><a href="/archive/?tag=bigdata" aria-label="View all posts with the bigdata tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  bigdata </a><a href="/archive/?tag=C%2B%2B" aria-label="View all posts with the C++ tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  C++ </a><a href="/archive/?tag=centos" aria-label="View all posts with the centos tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  centos </a><a href="/archive/?tag=channel" aria-label="View all posts with the channel tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  channel </a><a href="/archive/?tag=ci%2Fcd" aria-label="View all posts with the ci/cd tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  ci/cd </a><a href="/archive/?tag=clash" aria-label="View all posts with the clash tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  clash </a><a href="/archive/?tag=daily-analysis" aria-label="View all posts with the daily-analysis tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  daily-analysis </a><a href="/archive/?tag=datasophon" aria-label="View all posts with the datasophon tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  datasophon </a><a href="/archive/?tag=datax" aria-label="View all posts with the datax tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  datax </a><a href="/archive/?tag=DeepSeek" aria-label="View all posts with the DeepSeek tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  DeepSeek </a><a href="/archive/?tag=devops" aria-label="View all posts with the devops tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  devops </a><a href="/archive/?tag=DISM" aria-label="View all posts with the DISM tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  DISM </a><a href="/archive/?tag=Docker" aria-label="View all posts with the Docker tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Docker </a><a href="/archive/?tag=dolphinscheduler" aria-label="View all posts with the dolphinscheduler tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  dolphinscheduler </a><a href="/archive/?tag=doris" aria-label="View all posts with the doris tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  doris </a><a href="/archive/?tag=FDE" aria-label="View all posts with the FDE tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  FDE </a><a href="/archive/?tag=flink" aria-label="View all posts with the flink tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  flink </a><a href="/archive/?tag=GC" aria-label="View all posts with the GC tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  GC </a><a href="/archive/?tag=gcc" aria-label="View all posts with the gcc tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  gcc </a><a href="/archive/?tag=gdb" aria-label="View all posts with the gdb tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  gdb </a><a href="/archive/?tag=gin" aria-label="View all posts with the gin tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  gin </a><a href="/archive/?tag=git" aria-label="View all posts with the git tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  git </a><a href="/archive/?tag=GMP" aria-label="View all posts with the GMP tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  GMP </a><a href="/archive/?tag=Go" aria-label="View all posts with the Go tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Go </a><a href="/archive/?tag=GPE" aria-label="View all posts with the GPE tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  GPE </a><a href="/archive/?tag=grafana" aria-label="View all posts with the grafana tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  grafana </a><a href="/archive/?tag=gravitino" aria-label="View all posts with the gravitino tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  gravitino </a><a href="/archive/?tag=Harness" aria-label="View all posts with the Harness tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Harness </a><a href="/archive/?tag=HBM" aria-label="View all posts with the HBM tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  HBM </a><a href="/archive/?tag=hdfs" aria-label="View all posts with the hdfs tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  hdfs </a><a href="/archive/?tag=hive" aria-label="View all posts with the hive tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  hive </a><a href="/archive/?tag=HTTP" aria-label="View all posts with the HTTP tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  HTTP </a><a href="/archive/?tag=hudi" aria-label="View all posts with the hudi tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  hudi </a><a href="/archive/?tag=iceberg" aria-label="View all posts with the iceberg tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  iceberg </a><a href="/archive/?tag=IM" aria-label="View all posts with the IM tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  IM </a><a href="/archive/?tag=Infra" aria-label="View all posts with the Infra tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Infra </a><a href="/archive/?tag=innodb" aria-label="View all posts with the innodb tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  innodb </a><a href="/archive/?tag=jenkins" aria-label="View all posts with the jenkins tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  jenkins </a><a href="/archive/?tag=juicefs" aria-label="View all posts with the juicefs tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  juicefs </a><a href="/archive/?tag=k8s" aria-label="View all posts with the k8s tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  k8s </a><a href="/archive/?tag=kafka" aria-label="View all posts with the kafka tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  kafka </a><a href="/archive/?tag=kerberos" aria-label="View all posts with the kerberos tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  kerberos </a><a href="/archive/?tag=kubernetes" aria-label="View all posts with the kubernetes tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  kubernetes </a><a href="/archive/?tag=leetcode" aria-label="View all posts with the leetcode tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  leetcode </a><a href="/archive/?tag=main-invest" aria-label="View all posts with the main-invest tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  main-invest </a><a href="/archive/?tag=map" aria-label="View all posts with the map tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  map </a><a href="/archive/?tag=mapreduce" aria-label="View all posts with the mapreduce tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  mapreduce </a><a href="/archive/?tag=market-thought" aria-label="View all posts with the market-thought tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  market-thought </a><a href="/archive/?tag=middle-invest" aria-label="View all posts with the middle-invest tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  middle-invest </a><a href="/archive/?tag=middleware" aria-label="View all posts with the middleware tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  middleware </a><a href="/archive/?tag=MSI" aria-label="View all posts with the MSI tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  MSI </a><a href="/archive/?tag=mutex" aria-label="View all posts with the mutex tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  mutex </a><a href="/archive/?tag=mysql" aria-label="View all posts with the mysql tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  mysql </a><a href="/archive/?tag=nacos" aria-label="View all posts with the nacos tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  nacos </a><a href="/archive/?tag=olap" aria-label="View all posts with the olap tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  olap </a><a href="/archive/?tag=opencode" aria-label="View all posts with the opencode tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  opencode </a><a href="/archive/?tag=paimon" aria-label="View all posts with the paimon tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  paimon </a><a href="/archive/?tag=plan" aria-label="View all posts with the plan tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  plan </a><a href="/archive/?tag=PowerShell" aria-label="View all posts with the PowerShell tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  PowerShell </a><a href="/archive/?tag=priority_queue" aria-label="View all posts with the priority_queue tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  priority_queue </a><a href="/archive/?tag=prometheus" aria-label="View all posts with the prometheus tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  prometheus </a><a href="/archive/?tag=ranger" aria-label="View all posts with the ranger tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  ranger </a><a href="/archive/?tag=redis" aria-label="View all posts with the redis tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  redis </a><a href="/archive/?tag=review" aria-label="View all posts with the review tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  review </a><a href="/archive/?tag=rocketmq" aria-label="View all posts with the rocketmq tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  rocketmq </a><a href="/archive/?tag=set" aria-label="View all posts with the set tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  set </a><a href="/archive/?tag=snowflake" aria-label="View all posts with the snowflake tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  snowflake </a><a href="/archive/?tag=spark" aria-label="View all posts with the spark tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  spark </a><a href="/archive/?tag=sql" aria-label="View all posts with the sql tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  sql </a><a href="/archive/?tag=starrocks" aria-label="View all posts with the starrocks tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  starrocks </a><a href="/archive/?tag=STL" aria-label="View all posts with the STL tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  STL </a><a href="/archive/?tag=sync" aria-label="View all posts with the sync tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  sync </a><a href="/archive/?tag=TDD" aria-label="View all posts with the TDD tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  TDD </a><a href="/archive/?tag=tez" aria-label="View all posts with the tez tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  tez </a><a href="/archive/?tag=Thinking" aria-label="View all posts with the Thinking tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Thinking </a><a href="/archive/?tag=Windows" aria-label="View all posts with the Windows tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Windows </a><a href="/archive/?tag=WSL2" aria-label="View all posts with the WSL2 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  WSL2 </a><a href="/archive/?tag=yarn" aria-label="View all posts with the yarn tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  yarn </a><a href="/archive/?tag=zinx" aria-label="View all posts with the zinx tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  zinx </a><a href="/archive/?tag=zookeeper" aria-label="View all posts with the zookeeper tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  zookeeper </a> </div>  </div> <div class="expand-btn px-4 -mb-2" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <button class="btn-plain rounded-lg w-full h-9" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <div class="text-[var(--primary)] flex items-center justify-center gap-2 -translate-x-2" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <svg width="1em" height="1em" viewBox="0 0 24 24" class="text-[1.75rem]" data-astro-cid-ucso7hve="true" data-icon="material-symbols:more-horiz">   <use href="#ai:material-symbols:more-horiz"></use>  </svg> 更多 </div> </button> </div> </widget-layout>   </div> </div> <main id="swup-container" class="transition-swup-fade col-span-2 lg:col-span-1 overflow-hidden"> <div id="content-wrapper" class="onload-animation"> <!-- the overflow-hidden here prevent long text break the layout--> <!-- make id different from windows.swup global property -->   <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4"> <div id="post-container" class="card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full "> <!-- word count and reading time --> <div class="flex flex-row text-black/30 dark:text-white/30 gap-5 mb-3 transition onload-animation"> <div class="flex flex-row items-center"> <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2"> <svg width="1em" height="1em" data-icon="material-symbols:notes-rounded">   <symbol id="ai:material-symbols:notes-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M4 18q-.425 0-.712-.288T3 17t.288-.712T4 16h10q.425 0 .713.288T15 17t-.288.713T14 18zm0-5q-.425 0-.712-.288T3 12t.288-.712T4 11h16q.425 0 .713.288T21 12t-.288.713T20 13zm0-5q-.425 0-.712-.288T3 7t.288-.712T4 6h16q.425 0 .713.288T21 7t-.288.713T20 8z"/></symbol><use href="#ai:material-symbols:notes-rounded"></use>  </svg> </div> <div class="text-sm">3771  字</div> </div> <div class="flex flex-row items-center"> <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2"> <svg width="1em" height="1em" data-icon="material-symbols:schedule-outline-rounded">   <symbol id="ai:material-symbols:schedule-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M13 11.6V8q0-.425-.288-.712T12 7t-.712.288T11 8v3.975q0 .2.075.388t.225.337l3.3 3.3q.275.275.7.275T16 16t.275-.7t-.275-.7zM12 22q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22m0-2q3.325 0 5.663-2.337T20 12t-2.337-5.663T12 4T6.337 6.338T4 12t2.338 5.663T12 20"/></symbol><use href="#ai:material-symbols:schedule-outline-rounded"></use>  </svg> </div> <div class="text-sm"> 19  分钟 </div> </div> </div> <!-- title --> <div class="relative onload-animation"> <div data-pagefind-body data-pagefind-weight="10" data-pagefind-meta="title" class="transition w-full block font-bold mb-3
+                    text-3xl md:text-[2.25rem]/[2.75rem]
+                    text-black/90 dark:text-white/90
+                    md:before:w-1 before:h-5 before:rounded-md before:bg-[var(--primary)]
+                    before:absolute before:top-[0.75rem] before:left-[-1.125rem]
+                "> Redis 学习笔记：概念、持久化与底层 </div> </div> <!-- metadata --> <div class="onload-animation"> <div class="flex flex-wrap text-neutral-500 dark:text-neutral-400 items-center gap-4 gap-x-4 gap-y-2 mb-5"> <!-- publish date --> <div class="flex items-center"> <div class="meta-icon"> <svg width="1em" height="1em" class="text-xl" data-icon="material-symbols:calendar-today-outline-rounded">   <symbol id="ai:material-symbols:calendar-today-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V3q0-.425.288-.712T7 2t.713.288T8 3v1h8V3q0-.425.288-.712T17 2t.713.288T18 3v1h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5zM5 8h14V6H5zm0 0V6z"/></symbol><use href="#ai:material-symbols:calendar-today-outline-rounded"></use>  </svg> </div> <span class="text-50 text-sm font-medium">2026-08-10</span> </div> <!-- update date -->  <!-- categories --> <div class="flex items-center"> <div class="meta-icon"> <svg width="1em" height="1em" class="text-xl" data-icon="material-symbols:book-2-outline-rounded">   <symbol id="ai:material-symbols:book-2-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M6 15.325q.35-.175.725-.25T7.5 15H8V4h-.5q-.625 0-1.062.438T6 5.5zM10 15h8V4h-8zm-4 .325V4zM7.5 22q-1.45 0-2.475-1.025T4 18.5v-13q0-1.45 1.025-2.475T7.5 2H18q.825 0 1.413.587T20 4v12.525q0 .2-.162.363t-.588.362q-.35.175-.55.5t-.2.75t.2.763t.55.487t.55.413t.2.562v.25q0 .425-.288.725T19 22zm0-2h9.325q-.15-.35-.237-.712T16.5 18.5q0-.4.075-.775t.25-.725H7.5q-.65 0-1.075.438T6 18.5q0 .65.425 1.075T7.5 20"/></symbol><use href="#ai:material-symbols:book-2-outline-rounded"></use>  </svg> </div> <div class="flex flex-row flex-nowrap items-center"> <a href="/archive/?category=middleware" aria-label="View all posts in the middleware category" class="link-lg transition text-50 text-sm font-medium
+                            hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> middleware </a> </div> </div> <!-- tags --> <div class="items-center flex"> <div class="meta-icon"> <svg width="1em" height="1em" class="text-xl" data-icon="material-symbols:tag-rounded">   <symbol id="ai:material-symbols:tag-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="m9 16l-.825 3.275q-.075.325-.325.525t-.6.2q-.475 0-.775-.375T6.3 18.8L7 16H4.275q-.5 0-.8-.387T3.3 14.75q.075-.35.35-.55t.625-.2H7.5l1-4H5.775q-.5 0-.8-.387T4.8 8.75q.075-.35.35-.55t.625-.2H9l.825-3.275Q9.9 4.4 10.15 4.2t.6-.2q.475 0 .775.375t.175.825L11 8h4l.825-3.275q.075-.325.325-.525t.6-.2q.475 0 .775.375t.175.825L17 8h2.725q.5 0 .8.387t.175.863q-.075.35-.35.55t-.625.2H16.5l-1 4h2.725q.5 0 .8.388t.175.862q-.075.35-.35.55t-.625.2H15l-.825 3.275q-.075.325-.325.525t-.6.2q-.475 0-.775-.375T12.3 18.8L13 16zm.5-2h4l1-4h-4z"/></symbol><use href="#ai:material-symbols:tag-rounded"></use>  </svg> </div> <div class="flex flex-row flex-nowrap items-center"> <div class="hidden mx-1.5 text-[var(--meta-divider)] text-sm">/</div>
+                <a href="/archive/?tag=2026" aria-label="View all posts with the 2026 tag" class="link-lg transition text-50 text-sm font-medium
+                                hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> 2026 </a><div class="mx-1.5 text-[var(--meta-divider)] text-sm">/</div>
+                <a href="/archive/?tag=redis" aria-label="View all posts with the redis tag" class="link-lg transition text-50 text-sm font-medium
+                                hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> redis </a><div class="mx-1.5 text-[var(--meta-divider)] text-sm">/</div>
+                <a href="/archive/?tag=middleware" aria-label="View all posts with the middleware tag" class="link-lg transition text-50 text-sm font-medium
+                                hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> middleware </a>  </div> </div> </div> <div class="border-[var(--line-divider)] border-dashed border-b-[1px] mb-5"></div> </div> <!-- always show cover as long as it has one -->  <div data-pagefind-body class="prose dark:prose-invert prose-base !max-w-none custom-md mb-6 markdown-content onload-animation"> <!--<div class="prose dark:prose-invert max-w-none custom-md">--> <!--<div class="max-w-none custom-md">-->  <blockquote>
+<p>2022 年学习 Redis 的两篇笔记（浅谈 Redis 中间件、深入理解 Redis 底层）合并整理。教程来源于 b站狂神说 Java 的 Redis 教程，底层部分配图主要来自极客时间。</p>
+</blockquote>
+<section><h2 id="redis-概念">Redis 概念<a class="anchor" href="#redis-概念"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>1、Redis 是基于计算机内存的数据库，一般称为缓存数据库，由于没有固定的表结构与关系，也叫 NoSQL（Not Only SQL）数据库。</p><p>2、为什么要使用 Redis：</p><ul>
+<li>数据的爆发增长</li>
+<li>没有固定关系的数据</li>
+</ul><p>3、最新的版本中，官方不建议直接在 win 上直接使用 Redis，而是使用 WSL2 Linux 子系统进行 Redis 的开发。</p><p>4、Redis 常见使用场景：</p><ul>
+<li>内存缓存</li>
+<li>不想使用 Kafka 的话，可以作为消息队列而存在</li>
+<li>做电商的热点数据保存，因为可以设置 TTL</li>
+<li>朋友圈点赞</li>
+<li>做秒杀的库存</li>
+</ul></section>
+<section><h2 id="redis-benchmark-压力测试">Redis benchmark 压力测试<a class="anchor" href="#redis-benchmark-压力测试"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>使用官方自带的 redis-benchmark 工具进行压力测试，其中：</p><ul>
+<li>-h：host，可以是本地，也能是远程进行压力测试</li>
+<li>-p：port，即端口号</li>
+<li>-c：connection，连接的数量，基本上连接都是基于 TCP/socket 的</li>
+<li>-n：跟时间复杂度与空间复杂度差不多，即指定每一个连接数的请求次数</li>
+</ul><div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.4fsv9.css"><script type="module" src="/_astro/ec.g1fg5.js"></script><figure class="frame is-terminal"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash" class="wrap" style="--ecMaxLine:64ch"><code><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">1</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">redis-benchmark</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">-h</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">localhost</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">-p</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">6379</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">-c</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">100</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">-n</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">10000</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">2</div></div><div class="code">
+</div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">3</div></div><div class="code"><span style="--0:#99A0A6;--1:#99A0A6"># 如果需要保存在一个日志文件中</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">4</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">redis-benchmark</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">-h</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">localhost</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">-p</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">6379</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">-c</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">100</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">-n</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">10000</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#F97583;--1:#F97583">></span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">redis.log</span></div></div></code><button class="copy-btn" aria-label="Copy code"><div class="copy-btn-icon"><svg viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg" class="copy-btn-icon copy-icon"><path d="M368.37-237.37q-34.48 0-58.74-24.26-24.26-24.26-24.26-58.74v-474.26q0-34.48 24.26-58.74 24.26-24.26 58.74-24.26h378.26q34.48 0 58.74 24.26 24.26 24.26 24.26 58.74v474.26q0 34.48-24.26 58.74-24.26 24.26-58.74 24.26H368.37Zm0-83h378.26v-474.26H368.37v474.26Zm-155 238q-34.48 0-58.74-24.26-24.26-24.26-24.26-58.74v-515.76q0-17.45 11.96-29.48 11.97-12.02 29.33-12.02t29.54 12.02q12.17 12.03 12.17 29.48v515.76h419.76q17.45 0 29.48 11.96 12.02 11.97 12.02 29.33t-12.02 29.54q-12.03 12.17-29.48 12.17H213.37Zm155-238v-474.26 474.26Z"></path></svg><svg viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg" class="copy-btn-icon success-icon"><path d="m389-377.13 294.7-294.7q12.58-12.67 29.52-12.67 16.93 0 29.61 12.67 12.67 12.68 12.67 29.53 0 16.86-12.28 29.14L419.07-288.41q-12.59 12.67-29.52 12.67-16.94 0-29.62-12.67L217.41-430.93q-12.67-12.68-12.79-29.45-.12-16.77 12.55-29.45 12.68-12.67 29.62-12.67 16.93 0 29.28 12.67L389-377.13Z"></path></svg></div></button></pre></figure></div></section>
+<section><h2 id="redis-基本知识">Redis 基本知识<a class="anchor" href="#redis-基本知识"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>Redis 默认有 16 个数据库，默认是第 0 个数据库。Redis 的命令大小写不敏感，而其中的 key - value 大小写敏感。常见的命令有：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">命令</th><th align="left">效果</th></tr></thead><tbody><tr><td align="left">select</td><td align="left">切换数据库</td></tr><tr><td align="left">dbsize</td><td align="left">查看数据库大小</td></tr><tr><td align="left">flushdb</td><td align="left">清空当前数据库所有 K-V 值</td></tr><tr><td align="left">flushall</td><td align="left">清空 Redis 数据库中所有 K-V 值</td></tr></tbody></table><p>Redis 的限制跟 CPU 的性能无关，性能主要受制于硬件的内存与网络带宽。</p></section>
+<section><h2 id="redis-设计目标与底层数据结构">Redis 设计目标与底层数据结构<a class="anchor" href="#redis-设计目标与底层数据结构"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>Redis 主要是为了实现<strong>高性能、高可靠、高可扩展性</strong>三个目标。而全面学习 Redis，主要是当 Redis 出现相应的故障问题时，开发人员能快速对问题进行定位与解决：</p><p><img src="/images/middleware/redis1.png" alt=""></p><p>Redis 底层数据结构主要采用整数数组和压缩列表，但是在查找时间复杂度方面并没有很大的优势，那为什么 Redis 还会把它们作为底层数据结构呢？这有两个方面的原因：</p><blockquote>
+<p>1、从内存利用率出发，数组和压缩列表都是非常紧凑的数据结构，它比链表占用的内存要更少。Redis 是内存数据库，大量数据存到内存中，此时需要做尽可能的优化，提高内存的利用率。</p>
+<p>2、从 CPU 高速缓存出发，Redis 在设计时，集合数据元素较少的情况下，默认采用内存紧凑排列的方式存储，同时利用 CPU 高速缓存不会降低访问速度。当数据元素超过设定阈值后，避免查询时间复杂度太高，转为哈希和跳表数据结构存储，保证查询效率。</p>
+</blockquote></section>
+<section><h2 id="redis-五大基本类型">Redis 五大基本类型<a class="anchor" href="#redis-五大基本类型"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><section><h3 id="string-类型">String 类型<a class="anchor" href="#string-类型"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>String 类型中常见的几种命令：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">命令</th><th align="left">效果</th></tr></thead><tbody><tr><td align="left">keys *</td><td align="left">查询所有的 key 值</td></tr><tr><td align="left">type key</td><td align="left">查看 key 的类型</td></tr><tr><td align="left">exist key</td><td align="left">是否存在 key</td></tr><tr><td align="left">append key value</td><td align="left">向 key 类型添加数据</td></tr><tr><td align="left">incr key</td><td align="left">key 的 value 原子性 + 1</td></tr><tr><td align="left">decr key</td><td align="left">key 的 value 原子性 - 1</td></tr><tr><td align="left">incrby key [numbers]</td><td align="left">key 的 value 原子性 + numbers</td></tr><tr><td align="left">decrby key [numbers]</td><td align="left">key 的 value 原子性 - numbers</td></tr><tr><td align="left">expire key [second]</td><td align="left">设置 key 的过期时间，默认单位是秒</td></tr><tr><td align="left">getrange key start end</td><td align="left">取 key 的 value 从 start 到 end</td></tr><tr><td align="left">setrange key offset val</td><td align="left">设置 key 的 value 的 offset 位后替换为 val</td></tr><tr><td align="left">ttl key</td><td align="left">查看 key 剩余过期时间，默认单位是秒</td></tr><tr><td align="left">setex key expire value</td><td align="left">设置 key value 以及过期时间 expire</td></tr><tr><td align="left">setnx key value</td><td align="left">如果 key 不存在，则设置 value，存在则设置失败（分布式锁使用，乐观锁）</td></tr><tr><td align="left">getset key value</td><td align="left">先得到 key 再设置 key value</td></tr></tbody></table><p>getset 命令有点类似于 CompareAndSwap 这种类型的操作。同理，还有 mset、mget 为批量设置（非原子性），msetnx、msetex 等（原子性操作）。</p><p>在 Redis 中，如果要设计一种封装类型的对象，语法可以如下所示：</p><p>1、<code>set user:1 {name:zhangsan, age : 18}</code></p><p>2、<code>set user:1:name zhangsan user:1:age 18</code></p><p>String 常见的使用场景为：计数器、统计多单位的数量、粉丝数、对象缓存存储。</p></section><section><h3 id="list-类型">List 类型<a class="anchor" href="#list-类型"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">命令</th><th align="left">效果</th></tr></thead><tbody><tr><td align="left">lpush [listname] value</td><td align="left">将 value 插入 [listname] 队头</td></tr><tr><td align="left">lrange [listname] start end</td><td align="left">查看 [listname] 从队头的 start 到 end</td></tr><tr><td align="left">lpop [listname]</td><td align="left">将 [listname] 队头的元素移除</td></tr><tr><td align="left">lindex [listname] index</td><td align="left">从队头开始索引第 index 个值</td></tr><tr><td align="left">rpush [listname] value</td><td align="left">将 value 插入 [listname] 队尾</td></tr><tr><td align="left">rpop [listname]</td><td align="left">将 [listname] 队尾的元素移除</td></tr><tr><td align="left">llen [listname]</td><td align="left">查看 [listname] 长度</td></tr><tr><td align="left">lrem [listname] count value</td><td align="left">移除 [listname] 中 count 个值为 value 的值</td></tr><tr><td align="left">ltrim [listname] start end</td><td align="left">截断 [listname] 从 start 到 end</td></tr></tbody></table><p>List 底层实现就是一个双向链表，所以优点跟缺点都跟双向链表一样。</p></section><section><h3 id="set-类型">Set 类型<a class="anchor" href="#set-类型"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>Set 集合类型，里面的值不重复：</p><ul>
+<li><code>sadd [setname] value</code>：向 [setname] 添加 value</li>
+<li><code>spop [setname] value</code>：从 [setname] 移除 value</li>
+<li><code>smembers [setname]</code>：查看 [setname] 内所有值</li>
+<li><code>sismember [setname] value</code>：判断 value 是否存在 [setname] 中</li>
+<li><code>srem [setname] value</code>：移除 [setname] 中的 value</li>
+<li><code>srandmember [setname] count</code>：随机获取 [setname] 内的一个值</li>
+<li><code>smove source destination value</code>：将 value 从 source 移动到 destination</li>
+<li><code>sdiff [setname1] [setname2]</code>：[setname1] 与 [setname2] 的差集</li>
+<li><code>sinter [setname1] [setname2]</code>：[setname1] 与 [setname2] 的交集</li>
+<li><code>sunion [setname1] [setname2]</code>：[setname1] 与 [setname2] 的并集</li>
+</ul><p>Set 为一个无序、不重复集合。</p></section><section><h3 id="hash-类型">Hash 类型<a class="anchor" href="#hash-类型"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>其实就是变为 key - map 结构，只是一个 map 集合。</p><blockquote>
+<p>Hash 类型的命令大同小异，只是在基本操作前加一个 h，如 hget、hset、hgetall、hlen、hexists、hmset 等。其中独有的特性即是：hkeys 与 hvals 是只获取 k 或 v，以及 hincrby、hdecrby、hsetnx、hsetex 等命令。</p>
+</blockquote><p>虽然 Hash 与 String 很相似，但是从特点来看，Hash 更适合存储结构体对象，String 更适合存储字符串类型。</p></section><section><h3 id="zset-类型">Zset 类型<a class="anchor" href="#zset-类型"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>有序集合，在 Set 基础之上增加了一个排序维度。常见命令有 zadd、zrange、zrangebyscore xxx -inf +inf（涉及正负无穷的问题）、zcard（记个数）、zrem（删除）、zcount 等。其中没有 ( 与 ) 即是闭区间，有 ( 与 ) 是开区间，比大小的时候经常使用这种方式。</p><p>zset 主要存储重要消息、带权重进行判断、排行榜的应用实现 Top N 测试。</p><blockquote>
+<p>更多的命令，可以前往 Redis 的官网进行查询。我们使用 Go、Java、Cpp 等语言做开发的时候，Java 用 Jedis、Go 用 go-redis，具体使用看文档即可。</p>
+</blockquote></section></section>
+<section><h2 id="redis-三大特殊数据类型">Redis 三大特殊数据类型<a class="anchor" href="#redis-三大特殊数据类型"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><section><h3 id="geospatial">Geospatial<a class="anchor" href="#geospatial"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>Geospatial 在 Redis 中即是 geo，在 Redis 3.x 版本就已经推出了，可以推算地理位置信息，比如两地之间的距离、方圆几里的人。geo 的 api 在现在的官网只有 9 个命令：geoadd、geopos、geodist、georadius。其中 geo 的底层实现还是基于 zset，所以 zset 的命令都能操作 geo 数据结构。如果不做地图地理信息的话，基本上项目内不会使用此数据类型。</p></section><section><h3 id="hyperloglog">HyperLogLog<a class="anchor" href="#hyperloglog"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>HyperLogLog 是基数统计的算法，用于网页的 UV 计数。此数据结构占用内存非常小，只占用 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>64</mn></msup></mrow><annotation encoding="application/x-tex">2^{64}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">64</span></span></span></span></span></span></span></span></span></span></span></span> B，即 12 KB 大小，所以从内存角度，HyperLogLog 是优先选择。使用即是 pfadd、pfcount、pfmerge。</p></section><section><h3 id="bitmaps">Bitmaps<a class="anchor" href="#bitmaps"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>位图，跟操作系统里面的一样，Redis 里面可以统计用户信息：活跃、登陆、打开。操作为：setbit、getbit、bitcount。</p></section></section>
+<section><h2 id="redis-事务">Redis 事务<a class="anchor" href="#redis-事务"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><blockquote class="admonition bdm-caution"><span class="bdm-title">CAUTION</span><p>在 Redis 中，单条命令保证原子性，而其事务是不保证原子性的！</p></blockquote><p>事务的本质即是：一组命令的集合。事务具有一次性、顺序性、排他性。Redis 中的事务是没有隔离性的概念，没有隔离级别。所有的命令在事务中没有被执行，必须发起执行命令的时候，事务才能执行，即：exec 命令。</p><p>Redis 事务执行方式：</p><ul>
+<li>开启事务（multi）</li>
+<li>命令入队，返回值均为 queue</li>
+<li>执行事务（exec）</li>
+</ul><p>事务也能放弃，命令即是：discard（即放弃事务队列里的所有命令）。</p><p>以下几点异常需要注意：</p><ul>
+<li>1、编译型异常：代码错误、错误命令，Redis 事务队列不会去执行</li>
+<li>2、运行时异常：如果事务队列中存在语法性错误，那么执行命令的时候，只放弃命令错误的那几条</li>
+<li>3、<strong>注意：错误命令与命令错误这两种说法的区别</strong></li>
+</ul></section>
+<section><h2 id="redis-实现乐观锁">Redis 实现乐观锁<a class="anchor" href="#redis-实现乐观锁"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>乐观锁：只会在更新数据的时候去判断一下，在此期间是否有修改过数据。所以使用 watch 命令对 key 值进行监视即可。修改失败，用 unwatch 解锁，再 watch key，即可。</p></section>
+<section><h2 id="redisconf-配置文件">redis.conf 配置文件<a class="anchor" href="#redisconf-配置文件"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>Redis 大小写不敏感在配置文件中已经说明了：</p><div class="expressive-code"><figure class="frame is-terminal"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash" class="wrap" style="--ecMaxLine:46ch"><code><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">1</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">daemonize</span><span style="--0:#E1E4E8;--1:#E1E4E8">  </span><span style="--0:#9ECBFF;--1:#9ECBFF">yes</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#99A0A6;--1:#99A0A6"># 后台守护进程开启，默认为 no</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">2</div></div><div class="code">
+</div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">3</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">pidfile</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">/var/run/redis_6379.pid</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#99A0A6;--1:#99A0A6"># 后台运行的 pid 值</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">4</div></div><div class="code">
+</div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">5</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">save</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">900</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">1</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#99A0A6;--1:#99A0A6"># 快照 900s 内修改一个，就自动保存一次</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">6</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">save</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">300</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">10</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">7</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">save</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">60</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#79B8FF;--1:#79B8FF">10000</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">8</div></div><div class="code">
+</div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">9</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">config</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">get</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">/</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">set</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">requirepass</span><span style="--0:#E1E4E8;--1:#E1E4E8">  </span><span style="--0:#99A0A6;--1:#99A0A6"># 设置 redis 的安全密码</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">10</div></div><div class="code">
+</div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">11</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">maxmemory-policy</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#99A0A6;--1:#99A0A6"># 内存到达上限的处理政策，一般以下 6 种处理方法</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">12</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">1、volatile-lru</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">:</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">只对设置了过期时间的</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">key</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">进行</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">lru</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">13</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">2、allkeys-lru</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">14</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">3、volatile-random</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">随机删除设置了过期时间的</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">key</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">15</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">4、allkeys-random</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">16</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">5、volatile-ttl</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">删除即将过期的</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">17</div></div><div class="code"><span style="--0:#B392F0;--1:#B392F0">6、noeviction</span><span style="--0:#E1E4E8;--1:#E1E4E8"> </span><span style="--0:#9ECBFF;--1:#9ECBFF">永不过期，返回错误</span></div></div></code><button class="copy-btn" aria-label="Copy code"><div class="copy-btn-icon"><svg viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg" class="copy-btn-icon copy-icon"><path d="M368.37-237.37q-34.48 0-58.74-24.26-24.26-24.26-24.26-58.74v-474.26q0-34.48 24.26-58.74 24.26-24.26 58.74-24.26h378.26q34.48 0 58.74 24.26 24.26 24.26 24.26 58.74v474.26q0 34.48-24.26 58.74-24.26 24.26-58.74 24.26H368.37Zm0-83h378.26v-474.26H368.37v474.26Zm-155 238q-34.48 0-58.74-24.26-24.26-24.26-24.26-58.74v-515.76q0-17.45 11.96-29.48 11.97-12.02 29.33-12.02t29.54 12.02q12.17 12.03 12.17 29.48v515.76h419.76q17.45 0 29.48 11.96 12.02 11.97 12.02 29.33t-12.02 29.54q-12.03 12.17-29.48 12.17H213.37Zm155-238v-474.26 474.26Z"></path></svg><svg viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg" class="copy-btn-icon success-icon"><path d="m389-377.13 294.7-294.7q12.58-12.67 29.52-12.67 16.93 0 29.61 12.67 12.67 12.68 12.67 29.53 0 16.86-12.28 29.14L419.07-288.41q-12.59 12.67-29.52 12.67-16.94 0-29.62-12.67L217.41-430.93q-12.67-12.68-12.79-29.45-.12-16.77 12.55-29.45 12.68-12.67 29.62-12.67 16.93 0 29.28 12.67L389-377.13Z"></path></svg></div></button></pre></figure></div></section>
+<section><h2 id="aof-与-rdb">AOF 与 RDB<a class="anchor" href="#aof-与-rdb"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>在大部分情况下，RDB 是默认的持久化配置，大部分的情况下都够用了。</p><p>一般进行数据持久化的保存操作过程一般分为五步：</p><blockquote>
+<p>(1) 客户端向服务端发送写操作（数据在客户端的内存中）</p>
+<p>(2) 数据库服务端接收到写请求的数据（数据在服务端的内存中）</p>
+<p>(3) 服务端调用系统调用函数 write，将数据写入磁盘（数据在系统内存的缓冲区中）</p>
+<p>(4) 操作系统将缓冲区中的数据转移到磁盘控制器上（数据在磁盘缓存中）</p>
+<p>(5) 磁盘控制器将数据写到磁盘的物理介质中（数据真正落到磁盘上）</p>
+</blockquote><p>以上五个步骤为在理想条件下，一个正常的保存流程。但是在大多数情况下，我们的机器等等都会有各种各样的故障，这里划分了两种情况：</p><blockquote>
+<p>1、Redis 数据库发生故障，只要在上面的第三步执行完毕，那么就可以持久化保存，剩下的两步由操作系统替我们完成</p>
+<p>2、操作系统发生故障，必须上面 5 步都完成才可保存</p>
+</blockquote><section><h3 id="rdb">RDB<a class="anchor" href="#rdb"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>RDB（Redis DataBase）操作是<strong>在内存中的数据库记录定时 dump 到磁盘上的 RDB 持久化</strong>。这种方式就是将内存中数据以快照的方式写入到二进制文件中，默认的文件名为 dump.rdb：</p><p><img src="/images/SQL/RDB.jpg" alt="RDB"></p><p>在执行 RDB 快照备份时候，一般会通过父进程 fork 一个子进程，将数据写到一个临时文件，快照写完后，替换原来的快照文件，子进程就退出，临时文件变成正式的 RDB 文件。</p><p>但是 RDB 对数据的完整性不敏感，最后一次持久化之后的数据在宕机后可能丢失。</p><p>RDB 的触发条件如下：</p><p>1、满足默认的 save 条件，会触发 rdb 规则</p><p>2、执行 flushall，也会触发 rdb 规则</p><p>3、退出 redis，也会产生 rdb 文件</p><p>RDB 的恢复条件如下：</p><p>1、将 dump.rdb 文件放在 redis 启动目录即可，redis 会自动检查其中的数据并恢复</p><p>2、查看需要存在的位置：redis-cli 中 config get dir 即可</p><p>rdb 适合大规模的数据恢复，但是需要一定的时间间隔进程操作。</p></section><section><h3 id="aof">AOF<a class="anchor" href="#aof"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>AOF（Append Only File），记录服务器执行的<strong>所有写操作</strong>命令，类似于 MySQL 中的日志。在服务器启动时，通过重新执行 AOF 这些命令来还原数据集。相应的配置文件为 appendonly.aof，默认不开启，需要手动进行启动。</p><p>其他相应的配置可以查看 redis 的相应的 conf 文件，比如 appendfsync、auto-aof-rewrite-percentage、auto-aof-rewrite-min-size 等。aof 文件大小大于 64mb 后就会产生重写的操作。当 aof 文件出现问题时，需要使用 <code>redis-check-aof --fix</code> 工具对 aof 文件进行修复。</p><p>aof 同步设置：</p><ul>
+<li>每一次修改都会同步，文件的完整性会更好</li>
+<li>每 1s 同步一次，那么可能会丢失 1s 的数据</li>
+<li>不同步效率是最高的</li>
+</ul><p>对比 AOF 与 RDB，AOF 是文件读写流操作，所以运行效率比 RDB 低，数据文件也比 RDB 大，修复数据的速度也比 RDB 慢。</p><p>Redis 还可以<strong>同时使用 AOF 持久化和 RDB 持久化</strong>。在这种情况下，当 Redis 重启时，它会优先使用 AOF 文件来还原数据集，因为 AOF 文件保存的数据集通常比 RDB 文件所保存的数据集更完整。</p></section></section>
+<section><h2 id="redis-发布与订阅">Redis 发布与订阅<a class="anchor" href="#redis-发布与订阅"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>发布订阅（pub/sub）是一种消息通信的模型，发送者发送消息，接收者接受消息。一般此模型涉及三种对象：</p><blockquote>
+<p>1、消息发送者</p>
+<p>2、频道</p>
+<p>3、消息订阅者</p>
+</blockquote><p>模型的视图如下：</p><p><img src="/images/middleware/redis-pub-sub.png" alt="redis-pub-sub"></p><p>Redis 的客户端可以订阅任意数量的频道，其相应的操作文档可以参考前文的 Redis 官方文档。</p></section>
+<section><h2 id="redis-主从复制">Redis 主从复制<a class="anchor" href="#redis-主从复制"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>在企业中，Redis 集群是必用的，其架构通常为主从模式：一个主节点有多个从节点，一个从节点只有一个主节点。</p><p><strong>主从复制的作用如下所示：</strong></p><ul>
+<li>数据冗余：主从复制是可以热备份的，是区别于 Redis 持久化的另外一种数据冗余的方式</li>
+<li>故障恢复：当主节点出现问题时，可以由从节点提供服务，实现故障的快速恢复，也能称为服务冗余</li>
+<li>负载均衡：主从架构主要是一种多读少写型的架构模式，通过多个 Redis 服务器分担读的负载，可以大大提升 Redis 服务器的并发量</li>
+<li>高可用的基石：主从复制是哨兵和集群能实施的基础，所以说是基石</li>
+</ul><blockquote>
+<p>一般来说，单体 Redis 服务器一旦发生单点故障，那么很有可能会丢失至少 1s 以上的数据，并且单体 Redis 需要处理所有的请求负载，压力较大。而且，单体 Redis 由于服务器的内存有限，不可能让服务器内存全部交给 Redis 进行数据存储。单台 Redis 内存占用不应超过 20GB。</p>
+</blockquote><p><code>info replication</code> 表示查看当前的 Redis 服务器的角色信息。</p><p>实现 Redis 集群模式只需要修改三个配置属性即可，然后使用 Redis 启动这三个配置即可：</p><ul>
+<li>1、端口</li>
+<li>2、pid</li>
+<li>3、log 文件名</li>
+</ul><p>配置从机时候，使用 <code>slaveof + host + port</code> 即可配置主从形式，但是一旦此 Redis 重启后，配置就会重置，若需要持久化的配置文件，需要手动设置 redis.conf 配置文件。</p><p>主从复制一般两种形式：全量复制与增量复制。其中，但凡从机只要是重新连接主机，都会发生一次全量复制。</p></section>  </div> <script type="module">document.addEventListener("click",function(s){const t=s.target;if(t&&t.classList.contains("copy-btn")){const c=t.closest("pre")?.querySelector("code"),i=Array.from(c?.querySelectorAll(".code:not(summary *)")??[]).map(e=>e.textContent).map(e=>e===`
+`?"":e).join(`
+`);navigator.clipboard.writeText(i);const o=t.getAttribute("data-timeout-id");o&&clearTimeout(parseInt(o)),t.classList.add("success");const n=setTimeout(()=>{t.classList.remove("success")},1e3);t.setAttribute("data-timeout-id",n.toString())}});</script> <div class="relative transition overflow-hidden bg-[var(--license-block-bg)] py-5 px-6 mb-6 rounded-xl license-container onload-animation"> <div class="transition font-bold text-black/75 dark:text-white/75"> Redis 学习笔记：概念、持久化与底层 </div> <a href="https://chaggle.github.io/posts/2026/08/11/redis-notes/" class="link text-[var(--primary)]"> https://chaggle.github.io/posts/2026/08/11/redis-notes/ </a> <div class="flex gap-6 mt-2"> <div> <div class="transition text-black/30 dark:text-white/30 text-sm">作者</div> <div class="transition text-black/75 dark:text-white/75 line-clamp-2">chaggle</div> </div> <div> <div class="transition text-black/30 dark:text-white/30 text-sm">发布于</div> <div class="transition text-black/75 dark:text-white/75 line-clamp-2">2026-08-10</div> </div> <div> <div class="transition text-black/30 dark:text-white/30 text-sm">许可协议</div> <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" class="link text-[var(--primary)] line-clamp-2">CC BY-NC-SA 4.0</a> </div> </div> <svg width="0.97em" height="1em" class="transition text-[15rem] absolute pointer-events-none right-6 top-1/2 -translate-y-1/2 text-black/5 dark:text-white/5" data-icon="fa6-brands:creative-commons">   <symbol id="ai:fa6-brands:creative-commons" viewBox="0 0 496 512"><path fill="currentColor" d="m245.83 214.87l-33.22 17.28c-9.43-19.58-25.24-19.93-27.46-19.93c-22.13 0-33.22 14.61-33.22 43.84c0 23.57 9.21 43.84 33.22 43.84c14.47 0 24.65-7.09 30.57-21.26l30.55 15.5c-6.17 11.51-25.69 38.98-65.1 38.98c-22.6 0-73.96-10.32-73.96-77.05c0-58.69 43-77.06 72.63-77.06c30.72-.01 52.7 11.95 65.99 35.86m143.05 0l-32.78 17.28c-9.5-19.77-25.72-19.93-27.9-19.93c-22.14 0-33.22 14.61-33.22 43.84c0 23.55 9.23 43.84 33.22 43.84c14.45 0 24.65-7.09 30.54-21.26l31 15.5c-2.1 3.75-21.39 38.98-65.09 38.98c-22.69 0-73.96-9.87-73.96-77.05c0-58.67 42.97-77.06 72.63-77.06c30.71-.01 52.58 11.95 65.56 35.86M247.56 8.05C104.74 8.05 0 123.11 0 256.05c0 138.49 113.6 248 247.56 248c129.93 0 248.44-100.87 248.44-248c0-137.87-106.62-248-248.44-248m.87 450.81c-112.54 0-203.7-93.04-203.7-202.81c0-105.42 85.43-203.27 203.72-203.27c112.53 0 202.82 89.46 202.82 203.26c-.01 121.69-99.68 202.82-202.84 202.82"/></symbol><use href="#ai:fa6-brands:creative-commons"></use>  </svg> </div> <div class="giscus mt-6" id="giscus"></div> <script>
+    (function () {
+        const repo = "chaggle/chaggle.github.io";
+        const repoId = "R_kgDOHgSL5w";
+        const category = "General";
+        const categoryId = "DIC_kwDOHgSL584DD3ot";
+
+        function resolveTheme() {
+            const t = localStorage.getItem("theme") || "auto";
+            if (t === "dark") return "dark";
+            if (t === "light") return "light";
+            return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+
+        function applyGiscusTheme() {
+            const frame = document.querySelector("iframe.giscus-frame");
+            if (frame) {
+                frame.contentWindow.postMessage(
+                    { giscus: { setConfig: { theme: resolveTheme() } } },
+                    "https://giscus.app"
+                );
+            }
+        }
+
+        // 观察 Fuwari 暗色模式 class 切换，同步 giscus 主题
+        const observer = new MutationObserver(applyGiscusTheme);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+        const s = document.createElement("script");
+        s.src = "https://giscus.app/client.js";
+        s.setAttribute("data-repo", repo);
+        s.setAttribute("data-repo-id", repoId);
+        s.setAttribute("data-category", category);
+        s.setAttribute("data-category-id", categoryId);
+        s.setAttribute("data-mapping", "pathname");
+        s.setAttribute("data-strict", "0");
+        s.setAttribute("data-reactions-enabled", "1");
+        s.setAttribute("data-emit-metadata", "0");
+        s.setAttribute("data-input-position", "top");
+        s.setAttribute("data-theme", resolveTheme());
+        s.setAttribute("data-lang", "zh-CN");
+        s.setAttribute("crossorigin", "anonymous");
+        s.async = true;
+        document.getElementById("giscus").appendChild(s);
+    })();
+</script> </div> </div> <div class="flex flex-col md:flex-row justify-between mb-4 gap-4 overflow-hidden w-full"> <a href="/posts/2026/08/11/weekly-summaries-2022/" class="w-full font-bold overflow-hidden active:scale-95"> <div class="btn-card rounded-2xl w-full h-[3.75rem] max-w-full px-4 flex items-center !justify-start gap-4"> <svg width="1em" height="1em" class="text-[2rem] text-[var(--primary)]" data-icon="material-symbols:chevron-left-rounded">   <symbol id="ai:material-symbols:chevron-left-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="m10.8 12l3.9 3.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-4.6-4.6q-.15-.15-.212-.325T8.425 12t.063-.375t.212-.325l4.6-4.6q.275-.275.7-.275t.7.275t.275.7t-.275.7z"/></symbol><use href="#ai:material-symbols:chevron-left-rounded"></use>  </svg> <div class="overflow-hidden transition overflow-ellipsis whitespace-nowrap max-w-[calc(100%_-_3rem)] text-black/75 dark:text-white/75"> 2022 年周总结合集 </div> </div> </a> <a href="/posts/2026/08/10/datasophon-local-vs-remote/" class="w-full font-bold overflow-hidden active:scale-95"> <div class="btn-card rounded-2xl w-full h-[3.75rem] max-w-full px-4 flex items-center !justify-end gap-4"> <div class="overflow-hidden transition overflow-ellipsis whitespace-nowrap max-w-[calc(100%_-_3rem)] text-black/75 dark:text-white/75"> 本地 DataSophon 与开源增强版对比及升级思路 </div> <svg width="1em" height="1em" viewBox="0 0 24 24" class="text-[2rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg> </div> </a> </div>  <div class="footer col-span-2 onload-animation hidden lg:block"> <!--<div class="border-t border-[var(&#45;&#45;primary)] mx-16 border-dashed py-8 max-w-[var(&#45;&#45;page-width)] flex flex-col items-center justify-center px-6">--><div class="transition border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-32"></div> <!--<div class="transition bg-[oklch(92%_0.01_var(&#45;&#45;hue))] dark:bg-black rounded-2xl py-8 mt-4 mb-8 flex flex-col items-center justify-center px-6">--> <div class="transition border-dashed border-[oklch(85%_0.01_var(--hue))] dark:border-white/15 rounded-2xl mb-12 flex flex-col items-center justify-center px-6"> <div class="transition text-50 text-sm text-center">
+&copy; <span id="copyright-year">2026</span> chaggle. All Rights Reserved. /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/rss.xml">RSS</a> /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/sitemap-index.xml">Sitemap</a><br>
+Powered by
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://astro.build">Astro</a> &
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a> </div> </div> </div> </div> </main> <div class="footer col-span-2 onload-animation block lg:hidden"> <!--<div class="border-t border-[var(&#45;&#45;primary)] mx-16 border-dashed py-8 max-w-[var(&#45;&#45;page-width)] flex flex-col items-center justify-center px-6">--><div class="transition border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-32"></div> <!--<div class="transition bg-[oklch(92%_0.01_var(&#45;&#45;hue))] dark:bg-black rounded-2xl py-8 mt-4 mb-8 flex flex-col items-center justify-center px-6">--> <div class="transition border-dashed border-[oklch(85%_0.01_var(--hue))] dark:border-white/15 rounded-2xl mb-12 flex flex-col items-center justify-center px-6"> <div class="transition text-50 text-sm text-center">
+&copy; <span id="copyright-year">2026</span> chaggle. All Rights Reserved. /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/rss.xml">RSS</a> /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/sitemap-index.xml">Sitemap</a><br>
+Powered by
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://astro.build">Astro</a> &
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a> </div> </div> </div> </div> <!-- There can't be a filter on parent element, or it will break `fixed` --><div class="back-to-top-wrapper hidden lg:block" data-astro-cid-eymb5ayk> <div id="back-to-top-btn" class="back-to-top-btn hide flex items-center rounded-2xl overflow-hidden transition" onclick="backToTop()" data-astro-cid-eymb5ayk> <button aria-label="Back to Top" class="btn-card h-[3.75rem] w-[3.75rem]" data-astro-cid-eymb5ayk> <svg width="1em" height="1em" class="mx-auto" data-astro-cid-eymb5ayk="true" data-icon="material-symbols:keyboard-arrow-up-rounded">   <symbol id="ai:material-symbols:keyboard-arrow-up-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="m12 10.8l-3.9 3.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.6-4.6q.3-.3.7-.3t.7.3l4.6 4.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275z"/></symbol><use href="#ai:material-symbols:keyboard-arrow-up-rounded"></use>  </svg> </button> </div> </div>  <script>
+function backToTop() {
+    window.scroll({ top: 0, behavior: 'smooth' });
+}
+</script> </div> </div>  <div class="absolute w-full z-0 hidden 2xl:block"> <div class="relative max-w-[var(--page-width)] mx-auto"> <!-- TOC component --> <div id="toc-wrapper" class="hidden lg:block transition absolute top-0 -right-[var(--toc-width)] w-[var(--toc-width)] items-center"> <div id="toc-inner-wrapper" class="fixed top-14 w-[var(--toc-width)] h-[calc(100vh_-_20rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar"> <div id="toc" class="w-full h-full transition-swup-fade "> <div class="h-8 w-full"></div> <table-of-contents class="group"><a href="#redis-概念" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">1</div><div class="transition text-sm text-50">Redis 概念</div></a><a href="#redis-benchmark-压力测试" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">2</div><div class="transition text-sm text-50">Redis benchmark 压力测试</div></a><a href="#redis-基本知识" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">3</div><div class="transition text-sm text-50">Redis 基本知识</div></a><a href="#redis-设计目标与底层数据结构" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">4</div><div class="transition text-sm text-50">Redis 设计目标与底层数据结构</div></a><a href="#redis-五大基本类型" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">5</div><div class="transition text-sm text-50">Redis 五大基本类型</div></a><a href="#string-类型" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">String 类型</div></a><a href="#list-类型" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">List 类型</div></a><a href="#set-类型" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">Set 类型</div></a><a href="#hash-类型" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">Hash 类型</div></a><a href="#zset-类型" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">Zset 类型</div></a><a href="#redis-三大特殊数据类型" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">6</div><div class="transition text-sm text-50">Redis 三大特殊数据类型</div></a><a href="#geospatial" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">Geospatial</div></a><a href="#hyperloglog" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">HyperLogLog</div></a><a href="#bitmaps" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">Bitmaps</div></a><a href="#redis-事务" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">7</div><div class="transition text-sm text-50">Redis 事务</div></a><a href="#redis-实现乐观锁" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">8</div><div class="transition text-sm text-50">Redis 实现乐观锁</div></a><a href="#redisconf-配置文件" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">9</div><div class="transition text-sm text-50">redis.conf 配置文件</div></a><a href="#aof-与-rdb" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">10</div><div class="transition text-sm text-50">AOF 与 RDB</div></a><a href="#rdb" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">RDB</div></a><a href="#aof" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">AOF</div></a><a href="#redis-发布与订阅" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">11</div><div class="transition text-sm text-50">Redis 发布与订阅</div></a><a href="#redis-主从复制" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">12</div><div class="transition text-sm text-50">Redis 主从复制</div></a><div id="active-indicator" style="opacity: 0" class="-z-10 absolute bg-[var(--toc-btn-hover)] left-0 right-0 rounded-xl transition-all group-hover:bg-transparent border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed"></div></table-of-contents><script type="module">class l extends HTMLElement{tocEl=null;visibleClass="visible";observer;anchorNavTarget=null;headingIdxMap=new Map;headings=[];sections=[];tocEntries=[];active=[];activeIndicator=null;constructor(){super(),this.observer=new IntersectionObserver(this.markVisibleSection,{threshold:0})}markVisibleSection=t=>{t.forEach(e=>{const i=e.target.children[0]?.getAttribute("id"),s=i?this.headingIdxMap.get(i):void 0;s!=null&&(this.active[s]=e.isIntersecting),e.isIntersecting&&this.anchorNavTarget==e.target.firstChild&&(this.anchorNavTarget=null)}),this.active.includes(!0)||this.fallback(),this.update()};toggleActiveHeading=()=>{let t=this.active.length-1,e=this.active.length-1,i=-1;for(;t>=0&&!this.active[t];)this.tocEntries[t].classList.remove(this.visibleClass),t--;for(;t>=0&&this.active[t];)this.tocEntries[t].classList.add(this.visibleClass),e=Math.min(e,t),i=Math.max(i,t),t--;for(;t>=0;)this.tocEntries[t].classList.remove(this.visibleClass),t--;if(e>i)this.activeIndicator?.setAttribute("style","opacity: 0");else{let s=this.tocEl?.getBoundingClientRect().top||0,n=this.tocEl?.scrollTop||0,o=this.tocEntries[e].getBoundingClientRect().top-s+n,c=this.tocEntries[i].getBoundingClientRect().bottom-s+n;this.activeIndicator?.setAttribute("style",`top: ${o}px; height: ${c-o}px`)}};scrollToActiveHeading=()=>{if(this.anchorNavTarget||!this.tocEl)return;const t=document.querySelectorAll(`#toc .${this.visibleClass}`);if(!t.length)return;const e=t[0],i=t[t.length-1],s=this.tocEl.clientHeight;let n;i.getBoundingClientRect().bottom-e.getBoundingClientRect().top<.9*s?n=e.offsetTop-32:n=i.offsetTop-s*.8,this.tocEl.scrollTo({top:n,left:0,behavior:"smooth"})};update=()=>{requestAnimationFrame(()=>{this.toggleActiveHeading(),this.scrollToActiveHeading()})};fallback=()=>{if(this.sections.length)for(let t=0;t<this.sections.length;t++){let e=this.sections[t].getBoundingClientRect().top,i=this.sections[t].getBoundingClientRect().bottom;if(this.isInRange(e,0,window.innerHeight)||this.isInRange(i,0,window.innerHeight)||e<0&&i>window.innerHeight)this.markActiveHeading(t);else if(e>window.innerHeight)break}};markActiveHeading=t=>{this.active[t]=!0};handleAnchorClick=t=>{const e=t.composedPath().find(i=>i instanceof HTMLAnchorElement);if(e){const i=decodeURIComponent(e.hash?.substring(1)),s=this.headingIdxMap.get(i);s!==void 0?this.anchorNavTarget=this.headings[s]:this.anchorNavTarget=null}};isInRange(t,e,i){return e<t&&t<i}connectedCallback(){const t=document.querySelector(".prose");t?t.addEventListener("animationend",()=>{this.init()},{once:!0}):console.debug("Animation element not found")}init(){if(this.tocEl=document.getElementById("toc-inner-wrapper"),!!this.tocEl&&(this.tocEl.addEventListener("click",this.handleAnchorClick,{capture:!0}),this.activeIndicator=document.getElementById("active-indicator"),this.tocEntries=Array.from(document.querySelectorAll("#toc a[href^='#']")),this.tocEntries.length!==0)){this.sections=new Array(this.tocEntries.length),this.headings=new Array(this.tocEntries.length);for(let t=0;t<this.tocEntries.length;t++){const e=decodeURIComponent(this.tocEntries[t].hash?.substring(1)),i=document.getElementById(e),s=i?.parentElement;i instanceof HTMLElement&&s instanceof HTMLElement&&(this.headings[t]=i,this.sections[t]=s,this.headingIdxMap.set(e,t))}this.active=new Array(this.tocEntries.length).fill(!1),this.sections.forEach(t=>this.observer.observe(t)),this.fallback(),this.update()}}disconnectedCallback(){this.sections.forEach(t=>this.observer.unobserve(t)),this.observer.disconnect(),this.tocEl?.removeEventListener("click",this.handleAnchorClick)}}customElements.get("table-of-contents")||customElements.define("table-of-contents",l);</script> <div class="h-8 w-full"></div> </div> </div> </div> <!-- #toc needs to exist for Swup to work normally -->  </div> </div>  <!-- increase the page height during page transition to prevent the scrolling animation from jumping --> <div id="page-height-extend" class="hidden h-[300vh]" data-astro-cid-sckkx6r4 style="--bannerOffset: 15vh;--banner-height-home: 65vh;--banner-height: 35vh;--configHue: 230;--page-width: 75rem;"></div>  <script type="module" src="/_astro/Layout.astro_astro_type_script_index_0_lang.DAHrxWCB.js"></script> <script type="module" src="/_astro/Layout.astro_astro_type_script_index_1_lang.DlBknloJ.js"></script></body></html>

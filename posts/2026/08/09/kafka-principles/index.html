@@ -1,0 +1,608 @@
+<!DOCTYPE html><html lang="zh-CN" class="bg-[var(--page-bg)] transition text-[14px] md:text-[16px]" data-overlayscrollbars-initialize data-astro-cid-sckkx6r4 style="--bannerOffset: 15vh;--banner-height-home: 65vh;--banner-height: 35vh;--configHue: 230;--page-width: 75rem;"> <head><title>Kafka 底层原理与知识要点 - 大布丁的博客</title><meta charset="UTF-8"><meta name="description" content="Kafka 底层原理与知识要点 - 大布丁的博客"><meta name="author" content="chaggle"><meta property="og:site_name" content="大布丁的博客"><meta property="og:url" content="https://chaggle.github.io/posts/2026/08/09/kafka-principles/"><meta property="og:title" content="Kafka 底层原理与知识要点 - 大布丁的博客"><meta property="og:description" content="Kafka 底层原理与知识要点 - 大布丁的博客"><meta property="og:type" content="article"><meta name="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://chaggle.github.io/posts/2026/08/09/kafka-principles/"><meta name="twitter:title" content="Kafka 底层原理与知识要点 - 大布丁的博客"><meta name="twitter:description" content="Kafka 底层原理与知识要点 - 大布丁的博客"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v5.13.10"><link rel="icon" href="/img/chaggle.png"><!-- Set the theme before the page is rendered to avoid a flash --><script>(function(){const DEFAULT_THEME = "auto";
+const LIGHT_MODE = "light";
+const DARK_MODE = "dark";
+const AUTO_MODE = "auto";
+const BANNER_HEIGHT_EXTEND = 30;
+const PAGE_WIDTH = 75;
+const configHue = 230;
+
+			// Load the theme from local storage
+			const theme = localStorage.getItem('theme') || DEFAULT_THEME;
+			switch (theme) {
+				case LIGHT_MODE:
+					document.documentElement.classList.remove('dark');
+					break
+				case DARK_MODE:
+					document.documentElement.classList.add('dark');
+					break
+				case AUTO_MODE:
+					if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+						document.documentElement.classList.add('dark');
+					} else {
+						document.documentElement.classList.remove('dark');
+					}
+			}
+
+			// Load the hue from local storage
+			const hue = localStorage.getItem('hue') || configHue;
+			document.documentElement.style.setProperty('--hue', hue);
+
+			// calculate the --banner-height-extend, which needs to be a multiple of 4 to avoid blurry text
+			let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));
+			offset = offset - offset % 4;
+			document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
+		})();</script><!-- defines global css variables. This will be applied to <html> <body> and some other elements idk why --><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Kafka 底层原理与知识要点","description":"Kafka 底层原理与知识要点","keywords":["2026","kafka"],"author":{"@type":"Person","name":"chaggle","url":"https://chaggle.github.io/"},"datePublished":"2026-08-08","inLanguage":"zh-CN"}</script><link rel="alternate" type="application/rss+xml" title="chaggle" href="https://chaggle.github.io/rss.xml"><link rel="stylesheet" href="/_astro/Layout.DSulWsr7.css">
+<link rel="stylesheet" href="/_astro/Layout.y4KPJ9hc.css">
+<link rel="stylesheet" href="/_astro/_page_.CmMtgdrT.css">
+<link rel="stylesheet" href="/_astro/_page_.ZlghMKVQ.css">
+<link rel="stylesheet" href="/_astro/about.BtniRLn_.css">
+<style>input.svelte-1wah7ro:focus{outline:0}.search-panel.svelte-1wah7ro{max-height:calc(100vh - 100px);overflow-y:auto}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k){-webkit-appearance:none;height:1.5rem;background-image:var(--color-selection-bar);transition:background-image .15s ease-in-out}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-webkit-slider-thumb{-webkit-appearance:none;height:1rem;width:.5rem;border-radius:.125rem;background:#ffffffb3;box-shadow:none}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-webkit-slider-thumb:hover{background:#fffc}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-webkit-slider-thumb:active{background:#fff9}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-moz-range-thumb{-webkit-appearance:none;height:1rem;width:.5rem;border-radius:.125rem;border-width:0;background:#ffffffb3;box-shadow:none}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-moz-range-thumb:hover{background:#fffc}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-moz-range-thumb:active{background:#fff9}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-ms-thumb{-webkit-appearance:none;height:1rem;width:.5rem;border-radius:.125rem;background:#ffffffb3;box-shadow:none}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-ms-thumb:hover{background:#fffc}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-ms-thumb:active{background:#fff9}
+</style><script type="module" src="/_astro/page.Z8IJTFqj.js"></script></head> <body class=" min-h-screen transition " data-overlayscrollbars-initialize data-astro-cid-sckkx6r4 style="--bannerOffset: 15vh;--banner-height-home: 65vh;--banner-height: 35vh;--configHue: 230;--page-width: 75rem;"> <div id="config-carrier" data-hue="230"></div>    <div id="top-row" class="z-50 pointer-events-none relative transition-all duration-700 max-w-[var(--page-width)] px-0 md:px-4 mx-auto"> <div id="navbar-wrapper" class="pointer-events-auto sticky top-0 transition-all"> <div id="navbar" class="z-50 onload-animation"> <div class="absolute h-8 left-0 right-0 -top-8 bg-[var(--card-bg)] transition"></div> <!-- used for onload animation --> <div class="card-base !overflow-visible max-w-[var(--page-width)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4"> <a href="/" class="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95"> <div class="flex flex-row text-[var(--primary)] items-center text-md"> <svg width="1em" height="1em" class="text-[1.75rem] mb-1 mr-2" data-icon="material-symbols:home-outline-rounded">   <symbol id="ai:material-symbols:home-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M6 19h3v-5q0-.425.288-.712T10 13h4q.425 0 .713.288T15 14v5h3v-9l-6-4.5L6 10zm-2 0v-9q0-.475.213-.9t.587-.7l6-4.5q.525-.4 1.2-.4t1.2.4l6 4.5q.375.275.588.7T20 10v9q0 .825-.588 1.413T18 21h-4q-.425 0-.712-.288T13 20v-5h-2v5q0 .425-.288.713T10 21H6q-.825 0-1.412-.587T4 19m8-6.75"/></symbol><use href="#ai:material-symbols:home-outline-rounded"></use>  </svg> 大布丁的博客 </div> </a> <div class="hidden md:flex"> <a aria-label="主页" href="/" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> 主页  </div> </a><a aria-label="归档" href="/archive/" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> 归档  </div> </a><a aria-label="关于" href="/about/" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> 关于  </div> </a><a aria-label="GitHub" href="https://github.com/chaggle" target="_blank" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> GitHub <svg width="1em" height="1em" class="text-[0.875rem] transition -translate-y-[1px] ml-1 text-black/[0.2] dark:text-white/[0.2]" data-icon="fa6-solid:arrow-up-right-from-square">   <symbol id="ai:fa6-solid:arrow-up-right-from-square" viewBox="0 0 512 512"><path fill="currentColor" d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32h82.7L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3V192c0 17.7 14.3 32 32 32s32-14.3 32-32V32c0-17.7-14.3-32-32-32zM80 32C35.8 32 0 67.8 0 112v320c0 44.2 35.8 80 80 80h320c44.2 0 80-35.8 80-80V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v112c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16h112c17.7 0 32-14.3 32-32s-14.3-32-32-32z"/></symbol><use href="#ai:fa6-solid:arrow-up-right-from-square"></use>  </svg> </div> </a> </div> <div class="flex"> <!--<SearchPanel client:load>--> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).only=e;window.dispatchEvent(new Event("astro:only"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="1JbbOA" component-url="/_astro/Search.Dyki_PZ4.js" component-export="default" renderer-url="/_astro/client.svelte.BtEbdPyR.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;Search&quot;,&quot;value&quot;:&quot;svelte&quot;}"></astro-island> <button aria-label="Display Settings" class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" id="display-settings-switch"> <svg width="1em" height="1em" class="text-[1.25rem]" data-icon="material-symbols:palette-outline">   <symbol id="ai:material-symbols:palette-outline" viewBox="0 0 24 24"><path fill="currentColor" d="M12 22q-2.05 0-3.875-.788t-3.187-2.15t-2.15-3.187T2 12q0-2.075.813-3.9t2.2-3.175T8.25 2.788T12.2 2q2 0 3.775.688t3.113 1.9t2.125 2.875T22 11.05q0 2.875-1.75 4.413T16 17h-1.85q-.225 0-.312.125t-.088.275q0 .3.375.863t.375 1.287q0 1.25-.687 1.85T12 22m-5.5-9q.65 0 1.075-.425T8 11.5t-.425-1.075T6.5 10t-1.075.425T5 11.5t.425 1.075T6.5 13m3-4q.65 0 1.075-.425T11 7.5t-.425-1.075T9.5 6t-1.075.425T8 7.5t.425 1.075T9.5 9m5 0q.65 0 1.075-.425T16 7.5t-.425-1.075T14.5 6t-1.075.425T13 7.5t.425 1.075T14.5 9m3 4q.65 0 1.075-.425T19 11.5t-.425-1.075T17.5 10t-1.075.425T16 11.5t.425 1.075T17.5 13M12 20q.225 0 .363-.125t.137-.325q0-.35-.375-.825T11.75 17.3q0-1.05.725-1.675T14.25 15H16q1.65 0 2.825-.962T20 11.05q0-3.025-2.312-5.038T12.2 4Q8.8 4 6.4 6.325T4 12q0 3.325 2.338 5.663T12 20"/></symbol><use href="#ai:material-symbols:palette-outline"></use>  </svg> </button> <astro-island uid="17pPOe" component-url="/_astro/LightDarkSwitch.BSapTNdP.js" component-export="default" renderer-url="/_astro/client.svelte.BtEbdPyR.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;LightDarkSwitch&quot;,&quot;value&quot;:&quot;svelte&quot;}"></astro-island> <button aria-label="Menu" name="Nav Menu" class="btn-plain scale-animation rounded-lg w-11 h-11 active:scale-90 md:!hidden" id="nav-menu-switch"> <svg width="1em" height="1em" class="text-[1.25rem]" data-icon="material-symbols:menu-rounded">   <symbol id="ai:material-symbols:menu-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M4 18q-.425 0-.712-.288T3 17t.288-.712T4 16h16q.425 0 .713.288T21 17t-.288.713T20 18zm0-5q-.425 0-.712-.288T3 12t.288-.712T4 11h16q.425 0 .713.288T21 12t-.288.713T20 13zm0-5q-.425 0-.712-.288T3 7t.288-.712T4 6h16q.425 0 .713.288T21 7t-.288.713T20 8z"/></symbol><use href="#ai:material-symbols:menu-rounded"></use>  </svg> </button> </div> <div id="nav-menu-panel" class="float-panel float-panel-closed absolute transition-all fixed right-4 px-2 py-2"> <a href="/" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        "> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> 主页 </div> <svg width="1em" height="1em" class="transition text-[1.25rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <symbol id="ai:material-symbols:chevron-right-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M12.6 12L8.7 8.1q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.6 4.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.6 4.6q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7z"/></symbol><use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg>  </a><a href="/archive/" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        "> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> 归档 </div> <svg width="1em" height="1em" viewBox="0 0 24 24" class="transition text-[1.25rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg>  </a><a href="/about/" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        "> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> 关于 </div> <svg width="1em" height="1em" viewBox="0 0 24 24" class="transition text-[1.25rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg>  </a><a href="https://github.com/chaggle" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        " target="_blank"> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> GitHub </div>  <svg width="1em" height="1em" viewBox="0 0 512 512" class="transition text-[0.75rem] text-black/25 dark:text-white/25 -translate-x-1" data-icon="fa6-solid:arrow-up-right-from-square">   <use href="#ai:fa6-solid:arrow-up-right-from-square"></use>  </svg> </a> </div> <astro-island uid="Z24jrlb" component-url="/_astro/DisplaySettings.CcQr5-8Z.js" component-export="default" renderer-url="/_astro/client.svelte.BtEbdPyR.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;DisplaySettings&quot;,&quot;value&quot;:&quot;svelte&quot;}"></astro-island> </div> </div> <script type="module">function c(){localStorage.theme==="dark"?(document.documentElement.classList.remove("dark"),localStorage.theme="light"):(document.documentElement.classList.add("dark"),localStorage.theme="dark")}function o(){let t=document.getElementById("scheme-switch");t&&(t.onclick=function(){c()});let n=document.getElementById("display-settings-switch");n&&(n.onclick=function(){let e=document.getElementById("display-setting");e&&e.classList.toggle("float-panel-closed")});let l=document.getElementById("nav-menu-switch");l&&(l.onclick=function(){let e=document.getElementById("nav-menu-panel");e&&e.classList.toggle("float-panel-closed")})}o();</script> <script>(function(){const scriptUrl = "/pagefind/pagefind.js";
+
+async function loadPagefind() {
+    try {
+        const response = await fetch(scriptUrl, { method: 'HEAD' });
+        if (!response.ok) {
+            throw new Error(`Pagefind script not found: ${response.status}`);
+        }
+
+        const pagefind = await import(scriptUrl);
+
+        await pagefind.options({
+            excerptLength: 20
+        });
+
+        window.pagefind = pagefind;
+
+        document.dispatchEvent(new CustomEvent('pagefindready'));
+        console.log('Pagefind loaded and initialized successfully, event dispatched.');
+    } catch (error) {
+        console.error('Failed to load Pagefind:', error);
+        window.pagefind = {
+            search: () => Promise.resolve({ results: [] }),
+            options: () => Promise.resolve(),
+        };
+        document.dispatchEvent(new CustomEvent('pagefindloaderror'));
+        console.log('Pagefind load error, event dispatched.');
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadPagefind);
+} else {
+    loadPagefind();
+}
+})();</script> </div> </div>   <div class="absolute w-full z-30 pointer-events-none" style="top: 5.5rem"> <!-- The pointer-events-none here prevent blocking the click event of the TOC --> <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto"> <div id="main-grid" class="transition duration-700 w-full left-0 right-0 grid grid-cols-[17.5rem_auto] grid-rows-[auto_1fr_auto] lg:grid-rows-[auto]
+    mx-auto gap-4 px-0 md:px-4"> <!-- Banner image credit -->  <div id="sidebar" class="mb-4 row-start-2 row-end-3 col-span-2 lg:row-start-1 lg:row-end-2 lg:col-span-1 lg:max-w-[17.5rem] onload-animation w-full"> <div class="flex flex-col w-full gap-4 mb-4"> <div class="card-base p-3"> <a aria-label="Go to About Page" href="/about/" class="group block relative mx-auto mt-1 lg:mx-0 lg:mt-0 mb-3
+       max-w-[12rem] lg:max-w-none overflow-hidden rounded-xl active:scale-95"> <div class="absolute transition pointer-events-none group-hover:bg-black/30 group-active:bg-black/50
+        w-full h-full z-50 flex items-center justify-center"> <svg width="1.13em" height="1em" class="transition opacity-0 scale-90 group-hover:scale-100 group-hover:opacity-100 text-white text-5xl" data-icon="fa6-regular:address-card">   <symbol id="ai:fa6-regular:address-card" viewBox="0 0 576 512"><path fill="currentColor" d="M512 80c8.8 0 16 7.2 16 16v320c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V96c0-8.8 7.2-16 16-16zM64 32C28.7 32 0 60.7 0 96v320c0 35.3 28.7 64 64 64h448c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64zm144 224a64 64 0 1 0 0-128a64 64 0 1 0 0 128m-32 32c-44.2 0-80 35.8-80 80c0 8.8 7.2 16 16 16h192c8.8 0 16-7.2 16-16c0-44.2-35.8-80-80-80zm200-144c-13.3 0-24 10.7-24 24s10.7 24 24 24h80c13.3 0 24-10.7 24-24s-10.7-24-24-24zm0 96c-13.3 0-24 10.7-24 24s10.7 24 24 24h80c13.3 0 24-10.7 24-24s-10.7-24-24-24z"/></symbol><use href="#ai:fa6-regular:address-card"></use>  </svg> </div> <div class="mx-auto lg:w-full h-full lg:mt-0  overflow-hidden relative"> <div class="transition absolute inset-0 dark:bg-black/10 bg-opacity-50 pointer-events-none"></div>  <img src="/img/chaggle.png" alt="Profile Image of the Author" class="w-full h-full object-cover" style="object-position: center"> </div> </a> <div class="px-2"> <div class="font-bold text-xl text-center mb-1 dark:text-neutral-50 transition">chaggle</div> <div class="h-1 w-5 bg-[var(--primary)] mx-auto rounded-full mb-2 transition"></div> <div class="text-center text-neutral-400 mb-2.5 transition">人格的容纳之地——从后端开发走到技术管理，再走向数据架构与 AI Agent。</div> <div class="flex flex-wrap gap-2 justify-center mb-1">  <a rel="me" aria-label="GitHub" href="https://github.com/chaggle" target="_blank" class="btn-regular rounded-lg h-10 gap-2 px-3 font-bold active:scale-95"> <svg width="0.97em" height="1em" class="text-[1.5rem]" data-icon="fa6-brands:github">   <symbol id="ai:fa6-brands:github" viewBox="0 0 496 512"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6c-3.3.3-5.6-1.3-5.6-3.6c0-2 2.3-3.6 5.2-3.6c3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9c2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9c.3 2 2.9 3.3 5.9 2.6c2.9-.7 4.9-2.6 4.6-4.6c-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2c12.8 2.3 17.3-5.6 17.3-12.1c0-6.2-.3-40.4-.3-61.4c0 0-70 15-84.7-29.8c0 0-11.4-29.1-27.8-36.6c0 0-22.9-15.7 1.6-15.4c0 0 24.9 2 38.6 25.8c21.9 38.6 58.6 27.5 72.9 20.9c2.3-16 8.8-27.1 16-33.7c-55.9-6.2-112.3-14.3-112.3-110.5c0-27.5 7.6-41.3 23.6-58.9c-2.6-6.5-11.1-33.3 2.6-67.9c20.9-6.5 69 27 69 27c20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27c13.7 34.7 5.2 61.4 2.6 67.9c16 17.7 25.8 31.5 25.8 58.9c0 96.5-58.9 104.2-114.8 110.5c9.2 7.9 17 22.9 17 46.4c0 33.7-.3 75.4-.3 83.6c0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252C496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2c1.6 1.6 3.9 2.3 5.2 1c1.3-1 1-3.3-.7-5.2c-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9c1.6 1 3.6.7 4.3-.7c.7-1.3-.3-2.9-2.3-3.9c-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2c2.3 2.3 5.2 2.6 6.5 1c1.3-1.3.7-4.3-1.3-6.2c-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2c-1.4-2.3-4-3.3-5.6-2"/></symbol><use href="#ai:fa6-brands:github"></use>  </svg> GitHub </a> </div> </div> </div> </div> <div id="sidebar-sticky" class="transition-all duration-700 flex flex-col w-full gap-4 top-4 sticky top-4"> <widget-layout data-id="categories" data-is-collapsed="true" class="pb-4 card-base onload-animation" style="animation-delay: 150ms; --collapsedHeight: 7.5rem;" data-astro-cid-ucso7hve="true"> <div class="font-bold transition text-lg text-neutral-900 dark:text-neutral-100 relative ml-8 mt-4 mb-2
+        before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
+        before:absolute before:left-[-16px] before:top-[5.5px]" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;">分类</div> <div id="categories" class="collapse-wrapper px-4 overflow-hidden collapsed" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <a href="/archive/?category=AI" aria-label="View all posts in the AI category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> AI </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 7 </div> </div> </button> </a><a href="/archive/?category=bigdata" aria-label="View all posts in the bigdata category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> bigdata </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 28 </div> </div> </button> </a><a href="/archive/?category=cpp" aria-label="View all posts in the cpp category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> cpp </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 2 </div> </div> </button> </a><a href="/archive/?category=go" aria-label="View all posts in the go category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> go </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 3 </div> </div> </button> </a><a href="/archive/?category=invest" aria-label="View all posts in the invest category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> invest </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 11 </div> </div> </button> </a><a href="/archive/?category=leetcode" aria-label="View all posts in the leetcode category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> leetcode </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 99 </div> </div> </button> </a><a href="/archive/?category=linux" aria-label="View all posts in the linux category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> linux </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 4 </div> </div> </button> </a><a href="/archive/?category=middleware" aria-label="View all posts in the middleware category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> middleware </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 19 </div> </div> </button> </a><a href="/archive/?category=powershell" aria-label="View all posts in the powershell category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> powershell </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 1 </div> </div> </button> </a><a href="/archive/?category=summary" aria-label="View all posts in the summary category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> summary </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 8 </div> </div> </button> </a><a href="/archive/?category=windows" aria-label="View all posts in the windows category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> windows </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 1 </div> </div> </button> </a> </div> <div class="expand-btn px-4 -mb-2" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <button class="btn-plain rounded-lg w-full h-9" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <div class="text-[var(--primary)] flex items-center justify-center gap-2 -translate-x-2" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <svg width="1em" height="1em" class="text-[1.75rem]" data-astro-cid-ucso7hve="true" data-icon="material-symbols:more-horiz">   <symbol id="ai:material-symbols:more-horiz" viewBox="0 0 24 24"><path fill="currentColor" d="M6 14q-.825 0-1.412-.587T4 12t.588-1.412T6 10t1.413.588T8 12t-.587 1.413T6 14m6 0q-.825 0-1.412-.587T10 12t.588-1.412T12 10t1.413.588T14 12t-.587 1.413T12 14m6 0q-.825 0-1.412-.587T16 12t.588-1.412T18 10t1.413.588T20 12t-.587 1.413T18 14"/></symbol><use href="#ai:material-symbols:more-horiz"></use>  </svg> 更多 </div> </button> </div> </widget-layout>  <script type="module">class d extends HTMLElement{constructor(){if(super(),this.dataset.isCollapsed!=="true")return;const e=this.dataset.id,t=this.querySelector(".expand-btn"),s=this.querySelector(`#${e}`);t.addEventListener("click",()=>{s.classList.remove("collapsed"),t.classList.add("hidden")})}}customElements.get("widget-layout")||customElements.define("widget-layout",d);</script> <widget-layout data-id="tags" data-is-collapsed="true" class="pb-4 card-base onload-animation" style="animation-delay: 200ms; --collapsedHeight: 7.5rem;" data-astro-cid-ucso7hve="true"> <div class="font-bold transition text-lg text-neutral-900 dark:text-neutral-100 relative ml-8 mt-4 mb-2
+        before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
+        before:absolute before:left-[-16px] before:top-[5.5px]" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;">标签</div> <div id="tags" class="collapse-wrapper px-4 overflow-hidden collapsed" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;">  <div class="flex gap-2 flex-wrap"> <a href="/archive/?tag=2021" aria-label="View all posts with the 2021 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  2021 </a><a href="/archive/?tag=2022" aria-label="View all posts with the 2022 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  2022 </a><a href="/archive/?tag=2025" aria-label="View all posts with the 2025 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  2025 </a><a href="/archive/?tag=2026" aria-label="View all posts with the 2026 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  2026 </a><a href="/archive/?tag=%E5%8D%8A%E5%AF%BC%E4%BD%93" aria-label="View all posts with the 半导体 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  半导体 </a><a href="/archive/?tag=%E5%A4%87%E4%BB%BD" aria-label="View all posts with the 备份 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  备份 </a><a href="/archive/?tag=%E9%83%A8%E7%BD%B2" aria-label="View all posts with the 部署 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  部署 </a><a href="/archive/?tag=%E8%B8%A9%E5%9D%91" aria-label="View all posts with the 踩坑 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  踩坑 </a><a href="/archive/?tag=%E5%AD%98%E5%82%A8" aria-label="View all posts with the 存储 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  存储 </a><a href="/archive/?tag=%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86" aria-label="View all posts with the 错误处理 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  错误处理 </a><a href="/archive/?tag=%E8%B0%83%E4%BC%98" aria-label="View all posts with the 调优 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  调优 </a><a href="/archive/?tag=%E5%A4%9A%E6%99%BA%E8%83%BD%E4%BD%93" aria-label="View all posts with the 多智能体 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  多智能体 </a><a href="/archive/?tag=%E8%A7%84%E8%8C%83" aria-label="View all posts with the 规范 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  规范 </a><a href="/archive/?tag=%E6%B9%96%E4%BB%93" aria-label="View all posts with the 湖仓 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  湖仓 </a><a href="/archive/?tag=%E6%9E%B6%E6%9E%84" aria-label="View all posts with the 架构 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  架构 </a><a href="/archive/?tag=%E8%84%9A%E6%9C%AC" aria-label="View all posts with the 脚本 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  脚本 </a><a href="/archive/?tag=%E7%A7%91%E6%8A%80" aria-label="View all posts with the 科技 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  科技 </a><a href="/archive/?tag=%E9%9D%A2%E8%AF%95" aria-label="View all posts with the 面试 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  面试 </a><a href="/archive/?tag=%E6%B1%82%E8%81%8C" aria-label="View all posts with the 求职 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  求职 </a><a href="/archive/?tag=%E5%AE%B9%E5%99%A8" aria-label="View all posts with the 容器 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  容器 </a><a href="/archive/?tag=%E4%B8%89%E6%98%9F" aria-label="View all posts with the 三星 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  三星 </a><a href="/archive/?tag=%E5%8D%87%E7%BA%A7" aria-label="View all posts with the 升级 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  升级 </a><a href="/archive/?tag=%E7%B3%BB%E7%BB%9F%E9%87%8D%E8%A3%85" aria-label="View all posts with the 系统重装 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  系统重装 </a><a href="/archive/?tag=%E5%86%99%E4%BD%9C" aria-label="View all posts with the 写作 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  写作 </a><a href="/archive/?tag=%E5%BA%94%E7%94%A8" aria-label="View all posts with the 应用 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  应用 </a><a href="/archive/?tag=%E5%85%83%E6%95%B0%E6%8D%AE" aria-label="View all posts with the 元数据 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  元数据 </a><a href="/archive/?tag=%E8%BD%AC%E5%9E%8B" aria-label="View all posts with the 转型 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  转型 </a><a href="/archive/?tag=%E8%BD%AC%E8%BD%BD" aria-label="View all posts with the 转载 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  转载 </a><a href="/archive/?tag=%E6%80%BB%E7%BB%93" aria-label="View all posts with the 总结 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  总结 </a><a href="/archive/?tag=Agent" aria-label="View all posts with the Agent tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Agent </a><a href="/archive/?tag=AI" aria-label="View all posts with the AI tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  AI </a><a href="/archive/?tag=bigdata" aria-label="View all posts with the bigdata tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  bigdata </a><a href="/archive/?tag=C%2B%2B" aria-label="View all posts with the C++ tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  C++ </a><a href="/archive/?tag=centos" aria-label="View all posts with the centos tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  centos </a><a href="/archive/?tag=channel" aria-label="View all posts with the channel tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  channel </a><a href="/archive/?tag=ci%2Fcd" aria-label="View all posts with the ci/cd tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  ci/cd </a><a href="/archive/?tag=clash" aria-label="View all posts with the clash tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  clash </a><a href="/archive/?tag=daily-analysis" aria-label="View all posts with the daily-analysis tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  daily-analysis </a><a href="/archive/?tag=datasophon" aria-label="View all posts with the datasophon tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  datasophon </a><a href="/archive/?tag=datax" aria-label="View all posts with the datax tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  datax </a><a href="/archive/?tag=DeepSeek" aria-label="View all posts with the DeepSeek tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  DeepSeek </a><a href="/archive/?tag=devops" aria-label="View all posts with the devops tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  devops </a><a href="/archive/?tag=DISM" aria-label="View all posts with the DISM tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  DISM </a><a href="/archive/?tag=Docker" aria-label="View all posts with the Docker tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Docker </a><a href="/archive/?tag=dolphinscheduler" aria-label="View all posts with the dolphinscheduler tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  dolphinscheduler </a><a href="/archive/?tag=doris" aria-label="View all posts with the doris tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  doris </a><a href="/archive/?tag=FDE" aria-label="View all posts with the FDE tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  FDE </a><a href="/archive/?tag=flink" aria-label="View all posts with the flink tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  flink </a><a href="/archive/?tag=GC" aria-label="View all posts with the GC tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  GC </a><a href="/archive/?tag=gcc" aria-label="View all posts with the gcc tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  gcc </a><a href="/archive/?tag=gdb" aria-label="View all posts with the gdb tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  gdb </a><a href="/archive/?tag=gin" aria-label="View all posts with the gin tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  gin </a><a href="/archive/?tag=git" aria-label="View all posts with the git tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  git </a><a href="/archive/?tag=GMP" aria-label="View all posts with the GMP tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  GMP </a><a href="/archive/?tag=Go" aria-label="View all posts with the Go tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Go </a><a href="/archive/?tag=GPE" aria-label="View all posts with the GPE tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  GPE </a><a href="/archive/?tag=grafana" aria-label="View all posts with the grafana tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  grafana </a><a href="/archive/?tag=gravitino" aria-label="View all posts with the gravitino tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  gravitino </a><a href="/archive/?tag=Harness" aria-label="View all posts with the Harness tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Harness </a><a href="/archive/?tag=HBM" aria-label="View all posts with the HBM tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  HBM </a><a href="/archive/?tag=hdfs" aria-label="View all posts with the hdfs tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  hdfs </a><a href="/archive/?tag=hive" aria-label="View all posts with the hive tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  hive </a><a href="/archive/?tag=HTTP" aria-label="View all posts with the HTTP tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  HTTP </a><a href="/archive/?tag=hudi" aria-label="View all posts with the hudi tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  hudi </a><a href="/archive/?tag=iceberg" aria-label="View all posts with the iceberg tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  iceberg </a><a href="/archive/?tag=IM" aria-label="View all posts with the IM tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  IM </a><a href="/archive/?tag=Infra" aria-label="View all posts with the Infra tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Infra </a><a href="/archive/?tag=innodb" aria-label="View all posts with the innodb tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  innodb </a><a href="/archive/?tag=jenkins" aria-label="View all posts with the jenkins tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  jenkins </a><a href="/archive/?tag=juicefs" aria-label="View all posts with the juicefs tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  juicefs </a><a href="/archive/?tag=k8s" aria-label="View all posts with the k8s tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  k8s </a><a href="/archive/?tag=kafka" aria-label="View all posts with the kafka tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  kafka </a><a href="/archive/?tag=kerberos" aria-label="View all posts with the kerberos tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  kerberos </a><a href="/archive/?tag=kubernetes" aria-label="View all posts with the kubernetes tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  kubernetes </a><a href="/archive/?tag=leetcode" aria-label="View all posts with the leetcode tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  leetcode </a><a href="/archive/?tag=main-invest" aria-label="View all posts with the main-invest tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  main-invest </a><a href="/archive/?tag=map" aria-label="View all posts with the map tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  map </a><a href="/archive/?tag=mapreduce" aria-label="View all posts with the mapreduce tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  mapreduce </a><a href="/archive/?tag=market-thought" aria-label="View all posts with the market-thought tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  market-thought </a><a href="/archive/?tag=middle-invest" aria-label="View all posts with the middle-invest tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  middle-invest </a><a href="/archive/?tag=middleware" aria-label="View all posts with the middleware tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  middleware </a><a href="/archive/?tag=MSI" aria-label="View all posts with the MSI tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  MSI </a><a href="/archive/?tag=mutex" aria-label="View all posts with the mutex tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  mutex </a><a href="/archive/?tag=mysql" aria-label="View all posts with the mysql tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  mysql </a><a href="/archive/?tag=nacos" aria-label="View all posts with the nacos tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  nacos </a><a href="/archive/?tag=olap" aria-label="View all posts with the olap tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  olap </a><a href="/archive/?tag=opencode" aria-label="View all posts with the opencode tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  opencode </a><a href="/archive/?tag=paimon" aria-label="View all posts with the paimon tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  paimon </a><a href="/archive/?tag=plan" aria-label="View all posts with the plan tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  plan </a><a href="/archive/?tag=PowerShell" aria-label="View all posts with the PowerShell tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  PowerShell </a><a href="/archive/?tag=priority_queue" aria-label="View all posts with the priority_queue tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  priority_queue </a><a href="/archive/?tag=prometheus" aria-label="View all posts with the prometheus tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  prometheus </a><a href="/archive/?tag=ranger" aria-label="View all posts with the ranger tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  ranger </a><a href="/archive/?tag=redis" aria-label="View all posts with the redis tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  redis </a><a href="/archive/?tag=review" aria-label="View all posts with the review tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  review </a><a href="/archive/?tag=rocketmq" aria-label="View all posts with the rocketmq tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  rocketmq </a><a href="/archive/?tag=set" aria-label="View all posts with the set tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  set </a><a href="/archive/?tag=snowflake" aria-label="View all posts with the snowflake tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  snowflake </a><a href="/archive/?tag=spark" aria-label="View all posts with the spark tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  spark </a><a href="/archive/?tag=sql" aria-label="View all posts with the sql tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  sql </a><a href="/archive/?tag=starrocks" aria-label="View all posts with the starrocks tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  starrocks </a><a href="/archive/?tag=STL" aria-label="View all posts with the STL tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  STL </a><a href="/archive/?tag=sync" aria-label="View all posts with the sync tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  sync </a><a href="/archive/?tag=TDD" aria-label="View all posts with the TDD tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  TDD </a><a href="/archive/?tag=tez" aria-label="View all posts with the tez tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  tez </a><a href="/archive/?tag=Thinking" aria-label="View all posts with the Thinking tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Thinking </a><a href="/archive/?tag=Windows" aria-label="View all posts with the Windows tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Windows </a><a href="/archive/?tag=WSL2" aria-label="View all posts with the WSL2 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  WSL2 </a><a href="/archive/?tag=yarn" aria-label="View all posts with the yarn tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  yarn </a><a href="/archive/?tag=zinx" aria-label="View all posts with the zinx tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  zinx </a><a href="/archive/?tag=zookeeper" aria-label="View all posts with the zookeeper tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  zookeeper </a> </div>  </div> <div class="expand-btn px-4 -mb-2" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <button class="btn-plain rounded-lg w-full h-9" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <div class="text-[var(--primary)] flex items-center justify-center gap-2 -translate-x-2" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <svg width="1em" height="1em" viewBox="0 0 24 24" class="text-[1.75rem]" data-astro-cid-ucso7hve="true" data-icon="material-symbols:more-horiz">   <use href="#ai:material-symbols:more-horiz"></use>  </svg> 更多 </div> </button> </div> </widget-layout>   </div> </div> <main id="swup-container" class="transition-swup-fade col-span-2 lg:col-span-1 overflow-hidden"> <div id="content-wrapper" class="onload-animation"> <!-- the overflow-hidden here prevent long text break the layout--> <!-- make id different from windows.swup global property -->   <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4"> <div id="post-container" class="card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full "> <!-- word count and reading time --> <div class="flex flex-row text-black/30 dark:text-white/30 gap-5 mb-3 transition onload-animation"> <div class="flex flex-row items-center"> <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2"> <svg width="1em" height="1em" data-icon="material-symbols:notes-rounded">   <symbol id="ai:material-symbols:notes-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M4 18q-.425 0-.712-.288T3 17t.288-.712T4 16h10q.425 0 .713.288T15 17t-.288.713T14 18zm0-5q-.425 0-.712-.288T3 12t.288-.712T4 11h16q.425 0 .713.288T21 12t-.288.713T20 13zm0-5q-.425 0-.712-.288T3 7t.288-.712T4 6h16q.425 0 .713.288T21 7t-.288.713T20 8z"/></symbol><use href="#ai:material-symbols:notes-rounded"></use>  </svg> </div> <div class="text-sm">3271  字</div> </div> <div class="flex flex-row items-center"> <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2"> <svg width="1em" height="1em" data-icon="material-symbols:schedule-outline-rounded">   <symbol id="ai:material-symbols:schedule-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M13 11.6V8q0-.425-.288-.712T12 7t-.712.288T11 8v3.975q0 .2.075.388t.225.337l3.3 3.3q.275.275.7.275T16 16t.275-.7t-.275-.7zM12 22q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22m0-2q3.325 0 5.663-2.337T20 12t-2.337-5.663T12 4T6.337 6.338T4 12t2.338 5.663T12 20"/></symbol><use href="#ai:material-symbols:schedule-outline-rounded"></use>  </svg> </div> <div class="text-sm"> 16  分钟 </div> </div> </div> <!-- title --> <div class="relative onload-animation"> <div data-pagefind-body data-pagefind-weight="10" data-pagefind-meta="title" class="transition w-full block font-bold mb-3
+                    text-3xl md:text-[2.25rem]/[2.75rem]
+                    text-black/90 dark:text-white/90
+                    md:before:w-1 before:h-5 before:rounded-md before:bg-[var(--primary)]
+                    before:absolute before:top-[0.75rem] before:left-[-1.125rem]
+                "> Kafka 底层原理与知识要点 </div> </div> <!-- metadata --> <div class="onload-animation"> <div class="flex flex-wrap text-neutral-500 dark:text-neutral-400 items-center gap-4 gap-x-4 gap-y-2 mb-5"> <!-- publish date --> <div class="flex items-center"> <div class="meta-icon"> <svg width="1em" height="1em" class="text-xl" data-icon="material-symbols:calendar-today-outline-rounded">   <symbol id="ai:material-symbols:calendar-today-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V3q0-.425.288-.712T7 2t.713.288T8 3v1h8V3q0-.425.288-.712T17 2t.713.288T18 3v1h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5zM5 8h14V6H5zm0 0V6z"/></symbol><use href="#ai:material-symbols:calendar-today-outline-rounded"></use>  </svg> </div> <span class="text-50 text-sm font-medium">2026-08-08</span> </div> <!-- update date -->  <!-- categories --> <div class="flex items-center"> <div class="meta-icon"> <svg width="1em" height="1em" class="text-xl" data-icon="material-symbols:book-2-outline-rounded">   <symbol id="ai:material-symbols:book-2-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M6 15.325q.35-.175.725-.25T7.5 15H8V4h-.5q-.625 0-1.062.438T6 5.5zM10 15h8V4h-8zm-4 .325V4zM7.5 22q-1.45 0-2.475-1.025T4 18.5v-13q0-1.45 1.025-2.475T7.5 2H18q.825 0 1.413.587T20 4v12.525q0 .2-.162.363t-.588.362q-.35.175-.55.5t-.2.75t.2.763t.55.487t.55.413t.2.562v.25q0 .425-.288.725T19 22zm0-2h9.325q-.15-.35-.237-.712T16.5 18.5q0-.4.075-.775t.25-.725H7.5q-.65 0-1.075.438T6 18.5q0 .65.425 1.075T7.5 20"/></symbol><use href="#ai:material-symbols:book-2-outline-rounded"></use>  </svg> </div> <div class="flex flex-row flex-nowrap items-center"> <a href="/archive/?category=middleware" aria-label="View all posts in the middleware category" class="link-lg transition text-50 text-sm font-medium
+                            hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> middleware </a> </div> </div> <!-- tags --> <div class="items-center flex"> <div class="meta-icon"> <svg width="1em" height="1em" class="text-xl" data-icon="material-symbols:tag-rounded">   <symbol id="ai:material-symbols:tag-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="m9 16l-.825 3.275q-.075.325-.325.525t-.6.2q-.475 0-.775-.375T6.3 18.8L7 16H4.275q-.5 0-.8-.387T3.3 14.75q.075-.35.35-.55t.625-.2H7.5l1-4H5.775q-.5 0-.8-.387T4.8 8.75q.075-.35.35-.55t.625-.2H9l.825-3.275Q9.9 4.4 10.15 4.2t.6-.2q.475 0 .775.375t.175.825L11 8h4l.825-3.275q.075-.325.325-.525t.6-.2q.475 0 .775.375t.175.825L17 8h2.725q.5 0 .8.387t.175.863q-.075.35-.35.55t-.625.2H16.5l-1 4h2.725q.5 0 .8.388t.175.862q-.075.35-.35.55t-.625.2H15l-.825 3.275q-.075.325-.325.525t-.6.2q-.475 0-.775-.375T12.3 18.8L13 16zm.5-2h4l1-4h-4z"/></symbol><use href="#ai:material-symbols:tag-rounded"></use>  </svg> </div> <div class="flex flex-row flex-nowrap items-center"> <div class="hidden mx-1.5 text-[var(--meta-divider)] text-sm">/</div>
+                <a href="/archive/?tag=2026" aria-label="View all posts with the 2026 tag" class="link-lg transition text-50 text-sm font-medium
+                                hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> 2026 </a><div class="mx-1.5 text-[var(--meta-divider)] text-sm">/</div>
+                <a href="/archive/?tag=kafka" aria-label="View all posts with the kafka tag" class="link-lg transition text-50 text-sm font-medium
+                                hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> kafka </a>  </div> </div> </div> <div class="border-[var(--line-divider)] border-dashed border-b-[1px] mb-5"></div> </div> <!-- always show cover as long as it has one -->  <div data-pagefind-body class="prose dark:prose-invert prose-base !max-w-none custom-md mb-6 markdown-content onload-animation"> <!--<div class="prose dark:prose-invert max-w-none custom-md">--> <!--<div class="max-w-none custom-md">-->  <blockquote>
+<p>本文是我学习 Kafka 时整理的笔记，涵盖核心架构、底层存储原理、副本与一致性机制、生产消费流程，以及日常排障的经验总结，适合面试复习和实际排查问题参考。</p>
+</blockquote>
+<section><h2 id="核心架构">核心架构<a class="anchor" href="#核心架构"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><section><h3 id="角色划分">角色划分<a class="anchor" href="#角色划分"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>Kafka 集群主要由以下几类角色组成：</p><ul>
+<li><strong>Producer（生产者）</strong>：向 Topic 发送消息的客户端，负责选择分区、批量发送、处理发送结果。</li>
+<li><strong>Broker（服务端）</strong>：Kafka 集群中的一台服务器就是一个 Broker，负责消息的存储、接收与副本管理。</li>
+<li><strong>Consumer（消费者）</strong>：从 Topic 拉取消息的客户端，多个消费者组成消费组协同消费。</li>
+<li><strong>Controller（控制器）</strong>：集群中特殊角色，负责分区 Leader 选举、元数据管理等集群协调工作，本质是一个 Broker。</li>
+<li><strong>Zookeeper / KRaft</strong>：旧版本依赖 Zookeeper 存储元数据（Topic、分区、broker 状态等）并完成 Controller 选举；新版本引入 KRaft 模式，用内置的 Raft 协议替代 ZK，简化运维。</li>
+</ul><blockquote class="admonition bdm-note"><span class="bdm-title">NOTE</span><p>2.8 版本开始引入 KRaft（Kafka Raft Metadata mode），3.3+ 起 KRaft 生产可用，4.0 已完全移除 Zookeeper。KRaft 通过 Controller 节点上内置的 Raft 日志存储元数据，Controller 与 Broker 角色可以合并部署，也可以独立部署。</p></blockquote></section><section><h3 id="核心概念">核心概念<a class="anchor" href="#核心概念"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li><strong>Topic（主题）</strong>：消息的逻辑分类，一个 Topic 可被多个生产者写入、多个消费组读取。</li>
+<li><strong>Partition（分区）</strong>：Topic 在物理上的切分单元，每个分区是一个有序的日志文件，分区内消息有序，分区之间无序。</li>
+<li><strong>Offset（偏移量）</strong>：分区内消息的唯一序号，从 0 开始递增，Consumer 通过维护 offset 记录消费进度。</li>
+</ul><blockquote class="admonition bdm-tip"><span class="bdm-title">TIP</span><p>分区是 Kafka 并行度的来源：生产者按分区并行写、消费者按分区并行读。分区数越多，吞吐上限越高，但也带来更多文件句柄与副本开销，并非越多越好。</p></blockquote></section></section>
+<section><h2 id="存储原理">存储原理<a class="anchor" href="#存储原理"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><section><h3 id="分区与段segment">分区与段（Segment）<a class="anchor" href="#分区与段segment"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>每个 Partition 在磁盘上是一个目录（<code>topic-分区号</code>），目录内按**段（Segment）**组织数据：</p><ul>
+<li><code>.log</code>：消息数据文件，消息按 offset 顺序追加写入。</li>
+<li><code>.index</code>：稀疏索引文件，记录 offset 到物理位置的映射（消息在文件中的字节偏移）。</li>
+<li><code>.timeindex</code>：时间索引文件，记录时间戳与 offset 的映射，用于按时间查询。</li>
+</ul><p>每个 Segment 默认 1GB（<code>log.segment.bytes</code>）达到上限后滚动创建新 Segment，活动段（active segment）之外的段可以被删除或压缩。</p></section><section><h3 id="稀疏索引">稀疏索引<a class="anchor" href="#稀疏索引"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>.index 文件不是每条消息都建索引，而是<strong>每隔一定字节（<code>log.index.interval.bytes</code>，默认 4096）写入一条索引项</strong>，即稀疏索引。</p><ul>
+<li>好处：索引文件体积小，能常驻内存，检索快。</li>
+<li>查找流程：先二分查找最近的索引项定位到起始物理位置，再顺序扫描 .log 文件定位目标消息，单次查找磁盘扫描量很小，性能可观。</li>
+</ul></section><section><h3 id="顺序写与页缓存">顺序写与页缓存<a class="anchor" href="#顺序写与页缓存"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li><strong>顺序写</strong>：消息追加到日志文件尾部，磁盘顺序写速度远高于随机写（机械盘百倍级差距），这是 Kafka 高吞吐的核心之一。</li>
+<li><strong>页缓存（Page Cache）</strong>：Kafka 写入数据只落 Page Cache，由操作系统统一管理刷盘，而非自己维护缓存；读取时优先命中 Page Cache，保证读写两端都很快，也实现了”读写都用 OS 缓存、磁盘只做备份”的效果。</li>
+</ul><blockquote class="admonition bdm-warning"><span class="bdm-title">WARNING</span><p>Kafka 依赖页缓存 + 顺序写获得高性能，因此建议机器内存尽量充裕，并关闭”脏页回写”相关不必要的限制（如 vm.dirty_ratio），不要在同一台机器上部署多个重 IO 应用抢占缓存。</p></blockquote></section><section><h3 id="零拷贝sendfile">零拷贝（sendfile）<a class="anchor" href="#零拷贝sendfile"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>Consumer 拉取消息时，服务端将磁盘数据发给网卡，传统做法要经过”磁盘 → 内核缓冲区 → 用户态 → 内核 socket 缓冲区 → 网卡”多次拷贝；Kafka 使用 <code>sendfile</code>（FileChannel.transferTo）让数据<strong>直接从内核页缓存拷贝到网卡</strong>，全程不经过用户态，极大降低 CPU 与拷贝开销。</p></section><section><h3 id="批量写与批量读">批量写与批量读<a class="anchor" href="#批量写与批量读"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>Producer 攒批发送（batch + linger.ms），减少网络往返。</li>
+<li>Broker 接收后以批次（record batch）为单位落盘。</li>
+<li>Consumer 拉取时按 <code>fetch.min.bytes</code> / <code>fetch.max.wait.ms</code> 攒批返回。</li>
+</ul></section></section>
+<section><h2 id="副本机制">副本机制<a class="anchor" href="#副本机制"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><section><h3 id="分区副本">分区副本<a class="anchor" href="#分区副本"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>每个分区有多个副本（<code>replication.factor</code>），其中：</p><ul>
+<li><strong>Leader</strong>：负责所有读写请求，Producer 和 Consumer 只与 Leader 交互。</li>
+<li><strong>Follower</strong>：从 Leader 拉取消息同步数据，Leader 故障时参与选举。</li>
+</ul></section><section><h3 id="isrhwleo">ISR、HW、LEO<a class="anchor" href="#isrhwleo"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li><strong>LEO（Log End Offset）</strong>：副本日志下一条待写入消息的 offset，即日志末尾位置。</li>
+<li><strong>HW（High Watermark）</strong>：已同步的最小 LEO，Consumer 只能消费到 HW 之前的消息，保证消费到的数据至少在多数副本上存在。</li>
+<li><strong>ISR（In-Sync Replicas）</strong>：与 Leader 保持同步的副本集合，默认 <code>replica.lag.time.max.ms</code>（10 秒）内未跟上同步的副本会被踢出 ISR。</li>
+</ul><blockquote class="admonition bdm-caution"><span class="bdm-title">CAUTION</span><p>HW 机制下消费只能看到”已提交”的消息，可能造成消息”不可见延迟”；且 HW 的推进依赖副本之间的同步与 Leader 转发，配合 fetch 协议存在数据丢失/重复的窗口期（旧版本消息发送语义的固有风险），生产环境应启用 <code>min.insync.replicas</code> 并配合 acks=all 降低风险。</p></blockquote></section><section><h3 id="leader-选举">Leader 选举<a class="anchor" href="#leader-选举"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>分区 Leader 宕机后由 <strong>Controller</strong> 在 ISR 中挑选新 Leader（优先 ISR，ISR 为空时可降级选择非 ISR 副本，并可能丢数据）。</li>
+<li>选举范围优先”最近同步过”的副本，避免选出一个数据明显落后的副本导致大量消息”回退”。</li>
+</ul></section><section><h3 id="acks-三种级别">acks 三种级别<a class="anchor" href="#acks-三种级别"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">acks</th><th align="left">行为</th><th align="left">语义</th></tr></thead><tbody><tr><td align="left">0</td><td align="left">发完就返回，不等待任何确认</td><td align="left">最快，可能丢消息</td></tr><tr><td align="left">1</td><td align="left">Leader 写入本地日志后返回</td><td align="left">默认值，Leader 宕机可能丢数据</td></tr><tr><td align="left">all（-1）</td><td align="left">等待 ISR 全部副本写入后返回</td><td align="left">最可靠，配合 <code>min.insync.replicas</code> 使用</td></tr></tbody></table><blockquote class="admonition bdm-tip"><span class="bdm-title">TIP</span><p>高可靠场景建议 acks=all + min.insync.replicas=2（至少 2 个副本同步才算提交），牺牲部分延迟换取不丢消息。</p></blockquote></section></section>
+<section><h2 id="生产者原理">生产者原理<a class="anchor" href="#生产者原理"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><section><h3 id="分区策略">分区策略<a class="anchor" href="#分区策略"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>Producer 发送消息时确定目标分区，规则如下：</p><ul>
+<li>消息指定了 Partition：直接使用指定分区。</li>
+<li>指定了 Key：对 Key 哈希取模（<code>murmur2</code>）选择分区，相同 Key 的消息进入同一分区，保证同 Key 消息有序。</li>
+<li>两者都没指定：使用 <strong>Sticky Partitioner</strong>，随机选一个分区并尽量把消息攒到一个批次里发出去，兼顾负载均衡与批处理效率。</li>
+</ul></section><section><h3 id="批量发送与缓冲">批量发送与缓冲<a class="anchor" href="#批量发送与缓冲"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>消息先进入内存缓冲（<code>buffer.memory</code>，默认 32MB），由发送线程批量取出发送。</li>
+<li><code>batch.size</code>（默认 16KB）控制单批次大小，<code>linger.ms</code> 控制等待时间，两者共同决定”攒批”的程度。</li>
+<li>缓冲区写满时 <code>max.block.ms</code> 到期后抛异常，需要监控该异常。</li>
+</ul></section><section><h3 id="幂等性pid--序列号">幂等性（PID + 序列号）<a class="anchor" href="#幂等性pid--序列号"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>开启 <code>enable.idempotence=true</code> 后：</p><ul>
+<li>Producer 初始化时分配 <strong>PID（Producer Id）</strong>，每条消息携带该 PID 和<strong>单调递增的序列号</strong>（按分区维度）。</li>
+<li>Broker 端校验序列号，重复的序列号直接丢弃，从而解决”重试导致的消息重复”问题。</li>
+<li>注意：PID 只在单会话有效，重启会生成新 PID；且只对单分区有序，跨分区无法保证全局不重复。</li>
+</ul></section><section><h3 id="事务">事务<a class="anchor" href="#事务"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p><code>enable.idempotence=true</code> 是事务的前提，事务通过 Transaction Coordinator 管理：</p><ul>
+<li>支持”多分区原子写入”和”读已提交（read_committed）“消费语义。</li>
+<li>通过 LSO（Last Stable Offset）控制，只有事务提交后消息才对 read_committed 消费者可见。</li>
+<li>典型应用：Kafka Streams 的 exactly-once 处理。</li>
+</ul></section></section>
+<section><h2 id="消费者原理">消费者原理<a class="anchor" href="#消费者原理"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><section><h3 id="消费组与分区分配">消费组与分区分配<a class="anchor" href="#消费组与分区分配"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>同一消费组内，一个分区同一时刻只能被一个消费者实例消费（一条消息只被组内一个消费者消费）。</li>
+<li>消费者数 > 分区数时，多余的消费者空闲。</li>
+<li>分配策略（<code>partition.assignment.strategy</code>）：</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">策略</th><th align="left">说明</th></tr></thead><tbody><tr><td align="left">Range</td><td align="left">按 Topic 内分区序号范围连续划分，易造成”前段消费者分多、后端消费者分少”的不均衡</td></tr><tr><td align="left">RoundRobin</td><td align="left">全部分区轮询分配，相对均衡</td></tr><tr><td align="left">Sticky</td><td align="left">在保持上次分配尽量不变的前提下均衡分配，减少 rebalance 后的分区移动</td></tr></tbody></table></section><section><h3 id="rebalance新旧协议">Rebalance（新旧协议）<a class="anchor" href="#rebalance新旧协议"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>发生条件：消费者加入/退出、分区数变化、消费组订阅变化。</li>
+<li>新协议（增量式合作 rebalance，0.11+）：消费者和 Group Coordinator 之间用”分阶段协商”，每次只迁移需要移动的分区，Sticky/CooperativeSticky 策略下能显著降低全组停止消费的时间。</li>
+<li>旧协议：停止消费 → 全体重新分配 → 重新拉取，期间整个消费组不可用。</li>
+</ul><blockquote class="admonition bdm-warning"><span class="bdm-title">WARNING</span><p>Rebalance 期间消费组短暂不可用，频繁 rebalance 通常意味着：消费者心跳超时、处理时间过长导致会话超时、网络抖动，或消费者实例频繁启停，需要重点排查。</p></blockquote></section><section><h3 id="offset-提交">Offset 提交<a class="anchor" href="#offset-提交"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>自动提交（<code>enable.auto.commit=true</code>，默认）：每 <code>auto.commit.interval.ms</code>（默认 5 秒）提交当前拉取位置。注意它提交的是”最近一次 poll 返回的 offset”，处理滞后会导致重复消费，因此自动提交需配合幂等消费设计。</li>
+<li>手动提交：<code>commitSync</code>（同步，重试保证不丢）或 <code>commitAsync</code>（异步，不阻塞但可能失败）。</li>
+<li>Offset 存放在内部 Topic <code>__consumer_offsets</code>（默认 50 个分区），消费进度是”committed offset 与 consumed 之间”的关系。</li>
+</ul></section></section>
+<section><h2 id="高可用与故障恢复">高可用与故障恢复<a class="anchor" href="#高可用与故障恢复"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><ul>
+<li><strong>副本同步</strong>：Follower 以 fetch 方式向 Leader 拉取数据，Leader 在 ISR 内推进 HW，Consumer 只能读到 HW 前的数据。</li>
+<li><strong>Controller</strong>：负责分区 Leader 选举、Broker 上下线元数据变更通知（通过 ZK 或 KRaft）；Controller 本身也靠选举保证高可用（旧版基于 ZK，KRaft 基于 Raft）。</li>
+<li><strong>日志压缩（Log Compaction）</strong>：针对”保留最新 value”的场景（如 Key-Value 型数据、配置同步），压缩后日志中每个 Key 只保留最新版本，可配合 <code>cleanup.policy=compact</code> 使用，与”基于时间的过期删除”是两种不同的清理策略。</li>
+<li><strong>分区副本重新分配</strong>：Broker 下线后，Controller 会在存活 Broker 上补足副本（auto.leader.rebalance 与副本迁移任务）。</li>
+</ul><blockquote class="admonition bdm-tip"><span class="bdm-title">TIP</span><p>Kafka 的可用性保障是”多副本 + ISR 选主 + 分区迁移”，数据安全由 acks 级别和 min.insync.replicas 决定，两者组合使用才能兼顾可用与可靠。</p></blockquote></section>
+<section><h2 id="常规问题排查">常规问题排查<a class="anchor" href="#常规问题排查"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><section><h3 id="消费堆积lag">消费堆积（Lag）<a class="anchor" href="#消费堆积lag"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>用命令行查看：<code>kafka-consumer-groups.sh --bootstrap-server xxx --describe --group g1</code>，关注 LAG 列。</li>
+<li>判断堆积原因：
+<ul>
+<li>消费能力不足：单条消息处理耗时长、消费者线程数 &#x3C; 分区数。</li>
+<li>消费卡住：消费线程异常/阻塞/频繁 rebalance 导致重复消费。</li>
+<li>生产过快：生产速率超过消费能力。</li>
+</ul>
+</li>
+<li>处理手段：扩容消费者实例/增加分区、优化消费逻辑、必要时直接重置 offset（<code>--reset-offsets</code>，谨慎使用）。</li>
+</ul></section><section><h3 id="消息丢失与重复">消息丢失与重复<a class="anchor" href="#消息丢失与重复"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>丢失常见原因：</p><ul>
+<li><code>acks=0/1</code> 且 Broker 宕机。</li>
+<li>生产者发送失败未重试（<code>retries=0</code>）。</li>
+<li>消费者自动提交 offset 后处理失败。</li>
+<li>分区 Leader 从非 ISR 副本选出（丢未同步消息）。</li>
+</ul><p>重复常见原因：</p><ul>
+<li>生产者重试造成重复 → 开启幂等（PID+序列号）。</li>
+<li>消费者处理成功后未提交 offset 就宕机 → 重复消费，业务侧要做幂等。</li>
+<li>事务/跨分区场景的 exactly-once 需依赖事务与 read_committed。</li>
+</ul></section><section><h3 id="分区数调整">分区数调整<a class="anchor" href="#分区数调整"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>分区只能增多不能减少（<code>kafka-topics.sh --alter --partitions N</code>）。</li>
+<li>增加分区后，如果消息有 Key，相同 Key 可能落到不同分区，<strong>同 Key 有序性被破坏</strong>。</li>
+<li>分区数调整会触发消费者 rebalance。</li>
+</ul><blockquote class="admonition bdm-warning"><span class="bdm-title">WARNING</span><p>分区数的选择要结合吞吐目标与扩展计划一次规划好（如 3×broker 下 6/9 分区），后期”只增不减”，改分区数是个敏感操作。</p></blockquote></section><section><h3 id="磁盘占用与清理">磁盘占用与清理<a class="anchor" href="#磁盘占用与清理"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>默认按时间保留（<code>log.retention.hours=168</code>）或按大小（<code>log.retention.bytes</code>）。</li>
+<li>磁盘告警排查：<code>du -sh</code> 查看分区目录大小；确认是否有 Topic 未设置合理的 retention；检查日志压缩是否生效；清理旧 Topic（<code>kafka-topics.sh --delete</code>）。</li>
+<li>磁盘空间不足会直接导致 Broker 写失败，务必提前监控。</li>
+</ul></section><section><h3 id="吞吐瓶颈定位">吞吐瓶颈定位<a class="anchor" href="#吞吐瓶颈定位"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>排查链路：Producer 端（batch.size / linger.ms / compression 压缩）、网络带宽、Broker 磁盘 IO（顺序写是否被打断）、页缓存命中率、Consumer 拉取参数。</li>
+<li>常见手段：开启 <code>compression.type=lz4/zstd</code>、调大 <code>num.io.threads</code>、确认分区数足够并行。</li>
+<li>用 <code>kafka-run-class.sh kafka.tools.JmxTool</code> 或监控面板看 IO 与网络指标。</li>
+</ul></section><section><h3 id="rebalance-频繁">Rebalance 频繁<a class="anchor" href="#rebalance-频繁"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>检查 <code>session.timeout.ms</code> 与 <code>max.poll.interval.ms</code>：处理慢导致超时被踢出消费组。</li>
+<li>检查 <code>heartbeat.interval.ms</code> 是否过大。</li>
+<li>排查消费者实例是否频繁上下线（如容器 OOM、被调度重启）。</li>
+<li>升级到 CooperativeSticky 策略减少 rebalance 影响面。</li>
+</ul></section><section><h3 id="客户端参数调优要点">客户端参数调优要点<a class="anchor" href="#客户端参数调优要点"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">场景</th><th align="left">建议</th></tr></thead><tbody><tr><td align="left">高吞吐</td><td align="left">调大 batch.size、linger.ms，开启压缩</td></tr><tr><td align="left">低延迟</td><td align="left">调小 linger.ms（如 5ms），适当减小 batch</td></tr><tr><td align="left">高可靠</td><td align="left">acks=all + enable.idempotence=true + min.insync.replicas=2</td></tr><tr><td align="left">消费能力</td><td align="left">max.poll.records 与处理耗时匹配，超时调大 max.poll.interval.ms</td></tr></tbody></table><blockquote class="admonition bdm-tip"><span class="bdm-title">TIP</span><p>排查 Kafka 问题遵循三板斧：先看 Lag（消费是否跟上）、再看 rebalance（消费组是否稳定）、最后看磁盘/页缓存/网络（Broker 是否健康），配合监控告警能快速定位大部分故障。</p></blockquote></section></section>  </div> <script type="module">document.addEventListener("click",function(s){const t=s.target;if(t&&t.classList.contains("copy-btn")){const c=t.closest("pre")?.querySelector("code"),i=Array.from(c?.querySelectorAll(".code:not(summary *)")??[]).map(e=>e.textContent).map(e=>e===`
+`?"":e).join(`
+`);navigator.clipboard.writeText(i);const o=t.getAttribute("data-timeout-id");o&&clearTimeout(parseInt(o)),t.classList.add("success");const n=setTimeout(()=>{t.classList.remove("success")},1e3);t.setAttribute("data-timeout-id",n.toString())}});</script> <div class="relative transition overflow-hidden bg-[var(--license-block-bg)] py-5 px-6 mb-6 rounded-xl license-container onload-animation"> <div class="transition font-bold text-black/75 dark:text-white/75"> Kafka 底层原理与知识要点 </div> <a href="https://chaggle.github.io/posts/2026/08/09/kafka-principles/" class="link text-[var(--primary)]"> https://chaggle.github.io/posts/2026/08/09/kafka-principles/ </a> <div class="flex gap-6 mt-2"> <div> <div class="transition text-black/30 dark:text-white/30 text-sm">作者</div> <div class="transition text-black/75 dark:text-white/75 line-clamp-2">chaggle</div> </div> <div> <div class="transition text-black/30 dark:text-white/30 text-sm">发布于</div> <div class="transition text-black/75 dark:text-white/75 line-clamp-2">2026-08-08</div> </div> <div> <div class="transition text-black/30 dark:text-white/30 text-sm">许可协议</div> <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" class="link text-[var(--primary)] line-clamp-2">CC BY-NC-SA 4.0</a> </div> </div> <svg width="0.97em" height="1em" class="transition text-[15rem] absolute pointer-events-none right-6 top-1/2 -translate-y-1/2 text-black/5 dark:text-white/5" data-icon="fa6-brands:creative-commons">   <symbol id="ai:fa6-brands:creative-commons" viewBox="0 0 496 512"><path fill="currentColor" d="m245.83 214.87l-33.22 17.28c-9.43-19.58-25.24-19.93-27.46-19.93c-22.13 0-33.22 14.61-33.22 43.84c0 23.57 9.21 43.84 33.22 43.84c14.47 0 24.65-7.09 30.57-21.26l30.55 15.5c-6.17 11.51-25.69 38.98-65.1 38.98c-22.6 0-73.96-10.32-73.96-77.05c0-58.69 43-77.06 72.63-77.06c30.72-.01 52.7 11.95 65.99 35.86m143.05 0l-32.78 17.28c-9.5-19.77-25.72-19.93-27.9-19.93c-22.14 0-33.22 14.61-33.22 43.84c0 23.55 9.23 43.84 33.22 43.84c14.45 0 24.65-7.09 30.54-21.26l31 15.5c-2.1 3.75-21.39 38.98-65.09 38.98c-22.69 0-73.96-9.87-73.96-77.05c0-58.67 42.97-77.06 72.63-77.06c30.71-.01 52.58 11.95 65.56 35.86M247.56 8.05C104.74 8.05 0 123.11 0 256.05c0 138.49 113.6 248 247.56 248c129.93 0 248.44-100.87 248.44-248c0-137.87-106.62-248-248.44-248m.87 450.81c-112.54 0-203.7-93.04-203.7-202.81c0-105.42 85.43-203.27 203.72-203.27c112.53 0 202.82 89.46 202.82 203.26c-.01 121.69-99.68 202.82-202.84 202.82"/></symbol><use href="#ai:fa6-brands:creative-commons"></use>  </svg> </div> <div class="giscus mt-6" id="giscus"></div> <script>
+    (function () {
+        const repo = "chaggle/chaggle.github.io";
+        const repoId = "R_kgDOHgSL5w";
+        const category = "General";
+        const categoryId = "DIC_kwDOHgSL584DD3ot";
+
+        function resolveTheme() {
+            const t = localStorage.getItem("theme") || "auto";
+            if (t === "dark") return "dark";
+            if (t === "light") return "light";
+            return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+
+        function applyGiscusTheme() {
+            const frame = document.querySelector("iframe.giscus-frame");
+            if (frame) {
+                frame.contentWindow.postMessage(
+                    { giscus: { setConfig: { theme: resolveTheme() } } },
+                    "https://giscus.app"
+                );
+            }
+        }
+
+        // 观察 Fuwari 暗色模式 class 切换，同步 giscus 主题
+        const observer = new MutationObserver(applyGiscusTheme);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+        const s = document.createElement("script");
+        s.src = "https://giscus.app/client.js";
+        s.setAttribute("data-repo", repo);
+        s.setAttribute("data-repo-id", repoId);
+        s.setAttribute("data-category", category);
+        s.setAttribute("data-category-id", categoryId);
+        s.setAttribute("data-mapping", "pathname");
+        s.setAttribute("data-strict", "0");
+        s.setAttribute("data-reactions-enabled", "1");
+        s.setAttribute("data-emit-metadata", "0");
+        s.setAttribute("data-input-position", "top");
+        s.setAttribute("data-theme", resolveTheme());
+        s.setAttribute("data-lang", "zh-CN");
+        s.setAttribute("crossorigin", "anonymous");
+        s.async = true;
+        document.getElementById("giscus").appendChild(s);
+    })();
+</script> </div> </div> <div class="flex flex-col md:flex-row justify-between mb-4 gap-4 overflow-hidden w-full"> <a href="/posts/2026/08/09/hive-principles/" class="w-full font-bold overflow-hidden active:scale-95"> <div class="btn-card rounded-2xl w-full h-[3.75rem] max-w-full px-4 flex items-center !justify-start gap-4"> <svg width="1em" height="1em" class="text-[2rem] text-[var(--primary)]" data-icon="material-symbols:chevron-left-rounded">   <symbol id="ai:material-symbols:chevron-left-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="m10.8 12l3.9 3.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-4.6-4.6q-.15-.15-.212-.325T8.425 12t.063-.375t.212-.325l4.6-4.6q.275-.275.7-.275t.7.275t.275.7t-.275.7z"/></symbol><use href="#ai:material-symbols:chevron-left-rounded"></use>  </svg> <div class="overflow-hidden transition overflow-ellipsis whitespace-nowrap max-w-[calc(100%_-_3rem)] text-black/75 dark:text-white/75"> Hive 底层原理与知识要点 </div> </div> </a> <a href="/posts/2026/08/09/mapreduce-principles/" class="w-full font-bold overflow-hidden active:scale-95"> <div class="btn-card rounded-2xl w-full h-[3.75rem] max-w-full px-4 flex items-center !justify-end gap-4"> <div class="overflow-hidden transition overflow-ellipsis whitespace-nowrap max-w-[calc(100%_-_3rem)] text-black/75 dark:text-white/75"> MapReduce 底层原理与知识要点 </div> <svg width="1em" height="1em" viewBox="0 0 24 24" class="text-[2rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg> </div> </a> </div>  <div class="footer col-span-2 onload-animation hidden lg:block"> <!--<div class="border-t border-[var(&#45;&#45;primary)] mx-16 border-dashed py-8 max-w-[var(&#45;&#45;page-width)] flex flex-col items-center justify-center px-6">--><div class="transition border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-32"></div> <!--<div class="transition bg-[oklch(92%_0.01_var(&#45;&#45;hue))] dark:bg-black rounded-2xl py-8 mt-4 mb-8 flex flex-col items-center justify-center px-6">--> <div class="transition border-dashed border-[oklch(85%_0.01_var(--hue))] dark:border-white/15 rounded-2xl mb-12 flex flex-col items-center justify-center px-6"> <div class="transition text-50 text-sm text-center">
+&copy; <span id="copyright-year">2026</span> chaggle. All Rights Reserved. /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/rss.xml">RSS</a> /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/sitemap-index.xml">Sitemap</a><br>
+Powered by
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://astro.build">Astro</a> &
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a> </div> </div> </div> </div> </main> <div class="footer col-span-2 onload-animation block lg:hidden"> <!--<div class="border-t border-[var(&#45;&#45;primary)] mx-16 border-dashed py-8 max-w-[var(&#45;&#45;page-width)] flex flex-col items-center justify-center px-6">--><div class="transition border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-32"></div> <!--<div class="transition bg-[oklch(92%_0.01_var(&#45;&#45;hue))] dark:bg-black rounded-2xl py-8 mt-4 mb-8 flex flex-col items-center justify-center px-6">--> <div class="transition border-dashed border-[oklch(85%_0.01_var(--hue))] dark:border-white/15 rounded-2xl mb-12 flex flex-col items-center justify-center px-6"> <div class="transition text-50 text-sm text-center">
+&copy; <span id="copyright-year">2026</span> chaggle. All Rights Reserved. /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/rss.xml">RSS</a> /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/sitemap-index.xml">Sitemap</a><br>
+Powered by
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://astro.build">Astro</a> &
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a> </div> </div> </div> </div> <!-- There can't be a filter on parent element, or it will break `fixed` --><div class="back-to-top-wrapper hidden lg:block" data-astro-cid-eymb5ayk> <div id="back-to-top-btn" class="back-to-top-btn hide flex items-center rounded-2xl overflow-hidden transition" onclick="backToTop()" data-astro-cid-eymb5ayk> <button aria-label="Back to Top" class="btn-card h-[3.75rem] w-[3.75rem]" data-astro-cid-eymb5ayk> <svg width="1em" height="1em" class="mx-auto" data-astro-cid-eymb5ayk="true" data-icon="material-symbols:keyboard-arrow-up-rounded">   <symbol id="ai:material-symbols:keyboard-arrow-up-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="m12 10.8l-3.9 3.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.6-4.6q.3-.3.7-.3t.7.3l4.6 4.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275z"/></symbol><use href="#ai:material-symbols:keyboard-arrow-up-rounded"></use>  </svg> </button> </div> </div>  <script>
+function backToTop() {
+    window.scroll({ top: 0, behavior: 'smooth' });
+}
+</script> </div> </div>  <div class="absolute w-full z-0 hidden 2xl:block"> <div class="relative max-w-[var(--page-width)] mx-auto"> <!-- TOC component --> <div id="toc-wrapper" class="hidden lg:block transition absolute top-0 -right-[var(--toc-width)] w-[var(--toc-width)] items-center"> <div id="toc-inner-wrapper" class="fixed top-14 w-[var(--toc-width)] h-[calc(100vh_-_20rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar"> <div id="toc" class="w-full h-full transition-swup-fade "> <div class="h-8 w-full"></div> <table-of-contents class="group"><a href="#核心架构" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">1</div><div class="transition text-sm text-50">核心架构</div></a><a href="#角色划分" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">角色划分</div></a><a href="#核心概念" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">核心概念</div></a><a href="#存储原理" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">2</div><div class="transition text-sm text-50">存储原理</div></a><a href="#分区与段segment" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">分区与段（Segment）</div></a><a href="#稀疏索引" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">稀疏索引</div></a><a href="#顺序写与页缓存" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">顺序写与页缓存</div></a><a href="#零拷贝sendfile" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">零拷贝（sendfile）</div></a><a href="#批量写与批量读" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">批量写与批量读</div></a><a href="#副本机制" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">3</div><div class="transition text-sm text-50">副本机制</div></a><a href="#分区副本" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">分区副本</div></a><a href="#isrhwleo" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">ISR、HW、LEO</div></a><a href="#leader-选举" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">Leader 选举</div></a><a href="#acks-三种级别" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">acks 三种级别</div></a><a href="#生产者原理" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">4</div><div class="transition text-sm text-50">生产者原理</div></a><a href="#分区策略" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">分区策略</div></a><a href="#批量发送与缓冲" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">批量发送与缓冲</div></a><a href="#幂等性pid--序列号" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">幂等性（PID + 序列号）</div></a><a href="#事务" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">事务</div></a><a href="#消费者原理" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">5</div><div class="transition text-sm text-50">消费者原理</div></a><a href="#消费组与分区分配" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">消费组与分区分配</div></a><a href="#rebalance新旧协议" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">Rebalance（新旧协议）</div></a><a href="#offset-提交" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">Offset 提交</div></a><a href="#高可用与故障恢复" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">6</div><div class="transition text-sm text-50">高可用与故障恢复</div></a><a href="#常规问题排查" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">7</div><div class="transition text-sm text-50">常规问题排查</div></a><a href="#消费堆积lag" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">消费堆积（Lag）</div></a><a href="#消息丢失与重复" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">消息丢失与重复</div></a><a href="#分区数调整" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">分区数调整</div></a><a href="#磁盘占用与清理" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">磁盘占用与清理</div></a><a href="#吞吐瓶颈定位" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">吞吐瓶颈定位</div></a><a href="#rebalance-频繁" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">Rebalance 频繁</div></a><a href="#客户端参数调优要点" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">客户端参数调优要点</div></a><div id="active-indicator" style="opacity: 0" class="-z-10 absolute bg-[var(--toc-btn-hover)] left-0 right-0 rounded-xl transition-all group-hover:bg-transparent border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed"></div></table-of-contents><script type="module">class l extends HTMLElement{tocEl=null;visibleClass="visible";observer;anchorNavTarget=null;headingIdxMap=new Map;headings=[];sections=[];tocEntries=[];active=[];activeIndicator=null;constructor(){super(),this.observer=new IntersectionObserver(this.markVisibleSection,{threshold:0})}markVisibleSection=t=>{t.forEach(e=>{const i=e.target.children[0]?.getAttribute("id"),s=i?this.headingIdxMap.get(i):void 0;s!=null&&(this.active[s]=e.isIntersecting),e.isIntersecting&&this.anchorNavTarget==e.target.firstChild&&(this.anchorNavTarget=null)}),this.active.includes(!0)||this.fallback(),this.update()};toggleActiveHeading=()=>{let t=this.active.length-1,e=this.active.length-1,i=-1;for(;t>=0&&!this.active[t];)this.tocEntries[t].classList.remove(this.visibleClass),t--;for(;t>=0&&this.active[t];)this.tocEntries[t].classList.add(this.visibleClass),e=Math.min(e,t),i=Math.max(i,t),t--;for(;t>=0;)this.tocEntries[t].classList.remove(this.visibleClass),t--;if(e>i)this.activeIndicator?.setAttribute("style","opacity: 0");else{let s=this.tocEl?.getBoundingClientRect().top||0,n=this.tocEl?.scrollTop||0,o=this.tocEntries[e].getBoundingClientRect().top-s+n,c=this.tocEntries[i].getBoundingClientRect().bottom-s+n;this.activeIndicator?.setAttribute("style",`top: ${o}px; height: ${c-o}px`)}};scrollToActiveHeading=()=>{if(this.anchorNavTarget||!this.tocEl)return;const t=document.querySelectorAll(`#toc .${this.visibleClass}`);if(!t.length)return;const e=t[0],i=t[t.length-1],s=this.tocEl.clientHeight;let n;i.getBoundingClientRect().bottom-e.getBoundingClientRect().top<.9*s?n=e.offsetTop-32:n=i.offsetTop-s*.8,this.tocEl.scrollTo({top:n,left:0,behavior:"smooth"})};update=()=>{requestAnimationFrame(()=>{this.toggleActiveHeading(),this.scrollToActiveHeading()})};fallback=()=>{if(this.sections.length)for(let t=0;t<this.sections.length;t++){let e=this.sections[t].getBoundingClientRect().top,i=this.sections[t].getBoundingClientRect().bottom;if(this.isInRange(e,0,window.innerHeight)||this.isInRange(i,0,window.innerHeight)||e<0&&i>window.innerHeight)this.markActiveHeading(t);else if(e>window.innerHeight)break}};markActiveHeading=t=>{this.active[t]=!0};handleAnchorClick=t=>{const e=t.composedPath().find(i=>i instanceof HTMLAnchorElement);if(e){const i=decodeURIComponent(e.hash?.substring(1)),s=this.headingIdxMap.get(i);s!==void 0?this.anchorNavTarget=this.headings[s]:this.anchorNavTarget=null}};isInRange(t,e,i){return e<t&&t<i}connectedCallback(){const t=document.querySelector(".prose");t?t.addEventListener("animationend",()=>{this.init()},{once:!0}):console.debug("Animation element not found")}init(){if(this.tocEl=document.getElementById("toc-inner-wrapper"),!!this.tocEl&&(this.tocEl.addEventListener("click",this.handleAnchorClick,{capture:!0}),this.activeIndicator=document.getElementById("active-indicator"),this.tocEntries=Array.from(document.querySelectorAll("#toc a[href^='#']")),this.tocEntries.length!==0)){this.sections=new Array(this.tocEntries.length),this.headings=new Array(this.tocEntries.length);for(let t=0;t<this.tocEntries.length;t++){const e=decodeURIComponent(this.tocEntries[t].hash?.substring(1)),i=document.getElementById(e),s=i?.parentElement;i instanceof HTMLElement&&s instanceof HTMLElement&&(this.headings[t]=i,this.sections[t]=s,this.headingIdxMap.set(e,t))}this.active=new Array(this.tocEntries.length).fill(!1),this.sections.forEach(t=>this.observer.observe(t)),this.fallback(),this.update()}}disconnectedCallback(){this.sections.forEach(t=>this.observer.unobserve(t)),this.observer.disconnect(),this.tocEl?.removeEventListener("click",this.handleAnchorClick)}}customElements.get("table-of-contents")||customElements.define("table-of-contents",l);</script> <div class="h-8 w-full"></div> </div> </div> </div> <!-- #toc needs to exist for Swup to work normally -->  </div> </div>  <!-- increase the page height during page transition to prevent the scrolling animation from jumping --> <div id="page-height-extend" class="hidden h-[300vh]" data-astro-cid-sckkx6r4 style="--bannerOffset: 15vh;--banner-height-home: 65vh;--banner-height: 35vh;--configHue: 230;--page-width: 75rem;"></div>  <script type="module" src="/_astro/Layout.astro_astro_type_script_index_0_lang.DAHrxWCB.js"></script> <script type="module" src="/_astro/Layout.astro_astro_type_script_index_1_lang.DlBknloJ.js"></script></body></html>

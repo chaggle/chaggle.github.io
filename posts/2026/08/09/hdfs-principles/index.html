@@ -1,0 +1,611 @@
+<!DOCTYPE html><html lang="zh-CN" class="bg-[var(--page-bg)] transition text-[14px] md:text-[16px]" data-overlayscrollbars-initialize data-astro-cid-sckkx6r4 style="--bannerOffset: 15vh;--banner-height-home: 65vh;--banner-height: 35vh;--configHue: 230;--page-width: 75rem;"> <head><title>HDFS 底层原理与知识要点 - 大布丁的博客</title><meta charset="UTF-8"><meta name="description" content="HDFS 底层原理与知识要点 - 大布丁的博客"><meta name="author" content="chaggle"><meta property="og:site_name" content="大布丁的博客"><meta property="og:url" content="https://chaggle.github.io/posts/2026/08/09/hdfs-principles/"><meta property="og:title" content="HDFS 底层原理与知识要点 - 大布丁的博客"><meta property="og:description" content="HDFS 底层原理与知识要点 - 大布丁的博客"><meta property="og:type" content="article"><meta name="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://chaggle.github.io/posts/2026/08/09/hdfs-principles/"><meta name="twitter:title" content="HDFS 底层原理与知识要点 - 大布丁的博客"><meta name="twitter:description" content="HDFS 底层原理与知识要点 - 大布丁的博客"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v5.13.10"><link rel="icon" href="/img/chaggle.png"><!-- Set the theme before the page is rendered to avoid a flash --><script>(function(){const DEFAULT_THEME = "auto";
+const LIGHT_MODE = "light";
+const DARK_MODE = "dark";
+const AUTO_MODE = "auto";
+const BANNER_HEIGHT_EXTEND = 30;
+const PAGE_WIDTH = 75;
+const configHue = 230;
+
+			// Load the theme from local storage
+			const theme = localStorage.getItem('theme') || DEFAULT_THEME;
+			switch (theme) {
+				case LIGHT_MODE:
+					document.documentElement.classList.remove('dark');
+					break
+				case DARK_MODE:
+					document.documentElement.classList.add('dark');
+					break
+				case AUTO_MODE:
+					if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+						document.documentElement.classList.add('dark');
+					} else {
+						document.documentElement.classList.remove('dark');
+					}
+			}
+
+			// Load the hue from local storage
+			const hue = localStorage.getItem('hue') || configHue;
+			document.documentElement.style.setProperty('--hue', hue);
+
+			// calculate the --banner-height-extend, which needs to be a multiple of 4 to avoid blurry text
+			let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));
+			offset = offset - offset % 4;
+			document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
+		})();</script><!-- defines global css variables. This will be applied to <html> <body> and some other elements idk why --><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"HDFS 底层原理与知识要点","description":"HDFS 底层原理与知识要点","keywords":["2026","hdfs"],"author":{"@type":"Person","name":"chaggle","url":"https://chaggle.github.io/"},"datePublished":"2026-08-08","inLanguage":"zh-CN"}</script><link rel="alternate" type="application/rss+xml" title="chaggle" href="https://chaggle.github.io/rss.xml"><link rel="stylesheet" href="/_astro/Layout.DSulWsr7.css">
+<link rel="stylesheet" href="/_astro/Layout.y4KPJ9hc.css">
+<link rel="stylesheet" href="/_astro/_page_.CmMtgdrT.css">
+<link rel="stylesheet" href="/_astro/_page_.ZlghMKVQ.css">
+<link rel="stylesheet" href="/_astro/about.BtniRLn_.css">
+<style>input.svelte-1wah7ro:focus{outline:0}.search-panel.svelte-1wah7ro{max-height:calc(100vh - 100px);overflow-y:auto}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k){-webkit-appearance:none;height:1.5rem;background-image:var(--color-selection-bar);transition:background-image .15s ease-in-out}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-webkit-slider-thumb{-webkit-appearance:none;height:1rem;width:.5rem;border-radius:.125rem;background:#ffffffb3;box-shadow:none}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-webkit-slider-thumb:hover{background:#fffc}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-webkit-slider-thumb:active{background:#fff9}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-moz-range-thumb{-webkit-appearance:none;height:1rem;width:.5rem;border-radius:.125rem;border-width:0;background:#ffffffb3;box-shadow:none}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-moz-range-thumb:hover{background:#fffc}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-moz-range-thumb:active{background:#fff9}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-ms-thumb{-webkit-appearance:none;height:1rem;width:.5rem;border-radius:.125rem;background:#ffffffb3;box-shadow:none}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-ms-thumb:hover{background:#fffc}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-ms-thumb:active{background:#fff9}
+</style><script type="module" src="/_astro/page.Z8IJTFqj.js"></script></head> <body class=" min-h-screen transition " data-overlayscrollbars-initialize data-astro-cid-sckkx6r4 style="--bannerOffset: 15vh;--banner-height-home: 65vh;--banner-height: 35vh;--configHue: 230;--page-width: 75rem;"> <div id="config-carrier" data-hue="230"></div>    <div id="top-row" class="z-50 pointer-events-none relative transition-all duration-700 max-w-[var(--page-width)] px-0 md:px-4 mx-auto"> <div id="navbar-wrapper" class="pointer-events-auto sticky top-0 transition-all"> <div id="navbar" class="z-50 onload-animation"> <div class="absolute h-8 left-0 right-0 -top-8 bg-[var(--card-bg)] transition"></div> <!-- used for onload animation --> <div class="card-base !overflow-visible max-w-[var(--page-width)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4"> <a href="/" class="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95"> <div class="flex flex-row text-[var(--primary)] items-center text-md"> <svg width="1em" height="1em" class="text-[1.75rem] mb-1 mr-2" data-icon="material-symbols:home-outline-rounded">   <symbol id="ai:material-symbols:home-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M6 19h3v-5q0-.425.288-.712T10 13h4q.425 0 .713.288T15 14v5h3v-9l-6-4.5L6 10zm-2 0v-9q0-.475.213-.9t.587-.7l6-4.5q.525-.4 1.2-.4t1.2.4l6 4.5q.375.275.588.7T20 10v9q0 .825-.588 1.413T18 21h-4q-.425 0-.712-.288T13 20v-5h-2v5q0 .425-.288.713T10 21H6q-.825 0-1.412-.587T4 19m8-6.75"/></symbol><use href="#ai:material-symbols:home-outline-rounded"></use>  </svg> 大布丁的博客 </div> </a> <div class="hidden md:flex"> <a aria-label="主页" href="/" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> 主页  </div> </a><a aria-label="归档" href="/archive/" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> 归档  </div> </a><a aria-label="关于" href="/about/" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> 关于  </div> </a><a aria-label="GitHub" href="https://github.com/chaggle" target="_blank" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> GitHub <svg width="1em" height="1em" class="text-[0.875rem] transition -translate-y-[1px] ml-1 text-black/[0.2] dark:text-white/[0.2]" data-icon="fa6-solid:arrow-up-right-from-square">   <symbol id="ai:fa6-solid:arrow-up-right-from-square" viewBox="0 0 512 512"><path fill="currentColor" d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32h82.7L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3V192c0 17.7 14.3 32 32 32s32-14.3 32-32V32c0-17.7-14.3-32-32-32zM80 32C35.8 32 0 67.8 0 112v320c0 44.2 35.8 80 80 80h320c44.2 0 80-35.8 80-80V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v112c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16h112c17.7 0 32-14.3 32-32s-14.3-32-32-32z"/></symbol><use href="#ai:fa6-solid:arrow-up-right-from-square"></use>  </svg> </div> </a> </div> <div class="flex"> <!--<SearchPanel client:load>--> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).only=e;window.dispatchEvent(new Event("astro:only"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="1JbbOA" component-url="/_astro/Search.Dyki_PZ4.js" component-export="default" renderer-url="/_astro/client.svelte.BtEbdPyR.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;Search&quot;,&quot;value&quot;:&quot;svelte&quot;}"></astro-island> <button aria-label="Display Settings" class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" id="display-settings-switch"> <svg width="1em" height="1em" class="text-[1.25rem]" data-icon="material-symbols:palette-outline">   <symbol id="ai:material-symbols:palette-outline" viewBox="0 0 24 24"><path fill="currentColor" d="M12 22q-2.05 0-3.875-.788t-3.187-2.15t-2.15-3.187T2 12q0-2.075.813-3.9t2.2-3.175T8.25 2.788T12.2 2q2 0 3.775.688t3.113 1.9t2.125 2.875T22 11.05q0 2.875-1.75 4.413T16 17h-1.85q-.225 0-.312.125t-.088.275q0 .3.375.863t.375 1.287q0 1.25-.687 1.85T12 22m-5.5-9q.65 0 1.075-.425T8 11.5t-.425-1.075T6.5 10t-1.075.425T5 11.5t.425 1.075T6.5 13m3-4q.65 0 1.075-.425T11 7.5t-.425-1.075T9.5 6t-1.075.425T8 7.5t.425 1.075T9.5 9m5 0q.65 0 1.075-.425T16 7.5t-.425-1.075T14.5 6t-1.075.425T13 7.5t.425 1.075T14.5 9m3 4q.65 0 1.075-.425T19 11.5t-.425-1.075T17.5 10t-1.075.425T16 11.5t.425 1.075T17.5 13M12 20q.225 0 .363-.125t.137-.325q0-.35-.375-.825T11.75 17.3q0-1.05.725-1.675T14.25 15H16q1.65 0 2.825-.962T20 11.05q0-3.025-2.312-5.038T12.2 4Q8.8 4 6.4 6.325T4 12q0 3.325 2.338 5.663T12 20"/></symbol><use href="#ai:material-symbols:palette-outline"></use>  </svg> </button> <astro-island uid="17pPOe" component-url="/_astro/LightDarkSwitch.BSapTNdP.js" component-export="default" renderer-url="/_astro/client.svelte.BtEbdPyR.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;LightDarkSwitch&quot;,&quot;value&quot;:&quot;svelte&quot;}"></astro-island> <button aria-label="Menu" name="Nav Menu" class="btn-plain scale-animation rounded-lg w-11 h-11 active:scale-90 md:!hidden" id="nav-menu-switch"> <svg width="1em" height="1em" class="text-[1.25rem]" data-icon="material-symbols:menu-rounded">   <symbol id="ai:material-symbols:menu-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M4 18q-.425 0-.712-.288T3 17t.288-.712T4 16h16q.425 0 .713.288T21 17t-.288.713T20 18zm0-5q-.425 0-.712-.288T3 12t.288-.712T4 11h16q.425 0 .713.288T21 12t-.288.713T20 13zm0-5q-.425 0-.712-.288T3 7t.288-.712T4 6h16q.425 0 .713.288T21 7t-.288.713T20 8z"/></symbol><use href="#ai:material-symbols:menu-rounded"></use>  </svg> </button> </div> <div id="nav-menu-panel" class="float-panel float-panel-closed absolute transition-all fixed right-4 px-2 py-2"> <a href="/" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        "> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> 主页 </div> <svg width="1em" height="1em" class="transition text-[1.25rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <symbol id="ai:material-symbols:chevron-right-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M12.6 12L8.7 8.1q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.6 4.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.6 4.6q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7z"/></symbol><use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg>  </a><a href="/archive/" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        "> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> 归档 </div> <svg width="1em" height="1em" viewBox="0 0 24 24" class="transition text-[1.25rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg>  </a><a href="/about/" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        "> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> 关于 </div> <svg width="1em" height="1em" viewBox="0 0 24 24" class="transition text-[1.25rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg>  </a><a href="https://github.com/chaggle" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        " target="_blank"> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> GitHub </div>  <svg width="1em" height="1em" viewBox="0 0 512 512" class="transition text-[0.75rem] text-black/25 dark:text-white/25 -translate-x-1" data-icon="fa6-solid:arrow-up-right-from-square">   <use href="#ai:fa6-solid:arrow-up-right-from-square"></use>  </svg> </a> </div> <astro-island uid="Z24jrlb" component-url="/_astro/DisplaySettings.CcQr5-8Z.js" component-export="default" renderer-url="/_astro/client.svelte.BtEbdPyR.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;DisplaySettings&quot;,&quot;value&quot;:&quot;svelte&quot;}"></astro-island> </div> </div> <script type="module">function c(){localStorage.theme==="dark"?(document.documentElement.classList.remove("dark"),localStorage.theme="light"):(document.documentElement.classList.add("dark"),localStorage.theme="dark")}function o(){let t=document.getElementById("scheme-switch");t&&(t.onclick=function(){c()});let n=document.getElementById("display-settings-switch");n&&(n.onclick=function(){let e=document.getElementById("display-setting");e&&e.classList.toggle("float-panel-closed")});let l=document.getElementById("nav-menu-switch");l&&(l.onclick=function(){let e=document.getElementById("nav-menu-panel");e&&e.classList.toggle("float-panel-closed")})}o();</script> <script>(function(){const scriptUrl = "/pagefind/pagefind.js";
+
+async function loadPagefind() {
+    try {
+        const response = await fetch(scriptUrl, { method: 'HEAD' });
+        if (!response.ok) {
+            throw new Error(`Pagefind script not found: ${response.status}`);
+        }
+
+        const pagefind = await import(scriptUrl);
+
+        await pagefind.options({
+            excerptLength: 20
+        });
+
+        window.pagefind = pagefind;
+
+        document.dispatchEvent(new CustomEvent('pagefindready'));
+        console.log('Pagefind loaded and initialized successfully, event dispatched.');
+    } catch (error) {
+        console.error('Failed to load Pagefind:', error);
+        window.pagefind = {
+            search: () => Promise.resolve({ results: [] }),
+            options: () => Promise.resolve(),
+        };
+        document.dispatchEvent(new CustomEvent('pagefindloaderror'));
+        console.log('Pagefind load error, event dispatched.');
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadPagefind);
+} else {
+    loadPagefind();
+}
+})();</script> </div> </div>   <div class="absolute w-full z-30 pointer-events-none" style="top: 5.5rem"> <!-- The pointer-events-none here prevent blocking the click event of the TOC --> <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto"> <div id="main-grid" class="transition duration-700 w-full left-0 right-0 grid grid-cols-[17.5rem_auto] grid-rows-[auto_1fr_auto] lg:grid-rows-[auto]
+    mx-auto gap-4 px-0 md:px-4"> <!-- Banner image credit -->  <div id="sidebar" class="mb-4 row-start-2 row-end-3 col-span-2 lg:row-start-1 lg:row-end-2 lg:col-span-1 lg:max-w-[17.5rem] onload-animation w-full"> <div class="flex flex-col w-full gap-4 mb-4"> <div class="card-base p-3"> <a aria-label="Go to About Page" href="/about/" class="group block relative mx-auto mt-1 lg:mx-0 lg:mt-0 mb-3
+       max-w-[12rem] lg:max-w-none overflow-hidden rounded-xl active:scale-95"> <div class="absolute transition pointer-events-none group-hover:bg-black/30 group-active:bg-black/50
+        w-full h-full z-50 flex items-center justify-center"> <svg width="1.13em" height="1em" class="transition opacity-0 scale-90 group-hover:scale-100 group-hover:opacity-100 text-white text-5xl" data-icon="fa6-regular:address-card">   <symbol id="ai:fa6-regular:address-card" viewBox="0 0 576 512"><path fill="currentColor" d="M512 80c8.8 0 16 7.2 16 16v320c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V96c0-8.8 7.2-16 16-16zM64 32C28.7 32 0 60.7 0 96v320c0 35.3 28.7 64 64 64h448c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64zm144 224a64 64 0 1 0 0-128a64 64 0 1 0 0 128m-32 32c-44.2 0-80 35.8-80 80c0 8.8 7.2 16 16 16h192c8.8 0 16-7.2 16-16c0-44.2-35.8-80-80-80zm200-144c-13.3 0-24 10.7-24 24s10.7 24 24 24h80c13.3 0 24-10.7 24-24s-10.7-24-24-24zm0 96c-13.3 0-24 10.7-24 24s10.7 24 24 24h80c13.3 0 24-10.7 24-24s-10.7-24-24-24z"/></symbol><use href="#ai:fa6-regular:address-card"></use>  </svg> </div> <div class="mx-auto lg:w-full h-full lg:mt-0  overflow-hidden relative"> <div class="transition absolute inset-0 dark:bg-black/10 bg-opacity-50 pointer-events-none"></div>  <img src="/img/chaggle.png" alt="Profile Image of the Author" class="w-full h-full object-cover" style="object-position: center"> </div> </a> <div class="px-2"> <div class="font-bold text-xl text-center mb-1 dark:text-neutral-50 transition">chaggle</div> <div class="h-1 w-5 bg-[var(--primary)] mx-auto rounded-full mb-2 transition"></div> <div class="text-center text-neutral-400 mb-2.5 transition">人格的容纳之地——从后端开发走到技术管理，再走向数据架构与 AI Agent。</div> <div class="flex flex-wrap gap-2 justify-center mb-1">  <a rel="me" aria-label="GitHub" href="https://github.com/chaggle" target="_blank" class="btn-regular rounded-lg h-10 gap-2 px-3 font-bold active:scale-95"> <svg width="0.97em" height="1em" class="text-[1.5rem]" data-icon="fa6-brands:github">   <symbol id="ai:fa6-brands:github" viewBox="0 0 496 512"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6c-3.3.3-5.6-1.3-5.6-3.6c0-2 2.3-3.6 5.2-3.6c3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9c2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9c.3 2 2.9 3.3 5.9 2.6c2.9-.7 4.9-2.6 4.6-4.6c-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2c12.8 2.3 17.3-5.6 17.3-12.1c0-6.2-.3-40.4-.3-61.4c0 0-70 15-84.7-29.8c0 0-11.4-29.1-27.8-36.6c0 0-22.9-15.7 1.6-15.4c0 0 24.9 2 38.6 25.8c21.9 38.6 58.6 27.5 72.9 20.9c2.3-16 8.8-27.1 16-33.7c-55.9-6.2-112.3-14.3-112.3-110.5c0-27.5 7.6-41.3 23.6-58.9c-2.6-6.5-11.1-33.3 2.6-67.9c20.9-6.5 69 27 69 27c20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27c13.7 34.7 5.2 61.4 2.6 67.9c16 17.7 25.8 31.5 25.8 58.9c0 96.5-58.9 104.2-114.8 110.5c9.2 7.9 17 22.9 17 46.4c0 33.7-.3 75.4-.3 83.6c0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252C496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2c1.6 1.6 3.9 2.3 5.2 1c1.3-1 1-3.3-.7-5.2c-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9c1.6 1 3.6.7 4.3-.7c.7-1.3-.3-2.9-2.3-3.9c-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2c2.3 2.3 5.2 2.6 6.5 1c1.3-1.3.7-4.3-1.3-6.2c-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2c-1.4-2.3-4-3.3-5.6-2"/></symbol><use href="#ai:fa6-brands:github"></use>  </svg> GitHub </a> </div> </div> </div> </div> <div id="sidebar-sticky" class="transition-all duration-700 flex flex-col w-full gap-4 top-4 sticky top-4"> <widget-layout data-id="categories" data-is-collapsed="true" class="pb-4 card-base onload-animation" style="animation-delay: 150ms; --collapsedHeight: 7.5rem;" data-astro-cid-ucso7hve="true"> <div class="font-bold transition text-lg text-neutral-900 dark:text-neutral-100 relative ml-8 mt-4 mb-2
+        before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
+        before:absolute before:left-[-16px] before:top-[5.5px]" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;">分类</div> <div id="categories" class="collapse-wrapper px-4 overflow-hidden collapsed" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <a href="/archive/?category=AI" aria-label="View all posts in the AI category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> AI </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 7 </div> </div> </button> </a><a href="/archive/?category=bigdata" aria-label="View all posts in the bigdata category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> bigdata </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 28 </div> </div> </button> </a><a href="/archive/?category=cpp" aria-label="View all posts in the cpp category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> cpp </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 2 </div> </div> </button> </a><a href="/archive/?category=go" aria-label="View all posts in the go category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> go </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 3 </div> </div> </button> </a><a href="/archive/?category=invest" aria-label="View all posts in the invest category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> invest </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 11 </div> </div> </button> </a><a href="/archive/?category=leetcode" aria-label="View all posts in the leetcode category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> leetcode </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 99 </div> </div> </button> </a><a href="/archive/?category=linux" aria-label="View all posts in the linux category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> linux </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 4 </div> </div> </button> </a><a href="/archive/?category=middleware" aria-label="View all posts in the middleware category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> middleware </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 19 </div> </div> </button> </a><a href="/archive/?category=powershell" aria-label="View all posts in the powershell category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> powershell </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 1 </div> </div> </button> </a><a href="/archive/?category=summary" aria-label="View all posts in the summary category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> summary </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 8 </div> </div> </button> </a><a href="/archive/?category=windows" aria-label="View all posts in the windows category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> windows </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 1 </div> </div> </button> </a> </div> <div class="expand-btn px-4 -mb-2" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <button class="btn-plain rounded-lg w-full h-9" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <div class="text-[var(--primary)] flex items-center justify-center gap-2 -translate-x-2" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <svg width="1em" height="1em" class="text-[1.75rem]" data-astro-cid-ucso7hve="true" data-icon="material-symbols:more-horiz">   <symbol id="ai:material-symbols:more-horiz" viewBox="0 0 24 24"><path fill="currentColor" d="M6 14q-.825 0-1.412-.587T4 12t.588-1.412T6 10t1.413.588T8 12t-.587 1.413T6 14m6 0q-.825 0-1.412-.587T10 12t.588-1.412T12 10t1.413.588T14 12t-.587 1.413T12 14m6 0q-.825 0-1.412-.587T16 12t.588-1.412T18 10t1.413.588T20 12t-.587 1.413T18 14"/></symbol><use href="#ai:material-symbols:more-horiz"></use>  </svg> 更多 </div> </button> </div> </widget-layout>  <script type="module">class d extends HTMLElement{constructor(){if(super(),this.dataset.isCollapsed!=="true")return;const e=this.dataset.id,t=this.querySelector(".expand-btn"),s=this.querySelector(`#${e}`);t.addEventListener("click",()=>{s.classList.remove("collapsed"),t.classList.add("hidden")})}}customElements.get("widget-layout")||customElements.define("widget-layout",d);</script> <widget-layout data-id="tags" data-is-collapsed="true" class="pb-4 card-base onload-animation" style="animation-delay: 200ms; --collapsedHeight: 7.5rem;" data-astro-cid-ucso7hve="true"> <div class="font-bold transition text-lg text-neutral-900 dark:text-neutral-100 relative ml-8 mt-4 mb-2
+        before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
+        before:absolute before:left-[-16px] before:top-[5.5px]" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;">标签</div> <div id="tags" class="collapse-wrapper px-4 overflow-hidden collapsed" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;">  <div class="flex gap-2 flex-wrap"> <a href="/archive/?tag=2021" aria-label="View all posts with the 2021 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  2021 </a><a href="/archive/?tag=2022" aria-label="View all posts with the 2022 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  2022 </a><a href="/archive/?tag=2025" aria-label="View all posts with the 2025 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  2025 </a><a href="/archive/?tag=2026" aria-label="View all posts with the 2026 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  2026 </a><a href="/archive/?tag=%E5%8D%8A%E5%AF%BC%E4%BD%93" aria-label="View all posts with the 半导体 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  半导体 </a><a href="/archive/?tag=%E5%A4%87%E4%BB%BD" aria-label="View all posts with the 备份 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  备份 </a><a href="/archive/?tag=%E9%83%A8%E7%BD%B2" aria-label="View all posts with the 部署 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  部署 </a><a href="/archive/?tag=%E8%B8%A9%E5%9D%91" aria-label="View all posts with the 踩坑 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  踩坑 </a><a href="/archive/?tag=%E5%AD%98%E5%82%A8" aria-label="View all posts with the 存储 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  存储 </a><a href="/archive/?tag=%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86" aria-label="View all posts with the 错误处理 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  错误处理 </a><a href="/archive/?tag=%E8%B0%83%E4%BC%98" aria-label="View all posts with the 调优 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  调优 </a><a href="/archive/?tag=%E5%A4%9A%E6%99%BA%E8%83%BD%E4%BD%93" aria-label="View all posts with the 多智能体 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  多智能体 </a><a href="/archive/?tag=%E8%A7%84%E8%8C%83" aria-label="View all posts with the 规范 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  规范 </a><a href="/archive/?tag=%E6%B9%96%E4%BB%93" aria-label="View all posts with the 湖仓 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  湖仓 </a><a href="/archive/?tag=%E6%9E%B6%E6%9E%84" aria-label="View all posts with the 架构 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  架构 </a><a href="/archive/?tag=%E8%84%9A%E6%9C%AC" aria-label="View all posts with the 脚本 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  脚本 </a><a href="/archive/?tag=%E7%A7%91%E6%8A%80" aria-label="View all posts with the 科技 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  科技 </a><a href="/archive/?tag=%E9%9D%A2%E8%AF%95" aria-label="View all posts with the 面试 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  面试 </a><a href="/archive/?tag=%E6%B1%82%E8%81%8C" aria-label="View all posts with the 求职 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  求职 </a><a href="/archive/?tag=%E5%AE%B9%E5%99%A8" aria-label="View all posts with the 容器 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  容器 </a><a href="/archive/?tag=%E4%B8%89%E6%98%9F" aria-label="View all posts with the 三星 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  三星 </a><a href="/archive/?tag=%E5%8D%87%E7%BA%A7" aria-label="View all posts with the 升级 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  升级 </a><a href="/archive/?tag=%E7%B3%BB%E7%BB%9F%E9%87%8D%E8%A3%85" aria-label="View all posts with the 系统重装 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  系统重装 </a><a href="/archive/?tag=%E5%86%99%E4%BD%9C" aria-label="View all posts with the 写作 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  写作 </a><a href="/archive/?tag=%E5%BA%94%E7%94%A8" aria-label="View all posts with the 应用 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  应用 </a><a href="/archive/?tag=%E5%85%83%E6%95%B0%E6%8D%AE" aria-label="View all posts with the 元数据 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  元数据 </a><a href="/archive/?tag=%E8%BD%AC%E5%9E%8B" aria-label="View all posts with the 转型 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  转型 </a><a href="/archive/?tag=%E8%BD%AC%E8%BD%BD" aria-label="View all posts with the 转载 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  转载 </a><a href="/archive/?tag=%E6%80%BB%E7%BB%93" aria-label="View all posts with the 总结 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  总结 </a><a href="/archive/?tag=Agent" aria-label="View all posts with the Agent tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Agent </a><a href="/archive/?tag=AI" aria-label="View all posts with the AI tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  AI </a><a href="/archive/?tag=bigdata" aria-label="View all posts with the bigdata tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  bigdata </a><a href="/archive/?tag=C%2B%2B" aria-label="View all posts with the C++ tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  C++ </a><a href="/archive/?tag=centos" aria-label="View all posts with the centos tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  centos </a><a href="/archive/?tag=channel" aria-label="View all posts with the channel tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  channel </a><a href="/archive/?tag=ci%2Fcd" aria-label="View all posts with the ci/cd tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  ci/cd </a><a href="/archive/?tag=clash" aria-label="View all posts with the clash tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  clash </a><a href="/archive/?tag=daily-analysis" aria-label="View all posts with the daily-analysis tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  daily-analysis </a><a href="/archive/?tag=datasophon" aria-label="View all posts with the datasophon tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  datasophon </a><a href="/archive/?tag=datax" aria-label="View all posts with the datax tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  datax </a><a href="/archive/?tag=DeepSeek" aria-label="View all posts with the DeepSeek tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  DeepSeek </a><a href="/archive/?tag=devops" aria-label="View all posts with the devops tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  devops </a><a href="/archive/?tag=DISM" aria-label="View all posts with the DISM tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  DISM </a><a href="/archive/?tag=Docker" aria-label="View all posts with the Docker tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Docker </a><a href="/archive/?tag=dolphinscheduler" aria-label="View all posts with the dolphinscheduler tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  dolphinscheduler </a><a href="/archive/?tag=doris" aria-label="View all posts with the doris tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  doris </a><a href="/archive/?tag=FDE" aria-label="View all posts with the FDE tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  FDE </a><a href="/archive/?tag=flink" aria-label="View all posts with the flink tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  flink </a><a href="/archive/?tag=GC" aria-label="View all posts with the GC tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  GC </a><a href="/archive/?tag=gcc" aria-label="View all posts with the gcc tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  gcc </a><a href="/archive/?tag=gdb" aria-label="View all posts with the gdb tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  gdb </a><a href="/archive/?tag=gin" aria-label="View all posts with the gin tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  gin </a><a href="/archive/?tag=git" aria-label="View all posts with the git tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  git </a><a href="/archive/?tag=GMP" aria-label="View all posts with the GMP tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  GMP </a><a href="/archive/?tag=Go" aria-label="View all posts with the Go tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Go </a><a href="/archive/?tag=GPE" aria-label="View all posts with the GPE tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  GPE </a><a href="/archive/?tag=grafana" aria-label="View all posts with the grafana tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  grafana </a><a href="/archive/?tag=gravitino" aria-label="View all posts with the gravitino tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  gravitino </a><a href="/archive/?tag=Harness" aria-label="View all posts with the Harness tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Harness </a><a href="/archive/?tag=HBM" aria-label="View all posts with the HBM tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  HBM </a><a href="/archive/?tag=hdfs" aria-label="View all posts with the hdfs tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  hdfs </a><a href="/archive/?tag=hive" aria-label="View all posts with the hive tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  hive </a><a href="/archive/?tag=HTTP" aria-label="View all posts with the HTTP tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  HTTP </a><a href="/archive/?tag=hudi" aria-label="View all posts with the hudi tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  hudi </a><a href="/archive/?tag=iceberg" aria-label="View all posts with the iceberg tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  iceberg </a><a href="/archive/?tag=IM" aria-label="View all posts with the IM tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  IM </a><a href="/archive/?tag=Infra" aria-label="View all posts with the Infra tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Infra </a><a href="/archive/?tag=innodb" aria-label="View all posts with the innodb tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  innodb </a><a href="/archive/?tag=jenkins" aria-label="View all posts with the jenkins tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  jenkins </a><a href="/archive/?tag=juicefs" aria-label="View all posts with the juicefs tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  juicefs </a><a href="/archive/?tag=k8s" aria-label="View all posts with the k8s tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  k8s </a><a href="/archive/?tag=kafka" aria-label="View all posts with the kafka tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  kafka </a><a href="/archive/?tag=kerberos" aria-label="View all posts with the kerberos tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  kerberos </a><a href="/archive/?tag=kubernetes" aria-label="View all posts with the kubernetes tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  kubernetes </a><a href="/archive/?tag=leetcode" aria-label="View all posts with the leetcode tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  leetcode </a><a href="/archive/?tag=main-invest" aria-label="View all posts with the main-invest tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  main-invest </a><a href="/archive/?tag=map" aria-label="View all posts with the map tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  map </a><a href="/archive/?tag=mapreduce" aria-label="View all posts with the mapreduce tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  mapreduce </a><a href="/archive/?tag=market-thought" aria-label="View all posts with the market-thought tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  market-thought </a><a href="/archive/?tag=middle-invest" aria-label="View all posts with the middle-invest tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  middle-invest </a><a href="/archive/?tag=middleware" aria-label="View all posts with the middleware tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  middleware </a><a href="/archive/?tag=MSI" aria-label="View all posts with the MSI tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  MSI </a><a href="/archive/?tag=mutex" aria-label="View all posts with the mutex tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  mutex </a><a href="/archive/?tag=mysql" aria-label="View all posts with the mysql tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  mysql </a><a href="/archive/?tag=nacos" aria-label="View all posts with the nacos tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  nacos </a><a href="/archive/?tag=olap" aria-label="View all posts with the olap tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  olap </a><a href="/archive/?tag=opencode" aria-label="View all posts with the opencode tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  opencode </a><a href="/archive/?tag=paimon" aria-label="View all posts with the paimon tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  paimon </a><a href="/archive/?tag=plan" aria-label="View all posts with the plan tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  plan </a><a href="/archive/?tag=PowerShell" aria-label="View all posts with the PowerShell tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  PowerShell </a><a href="/archive/?tag=priority_queue" aria-label="View all posts with the priority_queue tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  priority_queue </a><a href="/archive/?tag=prometheus" aria-label="View all posts with the prometheus tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  prometheus </a><a href="/archive/?tag=ranger" aria-label="View all posts with the ranger tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  ranger </a><a href="/archive/?tag=redis" aria-label="View all posts with the redis tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  redis </a><a href="/archive/?tag=review" aria-label="View all posts with the review tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  review </a><a href="/archive/?tag=rocketmq" aria-label="View all posts with the rocketmq tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  rocketmq </a><a href="/archive/?tag=set" aria-label="View all posts with the set tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  set </a><a href="/archive/?tag=snowflake" aria-label="View all posts with the snowflake tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  snowflake </a><a href="/archive/?tag=spark" aria-label="View all posts with the spark tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  spark </a><a href="/archive/?tag=sql" aria-label="View all posts with the sql tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  sql </a><a href="/archive/?tag=starrocks" aria-label="View all posts with the starrocks tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  starrocks </a><a href="/archive/?tag=STL" aria-label="View all posts with the STL tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  STL </a><a href="/archive/?tag=sync" aria-label="View all posts with the sync tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  sync </a><a href="/archive/?tag=TDD" aria-label="View all posts with the TDD tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  TDD </a><a href="/archive/?tag=tez" aria-label="View all posts with the tez tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  tez </a><a href="/archive/?tag=Thinking" aria-label="View all posts with the Thinking tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Thinking </a><a href="/archive/?tag=Windows" aria-label="View all posts with the Windows tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  Windows </a><a href="/archive/?tag=WSL2" aria-label="View all posts with the WSL2 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  WSL2 </a><a href="/archive/?tag=yarn" aria-label="View all posts with the yarn tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  yarn </a><a href="/archive/?tag=zinx" aria-label="View all posts with the zinx tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  zinx </a><a href="/archive/?tag=zookeeper" aria-label="View all posts with the zookeeper tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  zookeeper </a> </div>  </div> <div class="expand-btn px-4 -mb-2" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <button class="btn-plain rounded-lg w-full h-9" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <div class="text-[var(--primary)] flex items-center justify-center gap-2 -translate-x-2" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <svg width="1em" height="1em" viewBox="0 0 24 24" class="text-[1.75rem]" data-astro-cid-ucso7hve="true" data-icon="material-symbols:more-horiz">   <use href="#ai:material-symbols:more-horiz"></use>  </svg> 更多 </div> </button> </div> </widget-layout>   </div> </div> <main id="swup-container" class="transition-swup-fade col-span-2 lg:col-span-1 overflow-hidden"> <div id="content-wrapper" class="onload-animation"> <!-- the overflow-hidden here prevent long text break the layout--> <!-- make id different from windows.swup global property -->   <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4"> <div id="post-container" class="card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full "> <!-- word count and reading time --> <div class="flex flex-row text-black/30 dark:text-white/30 gap-5 mb-3 transition onload-animation"> <div class="flex flex-row items-center"> <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2"> <svg width="1em" height="1em" data-icon="material-symbols:notes-rounded">   <symbol id="ai:material-symbols:notes-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M4 18q-.425 0-.712-.288T3 17t.288-.712T4 16h10q.425 0 .713.288T15 17t-.288.713T14 18zm0-5q-.425 0-.712-.288T3 12t.288-.712T4 11h16q.425 0 .713.288T21 12t-.288.713T20 13zm0-5q-.425 0-.712-.288T3 7t.288-.712T4 6h16q.425 0 .713.288T21 7t-.288.713T20 8z"/></symbol><use href="#ai:material-symbols:notes-rounded"></use>  </svg> </div> <div class="text-sm">2665  字</div> </div> <div class="flex flex-row items-center"> <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2"> <svg width="1em" height="1em" data-icon="material-symbols:schedule-outline-rounded">   <symbol id="ai:material-symbols:schedule-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M13 11.6V8q0-.425-.288-.712T12 7t-.712.288T11 8v3.975q0 .2.075.388t.225.337l3.3 3.3q.275.275.7.275T16 16t.275-.7t-.275-.7zM12 22q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22m0-2q3.325 0 5.663-2.337T20 12t-2.337-5.663T12 4T6.337 6.338T4 12t2.338 5.663T12 20"/></symbol><use href="#ai:material-symbols:schedule-outline-rounded"></use>  </svg> </div> <div class="text-sm"> 13  分钟 </div> </div> </div> <!-- title --> <div class="relative onload-animation"> <div data-pagefind-body data-pagefind-weight="10" data-pagefind-meta="title" class="transition w-full block font-bold mb-3
+                    text-3xl md:text-[2.25rem]/[2.75rem]
+                    text-black/90 dark:text-white/90
+                    md:before:w-1 before:h-5 before:rounded-md before:bg-[var(--primary)]
+                    before:absolute before:top-[0.75rem] before:left-[-1.125rem]
+                "> HDFS 底层原理与知识要点 </div> </div> <!-- metadata --> <div class="onload-animation"> <div class="flex flex-wrap text-neutral-500 dark:text-neutral-400 items-center gap-4 gap-x-4 gap-y-2 mb-5"> <!-- publish date --> <div class="flex items-center"> <div class="meta-icon"> <svg width="1em" height="1em" class="text-xl" data-icon="material-symbols:calendar-today-outline-rounded">   <symbol id="ai:material-symbols:calendar-today-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V3q0-.425.288-.712T7 2t.713.288T8 3v1h8V3q0-.425.288-.712T17 2t.713.288T18 3v1h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5zM5 8h14V6H5zm0 0V6z"/></symbol><use href="#ai:material-symbols:calendar-today-outline-rounded"></use>  </svg> </div> <span class="text-50 text-sm font-medium">2026-08-08</span> </div> <!-- update date -->  <!-- categories --> <div class="flex items-center"> <div class="meta-icon"> <svg width="1em" height="1em" class="text-xl" data-icon="material-symbols:book-2-outline-rounded">   <symbol id="ai:material-symbols:book-2-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M6 15.325q.35-.175.725-.25T7.5 15H8V4h-.5q-.625 0-1.062.438T6 5.5zM10 15h8V4h-8zm-4 .325V4zM7.5 22q-1.45 0-2.475-1.025T4 18.5v-13q0-1.45 1.025-2.475T7.5 2H18q.825 0 1.413.587T20 4v12.525q0 .2-.162.363t-.588.362q-.35.175-.55.5t-.2.75t.2.763t.55.487t.55.413t.2.562v.25q0 .425-.288.725T19 22zm0-2h9.325q-.15-.35-.237-.712T16.5 18.5q0-.4.075-.775t.25-.725H7.5q-.65 0-1.075.438T6 18.5q0 .65.425 1.075T7.5 20"/></symbol><use href="#ai:material-symbols:book-2-outline-rounded"></use>  </svg> </div> <div class="flex flex-row flex-nowrap items-center"> <a href="/archive/?category=bigdata" aria-label="View all posts in the bigdata category" class="link-lg transition text-50 text-sm font-medium
+                            hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> bigdata </a> </div> </div> <!-- tags --> <div class="items-center flex"> <div class="meta-icon"> <svg width="1em" height="1em" class="text-xl" data-icon="material-symbols:tag-rounded">   <symbol id="ai:material-symbols:tag-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="m9 16l-.825 3.275q-.075.325-.325.525t-.6.2q-.475 0-.775-.375T6.3 18.8L7 16H4.275q-.5 0-.8-.387T3.3 14.75q.075-.35.35-.55t.625-.2H7.5l1-4H5.775q-.5 0-.8-.387T4.8 8.75q.075-.35.35-.55t.625-.2H9l.825-3.275Q9.9 4.4 10.15 4.2t.6-.2q.475 0 .775.375t.175.825L11 8h4l.825-3.275q.075-.325.325-.525t.6-.2q.475 0 .775.375t.175.825L17 8h2.725q.5 0 .8.387t.175.863q-.075.35-.35.55t-.625.2H16.5l-1 4h2.725q.5 0 .8.388t.175.862q-.075.35-.35.55t-.625.2H15l-.825 3.275q-.075.325-.325.525t-.6.2q-.475 0-.775-.375T12.3 18.8L13 16zm.5-2h4l1-4h-4z"/></symbol><use href="#ai:material-symbols:tag-rounded"></use>  </svg> </div> <div class="flex flex-row flex-nowrap items-center"> <div class="hidden mx-1.5 text-[var(--meta-divider)] text-sm">/</div>
+                <a href="/archive/?tag=2026" aria-label="View all posts with the 2026 tag" class="link-lg transition text-50 text-sm font-medium
+                                hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> 2026 </a><div class="mx-1.5 text-[var(--meta-divider)] text-sm">/</div>
+                <a href="/archive/?tag=hdfs" aria-label="View all posts with the hdfs tag" class="link-lg transition text-50 text-sm font-medium
+                                hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> hdfs </a>  </div> </div> </div> <div class="border-[var(--line-divider)] border-dashed border-b-[1px] mb-5"></div> </div> <!-- always show cover as long as it has one -->  <div data-pagefind-body class="prose dark:prose-invert prose-base !max-w-none custom-md mb-6 markdown-content onload-animation"> <!--<div class="prose dark:prose-invert max-w-none custom-md">--> <!--<div class="max-w-none custom-md">-->  <blockquote>
+<p>大数据入门的第一块基石就是 HDFS。作为 Hadoop 的分布式文件系统，它藏了很多”为什么”：为什么块是 128M？为什么写数据要走 pipeline？NameNode 挂了数据会不会丢？这篇文章把 HDFS 的架构、原理、参数和排障经验梳理一遍。</p>
+</blockquote>
+<section><h2 id="核心架构">核心架构<a class="anchor" href="#核心架构"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>HDFS 是主从（Master/Slave）架构，核心角色有三个：NameNode、DataNode，以及辅助的 Secondary NameNode / Standby NameNode。</p><section><h3 id="namenode主节点">NameNode（主节点）<a class="anchor" href="#namenode主节点"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>管理文件系统的命名空间：目录树、文件名、文件与块的映射关系、块与 DataNode 的对应关系</li>
+<li>不存数据本身，只存元数据（Metadata），保存在内存中，由磁盘上的 FsImage + EditsLog 持久化</li>
+<li>响应客户端的读写请求：告诉客户端数据块在哪个 DataNode 上</li>
+<li>是单点（SPOF），依赖 HA 机制或 Secondary NameNode 缓解风险</li>
+</ul><blockquote class="admonition bdm-caution"><span class="bdm-title">CAUTION</span><p>NameNode 一旦丢失元数据（FsImage + EditsLog 全部损坏），整个集群的数据就”找不回来”了，因为块和文件的映射关系没了。所以 name.dir 一定要配置多个目录，最好在不同磁盘甚至不同机器上。</p></blockquote></section><section><h3 id="datanode从节点">DataNode（从节点）<a class="anchor" href="#datanode从节点"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>真正存储数据块的地方，默认块大小 128M，冗余副本默认 3 份</li>
+<li>周期性向 NameNode 发送心跳（默认 3 秒一次）和块报告（BlockReport）</li>
+<li>响应客户端的读写请求，负责数据块的复制、删除、校验</li>
+<li>每个块在磁盘上有两个文件：数据文件（blk_xxx）和校验文件（blk_xxx.meta）</li>
+</ul></section><section><h3 id="secondary-namenode辅助节点">Secondary NameNode（辅助节点）<a class="anchor" href="#secondary-namenode辅助节点"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><p>注意它<strong>不是</strong> NameNode 的热备，不能接管故障：</p><ul>
+<li>定期（默认 1 小时）从 NameNode 拉取 EditsLog，与 FsImage 合并（checkpoint），生成新的 FsImage 回传给 NameNode</li>
+<li>作用是把 NameNode 的 EditLog 控制在一个较小范围，加速 NameNode 重启恢复</li>
+<li>在 HA 架构中，它被 Standby NameNode 取代（Standby 会持续同步元数据，随时可以切换接管）</li>
+</ul></section><section><h3 id="机架感知rack-awareness">机架感知（Rack Awareness）<a class="anchor" href="#机架感知rack-awareness"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>Hadoop 默认认为所有节点在同一个机架，通过配置 <code>topology.script.file.name</code> 或 <code>net.topology.node.switch.mapping.impl</code> 启用</li>
+<li>副本放置策略依赖机架信息：第一个副本放客户端所在节点，第二个副本放同机架不同节点，第三个副本放不同机架节点</li>
+<li>好处：既满足容灾（跨机架），又减少跨机架带宽消耗（读写大多数副本在本机架内）</li>
+</ul></section></section>
+<section><h2 id="读写流程">读写流程<a class="anchor" href="#读写流程"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><section><h3 id="写数据流程pipeline-流水线复制">写数据流程（Pipeline 流水线复制）<a class="anchor" href="#写数据流程pipeline-流水线复制"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ol>
+<li>客户端调用 <code>FileSystem.create()</code>，向 NameNode 发起创建请求</li>
+<li>NameNode 检查权限、路径合法性，返回可写的 DataNode 列表（按机架感知选 3 个）</li>
+<li>客户端按块（128M）写入：把数据切包（packet，默认 64KB），流式推给第一个 DataNode</li>
+<li>第一个 DataNode 边接收边存盘，同时把 packet 转发给第二个，第二个再转发给第三个，形成 pipeline</li>
+<li>每个 DataNode 写完一个 packet 后逐级 ack 回传，客户端收到确认后才发送下一个 packet</li>
+<li>一个块写完，向 NameNode 汇报块完成信息；全部块写完，关闭文件流</li>
+</ol><blockquote class="admonition bdm-note"><span class="bdm-title">NOTE</span><p>pipeline 写入的妙处：3 份副本只需要一份网络流量即可完成（顺序转发），相比”并发写三份”带宽节省显著，代价是写入延迟随副本数增加而略微上升。</p></blockquote></section><section><h3 id="读数据流程就近读取">读数据流程（就近读取）<a class="anchor" href="#读数据流程就近读取"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ol>
+<li>客户端调用 <code>FileSystem.open()</code>，拿到文件的块列表（每个块包含多个副本位置）</li>
+<li>客户端对每个块按”网络距离”排序副本节点：本机 > 同机架 > 同数据中心 > 跨数据中心</li>
+<li>从最近的 DataNode 读取，优先读第一个副本，失败自动切换下一个副本</li>
+<li>读完自动校验 CRC 校验码，不一致会重新选取副本读取</li>
+</ol></section></section>
+<section><h2 id="重要原理机制">重要原理机制<a class="anchor" href="#重要原理机制"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><section><h3 id="块-block128m">块 Block（128M）<a class="anchor" href="#块-block128m"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>默认 128M（旧版本 64M），通过 <code>dfs.blocksize</code> 配置</li>
+<li>大块设计的原因：
+<ul>
+<li>减少元数据量：一个文件块数少，NameNode 内存占用小</li>
+<li>减少寻道次数：块大，一次寻道能读更多连续数据，适合”一次写入、多次读取、大文件流式读”的场景</li>
+<li>便于并行处理：文件被切块后，MapReduce/Spark 可以按块并行处理</li>
+</ul>
+</li>
+</ul><blockquote class="admonition bdm-warning"><span class="bdm-title">WARNING</span><p>块设置不是越大越好：块太大，MapReduce 任务分片粒度变粗，并行度下降；块太小，元数据膨胀。实际业务中小文件多才是更大的问题。</p></blockquote></section><section><h3 id="副本策略">副本策略<a class="anchor" href="#副本策略"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>默认副本数 3（<code>dfs.replication</code>），可对单个文件/目录单独设置（<code>hdfs dfs -setrep</code>）</li>
+<li>放置策略：机架感知（见上文）</li>
+<li>副本冗余的目的是容错 + 就近读取加速</li>
+</ul></section><section><h3 id="心跳与块报告">心跳与块报告<a class="anchor" href="#心跳与块报告"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>DataNode 每 3 秒向 NameNode 发送心跳（<code>dfs.heartbeat.interval</code>），表示”我还活着”</li>
+<li>心跳还携带容量、剩余空间、正在复制的块数等信息，NameNode 据此做负载均衡决策</li>
+<li>DataNode 启动时会向 NameNode 上报全部块列表（块报告），之后周期性增量上报</li>
+<li>超过 <code>dfs.namenode.heartbeat.recheck-interval</code> 判定 DataNode 死亡，将其上的块标记为需要复制</li>
+</ul></section><section><h3 id="安全模式safemode">安全模式（SafeMode）<a class="anchor" href="#安全模式safemode"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>NameNode 启动后先进入安全模式，此时只读，不能写</li>
+<li>等待各 DataNode 上报块报告，达到阈值（<code>dfs.namenode.safemode.threshold-pct</code>，默认 0.999）且副本满足率达标后自动退出</li>
+<li>手动操作：<code>hdfs dfsadmin -safemode enter/leave/get</code></li>
+</ul></section><section><h3 id="元数据管理fsimage--editslog">元数据管理：FsImage + EditsLog<a class="anchor" href="#元数据管理fsimage--editslog"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>内存中的元数据定期落盘为 FsImage（文件系统镜像）</li>
+<li>所有增删改操作先追加写 EditsLog（日志），定期 checkpoint 合并</li>
+<li>设计思路借鉴了传统数据库的 WAL：重启时加载 FsImage + 重放 EditsLog 恢复内存状态</li>
+<li>EditsLog 多目录冗余（<code>dfs.namenode.edits.dir</code>），防止单盘损坏</li>
+</ul></section><section><h3 id="ha-高可用qjm">HA 高可用（QJM）<a class="anchor" href="#ha-高可用qjm"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>两个 NameNode（Active/Standby），Active 对外服务，Standby 热备</li>
+<li>共享存储用 QJM（Quorum Journal Manager）：由 3 个 JournalNode 组成，Active 写 EditsLog 到多数派（2/3），Standby 实时读取并在内存中重放</li>
+<li>ZKFC（ZKFailoverController）借助 ZooKeeper 监控 Active 状态，故障时自动切换</li>
+<li>切换时靠 <strong>fencing（隔离）</strong> 防止脑裂：比如 kill 掉旧 Active 的进程、踢出共享存储，确保同时只有一个 Active</li>
+</ul><blockquote class="admonition bdm-caution"><span class="bdm-title">CAUTION</span><p>脑裂（Split Brain）是最危险的事故：两个 NameNode 同时认为自己是 Active，同时写 EditsLog，元数据会错乱。HA 场景下 fencing 机制必须配置完整，比如 <code>dfs.ha.fencing.methods</code> 要配置 sshfence 或 shell 脚本。</p></blockquote></section><section><h3 id="负载均衡">负载均衡<a class="anchor" href="#负载均衡"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li><code>hdfs balancer</code> 命令触发，按 <code>dfs.datanode.balance.bandwidthPerSec</code> 限速</li>
+<li>均衡目标是让各 DataNode 磁盘使用率接近集群平均值（±5%）</li>
+<li>新节点扩容后通常会执行一次 balancer</li>
+</ul></section></section>
+<section><h2 id="重要参数介绍">重要参数介绍<a class="anchor" href="#重要参数介绍"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>参数</th><th>默认值</th><th>说明</th></tr></thead><tbody><tr><td><code>dfs.replication</code></td><td>3</td><td>默认副本数；带宽有限或测试环境可调低，重要数据可调高</td></tr><tr><td><code>dfs.blocksize</code></td><td>134217728 (128M)</td><td>块大小，新写入生效</td></tr><tr><td><code>dfs.namenode.handler.count</code></td><td>10</td><td>NameNode 处理 RPC 的线程数；机器核多、集群大时适当调大（如 100~200）</td></tr><tr><td><code>dfs.namenode.name.dir</code></td><td>file:///…</td><td>元数据（FsImage+EditsLog）存储目录，配置多个以容灾</td></tr><tr><td><code>dfs.datanode.data.dir</code></td><td>file:///…</td><td>DataNode 数据存储目录，多盘可配置逗号分隔多个目录</td></tr><tr><td><code>dfs.replication.max</code></td><td>512</td><td>单个块最大副本数</td></tr><tr><td><code>dfs.heartbeat.interval</code></td><td>3</td><td>DataNode 心跳间隔（秒）</td></tr><tr><td><code>dfs.namenode.safemode.threshold-pct</code></td><td>0.999</td><td>安全模式退出的块报告比例阈值</td></tr><tr><td><code>dfs.trash.interval</code></td><td>0</td><td>垃圾回收站保留时间（分钟），0 表示关闭</td></tr></tbody></table><section><h3 id="与写入带宽相关的参数">与写入带宽相关的参数<a class="anchor" href="#与写入带宽相关的参数"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li><code>dfs.client.block.write.replace-datanode-on-failure</code>：pipeline 中某个 DataNode 故障时是否更换节点重写</li>
+<li><code>dfs.namenode.replication.work.multiplier.per.iteration</code>：NameNode 每轮心跳下发的复制任务数，影响副本恢复速度</li>
+<li><code>dfs.datanode.handler.count</code>：DataNode 处理读写请求的线程数，调大能提升并发吞吐</li>
+<li>客户端侧：<code>io.file.buffer.size</code>（默认 4KB~128KB）影响读写缓冲区，调大可提升单线程吞吐</li>
+</ul><blockquote class="admonition bdm-tip"><span class="bdm-title">TIP</span><p>垃圾回收站是保命神器：<code>dfs.trash.interval</code> 设为 1440（1 天），用户误删文件后可以在 <code>.Trash</code> 目录里捞回来，HDFS Shell 删文件默认只进回收站，不直接物理删除。</p></blockquote></section></section>
+<section><h2 id="常见问题排查">常见问题排查<a class="anchor" href="#常见问题排查"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><section><h3 id="namenode-启动失败--元数据损坏">NameNode 启动失败 / 元数据损坏<a class="anchor" href="#namenode-启动失败--元数据损坏"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>现象：日志报 <code>No such file or directory</code>、<code>Corrupt image</code>、<code>NameNode format without confirming</code> 等</li>
+<li>排查：
+<ul>
+<li>先看日志 <code>logs/hadoop-hdfs-namenode-xxx.log</code>，确认是镜像文件损坏还是磁盘故障</li>
+<li>用 <code>hdfs fsck / -files -blocks</code> 检查文件系统完整性</li>
+<li>单点环境可以用 Secondary NameNode 的最新 FsImage 恢复；HA 环境直接用 Standby 的元数据</li>
+<li>严重时考虑 <code>hdfs namenode -recover</code>（offline image viewer / edit log viewer 辅助判断）</li>
+</ul>
+</li>
+<li>预防：多目录冗余 + 定期备份 FsImage + 配置 HA</li>
+</ul></section><section><h3 id="datanode-下线decommission">DataNode 下线（Decommission）<a class="anchor" href="#datanode-下线decommission"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>下线流程：<code>hdfs dfsadmin -decommission datanode:50020</code>，NameNode 会把该节点上的块复制到其他节点，完成后状态变为 Decommissioned</li>
+<li>注意事项：
+<ul>
+<li>用 <code>-refresh</code> 刷新超时时间，防止复制未完成被误判</li>
+<li>下线期间观察 <code>hdfs dfsadmin -report</code>，确认副本数恢复后再真正关机</li>
+<li>千万别直接 kill DataNode 进程（块会变”复制中”，触发大量网络复制）</li>
+</ul>
+</li>
+</ul></section><section><h3 id="块丢失missing-blocks">块丢失（Missing Blocks）<a class="anchor" href="#块丢失missing-blocks"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>表现：<code>fsck</code> 报 <code>MISSING</code>，Spark 读数据报 <code>FileNotFoundException</code> 或 <code>ChecksumException</code></li>
+<li>排查：
+<ul>
+<li><code>hdfs fsck / -files -blocks</code> 定位丢失块的文件</li>
+<li>查 <code>hdfs dfsadmin -report</code> 看存活 DataNode 和副本状态</li>
+<li>磁盘坏、节点被误下线、硬件故障是常见原因；副本数 = 1 的文件一旦节点坏必丢</li>
+</ul>
+</li>
+<li>处理：无法恢复的块只能接受文件损坏；关键数据务必副本数 ≥ 3</li>
+</ul></section><section><h3 id="磁盘满disk-full">磁盘满（Disk Full）<a class="anchor" href="#磁盘满disk-full"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>表现：写入报 <code>Disk out of space</code>、<code>No space left on device</code></li>
+<li>排查：
+<ul>
+<li><code>df -h</code> 看 DataNode 数据盘使用率，<code>hdfs dfsadmin -report</code> 看各节点容量</li>
+<li>清理回收站、过期日志、临时文件</li>
+<li>扩容节点后跑 <code>hdfs balancer</code></li>
+</ul>
+</li>
+<li>注意 NameNode 所在盘满会导致元数据写不进去，比数据盘满更危险</li>
+</ul></section><section><h3 id="小文件过多">小文件过多<a class="anchor" href="#小文件过多"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>危害：每个文件、每个块都要占 NameNode 内存（约 150 字节/条目），百万小文件直接打爆 NameNode；MapReduce 每个小文件一个 map，效率极低</li>
+<li>治理：
+<ul>
+<li>写入侧：合并写入（SequenceFile / ORC / Parquet 大文件）</li>
+<li>存量侧：用 Spark 或 <code>hadoop archive -archiveName</code>（HAR）合并归档</li>
+<li>配合 <code>dfs.namenode.handler.count</code> 调大缓解压力</li>
+</ul>
+</li>
+</ul></section><section><h3 id="脑裂split-brain">脑裂（Split Brain）<a class="anchor" href="#脑裂split-brain"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>表现：两个 Active 同时出现，元数据双写错乱</li>
+<li>排查：检查 ZKFC 日志、fencing 脚本执行情况、网络分区是否恢复</li>
+<li>处理：第一时间停掉一个 NameNode，用 <code>hdfs haadmin -failover</code> 强制切换，之后从完好的元数据恢复</li>
+</ul></section><section><h3 id="安全模式卡住">安全模式卡住<a class="anchor" href="#安全模式卡住"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h3><ul>
+<li>现象：<code>SafeMode is ON</code> 一直不退出，无法写数据</li>
+<li>原因：DataNode 还没全部汇报完、块副本不足、或阈值配置不对</li>
+<li>处理：
+<ul>
+<li><code>hdfs dfsadmin -report</code> 看副本满足率</li>
+<li>等 DataNode 上线后自动退出；确认无丢失后可 <code>hdfs dfsadmin -safemode leave</code>（慎用）</li>
+</ul>
+</li>
+</ul><blockquote class="admonition bdm-note"><span class="bdm-title">NOTE</span><p>排障通用口诀：先看 NameNode/DataNode 日志，再 <code>hdfs dfsadmin -report</code> 看集群健康，最后 <code>hdfs fsck /</code> 定位具体问题路径。日志永远是最先要看的。</p></blockquote></section></section>
+<section><h2 id="小结">小结<a class="anchor" href="#小结"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>HDFS 的核心心智模型就三句话：<strong>元数据与数据分离</strong>（NameNode 管元数据、DataNode 管数据）、<strong>块 + 副本</strong>（128M 大块、3 副本、机架感知）、<strong>WAL 思路</strong>（EditsLog + FsImage 持久化元数据）。把这三点吃透，再看读写流程、HA、参数和排障，都会顺理成章。</p></section>  </div> <script type="module">document.addEventListener("click",function(s){const t=s.target;if(t&&t.classList.contains("copy-btn")){const c=t.closest("pre")?.querySelector("code"),i=Array.from(c?.querySelectorAll(".code:not(summary *)")??[]).map(e=>e.textContent).map(e=>e===`
+`?"":e).join(`
+`);navigator.clipboard.writeText(i);const o=t.getAttribute("data-timeout-id");o&&clearTimeout(parseInt(o)),t.classList.add("success");const n=setTimeout(()=>{t.classList.remove("success")},1e3);t.setAttribute("data-timeout-id",n.toString())}});</script> <div class="relative transition overflow-hidden bg-[var(--license-block-bg)] py-5 px-6 mb-6 rounded-xl license-container onload-animation"> <div class="transition font-bold text-black/75 dark:text-white/75"> HDFS 底层原理与知识要点 </div> <a href="https://chaggle.github.io/posts/2026/08/09/hdfs-principles/" class="link text-[var(--primary)]"> https://chaggle.github.io/posts/2026/08/09/hdfs-principles/ </a> <div class="flex gap-6 mt-2"> <div> <div class="transition text-black/30 dark:text-white/30 text-sm">作者</div> <div class="transition text-black/75 dark:text-white/75 line-clamp-2">chaggle</div> </div> <div> <div class="transition text-black/30 dark:text-white/30 text-sm">发布于</div> <div class="transition text-black/75 dark:text-white/75 line-clamp-2">2026-08-08</div> </div> <div> <div class="transition text-black/30 dark:text-white/30 text-sm">许可协议</div> <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" class="link text-[var(--primary)] line-clamp-2">CC BY-NC-SA 4.0</a> </div> </div> <svg width="0.97em" height="1em" class="transition text-[15rem] absolute pointer-events-none right-6 top-1/2 -translate-y-1/2 text-black/5 dark:text-white/5" data-icon="fa6-brands:creative-commons">   <symbol id="ai:fa6-brands:creative-commons" viewBox="0 0 496 512"><path fill="currentColor" d="m245.83 214.87l-33.22 17.28c-9.43-19.58-25.24-19.93-27.46-19.93c-22.13 0-33.22 14.61-33.22 43.84c0 23.57 9.21 43.84 33.22 43.84c14.47 0 24.65-7.09 30.57-21.26l30.55 15.5c-6.17 11.51-25.69 38.98-65.1 38.98c-22.6 0-73.96-10.32-73.96-77.05c0-58.69 43-77.06 72.63-77.06c30.72-.01 52.7 11.95 65.99 35.86m143.05 0l-32.78 17.28c-9.5-19.77-25.72-19.93-27.9-19.93c-22.14 0-33.22 14.61-33.22 43.84c0 23.55 9.23 43.84 33.22 43.84c14.45 0 24.65-7.09 30.54-21.26l31 15.5c-2.1 3.75-21.39 38.98-65.09 38.98c-22.69 0-73.96-9.87-73.96-77.05c0-58.67 42.97-77.06 72.63-77.06c30.71-.01 52.58 11.95 65.56 35.86M247.56 8.05C104.74 8.05 0 123.11 0 256.05c0 138.49 113.6 248 247.56 248c129.93 0 248.44-100.87 248.44-248c0-137.87-106.62-248-248.44-248m.87 450.81c-112.54 0-203.7-93.04-203.7-202.81c0-105.42 85.43-203.27 203.72-203.27c112.53 0 202.82 89.46 202.82 203.26c-.01 121.69-99.68 202.82-202.84 202.82"/></symbol><use href="#ai:fa6-brands:creative-commons"></use>  </svg> </div> <div class="giscus mt-6" id="giscus"></div> <script>
+    (function () {
+        const repo = "chaggle/chaggle.github.io";
+        const repoId = "R_kgDOHgSL5w";
+        const category = "General";
+        const categoryId = "DIC_kwDOHgSL584DD3ot";
+
+        function resolveTheme() {
+            const t = localStorage.getItem("theme") || "auto";
+            if (t === "dark") return "dark";
+            if (t === "light") return "light";
+            return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+
+        function applyGiscusTheme() {
+            const frame = document.querySelector("iframe.giscus-frame");
+            if (frame) {
+                frame.contentWindow.postMessage(
+                    { giscus: { setConfig: { theme: resolveTheme() } } },
+                    "https://giscus.app"
+                );
+            }
+        }
+
+        // 观察 Fuwari 暗色模式 class 切换，同步 giscus 主题
+        const observer = new MutationObserver(applyGiscusTheme);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+        const s = document.createElement("script");
+        s.src = "https://giscus.app/client.js";
+        s.setAttribute("data-repo", repo);
+        s.setAttribute("data-repo-id", repoId);
+        s.setAttribute("data-category", category);
+        s.setAttribute("data-category-id", categoryId);
+        s.setAttribute("data-mapping", "pathname");
+        s.setAttribute("data-strict", "0");
+        s.setAttribute("data-reactions-enabled", "1");
+        s.setAttribute("data-emit-metadata", "0");
+        s.setAttribute("data-input-position", "top");
+        s.setAttribute("data-theme", resolveTheme());
+        s.setAttribute("data-lang", "zh-CN");
+        s.setAttribute("crossorigin", "anonymous");
+        s.async = true;
+        document.getElementById("giscus").appendChild(s);
+    })();
+</script> </div> </div> <div class="flex flex-col md:flex-row justify-between mb-4 gap-4 overflow-hidden w-full"> <a href="/posts/2026/08/09/flink-principles/" class="w-full font-bold overflow-hidden active:scale-95"> <div class="btn-card rounded-2xl w-full h-[3.75rem] max-w-full px-4 flex items-center !justify-start gap-4"> <svg width="1em" height="1em" class="text-[2rem] text-[var(--primary)]" data-icon="material-symbols:chevron-left-rounded">   <symbol id="ai:material-symbols:chevron-left-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="m10.8 12l3.9 3.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-4.6-4.6q-.15-.15-.212-.325T8.425 12t.063-.375t.212-.325l4.6-4.6q.275-.275.7-.275t.7.275t.275.7t-.275.7z"/></symbol><use href="#ai:material-symbols:chevron-left-rounded"></use>  </svg> <div class="overflow-hidden transition overflow-ellipsis whitespace-nowrap max-w-[calc(100%_-_3rem)] text-black/75 dark:text-white/75"> Flink 底层原理与知识要点 </div> </div> </a> <a href="/posts/2026/08/09/hive-principles/" class="w-full font-bold overflow-hidden active:scale-95"> <div class="btn-card rounded-2xl w-full h-[3.75rem] max-w-full px-4 flex items-center !justify-end gap-4"> <div class="overflow-hidden transition overflow-ellipsis whitespace-nowrap max-w-[calc(100%_-_3rem)] text-black/75 dark:text-white/75"> Hive 底层原理与知识要点 </div> <svg width="1em" height="1em" viewBox="0 0 24 24" class="text-[2rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg> </div> </a> </div>  <div class="footer col-span-2 onload-animation hidden lg:block"> <!--<div class="border-t border-[var(&#45;&#45;primary)] mx-16 border-dashed py-8 max-w-[var(&#45;&#45;page-width)] flex flex-col items-center justify-center px-6">--><div class="transition border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-32"></div> <!--<div class="transition bg-[oklch(92%_0.01_var(&#45;&#45;hue))] dark:bg-black rounded-2xl py-8 mt-4 mb-8 flex flex-col items-center justify-center px-6">--> <div class="transition border-dashed border-[oklch(85%_0.01_var(--hue))] dark:border-white/15 rounded-2xl mb-12 flex flex-col items-center justify-center px-6"> <div class="transition text-50 text-sm text-center">
+&copy; <span id="copyright-year">2026</span> chaggle. All Rights Reserved. /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/rss.xml">RSS</a> /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/sitemap-index.xml">Sitemap</a><br>
+Powered by
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://astro.build">Astro</a> &
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a> </div> </div> </div> </div> </main> <div class="footer col-span-2 onload-animation block lg:hidden"> <!--<div class="border-t border-[var(&#45;&#45;primary)] mx-16 border-dashed py-8 max-w-[var(&#45;&#45;page-width)] flex flex-col items-center justify-center px-6">--><div class="transition border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-32"></div> <!--<div class="transition bg-[oklch(92%_0.01_var(&#45;&#45;hue))] dark:bg-black rounded-2xl py-8 mt-4 mb-8 flex flex-col items-center justify-center px-6">--> <div class="transition border-dashed border-[oklch(85%_0.01_var(--hue))] dark:border-white/15 rounded-2xl mb-12 flex flex-col items-center justify-center px-6"> <div class="transition text-50 text-sm text-center">
+&copy; <span id="copyright-year">2026</span> chaggle. All Rights Reserved. /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/rss.xml">RSS</a> /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/sitemap-index.xml">Sitemap</a><br>
+Powered by
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://astro.build">Astro</a> &
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a> </div> </div> </div> </div> <!-- There can't be a filter on parent element, or it will break `fixed` --><div class="back-to-top-wrapper hidden lg:block" data-astro-cid-eymb5ayk> <div id="back-to-top-btn" class="back-to-top-btn hide flex items-center rounded-2xl overflow-hidden transition" onclick="backToTop()" data-astro-cid-eymb5ayk> <button aria-label="Back to Top" class="btn-card h-[3.75rem] w-[3.75rem]" data-astro-cid-eymb5ayk> <svg width="1em" height="1em" class="mx-auto" data-astro-cid-eymb5ayk="true" data-icon="material-symbols:keyboard-arrow-up-rounded">   <symbol id="ai:material-symbols:keyboard-arrow-up-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="m12 10.8l-3.9 3.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.6-4.6q.3-.3.7-.3t.7.3l4.6 4.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275z"/></symbol><use href="#ai:material-symbols:keyboard-arrow-up-rounded"></use>  </svg> </button> </div> </div>  <script>
+function backToTop() {
+    window.scroll({ top: 0, behavior: 'smooth' });
+}
+</script> </div> </div>  <div class="absolute w-full z-0 hidden 2xl:block"> <div class="relative max-w-[var(--page-width)] mx-auto"> <!-- TOC component --> <div id="toc-wrapper" class="hidden lg:block transition absolute top-0 -right-[var(--toc-width)] w-[var(--toc-width)] items-center"> <div id="toc-inner-wrapper" class="fixed top-14 w-[var(--toc-width)] h-[calc(100vh_-_20rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar"> <div id="toc" class="w-full h-full transition-swup-fade "> <div class="h-8 w-full"></div> <table-of-contents class="group"><a href="#核心架构" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">1</div><div class="transition text-sm text-50">核心架构</div></a><a href="#namenode主节点" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">NameNode（主节点）</div></a><a href="#datanode从节点" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">DataNode（从节点）</div></a><a href="#secondary-namenode辅助节点" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">Secondary NameNode（辅助节点）</div></a><a href="#机架感知rack-awareness" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">机架感知（Rack Awareness）</div></a><a href="#读写流程" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">2</div><div class="transition text-sm text-50">读写流程</div></a><a href="#写数据流程pipeline-流水线复制" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">写数据流程（Pipeline 流水线复制）</div></a><a href="#读数据流程就近读取" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">读数据流程（就近读取）</div></a><a href="#重要原理机制" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">3</div><div class="transition text-sm text-50">重要原理机制</div></a><a href="#块-block128m" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">块 Block（128M）</div></a><a href="#副本策略" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">副本策略</div></a><a href="#心跳与块报告" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">心跳与块报告</div></a><a href="#安全模式safemode" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">安全模式（SafeMode）</div></a><a href="#元数据管理fsimage--editslog" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">元数据管理：FsImage + EditsLog</div></a><a href="#ha-高可用qjm" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">HA 高可用（QJM）</div></a><a href="#负载均衡" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">负载均衡</div></a><a href="#重要参数介绍" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">4</div><div class="transition text-sm text-50">重要参数介绍</div></a><a href="#与写入带宽相关的参数" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">与写入带宽相关的参数</div></a><a href="#常见问题排查" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">5</div><div class="transition text-sm text-50">常见问题排查</div></a><a href="#namenode-启动失败--元数据损坏" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">NameNode 启动失败 / 元数据损坏</div></a><a href="#datanode-下线decommission" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">DataNode 下线（Decommission）</div></a><a href="#块丢失missing-blocks" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">块丢失（Missing Blocks）</div></a><a href="#磁盘满disk-full" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">磁盘满（Disk Full）</div></a><a href="#小文件过多" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">小文件过多</div></a><a href="#脑裂split-brain" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">脑裂（Split Brain）</div></a><a href="#安全模式卡住" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">安全模式卡住</div></a><a href="#小结" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">6</div><div class="transition text-sm text-50">小结</div></a><div id="active-indicator" style="opacity: 0" class="-z-10 absolute bg-[var(--toc-btn-hover)] left-0 right-0 rounded-xl transition-all group-hover:bg-transparent border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed"></div></table-of-contents><script type="module">class l extends HTMLElement{tocEl=null;visibleClass="visible";observer;anchorNavTarget=null;headingIdxMap=new Map;headings=[];sections=[];tocEntries=[];active=[];activeIndicator=null;constructor(){super(),this.observer=new IntersectionObserver(this.markVisibleSection,{threshold:0})}markVisibleSection=t=>{t.forEach(e=>{const i=e.target.children[0]?.getAttribute("id"),s=i?this.headingIdxMap.get(i):void 0;s!=null&&(this.active[s]=e.isIntersecting),e.isIntersecting&&this.anchorNavTarget==e.target.firstChild&&(this.anchorNavTarget=null)}),this.active.includes(!0)||this.fallback(),this.update()};toggleActiveHeading=()=>{let t=this.active.length-1,e=this.active.length-1,i=-1;for(;t>=0&&!this.active[t];)this.tocEntries[t].classList.remove(this.visibleClass),t--;for(;t>=0&&this.active[t];)this.tocEntries[t].classList.add(this.visibleClass),e=Math.min(e,t),i=Math.max(i,t),t--;for(;t>=0;)this.tocEntries[t].classList.remove(this.visibleClass),t--;if(e>i)this.activeIndicator?.setAttribute("style","opacity: 0");else{let s=this.tocEl?.getBoundingClientRect().top||0,n=this.tocEl?.scrollTop||0,o=this.tocEntries[e].getBoundingClientRect().top-s+n,c=this.tocEntries[i].getBoundingClientRect().bottom-s+n;this.activeIndicator?.setAttribute("style",`top: ${o}px; height: ${c-o}px`)}};scrollToActiveHeading=()=>{if(this.anchorNavTarget||!this.tocEl)return;const t=document.querySelectorAll(`#toc .${this.visibleClass}`);if(!t.length)return;const e=t[0],i=t[t.length-1],s=this.tocEl.clientHeight;let n;i.getBoundingClientRect().bottom-e.getBoundingClientRect().top<.9*s?n=e.offsetTop-32:n=i.offsetTop-s*.8,this.tocEl.scrollTo({top:n,left:0,behavior:"smooth"})};update=()=>{requestAnimationFrame(()=>{this.toggleActiveHeading(),this.scrollToActiveHeading()})};fallback=()=>{if(this.sections.length)for(let t=0;t<this.sections.length;t++){let e=this.sections[t].getBoundingClientRect().top,i=this.sections[t].getBoundingClientRect().bottom;if(this.isInRange(e,0,window.innerHeight)||this.isInRange(i,0,window.innerHeight)||e<0&&i>window.innerHeight)this.markActiveHeading(t);else if(e>window.innerHeight)break}};markActiveHeading=t=>{this.active[t]=!0};handleAnchorClick=t=>{const e=t.composedPath().find(i=>i instanceof HTMLAnchorElement);if(e){const i=decodeURIComponent(e.hash?.substring(1)),s=this.headingIdxMap.get(i);s!==void 0?this.anchorNavTarget=this.headings[s]:this.anchorNavTarget=null}};isInRange(t,e,i){return e<t&&t<i}connectedCallback(){const t=document.querySelector(".prose");t?t.addEventListener("animationend",()=>{this.init()},{once:!0}):console.debug("Animation element not found")}init(){if(this.tocEl=document.getElementById("toc-inner-wrapper"),!!this.tocEl&&(this.tocEl.addEventListener("click",this.handleAnchorClick,{capture:!0}),this.activeIndicator=document.getElementById("active-indicator"),this.tocEntries=Array.from(document.querySelectorAll("#toc a[href^='#']")),this.tocEntries.length!==0)){this.sections=new Array(this.tocEntries.length),this.headings=new Array(this.tocEntries.length);for(let t=0;t<this.tocEntries.length;t++){const e=decodeURIComponent(this.tocEntries[t].hash?.substring(1)),i=document.getElementById(e),s=i?.parentElement;i instanceof HTMLElement&&s instanceof HTMLElement&&(this.headings[t]=i,this.sections[t]=s,this.headingIdxMap.set(e,t))}this.active=new Array(this.tocEntries.length).fill(!1),this.sections.forEach(t=>this.observer.observe(t)),this.fallback(),this.update()}}disconnectedCallback(){this.sections.forEach(t=>this.observer.unobserve(t)),this.observer.disconnect(),this.tocEl?.removeEventListener("click",this.handleAnchorClick)}}customElements.get("table-of-contents")||customElements.define("table-of-contents",l);</script> <div class="h-8 w-full"></div> </div> </div> </div> <!-- #toc needs to exist for Swup to work normally -->  </div> </div>  <!-- increase the page height during page transition to prevent the scrolling animation from jumping --> <div id="page-height-extend" class="hidden h-[300vh]" data-astro-cid-sckkx6r4 style="--bannerOffset: 15vh;--banner-height-home: 65vh;--banner-height: 35vh;--configHue: 230;--page-width: 75rem;"></div>  <script type="module" src="/_astro/Layout.astro_astro_type_script_index_0_lang.DAHrxWCB.js"></script> <script type="module" src="/_astro/Layout.astro_astro_type_script_index_1_lang.DlBknloJ.js"></script></body></html>
