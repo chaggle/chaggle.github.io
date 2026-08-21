@@ -1,16 +1,18 @@
 ---
 // Giscus 评论区（基于 GitHub Discussions）
 // 评论数据存储在 chaggle/chaggle.github.io 仓库的 Discussions 中
-const repo = "chaggle/chaggle.github.io";
-const repoId = "R_kgDOHgSL5w";
-const category = "General";
-const categoryId = "DIC_kwDOHgSL584DD3ot";
+// 注意：is:inline 脚本无法引用 frontmatter 变量，参数必须硬编码在脚本内
 ---
 
 <div class="giscus mt-6" id="giscus"></div>
 
 <script is:inline>
     (function () {
+        const repo = "chaggle/chaggle.github.io";
+        const repoId = "R_kgDOHgSL5w";
+        const category = "General";
+        const categoryId = "DIC_kwDOHgSL584DD3ot";
+
         function resolveTheme() {
             const t = localStorage.getItem("theme") || "auto";
             if (t === "dark") return "dark";
