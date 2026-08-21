@@ -75,6 +75,14 @@ draft: true                    # true = 草稿：本地可见，线上不发布
 | `> [!NOTE]` 等 | GitHub 风格提示框也支持 |
 | 标准 Markdown | 表格、引用、任务列表等全部支持 |
 
+### 评论区
+
+文章底部已集成 **Giscus** 评论（基于 GitHub Discussions）：
+
+- 评论数据存在本仓库的 **Discussions** 页签里，直接在 GitHub 上管理/删除
+- 访客首次评论时用 GitHub 账号授权即可，无需注册
+- 评论区自动跟随博客的亮/暗色主题
+
 ---
 
 ## 发布
