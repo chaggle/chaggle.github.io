@@ -1,0 +1,1179 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/09/bigdata/datasophon-local-vs-remote-20260810/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="上一篇《DataSophon 部署大数据组件》基于本地私有工程（2.0.0）。本文将其与 GitHub 公开仓库 88fantasy&#x2F;datasophon（3.0-SNAPSHOT，深度定制分支）做全面对比：技术栈、通信架构、组件清单、参数模型，并给出”要不要升、怎么升”的决策与迁移思路。  一、两个工程的定位   工程 版本 来源 定位    本地工程（IdeaProjects&#x2F;datasop">
+<meta property="og:type" content="article">
+<meta property="og:title" content="本地 DataSophon 与开源增强版对比及升级思路">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/09/bigdata/datasophon-local-vs-remote-20260810/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="上一篇《DataSophon 部署大数据组件》基于本地私有工程（2.0.0）。本文将其与 GitHub 公开仓库 88fantasy&#x2F;datasophon（3.0-SNAPSHOT，深度定制分支）做全面对比：技术栈、通信架构、组件清单、参数模型，并给出”要不要升、怎么升”的决策与迁移思路。  一、两个工程的定位   工程 版本 来源 定位    本地工程（IdeaProjects&#x2F;datasop">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-09T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T16:02:21.195Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="datasophon">
+<meta property="article:tag" content="升级">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>本地 DataSophon 与开源增强版对比及升级思路 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="本地 DataSophon 与开源增强版对比及升级思路"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-09 16:00" pubdate>
+          2026年8月9日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          42 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">本地 DataSophon 与开源增强版对比及升级思路</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-11T00:02:21+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>上一篇《DataSophon 部署大数据组件》基于本地私有工程（2.0.0）。本文将其与 GitHub 公开仓库 <code>88fantasy/datasophon</code>（3.0-SNAPSHOT，深度定制分支）做全面对比：技术栈、通信架构、组件清单、参数模型，并给出”要不要升、怎么升”的决策与迁移思路。</p>
+</blockquote>
+<h2 id="一、两个工程的定位"><a href="#一、两个工程的定位" class="headerlink" title="一、两个工程的定位"></a>一、两个工程的定位</h2><table>
+<thead>
+<tr>
+<th>工程</th>
+<th>版本</th>
+<th>来源</th>
+<th>定位</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>本地工程（<code>IdeaProjects/datasophon</code>）</td>
+<td>2.0.0（feature-V2.0.0）</td>
+<td>企业内网私有</td>
+<td>生产定制版：达梦数据库集成、21 组件、历经多年生产验证</td>
+</tr>
+<tr>
+<td>开源增强版（<code>github.com/88fantasy/datasophon</code>）</td>
+<td>3.0-SNAPSHOT</td>
+<td>公开 GitHub，活跃维护（38+ PR）</td>
+<td>现代化重写：Java 21&#x2F;gRPC&#x2F;K8s&#x2F;OTel&#x2F;Go CLI&#x2F;AI Agent</td>
+</tr>
+</tbody></table>
+<div class="note note-info">
+            <p>网上仓库是”基于上游 Datasophon 的定制分支”，README 明确说明做了 gRPC 替代 Pekko（原 Akka）、CLI Go 重写、Spring Boot 3 升级等改造。它不是原版社区（datasophon-org），而是第三方深度定制的增强分支。</p> 
+          </div>
+
+<h2 id="二、技术栈对比"><a href="#二、技术栈对比" class="headerlink" title="二、技术栈对比"></a>二、技术栈对比</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>本地 2.0.0</th>
+<th>开源增强版 3.0</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>语言</td>
+<td>Java 8</td>
+<td>Java 21</td>
+</tr>
+<tr>
+<td>后端框架</td>
+<td>Spring Boot 2.x</td>
+<td>Spring Boot 3.4.5、MyBatis-Plus 3.5.9、Druid、Flyway 9</td>
+</tr>
+<tr>
+<td>进程通信</td>
+<td>Akka 2.4.20（Akka Remote，2551&#x2F;2552 端口）</td>
+<td>gRPC 1.68（18081&#x2F;18082，grpc-spring-boot-starter）</td>
+</tr>
+<tr>
+<td>前端</td>
+<td>无独立前端模块（配套 UI 项目）</td>
+<td>React 19 + Ant Design Pro + Monaco + AntV X6&#x2F;G6（datasophon-ui）</td>
+</tr>
+<tr>
+<td>数据库</td>
+<td>达梦 DM（定制默认）</td>
+<td>MySQL 8 + Flyway 迁移（1.1.0 → 2.1.0 全链路迁移脚本）</td>
+</tr>
+<tr>
+<td>任务编排</td>
+<td>Akka Actor + DAG 构建</td>
+<td>RepoDAG + @Async + @Scheduled 巡检</td>
+</tr>
+<tr>
+<td>部署形态</td>
+<td>裸机脚本（datasophon-api.sh）</td>
+<td>裸机 &#x2F; Docker &#x2F; Docker Compose &#x2F; K8s manifest 四选一</td>
+</tr>
+<tr>
+<td>CLI</td>
+<td>无</td>
+<td>datasophon-cli-go（Go 1.21，节点初始化 33 步、断点续跑、–dry-run）</td>
+</tr>
+<tr>
+<td>K8s</td>
+<td>不支持</td>
+<td>datasophon-k8s-agent（RSA 签名鉴权）+ Helm + K8sServiceInstance</td>
+</tr>
+<tr>
+<td>可观测</td>
+<td>Prometheus&#x2F;Grafana&#x2F;AlertManager + JMX</td>
+<td>上者 + OTel Collector 生态 + Loki&#x2F;Promtail（otel 改造分支）</td>
+</tr>
+<tr>
+<td>AI 能力</td>
+<td>无</td>
+<td>datasophon-ai-agent 模块</td>
+</tr>
+</tbody></table>
+<div class="note note-warning">
+            <p><strong>技术栈差异是升级的根本成本</strong>：本地是 Java 8 + Akka 2.4.20 时代（Spring Boot 2 已停止社区维护），网上是 Java 21 + Spring Boot 3 + gRPC 的现代架构。这不是”换个版本号”，而是两次技术代际的跨越，Worker 与 Master 的通信协议完全不同（Akka 序列化 vs Protobuf）。</p> 
+          </div>
+
+<h2 id="三、组件能力对比"><a href="#三、组件能力对比" class="headerlink" title="三、组件能力对比"></a>三、组件能力对比</h2><h3 id="本地-2-0-0（DDP-2-0-0，21-个）"><a href="#本地-2-0-0（DDP-2-0-0，21-个）" class="headerlink" title="本地 2.0.0（DDP-2.0.0，21 个）"></a>本地 2.0.0（DDP-2.0.0，21 个）</h3><p>ZK 3.6.4、HDFS 3.3.6、YARN 3.3.6、Hive 3.1.3、Spark3 3.4.3、Flink 1.16.2、Kafka 2.8.2、Tez 0.10.4、HBase 2.4.16、Doris 1.2.6、DS 3.1.8、Kyuubi 1.7.3、Ranger 2.1.0、Kerberos 1.15.1、Trino 367、ES 7.16.2、Iceberg 1.4.0、StreamPark 2.1.1、Prometheus、Grafana 11.2.1、AlertManager</p>
+<h3 id="开源增强版-3-0（27-个）"><a href="#开源增强版-3-0（27-个）" class="headerlink" title="开源增强版 3.0（27+ 个）"></a>开源增强版 3.0（27+ 个）</h3><p>HDFS 3.5.0、YARN、Spark3、Flink、Hive、Kyuubi、Kafka、ZK、Doris、DS、ES、<strong>Gravitino</strong>、<strong>JuiceFS</strong>、<strong>Nacos</strong>、<strong>Nginx</strong>、<strong>OTelCollector</strong>、<strong>Valkey</strong>、<strong>APISIX</strong>、<strong>Datart</strong>、<strong>MinIO</strong>、<strong>ETCD</strong>、<strong>USCHEDULER</strong>、<strong>Loki&#x2F;Promtail</strong>、<strong>Redis</strong>、<strong>Amoro</strong>、<strong>StarRocks</strong>（Doris 兼容）等</p>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>本地独有</th>
+<th>网上独有</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>安全体系</td>
+<td><strong>Kerberos、Ranger</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td>计算</td>
+<td>Tez、Trino、Iceberg</td>
+<td>Gravitino（元数据）、Amoro</td>
+</tr>
+<tr>
+<td>存储</td>
+<td>HBase</td>
+<td>JuiceFS、MinIO</td>
+</tr>
+<tr>
+<td>消息&#x2F;协调</td>
+<td>StreamPark</td>
+<td>Nacos、ETCD、USCHEDULER</td>
+</tr>
+<tr>
+<td>网关&#x2F;缓存</td>
+<td>—</td>
+<td>APISIX、Nginx、Valkey（Redis 兼容）、Redis</td>
+</tr>
+<tr>
+<td>BI&#x2F;可观测</td>
+<td>—</td>
+<td>Datart、OTelCollector、Loki&#x2F;Promtail</td>
+</tr>
+</tbody></table>
+<div class="note note-danger">
+            <p><strong>组件清单是升级决策的最大变量</strong>：本地独有的 Kerberos&#x2F;Ranger（安全体系）与 Tez&#x2F;Trino&#x2F;HBase 等组件在 3.0 的 meta 中<strong>没有定义</strong>。升级到 3.0 意味着这些组件的部署能力需要重新开发移植，而安全体系（Kerberos&#x2F;Ranger）往往是政企场景的硬要求。</p> 
+          </div>
+
+<h2 id="四、服务定义与参数模型演进"><a href="#四、服务定义与参数模型演进" class="headerlink" title="四、服务定义与参数模型演进"></a>四、服务定义与参数模型演进</h2><p>两个版本都采用”service_ddl.json + worker 策略类”的元数据驱动模型，但参数定义字段有演进：</p>
+<figure class="highlight jsonc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs jsonc"><span class="hljs-comment">// 本地 2.0.0</span><br><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;dfs.namenode.handler.count&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;label&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;NameNode处理线程池大小&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;slider&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;configType&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span>          <span class="hljs-comment">// ha/path/map/rack/kb/permission/custom 归属</span><br>  <span class="hljs-attr">&quot;configurableInWizard&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;defaultValue&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;16&quot;</span><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-comment">// 开源增强版 3.0</span><br><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;dfs.namenode.handler.count&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;configName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;dfs.namenode.handler.count&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;required&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;minValue&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;maxValue&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">128</span><span class="hljs-punctuation">,</span>           <span class="hljs-comment">// 参数校验上下界</span><br>  <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;slider&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;configurableInWizard&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;defaultValue&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;16&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>演进点</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>参数校验</td>
+<td>3.0 增加 <code>required</code> &#x2F; <code>minValue</code> &#x2F; <code>maxValue</code>，前端可做输入校验</td>
+</tr>
+<tr>
+<td><code>arch</code> 字段</td>
+<td>3.0 服务定义支持 <code>arch</code>（x86&#x2F;arm），延续混合架构部署能力</td>
+</tr>
+<tr>
+<td>角色扩展</td>
+<td>HDFS 在 3.0 增加 HttpFs 角色，本地无</td>
+</tr>
+<tr>
+<td>元数据位置</td>
+<td>本地 <code>meta/DDP-2.0.0/</code>，3.0 为 <code>package/raw/meta/datacluster-physical/</code>（物理集群）并预留 datacluster-k8s 形态</td>
+</tr>
+</tbody></table>
+<div class="note note-info">
+            <p><strong>好消息</strong>：两版的 service_ddl.json 结构同源（name&#x2F;roles&#x2F;parameters&#x2F;configurableInWizard），组件定义迁移是”字段级适配”而非重写——主要工作是补 <code>required/minValue/maxValue</code> 等校验字段，以及把 configType 分组语义映射到 3.0 的表单组织方式。</p> 
+          </div>
+
+<h2 id="五、升级决策"><a href="#五、升级决策" class="headerlink" title="五、升级决策"></a>五、升级决策</h2><h3 id="何时值得升级"><a href="#何时值得升级" class="headerlink" title="何时值得升级"></a>何时值得升级</h3><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>有 K8s 化诉求（大数据上云、多集群、容器化）</td>
+<td>值得：3.0 原生支持 K8s Agent + 多形态集群</td>
+</tr>
+<tr>
+<td>需要现代可观测（OTel&#x2F;Loki 链路追踪）</td>
+<td>值得：3.0 已 OTel 化改造</td>
+</tr>
+<tr>
+<td>需要新组件（Gravitino&#x2F;JuiceFS&#x2F;Nacos&#x2F;APISIX&#x2F;Valkey）</td>
+<td>值得：现成定义直接用</td>
+</tr>
+<tr>
+<td>需要 AI Agent 运维能力</td>
+<td>值得：3.0 有 datasophon-ai-agent</td>
+</tr>
+<tr>
+<td>生产已稳定、无上述诉求、强依赖 Kerberos&#x2F;Ranger 安全体系</td>
+<td>暂缓：迁移成本高、收益低</td>
+</tr>
+</tbody></table>
+<h3 id="升级成本评估清单"><a href="#升级成本评估清单" class="headerlink" title="升级成本评估清单"></a>升级成本评估清单</h3><ol>
+<li><strong>通信架构重构</strong>：Akka（2551&#x2F;2552）→ gRPC（18081&#x2F;18082），Worker 侧所有 actor 消息处理需重写为 gRPC 服务</li>
+<li><strong>元数据迁移</strong>：本地达梦库表 → 3.0 MySQL 结构。3.0 自带 Flyway 1.1.0→2.1.0 迁移链，但<strong>不含本地定制库表</strong>（达梦 schema、定制配置表），需自写迁移 SQL</li>
+<li><strong>组件迁移</strong>：21 个 service_ddl.json 逐组件字段适配 + 对应 worker 策略类（<code>*HandlerStrategy</code>）移植；<strong>Kerberos&#x2F;Ranger&#x2F;Tez&#x2F;Trino&#x2F;HBase&#x2F;Iceberg&#x2F;StreamPark 需从零开发</strong>（3.0 无定义）</li>
+<li><strong>DDP 安装包</strong>：本地包与 3.0 组件版本不同（HDFS 3.3.6 vs 3.5.0），需重新准备包与校验</li>
+<li><strong>数据库定制回归</strong>：达梦 → MySQL 的驱动、方言、大小写规则差异</li>
+<li><strong>UI 切换</strong>：配套 UI → React 19 前端，运维习惯与权限流程需要适配</li>
+</ol>
+<h2 id="六、升级路径建议"><a href="#六、升级路径建议" class="headerlink" title="六、升级路径建议"></a>六、升级路径建议</h2><h3 id="路径-A：完整迁移（适合”新集群、无历史包袱”）"><a href="#路径-A：完整迁移（适合”新集群、无历史包袱”）" class="headerlink" title="路径 A：完整迁移（适合”新集群、无历史包袱”）"></a>路径 A：完整迁移（适合”新集群、无历史包袱”）</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">评估（<span class="hljs-number">2</span> 周）→ 元数据迁移（Flyway + 定制 <span class="hljs-keyword">SQL</span>）→ 核心组件迁移<br>→ 缺失组件开发（Kerberos/Ranger 优先）→ 双集群灰度 → 业务切换<br></code></pre></td></tr></table></figure>
+
+<h3 id="路径-B：渐进式（推荐，适合”生产稳定-逐步演进”）"><a href="#路径-B：渐进式（推荐，适合”生产稳定-逐步演进”）" class="headerlink" title="路径 B：渐进式（推荐，适合”生产稳定 + 逐步演进”）"></a>路径 B：渐进式（推荐，适合”生产稳定 + 逐步演进”）</h3><ol>
+<li><strong>阶段一（零风险）</strong>：保持 2.0.0 生产运行，搭一套 3.0 测试集群</li>
+<li><strong>阶段二（验证）</strong>：3.0 上复刻核心链路（ZK→HDFS→YARN→Hive&#x2F;Spark），验证 gRPC 通信、参数渲染、组件兼容</li>
+<li><strong>阶段三（移植）</strong>：把 3.0 的成熟组件定义（如 Gravitiño&#x2F;JuiceFS&#x2F;Nacos）反向移植到 2.0.0 或评估迁移；同步自研 Kerberos&#x2F;Ranger 的 3.0 版定义</li>
+<li><strong>阶段四（切换）</strong>：新业务集群直接用 3.0，老集群按生命周期自然淘汰</li>
+</ol>
+<h3 id="路径-C：不升平台，只升组件"><a href="#路径-C：不升平台，只升组件" class="headerlink" title="路径 C：不升平台，只升组件"></a>路径 C：不升平台，只升组件</h3><p>在 2.0.0 内用 <code>custom.*</code> 扩展参数（<code>multipleWithKey</code> 追加配置）+ 自研 service_ddl.json 补齐组件（Nacos 等），把 3.0 的”组件生态”借过来，平台本体不动。适合”平台稳定、只想加组件”的场景。</p>
+<div class="note note-info">
+            <p>三条路径的共同前提：<strong>先做组件清单对齐</strong>。把两边的服务定义逐项对照（组件名、版本、角色、parameters 数量），输出差异矩阵，作为迁移排期的输入——缺失组件（尤其 Kerberos&#x2F;Ranger 安全体系）的开发工作量决定路径选择，也最难自动化。</p> 
+          </div>
+
+<h2 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h2><ul>
+<li><strong>两者不是版本关系，是代际关系</strong>：本地 2.0.0 是”Java 8&#x2F;Akka&#x2F;裸机”的经典形态，网上 3.0 是”Java 21&#x2F;gRPC&#x2F;K8s&#x2F;OTel”的现代形态</li>
+<li><strong>组件生态各有侧重</strong>：本地强在安全（Kerberos&#x2F;Ranger）与 Hadoop 全家桶，3.0 强在新组件（Gravitino&#x2F;JuiceFS&#x2F;Nacos&#x2F;APISIX）与可观测</li>
+<li><strong>升级的本质是迁移工程</strong>：通信协议、元数据库、组件定义、DDP 包四件事，按”先对齐组件清单、再迁移元数据、最后切业务”的顺序推进</li>
+<li><strong>生产最优解通常是渐进式</strong>：3.0 测试集群先行验证，缺失组件（尤其安全体系）自研移植后再谈切换；平台本体不必追求一步到位</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/datasophon/" class="print-no-link">#datasophon</a>
+      
+        <a href="/tags/%E5%8D%87%E7%BA%A7/" class="print-no-link">#升级</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>本地 DataSophon 与开源增强版对比及升级思路</div>
+      <div>https://chaggle.github.io/2026/08/09/bigdata/datasophon-local-vs-remote-20260810/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月9日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月11日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/09/bigdata/datasophon-deploy-params-20260810/" title="DataSophon 部署大数据组件：参数说明与优化实践">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">DataSophon 部署大数据组件：参数说明与优化实践</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/09/bigdata/hdfs-tuning-20260810/" title="HDFS 生产调优实践">
+                        <span class="hidden-mobile">HDFS 生产调优实践</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '119f01bf1df67855fac2b8ad17e83a07'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,1118 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/08/bigdata/tez-20260809/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="Tez 是 Apache 旗下的 DAG 计算引擎，脱胎于 MapReduce，用于替代 MR 执行多阶段复杂作业。它把”多轮 MR 写盘”改成”一个 DAG 内存流转”，性能提升肉眼可见，也是 Hive 默认执行引擎之一。  一、Tez 的定位与背景MapReduce 的缺陷很明确：一次作业只能表达 Map → Reduce 两个阶段，复杂的分析（比如 Hive SQL）会被翻译成一串串 MR">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tez 底层原理与知识要点">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/08/bigdata/tez-20260809/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="Tez 是 Apache 旗下的 DAG 计算引擎，脱胎于 MapReduce，用于替代 MR 执行多阶段复杂作业。它把”多轮 MR 写盘”改成”一个 DAG 内存流转”，性能提升肉眼可见，也是 Hive 默认执行引擎之一。  一、Tez 的定位与背景MapReduce 的缺陷很明确：一次作业只能表达 Map → Reduce 两个阶段，复杂的分析（比如 Hive SQL）会被翻译成一串串 MR">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-08T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T15:33:41.414Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="tez">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Tez 底层原理与知识要点 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Tez 底层原理与知识要点"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-08 16:00" pubdate>
+          2026年8月8日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          32 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Tez 底层原理与知识要点</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-10T23:33:41+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>Tez 是 Apache 旗下的 DAG 计算引擎，脱胎于 MapReduce，用于替代 MR 执行多阶段复杂作业。它把”多轮 MR 写盘”改成”一个 DAG 内存流转”，性能提升肉眼可见，也是 Hive 默认执行引擎之一。</p>
+</blockquote>
+<h2 id="一、Tez-的定位与背景"><a href="#一、Tez-的定位与背景" class="headerlink" title="一、Tez 的定位与背景"></a>一、Tez 的定位与背景</h2><p>MapReduce 的缺陷很明确：一次作业只能表达 Map → Reduce 两个阶段，复杂的分析（比如 Hive SQL）会被翻译成一串串 MR 作业串行执行，每个 MR 作业的中间结果都要落 HDFS，一轮一轮地读写磁盘，性能极差，而且整个集群的调度开销也被放大。</p>
+<p>Tez 的解决思路：把多个 MR 阶段融合成<strong>一个有向无环图（DAG）</strong>，一次提交、一次调度，顶点之间直接传递数据，能省则省。</p>
+<div class="note note-success">
+            <p>Tez 不是要取代 HDFS&#x2F;Yarn，而是站在它们之上，解决”计算编排”层面的效率问题。它不存数据，只算数据。</p> 
+          </div>
+
+<p>核心收益：</p>
+<ul>
+<li>中间结果尽量留在内存&#x2F;本地磁盘，不写 HDFS</li>
+<li>一个 DAG 一次调度，避免多轮作业的 AM 反复启动</li>
+<li>任务&#x2F;容器复用，减少 JVM 启动开销</li>
+</ul>
+<h2 id="二、核心概念"><a href="#二、核心概念" class="headerlink" title="二、核心概念"></a>二、核心概念</h2><p>Tez 的核心抽象围绕 DAG 展开，先记住这几个词：</p>
+<ul>
+<li><strong>DAG</strong>：整个作业的执行计划图，节点是 Vertex，边是 Edge</li>
+<li><strong>Vertex（顶点）</strong>：一个逻辑阶段，对应 MR 里的 Map 或 Reduce 阶段，也可以对应 Spark 里的 stage 概念</li>
+<li><strong>Edge（边）</strong>：连接两个顶点，描述上游到下游的数据流转方式和数据分布方式</li>
+<li><strong>Task</strong>：顶点的一个并行实例，一个 Vertex 被拆成多个 Task 并行执行</li>
+<li><strong>Container</strong>：Yarn 分配的资源容器，Task 在 Container 里运行</li>
+<li><strong>Session</strong>：Tez 会话，复用 AM 与容器资源的长期运行环境</li>
+</ul>
+<h3 id="Edge-的类型"><a href="#Edge-的类型" class="headerlink" title="Edge 的类型"></a>Edge 的类型</h3><p>Edge 除了描述”谁给谁传数据”，还要声明数据怎么分，常用的有：</p>
+<ul>
+<li><strong>OneToOne（窄依赖）</strong>：上游一个 Task 的输出只发给下游一个 Task，如 Map 到 Map</li>
+<li><strong>Broadcast</strong>：上游每个 Task 的输出广播给下游所有 Task，如小表分发</li>
+<li><strong>ScatterGather（Shuffle）</strong>：上游输出按分区算法打散，下游每个 Task 从所有上游 Task 拉数据，如 Map 到 Reduce</li>
+</ul>
+<div class="note note-info">
+            <p>Edge 的分区器（Partitioner）和排序逻辑都可插拔，这也是 Tez 能支撑多种引擎接入的底气。</p> 
+          </div>
+
+<h2 id="三、执行原理"><a href="#三、执行原理" class="headerlink" title="三、执行原理"></a>三、执行原理</h2><h3 id="1-数据流转：尽量不落盘"><a href="#1-数据流转：尽量不落盘" class="headerlink" title="1. 数据流转：尽量不落盘"></a>1. 数据流转：尽量不落盘</h3><p>传统 MR：Map 输出 → Shuffle 写盘 → Reduce 拉取再写盘。</p>
+<p>Tez：同一 DAG 内，上游 Task 的输出可以<strong>直接通过内存&#x2F;网络传给下游 Task</strong>，只有当数据量超过内存阈值时才落本地磁盘做 spill。只有跨越多个作业（多个 DAG）时才会写 HDFS。</p>
+<h3 id="2-Task-复用与容器复用"><a href="#2-Task-复用与容器复用" class="headerlink" title="2. Task 复用与容器复用"></a>2. Task 复用与容器复用</h3><ul>
+<li><strong>Task 复用</strong>：一个 Task 处理完自己的分片后，如果还有空闲容器，可以继续处理其他分片，减少启动开销</li>
+<li><strong>容器复用（Container Reuse）</strong>：一个 Container 跑完一批 Task 后不销毁，继续加载下一个 Task，避免反复申请资源和启动 JVM</li>
+</ul>
+<p>这两招对”Task 数多但单个 Task 执行快”的场景（比如大量小文件、聚合类 SQL）收益特别大。</p>
+<h3 id="3-动态资源分配"><a href="#3-动态资源分配" class="headerlink" title="3. 动态资源分配"></a>3. 动态资源分配</h3><p>Tez 的 AM 会统计当前 DAG 各顶点的实际执行速度、数据量，动态调整后续顶点的并行度，比如 Shuffle 下游 Reduce 的 Task 数可以根据实际数据量缩放，避免预估不准导致资源浪费或倾斜。</p>
+<h2 id="四、与-MapReduce-的对比"><a href="#四、与-MapReduce-的对比" class="headerlink" title="四、与 MapReduce 的对比"></a>四、与 MapReduce 的对比</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>MapReduce</th>
+<th>Tez</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>作业模型</td>
+<td>单作业两阶段（Map&#x2F;Reduce）</td>
+<td>多阶段 DAG</td>
+</tr>
+<tr>
+<td>中间结果</td>
+<td>每轮写 HDFS</td>
+<td>内存&#x2F;本地流转，尽量不落盘</td>
+</tr>
+<tr>
+<td>调度次数</td>
+<td>每轮作业一次（AM 反复启停）</td>
+<td>整个 DAG 一次</td>
+</tr>
+<tr>
+<td>容器复用</td>
+<td>无</td>
+<td>支持，任务&#x2F;容器级复用</td>
+</tr>
+<tr>
+<td>资源利用</td>
+<td>轮次间有大量空窗</td>
+<td>连续流水线式执行</td>
+</tr>
+<tr>
+<td>复杂 SQL</td>
+<td>翻译成 N 个 MR 串行</td>
+<td>翻译成一个 DAG</td>
+</tr>
+</tbody></table>
+<div class="note note-warning">
+            <p>MR 不是一无是处：单阶段、逻辑简单的作业上两者差距不大，而且 MR 的稳定性经过多年打磨。但凡是多阶段 JOIN&#x2F;聚合类作业，Tez 的收益非常明显。</p> 
+          </div>
+
+<h2 id="五、在-Hive-Spark-中的应用"><a href="#五、在-Hive-Spark-中的应用" class="headerlink" title="五、在 Hive &#x2F; Spark 中的应用"></a>五、在 Hive &#x2F; Spark 中的应用</h2><h3 id="1-Hive-on-Tez"><a href="#1-Hive-on-Tez" class="headerlink" title="1. Hive on Tez"></a>1. Hive on Tez</h3><p>Hive 里一条 SQL 的执行计划（比如 JOIN → GROUP BY → ORDER BY）会被翻译成 Tez DAG，每个 MR 风格的阶段变成 DAG 中的 Vertex，Reduce 阶段之间的 Shuffle 变成 Edge，一次提交执行。</p>
+<p>切换引擎（老版本 Hive 1.x 时代常用）：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SET</span> hive.execution.engine<span class="hljs-operator">=</span>tez;   <span class="hljs-comment">-- tez / mr / spark</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="2-Spark-与-Tez"><a href="#2-Spark-与-Tez" class="headerlink" title="2. Spark 与 Tez"></a>2. Spark 与 Tez</h3><p>Spark 有自己的 DAG 引擎，一般不依赖 Tez。但在部分生态（如老版本 Hive on Spark 之前的过渡期、某些 Impala&#x2F;Athena 变体）里 Tez 仍扮演执行引擎角色。对大数据从业者来说，掌握 Tez 的 DAG 思想能帮助理解 Spark Stage 的划分，两者是同一个思想脉络。</p>
+<h2 id="六、重要参数"><a href="#六、重要参数" class="headerlink" title="六、重要参数"></a>六、重要参数</h2><h3 id="1-资源相关"><a href="#1-资源相关" class="headerlink" title="1. 资源相关"></a>1. 资源相关</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>tez.am.resource.memory.mb</code></td>
+<td>AM 内存，默认 1024，大作业建议调大，否则 AM 频繁 GC 甚至 OOM</td>
+</tr>
+<tr>
+<td><code>tez.task.resource.memory.mb</code></td>
+<td>单个 Task 内存，默认 1024</td>
+</tr>
+<tr>
+<td><code>tez.task.resource.cpu.vcores</code></td>
+<td>单个 Task 虚拟核数，默认 1</td>
+</tr>
+</tbody></table>
+<h3 id="2-复用相关"><a href="#2-复用相关" class="headerlink" title="2. 复用相关"></a>2. 复用相关</h3><ul>
+<li><code>tez.am.container.reuse.enabled</code>：默认 true，开启容器复用</li>
+<li><code>tez.am.container.reuse.rack-fallback.enabled</code>：容器复用落空时是否允许跨机架复用</li>
+</ul>
+<h3 id="3-运行时相关"><a href="#3-运行时相关" class="headerlink" title="3. 运行时相关"></a>3. 运行时相关</h3><ul>
+<li><code>tez.runtime.io.sort.mb</code>：排序缓冲区大小，类似 MR 的 sort.mb，大 shuffle 时可调大</li>
+<li><code>tez.grouping.min-size</code>：Map 端输入分片的最小分组大小，默认 16MB，影响 Input 合并粒度</li>
+<li><code>tez.session.mode</code>：会话模式，取值 <code>strict</code>（独占 AM）&#x2F; <code>nonsession</code>（按作业启停 AM），Hive 通常配合 <code>hive.server2.tez.sessions.per.default.queue</code> 管理常驻 Session</li>
+</ul>
+<h3 id="4-Hive-侧相关"><a href="#4-Hive-侧相关" class="headerlink" title="4. Hive 侧相关"></a>4. Hive 侧相关</h3><ul>
+<li><code>hive.execution.engine</code>：切换执行引擎</li>
+<li><code>hive.tez.container.size</code>：Hive 传给 Tez 的容器内存，常与 <code>tez.task.resource.memory.mb</code> 联动</li>
+</ul>
+<div class="note note-warning">
+            <p>改内存参数时注意和 Yarn 的 <code>yarn.scheduler.maximum-allocation-mb</code> 对齐，Task&#x2F;AM 申请超过队列上限会一直 pending。</p> 
+          </div>
+
+<h2 id="七、常见问题排查"><a href="#七、常见问题排查" class="headerlink" title="七、常见问题排查"></a>七、常见问题排查</h2><h3 id="1-任务启动慢"><a href="#1-任务启动慢" class="headerlink" title="1. 任务启动慢"></a>1. 任务启动慢</h3><p>DAG 调度阶段耗时过长，通常是 AM 申请慢、会话未复用（每次都新建 AM）、队列资源紧张。检查：</p>
+<ul>
+<li>是否启用了 Tez Session（Hive 场景看 <code>hive.server2.tez.sessions</code> 配置）</li>
+<li>Yarn 队列是否打满，AM 是否长时间 pending</li>
+</ul>
+<h3 id="2-AM-内存不足"><a href="#2-AM-内存不足" class="headerlink" title="2. AM 内存不足"></a>2. AM 内存不足</h3><p>日志出现 <code>Container killed by the ResourceManager</code> 或 AM OOM。把 <code>tez.am.resource.memory.mb</code> 调大，同时注意队列最大资源上限。</p>
+<h3 id="3-Tez-Session-未复用"><a href="#3-Tez-Session-未复用" class="headerlink" title="3. Tez Session 未复用"></a>3. Tez Session 未复用</h3><ul>
+<li><code>tez.session.mode</code> 配成了 <code>nonsession</code> 会导致每个查询都新建 AM</li>
+<li>Session 空闲超时被回收，检查 <code>tez.session.am.dag.submit.timeout</code>、<code>hive.server2.tez.sessions.per.default.queue</code></li>
+</ul>
+<h3 id="4-任务失败重试风暴"><a href="#4-任务失败重试风暴" class="headerlink" title="4. 任务失败重试风暴"></a>4. 任务失败重试风暴</h3><p>某个 Task 反复失败重试，占满集群资源。优先看：</p>
+<ul>
+<li>是否数据倾斜导致个别 Task 拉爆内存</li>
+<li>是否有坏节点，Container 反复失败，配合 <code>tez.am.max.task.attempts</code> 限制重试次数</li>
+</ul>
+<h3 id="5-数据倾斜"><a href="#5-数据倾斜" class="headerlink" title="5. 数据倾斜"></a>5. 数据倾斜</h3><p>Shuffle 下游个别 Task 处理量远大于均值。手段：</p>
+<ul>
+<li>开启倾斜优化（Hive 侧 <code>hive.groupby.skewindata=true</code>）</li>
+<li>合理设置分区数，避免 Reduce 数量过少</li>
+<li>大小表 JOIN 用 Broadcast Edge，避免全量 Shuffle</li>
+</ul>
+<h3 id="6-Yarn-资源配额问题"><a href="#6-Yarn-资源配额问题" class="headerlink" title="6. Yarn 资源配额问题"></a>6. Yarn 资源配额问题</h3><p>现象：Tez 作业正常，但提交后一直 ACCEPTED 不运行。检查：</p>
+<ul>
+<li><code>yarn.scheduler.maximum-allocation-mb</code> 是否小于 Tez 申请的内存</li>
+<li>队列容量&#x2F;最大容量是否被其他作业占满</li>
+<li>用户权限：提交的队列是否有访问权限</li>
+</ul>
+<h3 id="7-日志定位（Tez-UI）"><a href="#7-日志定位（Tez-UI）" class="headerlink" title="7. 日志定位（Tez UI）"></a>7. 日志定位（Tez UI）</h3><p>Tez 自带 Web UI（AM 页面），能看 DAG 各顶点耗时、每个 Task 的 Attempt 次数、Shuffle 数据量、反压情况。排查性能问题优先看：</p>
+<ul>
+<li>哪个 Vertex 耗时最长（瓶颈顶点）</li>
+<li>哪些 Task 的 Attempt 数异常（失败重试）</li>
+<li>顶点间传输数据量是否异常（倾斜）</li>
+</ul>
+<h2 id="八、小结"><a href="#八、小结" class="headerlink" title="八、小结"></a>八、小结</h2><div class="note note-success">
+            <p>一句话总结 Tez：<strong>把 MapReduce 的多轮写盘改成一张 DAG 的内存流水线，配合容器&#x2F;任务复用和动态资源，把多阶段计算的速度提上去。</strong> 它是理解 Hive 执行引擎、以及后来自研 DAG 引擎的重要基石。</p> 
+          </div>
+
+<p>学习建议：</p>
+<ul>
+<li>先跑一个 <code>explain</code> 看 Hive on Tez 的 DAG 结构，对照本文概念逐个理解</li>
+<li>出问题时先看 Tez UI，再查参数，不要盲目调内存</li>
+<li>和 Spark Stage&#x2F;Shuffle 对照着学，一通百通</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/tez/" class="print-no-link">#tez</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Tez 底层原理与知识要点</div>
+      <div>https://chaggle.github.io/2026/08/08/bigdata/tez-20260809/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月8日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/08/bigdata/spark-20260809/" title="Spark 底层原理与知识要点">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Spark 底层原理与知识要点</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/08/bigdata/yarn-20260809/" title="Yarn 底层原理与知识要点">
+                        <span class="hidden-mobile">Yarn 底层原理与知识要点</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'ba5197f6dd8ac7b6f6b62cfcdb48bf79'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

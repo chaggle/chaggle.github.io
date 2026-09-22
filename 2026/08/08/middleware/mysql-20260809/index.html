@@ -1,0 +1,1195 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/08/middleware/mysql-20260809/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="本文是对 MySQL 核心知识的系统性总结，覆盖架构、InnoDB 索引、事务与 MVCC、锁、日志、缓冲池以及日常问题排查要点，作为个人技术笔记使用。  整体架构：一条 SQL 是如何执行的MySQL 的架构可以自上而下分为四层：  连接层：负责客户端连接管理、认证授权、线程复用（thread pool） 服务层：SQL 接口、解析器、优化器、执行器、缓存 存储引擎层：可插拔式，常用 Inno">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL 底层原理与知识要点">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/08/middleware/mysql-20260809/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="本文是对 MySQL 核心知识的系统性总结，覆盖架构、InnoDB 索引、事务与 MVCC、锁、日志、缓冲池以及日常问题排查要点，作为个人技术笔记使用。  整体架构：一条 SQL 是如何执行的MySQL 的架构可以自上而下分为四层：  连接层：负责客户端连接管理、认证授权、线程复用（thread pool） 服务层：SQL 接口、解析器、优化器、执行器、缓存 存储引擎层：可插拔式，常用 Inno">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-08T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T15:33:41.425Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>MySQL 底层原理与知识要点 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="MySQL 底层原理与知识要点"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-08 16:00" pubdate>
+          2026年8月8日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          40 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">MySQL 底层原理与知识要点</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-10T23:33:41+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>本文是对 MySQL 核心知识的系统性总结，覆盖架构、InnoDB 索引、事务与 MVCC、锁、日志、缓冲池以及日常问题排查要点，作为个人技术笔记使用。</p>
+</blockquote>
+<h2 id="整体架构：一条-SQL-是如何执行的"><a href="#整体架构：一条-SQL-是如何执行的" class="headerlink" title="整体架构：一条 SQL 是如何执行的"></a>整体架构：一条 SQL 是如何执行的</h2><p>MySQL 的架构可以自上而下分为四层：</p>
+<ul>
+<li><strong>连接层</strong>：负责客户端连接管理、认证授权、线程复用（thread pool）</li>
+<li><strong>服务层</strong>：SQL 接口、解析器、优化器、执行器、缓存</li>
+<li><strong>存储引擎层</strong>：可插拔式，常用 InnoDB、MyISAM</li>
+<li><strong>文件系统层</strong>：数据文件（.ibd）、日志文件（redo&#x2F;binlog）、系统表空间</li>
+</ul>
+<p>一条 SQL 的完整执行流程：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs text">客户端 → 连接器(建立连接/权限校验) → 查询缓存(8.0 已移除)<br>       → 解析器(词法/语法分析，生成语法树)<br>       → 优化器(选择索引、生成执行计划)<br>       → 执行器(调用存储引擎 API，返回结果)<br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>查询缓存 8.0 已被移除，因为任何写操作都会使其大面积失效，维护成本远大于收益。</p> 
+          </div>
+
+<p>各组件职责：</p>
+<ul>
+<li><strong>连接器</strong>：<code>mysql -uroot -p</code> 建立连接，验证用户名密码，连接默认 8 小时空闲自动断开</li>
+<li><strong>解析器</strong>：词法分析拆分关键字，语法分析校验语法，出错报 <code>You have an error in your SQL syntax</code></li>
+<li><strong>优化器</strong>：决定用哪个索引、join 顺序，可通过 <code>explain</code> 观察优化结果</li>
+<li><strong>执行器</strong>：判断权限，调用引擎接口逐行读取数据，<code>rows_examined</code> 统计扫描行数</li>
+</ul>
+<h2 id="InnoDB-存储引擎与-B-树索引"><a href="#InnoDB-存储引擎与-B-树索引" class="headerlink" title="InnoDB 存储引擎与 B+ 树索引"></a>InnoDB 存储引擎与 B+ 树索引</h2><h3 id="为什么是-B-树"><a href="#为什么是-B-树" class="headerlink" title="为什么是 B+ 树"></a>为什么是 B+ 树</h3><ul>
+<li>相比哈希索引，B+ 树支持范围查询与排序</li>
+<li>相比 B 树，B+ 树只有叶子节点存数据，非叶子节点可存放更多索引键，树更矮，IO 次数更少（3~4 层即可支撑千万级数据）</li>
+<li>叶子节点之间通过链表串联，天然支持范围扫描与排序</li>
+</ul>
+<h3 id="聚簇索引与二级索引"><a href="#聚簇索引与二级索引" class="headerlink" title="聚簇索引与二级索引"></a>聚簇索引与二级索引</h3><p>InnoDB 表数据本身按主键组织，主键索引即聚簇索引：</p>
+<ul>
+<li><strong>聚簇索引</strong>：叶子节点直接存放整行数据，主键查找一次 IO 即可拿到数据</li>
+<li><strong>二级索引</strong>：叶子节点存放索引列 + 主键值，查询需要先找主键，再回表查数据</li>
+<li><strong>回表</strong>：通过二级索引查到主键，再回聚簇索引取整行，多一次 IO</li>
+<li><strong>索引覆盖</strong>：select 的列都在索引中，无需回表，<code>explain</code> 中 <code>Using index</code> 即表示覆盖</li>
+</ul>
+<div class="note note-success">
+            <p>主键建议使用自增整数，因为聚簇索引物理有序，随机字符串主键会导致页分裂与碎片。</p> 
+          </div>
+
+<h3 id="联合索引与最左前缀"><a href="#联合索引与最左前缀" class="headerlink" title="联合索引与最左前缀"></a>联合索引与最左前缀</h3><p>联合索引 <code>(a, b, c)</code> 实际上创建了 <code>a</code>、<code>(a,b)</code>、<code>(a,b,c)</code> 三个索引，遵循<strong>最左前缀原则</strong>：</p>
+<ul>
+<li><code>where a=1</code> ✅ 用到索引</li>
+<li><code>where a=1 and b=2</code> ✅ 用到索引</li>
+<li><code>where b=2</code> ❌ 索引失效，因为跳过了最左列</li>
+<li><code>where a=1 and c=3</code> ⚠️ 只用到 a 列，c 列无法用上</li>
+</ul>
+<p>排序字段如果符合最左前缀，还能避免 filesort。</p>
+<h3 id="页结构与行格式"><a href="#页结构与行格式" class="headerlink" title="页结构与行格式"></a>页结构与行格式</h3><ul>
+<li>InnoDB 最小存储单位是<strong>页</strong>，默认 16KB，页内由目录（Page Directory）、用户记录区组成</li>
+<li>页之间通过链表连接，树的高度即索引层数</li>
+<li>行格式默认 <code>DYNAMIC</code>，变长字段（varchar&#x2F;text&#x2F;blob）超长时部分存储在溢出页，页内只存 20 字节指针</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 查看行格式</span><br><span class="hljs-keyword">SHOW</span> <span class="hljs-keyword">TABLE</span> STATUS <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;t_user&#x27;</span>;<br><span class="hljs-comment">-- 查看索引</span><br><span class="hljs-keyword">SHOW</span> INDEX <span class="hljs-keyword">FROM</span> t_user;<br></code></pre></td></tr></table></figure>
+
+<h2 id="事务：ACID-与隔离级别"><a href="#事务：ACID-与隔离级别" class="headerlink" title="事务：ACID 与隔离级别"></a>事务：ACID 与隔离级别</h2><p>事务四大特性：</p>
+<ul>
+<li><strong>原子性 A</strong>：要么全部成功要么全部失败，靠 undo log 回滚</li>
+<li><strong>一致性 C</strong>：事务前后数据总量不变，由其他三个特性共同保证</li>
+<li><strong>隔离性 I</strong>：并发事务互不干扰，靠锁与 MVCC</li>
+<li><strong>持久性 D</strong>：事务提交后不丢失，靠 redo log</li>
+</ul>
+<p>隔离级别（由低到高）：</p>
+<table>
+<thead>
+<tr>
+<th>级别</th>
+<th>脏读</th>
+<th>不可重复读</th>
+<th>幻读</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Read Uncommitted</td>
+<td>可能</td>
+<td>可能</td>
+<td>可能</td>
+</tr>
+<tr>
+<td>Read Committed</td>
+<td>不会</td>
+<td>可能</td>
+<td>可能</td>
+</tr>
+<tr>
+<td>Repeatable Read</td>
+<td>不会</td>
+<td>不会</td>
+<td>可能（InnoDB 通过 next-key lock 解决）</td>
+</tr>
+<tr>
+<td>Serializable</td>
+<td>不会</td>
+<td>不会</td>
+<td>不会</td>
+</tr>
+</tbody></table>
+<div class="note note-warning">
+            <p>MySQL 默认隔离级别是 Repeatable Read，通过间隙锁完全解决了幻读问题，与 Oracle 默认 RC 不同。</p> 
+          </div>
+
+<h2 id="MVCC-原理"><a href="#MVCC-原理" class="headerlink" title="MVCC 原理"></a>MVCC 原理</h2><p>MVCC（多版本并发控制）用于解决读写冲突，实现”读写不阻塞”。</p>
+<h3 id="核心组成"><a href="#核心组成" class="headerlink" title="核心组成"></a>核心组成</h3><ul>
+<li><strong>隐藏字段</strong>：每行有隐藏的 <code>trx_id</code>（最近修改该行的事务 id）、<code>roll_pointer</code>（指向 undo log 版本链）</li>
+<li><strong>undo log</strong>：记录事务修改前的数据，多个版本串成一条版本链</li>
+<li><strong>ReadView</strong>：事务生成快照时记录活跃事务列表，用于判断版本可见性</li>
+</ul>
+<h3 id="ReadView-判断规则"><a href="#ReadView-判断规则" class="headerlink" title="ReadView 判断规则"></a>ReadView 判断规则</h3><p>ReadView 包含四个字段：<code>m_ids</code>（活跃事务 id 集合）、<code>min_trx_id</code>、<code>max_trx_id</code>、<code>creator_trx_id</code>。判断某版本可见性：</p>
+<ul>
+<li><code>trx_id &lt; min_trx_id</code>：已提交，可见</li>
+<li><code>trx_id &gt; max_trx_id</code>：未开始，不可见</li>
+<li>在 <code>m_ids</code> 中：活跃事务（含未提交），不可见</li>
+<li>等于 <code>creator_trx_id</code>：自己修改的，可见</li>
+</ul>
+<h3 id="快照读与当前读"><a href="#快照读与当前读" class="headerlink" title="快照读与当前读"></a>快照读与当前读</h3><ul>
+<li><strong>快照读</strong>：普通 <code>select</code>，读 ReadView 生成的快照，不加锁。RC 每次 select 重新生成 ReadView，RR 只在第一次 select 生成</li>
+<li><strong>当前读</strong>：<code>select ... for update</code>、<code>update</code>、<code>delete</code>、<code>insert</code>，读最新数据并加锁</li>
+</ul>
+<div class="note note-info">
+            <p>RR 下为什么能解决幻读：当前读靠 next-key lock 锁住间隙阻止插入，快照读靠 ReadView 一致性快照保证两次读取结果一致。</p> 
+          </div>
+
+<h2 id="锁机制"><a href="#锁机制" class="headerlink" title="锁机制"></a>锁机制</h2><p>按粒度分类：</p>
+<ul>
+<li><strong>全局锁</strong>：<code>flush tables with read lock</code>，锁整个库，用于全库备份</li>
+<li><strong>表级锁</strong>：<code>lock tables ... read/write</code>、元数据锁（DDL 时自动加）、意向锁</li>
+<li><strong>行级锁</strong>：InnoDB 特有，包括记录锁（Record Lock）、间隙锁（Gap Lock）、临键锁（Next-Key Lock）</li>
+</ul>
+<div class="note note-danger">
+            <p>行锁是加在索引上的！没有索引的 update&#x2F;delete 会退化为锁全表，生产事故高发点。</p> 
+          </div>
+
+<ul>
+<li><strong>记录锁</strong>：锁定单行记录</li>
+<li><strong>间隙锁</strong>：锁定一个区间，只阻止其他事务在间隙内插入，用于解决幻读</li>
+<li><strong>临键锁</strong>：记录锁 + 间隙锁的组合，左开右闭区间，RR 下默认使用</li>
+</ul>
+<h3 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h3><p>两个事务互相持有对方需要的锁时发生，InnoDB 会自动检测并回滚代价较小的事务：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 查看最近一次死锁信息</span><br><span class="hljs-keyword">SHOW</span> ENGINE INNODB STATUS;<br></code></pre></td></tr></table></figure>
+
+<p>死锁常见解决方案：</p>
+<ul>
+<li>业务上统一加锁顺序（如都按 id 升序操作）</li>
+<li>缩短事务时间，减少锁持有</li>
+<li>在 MySQL 8.0+ 使用 <code>innodb_deadlock_detect</code> 控制检测开关</li>
+</ul>
+<h2 id="三大日志：redo-log-binlog-undo-log"><a href="#三大日志：redo-log-binlog-undo-log" class="headerlink" title="三大日志：redo log &#x2F; binlog &#x2F; undo log"></a>三大日志：redo log &#x2F; binlog &#x2F; undo log</h2><h3 id="redo-log（重做日志）"><a href="#redo-log（重做日志）" class="headerlink" title="redo log（重做日志）"></a>redo log（重做日志）</h3><ul>
+<li>物理日志，记录”某页某偏移做了什么修改”，用于<strong>崩溃恢复</strong>，保证持久性</li>
+<li>采用 WAL（Write-Ahead Logging）：先写日志、再写磁盘数据页</li>
+<li>环形写入，<code>innodb_log_file_size</code> 控制大小，满了触发刷盘 checkpoint</li>
+</ul>
+<h3 id="binlog（归档日志）"><a href="#binlog（归档日志）" class="headerlink" title="binlog（归档日志）"></a>binlog（归档日志）</h3><ul>
+<li>逻辑日志，记录 SQL 或行变更，用于<strong>主从复制</strong>与<strong>数据恢复</strong></li>
+<li>三种格式：<code>STATEMENT</code>（记录 SQL）、<code>ROW</code>（记录行变更，默认，最安全）、<code>MIXED</code></li>
+<li>与 redo log 的区别：redo 是 InnoDB 引擎层的物理日志（环形覆盖），binlog 是 Server 层的逻辑日志（追加写）</li>
+</ul>
+<h3 id="两阶段提交"><a href="#两阶段提交" class="headerlink" title="两阶段提交"></a>两阶段提交</h3><p>redo log 与 binlog 要保持一致，否则崩溃恢复或主从复制可能出现数据不一致，因此采用两阶段提交：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs text">prepare 阶段：写 redo log 并置为 prepare 状态<br>commit 阶段：写 binlog，成功后 redo log 置为 commit 状态<br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>两阶段提交的恢复原则：崩溃后若 redo 处于 prepare 状态，检查 binlog 是否完整，完整则提交、否则回滚，保证两份日志一致。</p> 
+          </div>
+
+<h3 id="undo-log（回滚日志）"><a href="#undo-log（回滚日志）" class="headerlink" title="undo log（回滚日志）"></a>undo log（回滚日志）</h3><ul>
+<li>逻辑日志，记录修改前的旧值，用于事务回滚与 MVCC 版本链</li>
+<li>对应回滚段（rollback segment），purge 线程负责清理不再被任何 ReadView 引用的版本</li>
+</ul>
+<h2 id="Buffer-Pool-与-change-buffer"><a href="#Buffer-Pool-与-change-buffer" class="headerlink" title="Buffer Pool 与 change buffer"></a>Buffer Pool 与 change buffer</h2><ul>
+<li><strong>Buffer Pool</strong>：InnoDB 的内存缓冲，缓存数据页与索引页，默认 128MB（建议机器物理内存 50%~70%）。<code>innodb_buffer_pool_size</code> 可动态调整</li>
+<li>读：优先从缓冲池查，未命中才去磁盘加载</li>
+<li>写：修改先在缓冲池完成（脏页），由后台线程按 checkpoint 刷盘</li>
+<li><strong>change buffer</strong>：针对二级索引的变更缓冲，插入&#x2F;更新二级索引时若目标页不在缓冲池，先记录变更而非直接写磁盘，等页面被读到或后台合并</li>
+</ul>
+<div class="note note-success">
+            <p>唯一索引的插入无法使用 change buffer（必须先读页判断唯一性），因此”写多读少”的场景优先使用普通索引。</p> 
+          </div>
+
+<h2 id="常规问题排查"><a href="#常规问题排查" class="headerlink" title="常规问题排查"></a>常规问题排查</h2><h3 id="慢查询定位"><a href="#慢查询定位" class="headerlink" title="慢查询定位"></a>慢查询定位</h3><ul>
+<li>开启慢查询日志：</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SET</span> <span class="hljs-keyword">GLOBAL</span> slow_query_log <span class="hljs-operator">=</span> <span class="hljs-keyword">ON</span>;<br><span class="hljs-keyword">SET</span> <span class="hljs-keyword">GLOBAL</span> long_query_time <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;  <span class="hljs-comment">-- 超过 1 秒记录</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>拿到慢 SQL 后执行 <code>explain</code>，重点看：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>type</td>
+<td>all（全表扫描）→ index → range → ref → const，最好到 range 以上</td>
+</tr>
+<tr>
+<td>key</td>
+<td>实际使用的索引，为 null 表示没走索引</td>
+</tr>
+<tr>
+<td>rows</td>
+<td>预估扫描行数</td>
+</tr>
+<tr>
+<td>Extra</td>
+<td><code>Using filesort</code>&#x2F;<code>Using temporary</code> 需要优化</td>
+</tr>
+</tbody></table>
+<h3 id="索引失效常见场景"><a href="#索引失效常见场景" class="headerlink" title="索引失效常见场景"></a>索引失效常见场景</h3><ul>
+<li>对索引列使用函数或计算：<code>where year(create_time)=2026</code> ❌</li>
+<li>隐式类型转换：<code>where phone = 13800000000</code>（phone 是 varchar）❌</li>
+<li>前导模糊查询：<code>like &#39;%abc&#39;</code> ❌</li>
+<li>联合索引不满足最左前缀</li>
+<li>索引列用 <code>or</code> 且另一侧无索引</li>
+<li>大量数据 <code>not in</code> &#x2F; <code>is not null</code> 导致优化器放弃索引</li>
+</ul>
+<h3 id="死锁与锁等待排查"><a href="#死锁与锁等待排查" class="headerlink" title="死锁与锁等待排查"></a>死锁与锁等待排查</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SHOW</span> ENGINE INNODB STATUS;  <span class="hljs-comment">-- 查看死锁/锁等待</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> performance_schema.data_lock_waits;  <span class="hljs-comment">-- 8.0 查看锁等待</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="连接数打满"><a href="#连接数打满" class="headerlink" title="连接数打满"></a>连接数打满</h3><ul>
+<li>查看连接：<code>show status like &#39;Threads_connected&#39;;</code></li>
+<li>查看超时：<code>show variables like &#39;wait_timeout&#39;;</code></li>
+<li>排查长事务：<code>select * from information_schema.innodb_trx;</code></li>
+<li>应用侧：连接池合理配置、防止慢 SQL 占用连接、及时释放事务</li>
+</ul>
+<h3 id="主从延迟"><a href="#主从延迟" class="headerlink" title="主从延迟"></a>主从延迟</h3><p>常见原因与对策：</p>
+<ul>
+<li>主库大事务&#x2F;大 DDL：拆分事务，DDL 用 pt-osc 类工具</li>
+<li>从库单线程回放：开启并行复制 <code>slave_parallel_workers</code></li>
+<li>从库硬件差、有分析类大查询：提升配置或分担只读流量</li>
+<li>查看延迟：<code>show slave status</code> 的 <code>Seconds_Behind_Master</code></li>
+</ul>
+<h3 id="磁盘与内存问题"><a href="#磁盘与内存问题" class="headerlink" title="磁盘与内存问题"></a>磁盘与内存问题</h3><ul>
+<li>磁盘写满：优先清理 binlog（<code>purge binary logs</code>）与慢日志，检查 binlog 保留时间</li>
+<li>磁盘 IO 高：关注刷盘策略 <code>innodb_flush_log_at_trx_commit=1</code> 时每次提交 fsync，可权衡调整为 2</li>
+<li>内存不足：swap 会拖垮性能，检查 Buffer Pool 是否过大；Buffer Pool 命中率低时增大缓冲池并优化 SQL</li>
+</ul>
+<div class="note note-warning">
+            <p><code>innodb_flush_log_at_trx_commit=1</code> 保证每次提交都刷盘（最安全），改为 0&#x2F;2 可能丢最近 1 秒日志，生产环境需谨慎权衡。</p> 
+          </div>
+
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ul>
+<li>架构上理解一条 SQL 从解析、优化到执行的完整链路</li>
+<li>索引核心是 B+ 树 + 最左前缀 + 覆盖索引，减少回表</li>
+<li>事务靠 MVCC 与锁实现隔离，redo&#x2F;binlog 两阶段提交保证一致性与持久性</li>
+<li>排查问题的核心抓手：慢查询日志、explain、<code>SHOW ENGINE INNODB STATUS</code>、<code>performance_schema</code></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/mysql/" class="print-no-link">#mysql</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>MySQL 底层原理与知识要点</div>
+      <div>https://chaggle.github.io/2026/08/08/middleware/mysql-20260809/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月8日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/08/middleware/kafka-20260809/" title="Kafka 底层原理与知识要点">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Kafka 底层原理与知识要点</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/08/middleware/nacos-20260809/" title="Nacos 底层原理与知识要点">
+                        <span class="hidden-mobile">Nacos 底层原理与知识要点</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '0043414970dbb9c284a3cfad53d9e1c0'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

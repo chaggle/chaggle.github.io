@@ -1,0 +1,1096 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/10/bigdata/starrocks-deploy-tuning-20260811/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="StarRocks 是从 Doris 分叉出的 MPP 分析引擎，在”高并发点查、实时更新、物化视图、存算分离”上走得更远。本文覆盖底层原理、集群部署（FE&#x2F;BE）、存算分离形态、参数优化与常见问题。与《Doris 原理、部署与调优指南》对照阅读，差异点会标出来。  底层原理速览 FE &#x2F; BE 架构：与 Doris 同源（FE 元数据与查询规划，BE 存储与执行），但查询优">
+<meta property="og:type" content="article">
+<meta property="og:title" content="StarRocks 原理、部署与调优指南">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/10/bigdata/starrocks-deploy-tuning-20260811/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="StarRocks 是从 Doris 分叉出的 MPP 分析引擎，在”高并发点查、实时更新、物化视图、存算分离”上走得更远。本文覆盖底层原理、集群部署（FE&#x2F;BE）、存算分离形态、参数优化与常见问题。与《Doris 原理、部署与调优指南》对照阅读，差异点会标出来。  底层原理速览 FE &#x2F; BE 架构：与 Doris 同源（FE 元数据与查询规划，BE 存储与执行），但查询优">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-10T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T16:39:51.694Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="olap">
+<meta property="article:tag" content="starrocks">
+<meta property="article:tag" content="部署">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>StarRocks 原理、部署与调优指南 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="StarRocks 原理、部署与调优指南"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-10 16:00" pubdate>
+          2026年8月10日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          35 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">StarRocks 原理、部署与调优指南</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-11T00:39:51+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>StarRocks 是从 Doris 分叉出的 MPP 分析引擎，在”高并发点查、实时更新、物化视图、存算分离”上走得更远。本文覆盖底层原理、集群部署（FE&#x2F;BE）、存算分离形态、参数优化与常见问题。与《Doris 原理、部署与调优指南》对照阅读，差异点会标出来。</p>
+</blockquote>
+<h2 id="底层原理速览"><a href="#底层原理速览" class="headerlink" title="底层原理速览"></a>底层原理速览</h2><ul>
+<li><strong>FE &#x2F; BE 架构</strong>：与 Doris 同源（FE 元数据与查询规划，BE 存储与执行），但查询优化器是独立的 CBO（Cost-Based Optimizer，基于代价），统计信息驱动 Join 顺序选择</li>
+<li><strong>四种表模型</strong>：明细（Duplicate）、聚合（Aggregate）、更新（Unique&#x2F;主键表）、主键（Primary Key）——主键表支持真正的行级实时更新（Delete+Insert）</li>
+<li><strong>Pipeline 执行引擎</strong>：算子流水线化，消除执行引擎线程调度开销，多核利用率更高</li>
+<li><strong>同步&#x2F;异步物化视图</strong>：单表同步 MV 自动透明改写；异步 MV 支持多表 Join&#x2F;聚合，定时刷新</li>
+<li><strong>存算分离（Share-Nothing → Share-Data）</strong>：数据放对象存储，BE 只做缓存与计算，集群可独立弹性伸缩</li>
+<li><strong>Short Key Index &#x2F; ZoneMap</strong>：建表时可选前 3 列做稀疏索引；每列统计信息在扫描时裁剪数据块</li>
+</ul>
+<div class="note note-info">
+            <p>StarRocks 与 Doris 的关系：同源于百度 Doris，StarRocks 侧重<strong>性能与实时更新</strong>（主键表、CBO、Pipeline），Doris 侧重<strong>生态与易用性</strong>（Routine Load、物化视图、文档生态）。选型看场景：超高并发点查与实时更新选 StarRocks，求稳与生态全选 Doris。</p> 
+          </div>
+
+<h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><h3 id="1-规划"><a href="#1-规划" class="headerlink" title="1. 规划"></a>1. 规划</h3><table>
+<thead>
+<tr>
+<th>节点</th>
+<th>角色</th>
+<th>数量</th>
+<th>规格参考（生产）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>FE</td>
+<td>Leader + Follower（可加 Observer）</td>
+<td>1+2</td>
+<td>16C64G，SSD 元数据</td>
+</tr>
+<tr>
+<td>BE</td>
+<td>存储与计算</td>
+<td>3+</td>
+<td>32C256G</td>
+</tr>
+</tbody></table>
+<ul>
+<li>端口：FE 8030（Web）&#x2F; 9030（MySQL）；BE 9060（BE 通信）&#x2F; 9050（心跳）</li>
+<li><code>priority_networks</code> 必须显式指定；FE 与 BE 时钟同步（ntp）；<code>sysctl vm.max_map_count=262144</code> 且 <code>sysctl -w vm.swappiness=0</code></li>
+</ul>
+<h3 id="2-FE-部署"><a href="#2-FE-部署" class="headerlink" title="2. FE 部署"></a>2. FE 部署</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget https://releases.starrocks.io/starrocks/StarRocks-3.2.x-x86_64.tar.gz<br>tar -zxvf StarRocks-*.tar.gz -C /opt &amp;&amp; <span class="hljs-built_in">ln</span> -s /opt/StarRocks-* /opt/starrocks<br><span class="hljs-built_in">mkdir</span> -p /data/starrocks/meta &amp;&amp; <span class="hljs-built_in">chown</span> -R starrocks:starrocks /opt/starrocks /data/starrocks<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># fe/conf/fe.conf</span><br>meta_dir = /data/starrocks/meta<br>priority_networks = 10.0.0.0/24<br>JAVA_OPTS=<span class="hljs-string">&quot;-Xmx16g -Xms16g -Xmn4g&quot;</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 第一台初始化</span><br>fe/bin/start_fe.sh --daemon<br>mysql -h127.0.0.1 -P9030 -uroot<br><br><span class="hljs-comment"># 后续 FE 加入</span><br>mysql&gt; ALTER SYSTEM ADD FOLLOWER <span class="hljs-string">&quot;node2:9010&quot;</span>;<br>mysql&gt; ALTER SYSTEM ADD FOLLOWER <span class="hljs-string">&quot;node3:9010&quot;</span>;<br><span class="hljs-comment"># 每台：start_fe.sh --helper node1:9010 --daemon</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="3-BE-部署"><a href="#3-BE-部署" class="headerlink" title="3. BE 部署"></a>3. BE 部署</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># be/conf/be.conf</span><br>storage_root_path = /data/starrocks/data1,medium:ssd;/data/starrocks/data2,medium:hdd<br>priority_networks = 10.0.0.0/24<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">be/bin/start_be.sh --daemon<br>mysql&gt; ALTER SYSTEM ADD BACKEND <span class="hljs-string">&quot;node1:9050&quot;</span>;<br>mysql&gt; ALTER SYSTEM ADD BACKEND <span class="hljs-string">&quot;node2:9050&quot;</span>;<br>mysql&gt; ALTER SYSTEM ADD BACKEND <span class="hljs-string">&quot;node3:9050&quot;</span>;<br>mysql&gt; SHOW BACKENDS;   -- 全部 Alive 即就绪<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-建表验证（主键表-物化视图）"><a href="#4-建表验证（主键表-物化视图）" class="headerlink" title="4. 建表验证（主键表 + 物化视图）"></a>4. 建表验证（主键表 + 物化视图）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE TABLE</span> orders (<br>  order_id  <span class="hljs-type">BIGINT</span>,<br>  user_id   <span class="hljs-type">BIGINT</span>,<br>  status    <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">16</span>),<br>  amount    <span class="hljs-type">DECIMAL</span>(<span class="hljs-number">20</span>,<span class="hljs-number">2</span>),<br>  modify_ts DATETIME<br>)<br><span class="hljs-keyword">PRIMARY KEY</span> (order_id)                          <span class="hljs-comment">-- 主键表：实时更新</span><br>DISTRIBUTED <span class="hljs-keyword">BY</span> HASH(order_id) BUCKETS <span class="hljs-number">24</span>;<br><br><span class="hljs-comment">-- 异步物化视图：多表聚合定时刷新</span><br><span class="hljs-keyword">CREATE</span> MATERIALIZED <span class="hljs-keyword">VIEW</span> mv_user_daily<br>REFRESH ASYNC <span class="hljs-keyword">START</span>(<span class="hljs-string">&#x27;00:00&#x27;</span>) <span class="hljs-keyword">EVERY</span>(<span class="hljs-type">INTERVAL</span> <span class="hljs-number">1</span> <span class="hljs-keyword">DAY</span>)<br><span class="hljs-keyword">AS</span> <span class="hljs-keyword">SELECT</span> user_id, <span class="hljs-type">DATE</span>(create_time) d, <span class="hljs-built_in">SUM</span>(amount) total<br>   <span class="hljs-keyword">FROM</span> orders <span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> user_id, <span class="hljs-type">DATE</span>(create_time);<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-存算分离形态（Share-Data，可选）"><a href="#5-存算分离形态（Share-Data，可选）" class="headerlink" title="5. 存算分离形态（Share-Data，可选）"></a>5. 存算分离形态（Share-Data，可选）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 部署 CN（Compute Node）替代/并存 BE，数据在对象存储</span><br><span class="hljs-comment"># fe.conf 增加</span><br>enable_cloud_snapshot = <span class="hljs-literal">true</span><br><span class="hljs-comment"># 创建存储卷（示例：S3 兼容存储）</span><br>CREATE STORAGE VOLUME s3vol TYPE S3<br>  LOCATIONS (<span class="hljs-string">&quot;s3://bucket/prefix&quot;</span>)<br>  PROPERTIES (<span class="hljs-string">&quot;aws.s3.endpoint&quot;</span>=<span class="hljs-string">&quot;...&quot;</span>, <span class="hljs-string">&quot;aws.s3.access_key&quot;</span>=<span class="hljs-string">&quot;...&quot;</span>, <span class="hljs-string">&quot;aws.s3.secret_key&quot;</span>=<span class="hljs-string">&quot;...&quot;</span>);<br><br><span class="hljs-comment"># 建表时指定 use_storage_volume</span><br>CREATE TABLE t (...) DISTRIBUTED BY HASH(k) BUCKETS 16<br>  PROPERTIES (<span class="hljs-string">&quot;storage_volume&quot;</span>=<span class="hljs-string">&quot;s3vol&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+<div class="note note-warning">
+            <p>存算分离适合”弹性伸缩、多集群共享一份数据”的场景，但点查延迟依赖本地缓存命中率（热数据命中才快）。评估不了缓存命中率前，不建议把核心在线场景直接迁到 Share-Data。</p> 
+          </div>
+
+<h2 id="调优"><a href="#调优" class="headerlink" title="调优"></a>调优</h2><h3 id="1-查询优化器"><a href="#1-查询优化器" class="headerlink" title="1. 查询优化器"></a>1. 查询优化器</h3><ul>
+<li><code>SET enable_cbo=true</code>（默认开启）；关键表执行 <code>ANALYZE TABLE xxx</code> 收集统计信息，CBO 才有依据</li>
+<li>大宽表关掉无关列的统计；Join 用小表驱动（<code>SET join_implementation_mode=&quot;auto&quot;</code>）</li>
+<li>Pipeline：<code>SET pipeline_dop=0</code>（按机器核数自适应），高并发场景可显式设 4-8，避免线程数爆炸</li>
+</ul>
+<h3 id="2-内存"><a href="#2-内存" class="headerlink" title="2. 内存"></a>2. 内存</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>建议</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>BE <code>mem_limit</code></td>
+<td>60%-70% 物理内存</td>
+<td>单 BE 上限</td>
+</tr>
+<tr>
+<td>会话 <code>query_mem_limit</code></td>
+<td>大查询单独给</td>
+<td>防止 OOM，配合 <code>EXPLAIN</code> 看预算</td>
+</tr>
+<tr>
+<td><code>query_max_memory_limit_percent</code></td>
+<td>90</td>
+<td>单查询占 BE 内存上限</td>
+</tr>
+</tbody></table>
+<h3 id="3-主键表与实时更新"><a href="#3-主键表与实时更新" class="headerlink" title="3. 主键表与实时更新"></a>3. 主键表与实时更新</h3><ul>
+<li>主键表写入是”内存主键索引 + 写入时与旧数据合并”，<strong>高频小批次更新</strong>最合适（如 1 分钟级增量）</li>
+<li>批量导入用 <code>INSERT INTO ... VALUES</code> 分批，或 Broker Load；更新量大时增大分桶数（主键索引内存占用也增大）</li>
+<li>主键表不适用全表重写型大任务（如每天全量重灌），此时考虑明细表或异步物化视图</li>
+</ul>
+<h3 id="4-物化视图"><a href="#4-物化视图" class="headerlink" title="4. 物化视图"></a>4. 物化视图</h3><ul>
+<li>同步 MV：只服务单表聚合，命中即透明改写，适合高频点查计数</li>
+<li>异步 MV：刷新策略 <code>REFRESH ASYNC START(&#39;00:00&#39;) EVERY(INTERVAL 1 DAY)</code>，任务多时调大 <code>mv_task_run_num</code>（默认 4）</li>
+<li>查询是否能命中 MV：<code>EXPLAIN SELECT ...</code> 看是否出现 <code>MV_</code> 前缀节点</li>
+</ul>
+<h3 id="5-Colocate-Join-与缓存"><a href="#5-Colocate-Join-与缓存" class="headerlink" title="5. Colocate Join 与缓存"></a>5. Colocate Join 与缓存</h3><ul>
+<li><strong>Colocate Join</strong>：多表同分桶键 + <code>colocate_with=&quot;g1&quot;</code>，Join 时数据本地化，免 shuffle，高并发 Join 收益最大</li>
+<li>BE 块缓存 <code>storage_page_cache_limit</code>（默认 20% 内存）；热数据表可用 <code>CREATE TABLE ... PROPERTIES (&quot;enable_persistent_index&quot;=&quot;true&quot;)</code> 提升点查</li>
+</ul>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><table>
+<thead>
+<tr>
+<th>现象</th>
+<th>原因</th>
+<th>处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>点查延迟高</td>
+<td>未命中块缓存&#x2F;主键索引未加载</td>
+<td>查 <code>SHOW BE</code> 缓存命中率，调 storage_page_cache</td>
+</tr>
+<tr>
+<td>主键表导入慢</td>
+<td>主键索引内存不足换磁盘</td>
+<td>调大 BE mem_limit 或减少桶数</td>
+</tr>
+<tr>
+<td>物化视图不刷新</td>
+<td>mv_task 并发&#x2F;超时</td>
+<td><code>SHOW MATERIALIZED VIEWS</code> 看 State，调 mv_task_run_num</td>
+</tr>
+<tr>
+<td>存算分离查询慢</td>
+<td>缓存冷</td>
+<td>预热热表、调大磁盘缓存 <code>datacache.*</code></td>
+</tr>
+<tr>
+<td>磁盘水位不均</td>
+<td>新 BE 数据未均衡</td>
+<td>等待或 <code>ALTER SYSTEM ...</code> 检查 <code>SHOW BACKENDS</code></td>
+</tr>
+</tbody></table>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>StarRocks &#x3D; 同源 Doris 的”性能特化”分支：CBO + Pipeline + 主键表 + 同步&#x2F;异步物化视图</li>
+<li>部署与 Doris 同构（FE 集群 + BE 集群），新增存算分离形态（对象存储 + CN）</li>
+<li>调优主线：统计信息与 CBO → Pipeline 并行度 → 主键表写入模式 → 物化视图 → Colocate Join</li>
+<li>选型结论：高并发点查、实时更新场景优先 StarRocks；Doris&#x2F;StarRocks 两者是湖仓时代 OLAP 的左右手，底座迭代时二选一即可，不建议同时养两套</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/%E9%83%A8%E7%BD%B2/" class="print-no-link">#部署</a>
+      
+        <a href="/tags/olap/" class="print-no-link">#olap</a>
+      
+        <a href="/tags/starrocks/" class="print-no-link">#starrocks</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>StarRocks 原理、部署与调优指南</div>
+      <div>https://chaggle.github.io/2026/08/10/bigdata/starrocks-deploy-tuning-20260811/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月11日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/10/bigdata/juicefs-deploy-tuning-20260811/" title="JuiceFS 原理、部署与调优指南">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">JuiceFS 原理、部署与调优指南</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/10/middleware/jenkins-deploy-tuning-20260811/" title="Jenkins 原理、部署与调优指南">
+                        <span class="hidden-mobile">Jenkins 原理、部署与调优指南</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'ddbd5553bc5549032ebd4bff7034700b'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

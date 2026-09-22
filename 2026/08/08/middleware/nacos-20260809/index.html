@@ -1,0 +1,1238 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/08/middleware/nacos-20260809/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="本文梳理 Nacos 的架构、服务发现（AP&#x2F;Distro）、配置中心（长轮询）、集群一致性（Raft + Derby&#x2F;MySQL）、与主流注册中心的对比，以及常见问题的排查思路。  概述Nacos（Dynamic Naming and Configuration Service）是阿里巴巴开源的，同时提供服务发现与配置管理两大能力的中间件，是 Spring Cloud Al">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nacos 底层原理与知识要点">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/08/middleware/nacos-20260809/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="本文梳理 Nacos 的架构、服务发现（AP&#x2F;Distro）、配置中心（长轮询）、集群一致性（Raft + Derby&#x2F;MySQL）、与主流注册中心的对比，以及常见问题的排查思路。  概述Nacos（Dynamic Naming and Configuration Service）是阿里巴巴开源的，同时提供服务发现与配置管理两大能力的中间件，是 Spring Cloud Al">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-08T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T15:37:55.963Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="nacos">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Nacos 底层原理与知识要点 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Nacos 底层原理与知识要点"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-08 16:00" pubdate>
+          2026年8月8日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          49 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Nacos 底层原理与知识要点</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-10T23:37:55+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>本文梳理 Nacos 的架构、服务发现（AP&#x2F;Distro）、配置中心（长轮询）、集群一致性（Raft + Derby&#x2F;MySQL）、与主流注册中心的对比，以及常见问题的排查思路。</p>
+</blockquote>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Nacos（Dynamic Naming and Configuration Service）是阿里巴巴开源的，同时提供<strong>服务发现</strong>与<strong>配置管理</strong>两大能力的中间件，是 Spring Cloud Alibaba 生态的核心组件。</p>
+<div class="note note-success">
+            <p>Nacos 的核心卖点是”一个组件解决注册中心 + 配置中心两个问题”，且原生支持 AP（可用性优先）与 CP（一致性优先）双模型切换，比 Zookeeper&#x2F;Eureka 的组合更简单。</p> 
+          </div>
+
+<p>核心概念：</p>
+<ul>
+<li><strong>命名空间（Namespace）</strong>：用于多环境&#x2F;多租户隔离，默认 public</li>
+<li><strong>分组（Group）</strong>：同一命名空间内的逻辑分组，默认 DEFAULT_GROUP，用于区分不同业务域</li>
+<li><strong>服务（Service）</strong>：逻辑上的服务名，下面挂多个实例（Instance）</li>
+<li><strong>实例（Instance）</strong>：具体提供服务的地址（ip:port + 元数据），分为临时实例与持久实例</li>
+</ul>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-comment"># 定位一个配置/服务资源的完整标识</span><br><span class="hljs-attr">namespace</span> <span class="hljs-string">+ group + service/dataId</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="架构与一致性模型"><a href="#架构与一致性模型" class="headerlink" title="架构与一致性模型"></a>架构与一致性模型</h2><h3 id="Server-端双模型"><a href="#Server-端双模型" class="headerlink" title="Server 端双模型"></a>Server 端双模型</h3><p>Nacos Server 内部有两种一致性协议，按数据类别分工：</p>
+<table>
+<thead>
+<tr>
+<th>数据</th>
+<th>一致性模型</th>
+<th>底层协议</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>注册中心（临时实例）</td>
+<td><strong>AP</strong></td>
+<td>Distro</td>
+<td>多节点异步复制，可用性优先，允许短暂不一致</td>
+</tr>
+<tr>
+<td>注册中心（持久实例）</td>
+<td><strong>CP</strong></td>
+<td>Raft</td>
+<td>强一致，配合健康检查</td>
+</tr>
+<tr>
+<td>配置中心</td>
+<td><strong>CP</strong></td>
+<td>Raft</td>
+<td>配置必须强一致，防止读到旧配置</td>
+</tr>
+</tbody></table>
+<div class="note note-info">
+            <p>Nacos 1.x 的 Raft 是自研简化版（内部依赖轻量级实现），Nacos 2.x 起配置&#x2F;持久化数据统一采用 <strong>Raft（Jraft）</strong> 实现，并引入了 <strong>gRPC</strong> 通信协议，大幅提升性能。</p> 
+          </div>
+
+<h3 id="架构角色"><a href="#架构角色" class="headerlink" title="架构角色"></a>架构角色</h3><ul>
+<li><strong>Server</strong>：Nacos 集群节点，通过 Raft 选主；负责数据存储、健康检查、配置推送</li>
+<li><strong>Client（SDK）</strong>：业务侧 Java&#x2F;Go 等 SDK，注册实例、订阅配置、维护心跳；也提供 <strong>OpenAPI</strong>（HTTP）方式接入</li>
+<li><strong>Console</strong>：控制台，管理命名空间、服务、配置</li>
+<li>2.x 起客户端与 Server 之间默认走 <strong>gRPC 长连接</strong>（1.x 是 HTTP 短连接 + UDP 推送），每个服务实例一个长连接，服务端主动推送配置变更</li>
+</ul>
+<div class="note note-warning">
+            <p>Nacos 2.x 的 gRPC 长连接是常见问题根源：客户端与服务端之间的连接被防火墙&#x2F;网关静默断开（半开连接），会导致注册信息不更新、配置收不到推送。排查时优先看 gRPC 端口（默认 9848、9849）是否放通。</p> 
+          </div>
+
+<h2 id="服务发现"><a href="#服务发现" class="headerlink" title="服务发现"></a>服务发现</h2><h3 id="注册原理"><a href="#注册原理" class="headerlink" title="注册原理"></a>注册原理</h3><ol>
+<li>客户端启动时调用注册接口（SDK <code>naming.registerInstance</code> 或 OpenAPI POST <code>/nacos/v1/ns/instance</code>）</li>
+<li>临时实例注册到<strong>当前连接的 Server 节点</strong>，节点通过 Distro 协议异步同步给其他节点</li>
+<li>注册数据放入本地内存 + 定期同步，心跳续约</li>
+</ol>
+<h3 id="健康检查（双机制）"><a href="#健康检查（双机制）" class="headerlink" title="健康检查（双机制）"></a>健康检查（双机制）</h3><ul>
+<li><strong>临时实例：客户端主动上报（心跳）</strong><ul>
+<li>客户端每 5 秒发一次心跳（<code>beat</code>），服务端每 15 秒检查一次，超过 30 秒（默认）未收到心跳则标记不健康并剔除</li>
+<li>心跳超时判定、实例剔除都是<strong>每台节点本地执行</strong>，靠 Distro 同步结果</li>
+</ul>
+</li>
+<li><strong>持久实例：服务端主动探测</strong><ul>
+<li>服务端按配置的检查协议（HTTP&#x2F;TCP&#x2F;MySQL 等）主动探测实例健康状态</li>
+<li>探测失败按 <code>healthyCheckTimes</code> 阈值判定不健康</li>
+</ul>
+</li>
+</ul>
+<div class="note note-info">
+            <p>临时实例适合”进程级注册”（进程退出即消失），持久实例适合”需要服务端探测”的静态&#x2F;外部服务（如数据库、跨网络的服务）。默认是临时实例。</p> 
+          </div>
+
+<h3 id="保护阈值（Protect-Threshold）"><a href="#保护阈值（Protect-Threshold）" class="headerlink" title="保护阈值（Protect Threshold）"></a>保护阈值（Protect Threshold）</h3><ul>
+<li>每个服务可设置 <code>protectThreshold</code>（0~1，默认 0）</li>
+<li>当<strong>健康实例数 &#x2F; 总实例数 &lt; 保护阈值</strong>时，触发保护：不再剔除不健康实例，而是把不健康实例也返回给调用方</li>
+</ul>
+<div class="note note-danger">
+            <p>保护阈值的本意是”防止全部实例被误判下线导致流量打空”（比返回空列表好，至少能尝试调用）。但如果不健康实例真不可用，流量会大量失败。排查”突然出现大量失败调用”时要先看是否触发了保护阈值。</p> 
+          </div>
+
+<h3 id="订阅与变更感知"><a href="#订阅与变更感知" class="headerlink" title="订阅与变更感知"></a>订阅与变更感知</h3><ul>
+<li>消费者订阅服务，SDK 通过 gRPC 建立订阅，服务端实例变更时<strong>主动推送</strong>（UDP 广播推送在 1.x；2.x 走 gRPC 推送）</li>
+<li>客户端本地也做兜底：定期拉取全量实例列表（<code>failover</code> 双缓存）</li>
+</ul>
+<h2 id="配置中心"><a href="#配置中心" class="headerlink" title="配置中心"></a>配置中心</h2><h3 id="发布与订阅"><a href="#发布与订阅" class="headerlink" title="发布与订阅"></a>发布与订阅</h3><ul>
+<li><strong>发布</strong>：控制台&#x2F;OpenAPI&#x2F;SDK 写入配置，Server 通过 Raft 保证一致后持久化，再通知订阅方</li>
+<li><strong>订阅</strong>：客户端 <code>configService.addListener</code> 注册监听器（Listener），配置变更时回调 <code>receiveConfigInfo</code></li>
+</ul>
+<h3 id="长轮询机制（Long-Polling）"><a href="#长轮询机制（Long-Polling）" class="headerlink" title="长轮询机制（Long Polling）"></a>长轮询机制（Long Polling）</h3><p>这是 Nacos 配置中心的灵魂：</p>
+<ol>
+<li>客户端发起配置拉取请求（带 <code>dataId + group + content-md5</code>）</li>
+<li>如果本地缓存 md5 与服务端一致（无变化），服务端<strong>挂起请求</strong>（默认 30 秒内不返回）</li>
+<li>期间配置被修改 → 服务端立即返回新配置；30 秒内无变化 → 返回”无变化”</li>
+<li>客户端拿到结果后，循环发起下一次长轮询</li>
+</ol>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text">客户端 ---- 长轮询请求(带md5) ----&gt; 服务端<br>客户端 &lt;---- 立即返回新配置/超时返回无变化 --- 服务端<br>客户端(有变化) ----&gt; 拉取完整配置<br></code></pre></td></tr></table></figure>
+
+<div class="note note-success">
+            <p>长轮询的好处：相比纯推送，服务端不需要维护海量连接状态；相比短轮询，几乎无轮询开销，变更感知延迟能做到秒级甚至毫秒级。</p> 
+          </div>
+
+<h3 id="监听回调与灰度发布"><a href="#监听回调与灰度发布" class="headerlink" title="监听回调与灰度发布"></a>监听回调与灰度发布</h3><ul>
+<li><strong>Listener</strong>：<code>addListener</code> 后，配置变更由内部长轮询线程感知，回调业务代码</li>
+<li>常见坑：回调内做重逻辑会阻塞配置线程；多个 listener 变更顺序不确定，不要依赖回调顺序</li>
+<li><strong>灰度发布（Beta 发布）</strong>：指定部分 IP 灰度下发，通过 <code>publishConfig</code> 携带灰度规则；灰度发布仅对临时配置有效，正式发布后灰度信息清除</li>
+</ul>
+<h3 id="配置快照与容灾"><a href="#配置快照与容灾" class="headerlink" title="配置快照与容灾"></a>配置快照与容灾</h3><ul>
+<li>客户端本地有<strong>配置快照</strong>（默认 <code>$&#123;user.home&#125;/nacos/config</code>），缓存最近拉取的配置</li>
+<li>Server 全挂时，客户端用本地快照 + <code>failover</code> 机制继续提供旧配置，业务不中断</li>
+<li>服务端配置持久化：内嵌 <strong>Derby</strong>（默认单机，集群共享一份）或外置 <strong>MySQL</strong></li>
+</ul>
+<h2 id="集群部署与持久化"><a href="#集群部署与持久化" class="headerlink" title="集群部署与持久化"></a>集群部署与持久化</h2><h3 id="集群一致性"><a href="#集群一致性" class="headerlink" title="集群一致性"></a>集群一致性</h3><ul>
+<li><strong>配置中心 &#x2F; 持久实例：Raft（CP）</strong><ul>
+<li>集群选 Leader，写请求走 Leader，过半确认</li>
+<li>节点故障（&lt; 半数）不影响写入</li>
+</ul>
+</li>
+<li><strong>临时实例注册：Distro（AP）</strong><ul>
+<li>每个节点独立承接写请求（无 Leader 瓶颈），本地生效后<strong>异步</strong>复制给其他节点</li>
+<li>节点故障期间的数据差异靠定期全量同步 + 心跳续约收敛</li>
+</ul>
+</li>
+</ul>
+<div class="note note-warning">
+            <p>Distro 是最终一致：刚注册的实例可能在其他节点上要等一小段时间才能被读到（异步复制）。如果服务刚上线就被消费端请求打过来且报”服务不存在”，多半是 Distro 复制延迟 + 本地缓存未刷新。</p> 
+          </div>
+
+<h3 id="Raft-选举"><a href="#Raft-选举" class="headerlink" title="Raft 选举"></a>Raft 选举</h3><ul>
+<li>基于 Raft 协议：Leader 心跳超时 → 触发选举 → 得票过半当选</li>
+<li>选举时比较 <strong>term + log index</strong>（日志越新越有资格）</li>
+<li>集群建议奇数节点（3 台起步），单节点无法满足 CP 写入半数要求（单节点集群会退化为独立模式）</li>
+</ul>
+<h3 id="数据持久化"><a href="#数据持久化" class="headerlink" title="数据持久化"></a>数据持久化</h3><ul>
+<li><strong>内嵌 Derby</strong>：默认模式，适合单机&#x2F;快速体验；多节点共享同一份 Derby 存储时用 <code>jdbcUrl</code> 指向同一个数据库（1.x 的集群默认方式是共享 Derby，存在锁问题，2.x 默认每节点独立 Derby，配置走 raft 同步）</li>
+<li><strong>外置 MySQL</strong>：生产推荐，<code>application.properties</code> 配置 <code>spring.datasource.platform=mysql</code> 并执行初始化 SQL 脚本；MySQL 高可用（主从）需自行保证</li>
+</ul>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-comment"># conf/application.properties 关键配置</span><br><span class="hljs-attr">spring.datasource.platform</span>=<span class="hljs-string">mysql</span><br><span class="hljs-attr">db.num</span>=<span class="hljs-string">1</span><br><span class="hljs-attr">db.url.0</span>=<span class="hljs-string">jdbc:mysql://127.0.0.1:3306/nacos_config?characterEncoding=utf8</span><br><span class="hljs-attr">db.user.0</span>=<span class="hljs-string">root</span><br><span class="hljs-attr">db.password.0</span>=<span class="hljs-string">root</span><br></code></pre></td></tr></table></figure>
+
+<div class="note note-danger">
+            <p>Derby 锁问题：1.x 集群多个节点共享同一个 Derby 数据库时，可能出现 <code>Table &#39;CONFIG_INFO&#39; in statement is locked</code> 或写入失败。解决：改用 MySQL，或升级到 2.x 每节点独立 Derby。</p> 
+          </div>
+
+<h2 id="与-Zookeeper-Eureka-Consul-对比"><a href="#与-Zookeeper-Eureka-Consul-对比" class="headerlink" title="与 Zookeeper &#x2F; Eureka &#x2F; Consul 对比"></a>与 Zookeeper &#x2F; Eureka &#x2F; Consul 对比</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Nacos</th>
+<th>Zookeeper</th>
+<th>Eureka</th>
+<th>Consul</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>能力</td>
+<td>注册中心 + 配置中心</td>
+<td>协调服务（可做注册）</td>
+<td>仅注册中心</td>
+<td>注册 + 配置 + KV</td>
+</tr>
+<tr>
+<td>一致性</td>
+<td>AP（临时）&#x2F; CP（配置）</td>
+<td>CP（ZAB）</td>
+<td>AP（无主）</td>
+<td>CP（Raft）</td>
+</tr>
+<tr>
+<td>健康检查</td>
+<td>心跳上报 + 服务端探测</td>
+<td>会话心跳（临时节点）</td>
+<td>客户端心跳</td>
+<td>服务端探测</td>
+</tr>
+<tr>
+<td>配置中心</td>
+<td>内置，长轮询</td>
+<td>可做（watch）</td>
+<td>无</td>
+<td>内置（KV watch）</td>
+</tr>
+<tr>
+<td>协议</td>
+<td>gRPC &#x2F; HTTP</td>
+<td>TCP 长连接 + ZAB</td>
+<td>HTTP 心跳</td>
+<td>HTTP + Raft</td>
+</tr>
+<tr>
+<td>适用</td>
+<td>Spring Cloud 全家桶</td>
+<td>强一致协调场景</td>
+<td>大规模注册（已停维护）</td>
+<td>多数据中心注册</td>
+</tr>
+</tbody></table>
+<div class="note note-info">
+            <p>选型建议：</p> <ul> <li>追求”注册 + 配置一站式”、Spring Cloud 技术栈 → Nacos</li> <li>需要强一致协调能力（锁、选主）→ Zookeeper</li> <li>纯注册中心、读写都大 → 考虑 Nacos AP 模式或 Consul</li> <li>Eureka 已进入维护期，新项目不建议</li> </ul> 
+          </div>
+
+<h2 id="常规问题排查"><a href="#常规问题排查" class="headerlink" title="常规问题排查"></a>常规问题排查</h2><h3 id="1-服务上下线不及时"><a href="#1-服务上下线不及时" class="headerlink" title="1. 服务上下线不及时"></a>1. 服务上下线不及时</h3><ul>
+<li>现象：服务停止后很久才从列表消失，或新服务迟迟不可见</li>
+<li>排查：<ul>
+<li>临时实例靠心跳超时（默认 30 秒），下线延迟正常；调小 <code>healthCheckTimeout</code> &#x2F; 心跳间隔可加快，但会增加误判风险</li>
+<li>Distro 异步复制延迟：检查集群各节点时间是否同步（NTP），日志是否有 <code>distro</code> 同步报错</li>
+<li>客户端是否优雅下线（<code>deregisterInstance</code>）：kill -9 无法走注销流程，只能等心跳超时</li>
+<li>2.x 的 gRPC 连接是否被断开导致服务端感知不到客户端异常</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-配置变更不生效-未触发监听"><a href="#2-配置变更不生效-未触发监听" class="headerlink" title="2. 配置变更不生效 &#x2F; 未触发监听"></a>2. 配置变更不生效 &#x2F; 未触发监听</h3><ul>
+<li>现象：改了配置，客户端 <code>receiveConfigInfo</code> 没回调，或拿到的还是旧值</li>
+<li>排查：<ul>
+<li>dataId、group、namespace 三者是否与服务端完全一致（最常见的”改了别的环境的配置”）</li>
+<li>客户端是否 <code>addListener</code> 后才修改的配置（先监听再发布才有回调）</li>
+<li>长轮询线程是否被阻塞（服务端 30s 挂起超时被占用）——看服务端日志 <code>ConfigChangeNotifyTask</code></li>
+<li>gRPC 半开连接：客户端收到推送但连接已断</li>
+<li>检查本地快照是否被手动修改（快照 md5 与服务端不同会导致一直走”拉取”分支的假象）</li>
+<li>灰度发布只对灰度 IP 生效，普通实例收不到是正常行为</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-心跳超时实例被剔除"><a href="#3-心跳超时实例被剔除" class="headerlink" title="3. 心跳超时实例被剔除"></a>3. 心跳超时实例被剔除</h3><ul>
+<li>现象：实例被误剔除，或总是进 <code>不健康</code> 列表</li>
+<li>排查：<ul>
+<li>客户端进程 GC 停顿&#x2F;主线程阻塞导致心跳发送延迟（临时实例 5s 心跳，连续 6 次未收到才剔除，GC 太久会触发）</li>
+<li>服务端与客户端时钟偏差过大</li>
+<li>服务端负载高、健康检查线程池打满，处理心跳慢——看 Nacos 日志 <code>health check</code> 相关 warning</li>
+<li>网络抖动：Nacos 所在网络与业务网络之间丢包</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-集群数据不一致"><a href="#4-集群数据不一致" class="headerlink" title="4. 集群数据不一致"></a>4. 集群数据不一致</h3><ul>
+<li>现象：不同节点查到的服务实例&#x2F;配置不一样</li>
+<li>排查：<ul>
+<li>临时实例走 Distro：检查节点间 8848（HTTP）&#x2F;9848（gRPC）互通，<code>distro</code> 同步任务是否报错</li>
+<li>配置走 Raft：检查是否选了 Leader（<code>nacos_raft</code> 相关日志），Leader 挂后是否正常重新选举</li>
+<li>检查各节点配置 <code>cluster.conf</code> 是否一致、节点间时钟同步</li>
+<li>持久实例走 Raft，如果发现不一致，优先看 Raft 日志是否有 snapshot 恢复失败</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-Derby-锁问题"><a href="#5-Derby-锁问题" class="headerlink" title="5. Derby 锁问题"></a>5. Derby 锁问题</h3><ul>
+<li>现象：控制台&#x2F;服务端日志报 <code>Table &#39;xxx&#39; is locked</code>、<code>Unable to obtain lock</code></li>
+<li>原因：1.x 集群多节点共享 Derby</li>
+<li>处理：迁移到 MySQL（执行 <code>conf/mysql-schema.sql</code>），或升级 2.x</li>
+</ul>
+<h3 id="6-保护阈值触发导致无可用实例"><a href="#6-保护阈值触发导致无可用实例" class="headerlink" title="6. 保护阈值触发导致无可用实例"></a>6. 保护阈值触发导致无可用实例</h3><ul>
+<li>现象：突然大量调用失败，但服务列表里实例”看起来都在”</li>
+<li>排查：<ul>
+<li>查看服务详情页的<strong>保护阈值</strong>设置与健康实例比例</li>
+<li>保护触发后不健康实例也会被返回，调用方需自行做失败重试&#x2F;熔断</li>
+<li>阈值设置过高（如 0.9）会在正常波动时误触发，建议结合健康实例数合理设置</li>
+</ul>
+</li>
+</ul>
+<h3 id="7-灰度发布失效"><a href="#7-灰度发布失效" class="headerlink" title="7. 灰度发布失效"></a>7. 灰度发布失效</h3><ul>
+<li>现象：灰度发布后，目标 IP 没收到灰度配置，或全量实例都收到灰度配置</li>
+<li>排查：<ul>
+<li>灰度发布基于 IP 列表匹配，确认服务端拿到的客户端 IP 是否正确（经过代理&#x2F;网关后取到的是代理 IP）</li>
+<li>灰度配置只对临时配置生效，检查是否误把配置改成正式发布</li>
+<li>灰度期间又做了正式发布，灰度信息会被覆盖清除</li>
+</ul>
+</li>
+</ul>
+<h3 id="8-与-Spring-Cloud-Alibaba-集成问题"><a href="#8-与-Spring-Cloud-Alibaba-集成问题" class="headerlink" title="8. 与 Spring Cloud Alibaba 集成问题"></a>8. 与 Spring Cloud Alibaba 集成问题</h3><ul>
+<li>现象：<code>No Feign Client for loadBalancing defined</code>、<code>Config not found</code>、<code>NacosException: Client not connected</code></li>
+<li>排查：<ul>
+<li>版本兼容：Spring Boot &#x2F; Spring Cloud &#x2F; Spring Cloud Alibaba 版本必须按官方对应矩阵（如 Spring Cloud 2021.x 配 Alibaba 2021.0.x）</li>
+<li>连接失败：检查 <code>nacos.config.server-addr</code>、<code>nacos.discovery.server-addr</code> 是否正确，2.x 需放通 9848&#x2F;9849 gRPC 端口</li>
+<li>配置优先级：<code>bootstrap.yml</code> 中的配置要早于业务配置，<code>spring.cloud.nacos.config</code> 前缀不要拼错</li>
+<li><code>NacosException: Client not connected</code>：多半是 gRPC 长连接被断，检查防火墙&#x2F;负载均衡对长连接的空闲断开策略</li>
+</ul>
+</li>
+</ul>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ul>
+<li>架构上记住”命名空间&#x2F;分组&#x2F;服务三层隔离，Server AP+CP 双模型，Client 走 gRPC”</li>
+<li>服务发现记住”临时实例心跳上报（AP），持久实例服务端探测（CP），保护阈值兜底”</li>
+<li>配置中心记住”长轮询 + md5 比对 + Listener 回调 + 本地快照容灾”</li>
+<li>集群记住”配置 Raft 强一致，临时实例 Distro 最终一致，生产用 MySQL 持久化”</li>
+<li>排查问题的第一直觉：<strong>先看 gRPC 连接是否正常，再看 dataId&#x2F;group&#x2F;namespace 是否对齐，最后看 AP&#x2F;CP 同步日志</strong></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/nacos/" class="print-no-link">#nacos</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Nacos 底层原理与知识要点</div>
+      <div>https://chaggle.github.io/2026/08/08/middleware/nacos-20260809/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月8日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/08/middleware/mysql-20260809/" title="MySQL 底层原理与知识要点">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">MySQL 底层原理与知识要点</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/08/middleware/redis-20260809/" title="Redis 底层原理与知识要点">
+                        <span class="hidden-mobile">Redis 底层原理与知识要点</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '6903bf6e20a5daafb2dd10f8bfe2217d'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

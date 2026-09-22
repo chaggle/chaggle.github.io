@@ -1,0 +1,1283 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/10/go/fundamentals-engineering-20260811/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="2022 年学习 Go 语言基础与工程实践的多篇笔记（基础知识点、错误处理、TDD、面试复盘、学习方向思考等）合并整理。  Go 基础知识点自我总结 tips: 总结知识点一定要自己动手，这样知识点才能牢记！比如开源社区有雨痕大佬的 Go 语言笔记，但是光看几个用法，而不进行代码的编写，代码能力提升不明显，能看懂，但是做不到，形成一种眼高手低的习惯。更何况，以后的工作本来就是写需求的代码，所以，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 语言基础与工程实践笔记">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/10/go/fundamentals-engineering-20260811/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="2022 年学习 Go 语言基础与工程实践的多篇笔记（基础知识点、错误处理、TDD、面试复盘、学习方向思考等）合并整理。  Go 基础知识点自我总结 tips: 总结知识点一定要自己动手，这样知识点才能牢记！比如开源社区有雨痕大佬的 Go 语言笔记，但是光看几个用法，而不进行代码的编写，代码能力提升不明显，能看懂，但是做不到，形成一种眼高手低的习惯。更何况，以后的工作本来就是写需求的代码，所以，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chaggle.github.io/images/go/TDD1.png">
+<meta property="og:image" content="https://chaggle.github.io/images/go/TDD-2.jpg">
+<meta property="og:image" content="https://chaggle.github.io/images/go/go-test.png">
+<meta property="og:image" content="https://chaggle.github.io/images/go/tcp3.png">
+<meta property="og:image" content="https://chaggle.github.io/images/go/tcp4.png">
+<meta property="og:image" content="https://chaggle.github.io/images/go/TLV.jpeg">
+<meta property="og:image" content="https://chaggle.github.io/images/go/mapsearch.png">
+<meta property="og:image" content="https://chaggle.github.io/images/go/mapAnswer1.png">
+<meta property="og:image" content="https://chaggle.github.io/images/go/mapAnswer2.png">
+<meta property="article:published_time" content="2026-08-10T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T16:10:07.527Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="TDD">
+<meta property="article:tag" content="错误处理">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://chaggle.github.io/images/go/TDD1.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Go 语言基础与工程实践笔记 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Go 语言基础与工程实践笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-10 16:00" pubdate>
+          2026年8月10日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          15k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          126 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Go 语言基础与工程实践笔记</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-11T00:10:07+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>2022 年学习 Go 语言基础与工程实践的多篇笔记（基础知识点、错误处理、TDD、面试复盘、学习方向思考等）合并整理。</p>
+</blockquote>
+<h2 id="Go-基础知识点自我总结"><a href="#Go-基础知识点自我总结" class="headerlink" title="Go 基础知识点自我总结"></a>Go 基础知识点自我总结</h2><blockquote>
+<p>tips: 总结知识点一定要自己动手，这样知识点才能牢记！比如开源社区有雨痕大佬的 Go 语言笔记，但是光看几个用法，而不进行代码的编写，代码能力提升不明显，能看懂，但是做不到，形成一种眼高手低的习惯。更何况，以后的工作本来就是写需求的代码，所以，各种基础知识点，快速过完！</p>
+</blockquote>
+<h3 id="保留字与预定义字"><a href="#保留字与预定义字" class="headerlink" title="保留字与预定义字"></a>保留字与预定义字</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">//保留字有 25 个</span><br><span class="hljs-keyword">break</span>  <span class="hljs-keyword">continue</span>  <span class="hljs-function"><span class="hljs-keyword">func</span>  <span class="hljs-title">interface</span>  <span class="hljs-title">select</span></span><br><span class="hljs-keyword">case</span>  <span class="hljs-keyword">defer</span>   <span class="hljs-keyword">go</span>  <span class="hljs-keyword">map</span>   <span class="hljs-keyword">struct</span><br><span class="hljs-keyword">chan</span>  <span class="hljs-keyword">else</span>   <span class="hljs-keyword">goto</span>  <span class="hljs-keyword">package</span>   <span class="hljs-keyword">fallthrough</span><br><span class="hljs-keyword">const</span>  <span class="hljs-keyword">switch</span>   <span class="hljs-keyword">if</span>  <span class="hljs-keyword">range</span>   <span class="hljs-keyword">type</span><br><span class="hljs-keyword">default</span>  <span class="hljs-keyword">for</span>   <span class="hljs-keyword">import</span>  <span class="hljs-keyword">return</span>    <span class="hljs-keyword">var</span><br><br><span class="hljs-comment">//以下为相关的预定义字</span><br><span class="hljs-literal">true</span>  <span class="hljs-literal">false</span>   <span class="hljs-literal">iota</span>  <span class="hljs-literal">nil</span><br><br><span class="hljs-comment">//内建字类型</span><br><span class="hljs-type">int</span>  <span class="hljs-type">int16</span>  <span class="hljs-type">int32</span> <span class="hljs-type">int64</span><br><span class="hljs-type">uint</span>  <span class="hljs-type">uint16</span>   <span class="hljs-type">uint32</span>  <span class="hljs-type">uint64</span><br><span class="hljs-type">float32</span>  <span class="hljs-type">float64</span>   <span class="hljs-type">complex64</span> <span class="hljs-type">complex128</span><br><span class="hljs-type">bool</span>  <span class="hljs-type">byte</span>   <span class="hljs-type">rune</span>  <span class="hljs-type">string</span>   <span class="hljs-type">error</span><br><br><span class="hljs-comment">//内建函数</span><br><span class="hljs-built_in">make</span>  <span class="hljs-built_in">len</span>   <span class="hljs-built_in">cap</span>  <span class="hljs-built_in">new</span>  <span class="hljs-built_in">append</span><br><span class="hljs-built_in">copy</span>  <span class="hljs-built_in">close</span>   <span class="hljs-built_in">delete</span>  <span class="hljs-built_in">complex</span>  <span class="hljs-built_in">real</span><br><span class="hljs-built_in">imag</span>  <span class="hljs-built_in">panic</span>   <span class="hljs-built_in">recover</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Go-中的一些常用函数"><a href="#Go-中的一些常用函数" class="headerlink" title="Go 中的一些常用函数"></a>Go 中的一些常用函数</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-built_in">append</span>          -- 用来追加元素到数组、slice中,返回修改后的数组、slice<br><span class="hljs-built_in">close</span>           -- 主要用来关闭 channel<br><span class="hljs-built_in">delete</span>          -- 从<span class="hljs-keyword">map</span>中删除 key 对应的 value<br><span class="hljs-built_in">panic</span>           -- 停止常规的 goroutine (<span class="hljs-built_in">panic</span>和<span class="hljs-built_in">recover</span>：用来做错误处理)<br>   <span class="hljs-built_in">recover</span>         -- 允许程序定义goroutine的<span class="hljs-built_in">panic</span>动作<br><span class="hljs-built_in">real</span>            -- 返回<span class="hljs-built_in">complex</span>的实部 (<span class="hljs-built_in">complex</span>、<span class="hljs-built_in">real</span> <span class="hljs-built_in">imag</span>用于创建和操作复数)<br>   <span class="hljs-built_in">imag</span>            -- 返回<span class="hljs-built_in">complex</span>的虚部<br>   <span class="hljs-built_in">make</span>            -- 用来分配内存，返回 Type 本身(只能应用于 slice, <span class="hljs-keyword">map</span>, channel )<br>   <span class="hljs-built_in">new</span>             -- 用来分配内存，主要用来分配值类型，如 <span class="hljs-type">int</span>、<span class="hljs-keyword">struct</span> 返回指向 Type 的指针<br>   <span class="hljs-built_in">cap</span>             -- capacity是容量的意思，用于返回某个类型的最大容量（只能用于切片和 <span class="hljs-keyword">map</span>）<br>   <span class="hljs-built_in">copy</span>            -- 用于复制和连接 slice，返回复制的数目<br>   <span class="hljs-built_in">len</span>             -- 来求长度，比如 <span class="hljs-type">string</span>、array、slice、<span class="hljs-keyword">map</span>、channel，返回长度<br></code></pre></td></tr></table></figure>
+
+<h3 id="Go-中的-Array-数组"><a href="#Go-中的-Array-数组" class="headerlink" title="Go 中的 Array 数组"></a>Go 中的 Array 数组</h3><blockquote>
+<p>答：Go 语言中的数组与其他语言的数组不一样：</p>
+<p>1、Go 语言中的数组是值类型，赋值和传参会复制整个数组，而不是指针</p>
+<p>2、Go 语言中的数组长度必须是常量，而且是类型的组成成分，[2]int、[3]int 是不同类型</p>
+<p>3、Go 语言中的数组能支持 “&#x3D;&#x3D;” “!&#x3D;” 操作，因为内存被初始化过</p>
+<p>4、指针数组 [n]<em>T &#x2F;&#x2F;表示由 n 个</em>T 指针构成</p>
+<p>5、数组指针 *[n]T &#x2F;&#x2F;表示由一个指针指向这个数组，可以视为一维数组来看</p>
+<p>6、array 数组不建议拷贝，如需要拷贝使用 slice 更好，或者数组指针</p>
+</blockquote>
+<h3 id="Go-中的-slice"><a href="#Go-中的-slice" class="headerlink" title="Go 中的 slice"></a>Go 中的 slice</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">/*</span><br><span class="hljs-comment"> slice 为结构体，通过内部指针和相关的结构属性引用数组片段</span><br><span class="hljs-comment">*/</span><br><span class="hljs-keyword">struct</span> Slice &#123;<br> <span class="hljs-type">byte</span>* array  <span class="hljs-comment">//引用类型，但是是结构体，所以采用值拷贝传递</span><br>    uintgo <span class="hljs-built_in">len</span>  <span class="hljs-comment">//slice 数量，读写不超过该限制</span><br>    uintgo <span class="hljs-built_in">cap</span>  <span class="hljs-comment">//slice 容量，不能超出数组限制</span><br> <span class="hljs-comment">//slice == nil, len = cap = 0</span><br>&#125;<br><br><span class="hljs-comment">//Go 中还有一个关于 slice 的拼接问题，两个 slice 在 append 的时候，</span><br><span class="hljs-comment">//记住拼接第二个 slice 时，需要将 slice 打散再拼接！</span><br>s1 := []<span class="hljs-type">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;<br>s2 := []<span class="hljs-type">int</span>&#123;<span class="hljs-number">4</span>, <span class="hljs-number">5</span>&#125;<br>s1 = <span class="hljs-built_in">append</span>(s1, s2...) <span class="hljs-comment">//正确写法</span><br><span class="hljs-comment">//s1 = append(s1, s2) 编译失败: cannot use s2 (type []int) as type int in append</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Go-中的面向对象"><a href="#Go-中的面向对象" class="headerlink" title="Go 中的面向对象"></a>Go 中的面向对象</h3><p>面向对象的三大特征：多态、继承、封装。Go 语言只支持封装行为，没有继承与多态，也没有 class 关键字，但是能做到 struct 中嵌入 struct 类型。</p>
+<h3 id="Go-方法"><a href="#Go-方法" class="headerlink" title="Go 方法"></a>Go 方法</h3><p>方法：方法是绑定对象实例的，隐式将实例作为第一形参。</p>
+<ul>
+<li>1、只能为当前包内命名类型定义方法</li>
+<li>2、参数 receiver 随意命名，如果未使用此名称，可省略</li>
+<li>3、参数 receiver 类型可以为 T、*T，但是基类 T 不能是指针与接口</li>
+<li>4、不支持方法重载，receiver 为参数签名的组成成分</li>
+<li>5、可用实例 value 或 pointer 调用全部方法，编译器自动转换</li>
+<li>6、通常使用简单工厂模式返回对象实例</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Queue <span class="hljs-keyword">struct</span>&#123;<br>    elements []<span class="hljs-keyword">interface</span>&#123;&#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewQueue</span><span class="hljs-params">()</span></span> *Queue &#123;<br>    <span class="hljs-keyword">return</span> &amp;Queue&#123;<br>        elements: <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">interface</span>&#123;&#125;, <span class="hljs-number">10</span>),<br>    &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(*Queue)</span></span> push(e <span class="hljs-keyword">interface</span>&#123;&#125;) <span class="hljs-type">error</span> &#123;<br>    <span class="hljs-built_in">panic</span>(<span class="hljs-string">&quot;not implemented&quot;</span>)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(this *Queue)</span></span> length() <span class="hljs-type">int</span> &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">len</span>(this.elements)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="Go-接口"><a href="#Go-接口" class="headerlink" title="Go 接口"></a>Go 接口</h3><p>接口是方法的集合，由于不支持重载，所以每个方法命名唯一：</p>
+<ul>
+<li>1、接口命名以 er 结尾，结构体</li>
+<li>2、接口不实现方法</li>
+<li>3、接口无数据字段</li>
+<li>4、接口内可以嵌入其他接口</li>
+<li>5、类型可实现多接口</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Stringer <span class="hljs-keyword">interface</span> &#123;<br>    String() <span class="hljs-type">string</span><br>&#125;<br><br><span class="hljs-keyword">type</span> Pointer <span class="hljs-keyword">interface</span> &#123;<br>    Stringer<br>    Print()<br>&#125;<br><br><span class="hljs-keyword">type</span> User <span class="hljs-keyword">struct</span> &#123;<br>    id <span class="hljs-type">int</span><br>    name <span class="hljs-type">string</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(this *User)</span></span> String() <span class="hljs-type">string</span> &#123;<br>    <span class="hljs-keyword">return</span> fmt.Sprintf(<span class="hljs-string">&quot;User %d, %s&quot;</span>, this.id, this.name)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(this *User)</span></span> Print() &#123;<br>    <span class="hljs-keyword">return</span> fmt.Println(this.String())<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="Goroutine"><a href="#Goroutine" class="headerlink" title="Goroutine"></a>Goroutine</h3><p>Goroutine 为 go 协程，仅仅需要在函数调用语句前添加 go 关键字即可调用 goroutine，并且创建并发执行单元。goroutine 的设计具有轻量级：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>    fmt.Println(<span class="hljs-string">&quot;Hello World&quot;</span>) <span class="hljs-comment">//此为 goroutine</span><br>&#125;()<br><span class="hljs-comment">//main 函数的执行其实也是 goroutine</span><br>runtime.Goexit() <span class="hljs-comment">//立即终止当前 goroutine 的执行</span><br></code></pre></td></tr></table></figure>
+
+<p>具体 CSP 的模式与 GMP 的模型在并发的笔记中继续学习。</p>
+<h3 id="Channel"><a href="#Channel" class="headerlink" title="Channel"></a>Channel</h3><p>引用类型 channel 为 CSP 的模式的具体实现，使用 channel 用于多个 goroutine 的通信，确保并发安全，尽量使用 channel 来代替锁进行同步。channel 默认为同步的模式，需要发送和接收配对，否则一直处于被阻塞的状态，直到两边都处于活跃状态然后才被唤醒：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span><br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    data := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-type">int</span>) <span class="hljs-comment">// 数据交换队列</span><br>    exit := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-type">bool</span>) <span class="hljs-comment">// 退出通知</span><br><br>    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>        <span class="hljs-keyword">for</span> d := <span class="hljs-keyword">range</span> data &#123; <span class="hljs-comment">// 从队列迭代接收数据，直到 close</span><br>            fmt.Println(d)<br>        &#125;<br><br>        fmt.Println(<span class="hljs-string">&quot;recv over.&quot;</span>)<br><br>        exit &lt;- <span class="hljs-literal">true</span> <span class="hljs-comment">// 发出退出通知</span><br>    &#125;()<br><br>    data &lt;- <span class="hljs-number">1</span> <span class="hljs-comment">// 发送数据</span><br>    data &lt;- <span class="hljs-number">2</span><br>    data &lt;- <span class="hljs-number">3</span><br><br>    <span class="hljs-built_in">close</span>(data) <span class="hljs-comment">// 关闭队列</span><br><br>    fmt.Println(<span class="hljs-string">&quot;send over.&quot;</span>)<br><br>    &lt;-exit <span class="hljs-comment">// 等待退出通知</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>异步方式：通过判断缓冲区来决定是否阻塞。如果缓冲区满，发送阻塞；缓冲区为空，接收阻塞。通常情况下，异步的 channel 可以减少排队阻塞，具有更高的效率。但是应该考虑使用指针规避大对象的拷贝，将大对象分治为小对象，如多个元素打包、减小缓冲区大小等：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span><br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    data := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-type">int</span>, <span class="hljs-number">3</span>) <span class="hljs-comment">// 数据交换队列</span><br>    exit := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-type">bool</span>) <span class="hljs-comment">// 退出通知</span><br><br>    data &lt;- <span class="hljs-number">1</span> <span class="hljs-comment">// 在缓冲区未满前，不会阻塞</span><br>    data &lt;- <span class="hljs-number">2</span><br>    data &lt;- <span class="hljs-number">3</span><br><br>    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>        <span class="hljs-keyword">for</span> d := <span class="hljs-keyword">range</span> data &#123; <span class="hljs-comment">// 在缓冲区未空前，不会阻塞</span><br>            fmt.Println(d)<br>        &#125;<br>        exit &lt;- <span class="hljs-literal">true</span> <span class="hljs-comment">// 发出退出通知</span><br>    &#125;()<br><br>    data &lt;- <span class="hljs-number">4</span><br>    data &lt;- <span class="hljs-number">5</span><br>    <span class="hljs-built_in">close</span>(data)<br><br>    &lt;-exit <span class="hljs-comment">// 等待退出通知</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>其中缓冲区是内部属性，非类型构成要素，内置函数 len 返回未被读取的缓冲元素数量，cap 返回缓冲区大小。channel 是第一类对象，可传参（内部实现为指针）或者作为结构成员。</p>
+<p>Go 语言还内建了 <code>close()</code> 函数来关闭一个 channel，但是存在以下几种情况：</p>
+<blockquote>
+<p>1、读写 nil Channel 会永远阻塞，关闭 nil Channel 会导致 panic</p>
+<p>2、关闭一个已关闭的 Channel 会导致 panic</p>
+<p>3、向已经关闭的 Channel 发送数据会导致 panic</p>
+<p>4、向已经关闭的 Channel 读取数据不会导致 panic，但读取的值为 Channel 传递的数据类型的零值，可以通过接收语句的第二个返回值来检查 Channel 是否关闭且排空：</p>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs go">v, ok := &lt;- ch<br><span class="hljs-keyword">if</span> !ok &#123;<br>    <span class="hljs-comment">// 如果是非缓冲 Channel ，说明已经关闭；</span><br>    <span class="hljs-comment">// 如果是带缓冲 Channel ，说明已经关闭，且其内部缓冲区已经排空</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="Go-中的-select-用法"><a href="#Go-中的-select-用法" class="headerlink" title="Go 中的 select 用法"></a>Go 中的 select 用法</h3><p>select 是 Go 中的一个控制结构，类似于用于通信的 switch 语句，其用于处理异步的 I&#x2F;O 操作。其有以下的几个特征：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-number">1</span>、每个<span class="hljs-keyword">case</span>都必须是一个通信，所有 channel 表达式都会被求值<br><span class="hljs-number">2</span>、所有被发送的表达式都会被求值<br><span class="hljs-number">3</span>、如果任意某个通信可以进行，它就执行；其他被忽略<br><span class="hljs-number">4</span>、如果有多个<span class="hljs-keyword">case</span>都可以运行，<span class="hljs-keyword">select</span> 会随机公平地选出一个执行。其他不会执行<br><span class="hljs-number">5</span>、如果有<span class="hljs-keyword">default</span>子句，则执行该语句。如果没有<span class="hljs-keyword">default</span>子句，<span class="hljs-keyword">select</span>将阻塞，<br>   直到某个通信可以运行；Go不会重新对channel或值进行求值<br></code></pre></td></tr></table></figure>
+
+<p>select 会监听每个 case 中 channel 的读写操作，但是每次只能运行一个 channel 进行读或写。</p>
+<h3 id="初始化函数"><a href="#初始化函数" class="headerlink" title="初始化函数"></a>初始化函数</h3><p>初始化函数 init()：go 语言中 <code>init</code> 函数用于包（package）的初始化，该函数是 go 语言的一个重要特性。</p>
+<blockquote>
+<p>1 init函数是用于程序执行前做包的初始化的函数，比如初始化包里的变量等</p>
+<p>2 每个包可以拥有多个init函数</p>
+<p>3 包的每个源文件也可以拥有多个init函数</p>
+<p>4 同一个包中多个init函数的执行顺序go语言没有明确的定义</p>
+<p>5 不同包的init函数按照包导入的依赖关系决定该初始化函数的执行顺序</p>
+<p>6 init函数不能被其他函数调用，而是在main函数执行之前，自动被调用</p>
+<p>main 对比 init 函数，main函数只能用于main包中，且只能定义一个</p>
+</blockquote>
+<h3 id="go-mod-包管理"><a href="#go-mod-包管理" class="headerlink" title="go mod 包管理"></a>go mod 包管理</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs go">初始化模块 <span class="hljs-keyword">go</span> mod init &lt;项目模块名称&gt;<br>依赖关系处理 ,根据<span class="hljs-keyword">go</span>.mod文件 <span class="hljs-keyword">go</span> mod tidy<br>将依赖包复制到项目下的 vendor目录 <span class="hljs-keyword">go</span> mod vendor<br>   （如果包被屏蔽(墙)，可以使用这个命令，随后使用<span class="hljs-keyword">go</span> build -mod=vendor编译）<br>显示依赖关系 <span class="hljs-keyword">go</span> list -m all<br>显示详细依赖关系 <span class="hljs-keyword">go</span> list -m -json all<br>下载依赖 <span class="hljs-keyword">go</span> mod download [path@version]<br></code></pre></td></tr></table></figure>
+
+<h3 id="go-debug"><a href="#go-debug" class="headerlink" title="go debug"></a>go debug</h3><ul>
+<li>go run -race 可以查看有无相应的锁竞争问题</li>
+<li>go tool compile -S [filename] 查看相应的汇编代码</li>
+<li>Linux 下使用 top&#x2F;htop 指令查看 CPU、Memory、VIRT 等信息，其中关于内存泄漏的问题，主要查看的是 VIRT 是否出现不断增长的情况</li>
+</ul>
+<h3 id="go-内存逃逸"><a href="#go-内存逃逸" class="headerlink" title="go 内存逃逸"></a>go 内存逃逸</h3><p>内存逃逸的主要概念是：编译时 go 语言编译器会自动决定把一个变量放在栈还是放在堆，编译器会做逃逸分析（escape analysis），当<strong>发现变量的作用域没有跑出函数范围，就可以在栈上，反之则必须分配在堆</strong>。一般内存逃逸的分析都是编译器进行的，go 语言的设计者不希望我们过多的研究这个方面的内容，所以一般不用管！</p>
+<h2 id="Go-语言中的错误处理"><a href="#Go-语言中的错误处理" class="headerlink" title="Go 语言中的错误处理"></a>Go 语言中的错误处理</h2><blockquote>
+<p>通过模块化组件的方式，学习 Go 语言的微服务。</p>
+</blockquote>
+<p>Go 语言中的 error 定义如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> <span class="hljs-type">error</span> <span class="hljs-keyword">interface</span> &#123;<br>    Error() <span class="hljs-type">string</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在 Go 1.13 版本之前，我们通常使用的是 <code>errors.New()</code> 来进行返回一个 error 对象指针，相应的源码如下所示：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">New</span><span class="hljs-params">(text <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">error</span> &#123;<br>    <span class="hljs-keyword">return</span> &amp;errorString&#123;text&#125;<br>&#125;<br><br><span class="hljs-comment">// errorString is a trivial implementation of error.</span><br><span class="hljs-keyword">type</span> errorString <span class="hljs-keyword">struct</span> &#123;<br>    s <span class="hljs-type">string</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>关于 Go 中的指针与 C 中指针大致相同，都是指向某块内存地址值，可以通过 * 解引用的方式进行使用。至于此处为什么错误类型需要返回一个指针变量，如下解释：</p>
+<blockquote>
+<p>主要是防止因为相同的字符串进行匹配，导致错误类型区别不准而导致的问题</p>
+</blockquote>
+<p>可能第一次听会难以理解，我们通过代码来解释，来看以下的代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>    <span class="hljs-string">&quot;errors&quot;</span><br>    <span class="hljs-string">&quot;fmt&quot;</span><br>)<br><br><span class="hljs-keyword">type</span> errorString <span class="hljs-type">string</span><br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e errorString)</span></span> Error() <span class="hljs-type">string</span> &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-type">string</span>(e)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">New</span><span class="hljs-params">(text <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">error</span> &#123;<br>    <span class="hljs-keyword">return</span> errorString(text)<br>&#125;<br><br><span class="hljs-keyword">var</span> ErrorName = New(<span class="hljs-string">&quot;EOF&quot;</span>)<br><span class="hljs-keyword">var</span> ErrorStructType = errors.New(<span class="hljs-string">&quot;EOF&quot;</span>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    <span class="hljs-keyword">if</span> ErrorName == New(<span class="hljs-string">&quot;EOF&quot;</span>) &#123;<br>        fmt.Println(<span class="hljs-string">&quot;Named Type Error&quot;</span>)<br>    &#125;<br>    <span class="hljs-keyword">if</span> ErrorStructType == errors.New(<span class="hljs-string">&quot;EOF&quot;</span>) &#123;<br>        fmt.Println(<span class="hljs-string">&quot;Struct Type Error&quot;</span>)<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>以上代码输出的是 <code>Named Type Error</code>，因为 <code>var ErrorStructType = errors.New(&quot;EOF&quot;)</code> 与 <code>if ErrorStructType == errors.New(&quot;EOF&quot;)</code> 虽然字符串的值相同，但是因为返回的是一个指针地址，地址不同的指针进行比较，当然也不同。所以这就是为什么要返回指针的原因。</p>
+<p>其中 <code>panic</code> 与 <code>error</code> 的区别，主要是 <code>error</code> 类型定义仅仅只作为值类型进行处理，其抛出错误，证明业务进行到此处，有错误，但是不影响全局，程序员在后续能进行处理。而 <code>panic</code> 一般表示不可恢复类的错误，比如栈溢出、索引越界等程序员在后续无法进行处理的问题，必须修改代码才能解决问题。</p>
+<h3 id="错误类型"><a href="#错误类型" class="headerlink" title="错误类型"></a>错误类型</h3><p>一般错误类型有以下几种：</p>
+<p>1、<code>Sentinel Error</code> 预定义的错误，如 <code>io.EOF</code>、<code>syscall.ENOENT</code>。使用预定义的错误相当的不方便，所以尽可能避免使用预定义的错误，如果实在要使用，需要联系资深的程序员，进行 code review。</p>
+<p>2、<code>Error types</code> 使用 <code>error interface</code> 接口的自定义类型，定义后可以包装底层的错误，提供更多的上下文与堆栈的信息，方便程序员进行调试、定位问题。但是使用这种 interface 接口进行实现的 API 需要将 error 变成 public 字段，会导致和调用者产生强耦合，从而导致 API 变得脆弱。所以还是得尽量避免使用 error types。</p>
+<p>3、<code>Opaque errors</code> 最为灵活的错误处理，主要是只返回错误，但是错误内部不透明，一般建议 API 的设计，对外只暴露一个 error 类型的返回值即可！</p>
+<h3 id="go-1-13-版本前的错误处理"><a href="#go-1-13-版本前的错误处理" class="headerlink" title="go 1.13 版本前的错误处理"></a>go 1.13 版本前的错误处理</h3><p>一般的错误处理模式基本上是 <code>if err != nil {}</code> 这种常见的模式。所以此处只写建议的事情：</p>
+<p>1、无第三方库协作的时候，简单使用 <code>errors.New()</code> 或者 <code>errors.Errorf()</code> 两个函数进行方法的处理。</p>
+<p>2、如果需要配合 github 开源第三方包以及公司中台组件内部的包，使用 <code>errors.Wrap()</code> 与 <code>errors.Wrapf()</code> 保存堆栈信息，最终集中化输出所有日志，而不是遇到错误就打印日志。</p>
+<h3 id="go-1-13-版本后的错误处理"><a href="#go-1-13-版本后的错误处理" class="headerlink" title="go 1.13 版本后的错误处理"></a>go 1.13 版本后的错误处理</h3><p>go 在 1.13 版本给 <code>errors</code> 包新增了两个函数方法：errors.Is() 与 errors.As()。并在 <code>fmt</code> 包中也新增了 <code>fmt.Errorf()</code> 函数方法，用于向错误中添加错误信息，占位符为 <code>%w</code>，用于支持以上两个 errors 方法。具体使用案例如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs go">err := fmt.Errorf(<span class="hljs-string">&quot;access denied: %w&quot;</span>, ErrPermission)<br><br><span class="hljs-keyword">if</span> errors.Is(err, ErrPermission)<br></code></pre></td></tr></table></figure>
+
+<h3 id="go-日志错误处理注意事项"><a href="#go-日志错误处理注意事项" class="headerlink" title="go 日志错误处理注意事项"></a>go 日志错误处理注意事项</h3><p>关于 <code>log.Fatal()</code> 使用只推荐在 go 项目 init 函数中使用，或者 main 函数内初始化配置失败时候使用！因为 <code>log.Fatal()</code> 函数会调用 <code>os.Exit(1)</code>，此种情况下会导致程序直接退出，defer 函数都不会执行，不利于程序排查问题！</p>
+<h3 id="uber-go-guide-错误处理"><a href="#uber-go-guide-错误处理" class="headerlink" title="uber_go_guide 错误处理"></a>uber_go_guide 错误处理</h3><p>1、若调用者需要自己处理其中抛出的错误，采用 error.As() 或 error.Is() 函数合适。</p>
+<p>2、错误如果不需要匹配，则如果是静态字符串，则使用 errors.New 进行抛出即可，若是动态字符串信息，则使用 fmt.Errorf 或者自定义的错误。</p>
+<table>
+<thead>
+<tr>
+<th align="center">错误匹配？</th>
+<th align="center">错误消息</th>
+<th align="center">指导</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">No</td>
+<td align="center">static</td>
+<td align="center">errors.New</td>
+</tr>
+<tr>
+<td align="center">No</td>
+<td align="center">dynamic</td>
+<td align="center">fmt.Errorf</td>
+</tr>
+<tr>
+<td align="center">Yes</td>
+<td align="center">static</td>
+<td align="center">top-level var with errors.New</td>
+</tr>
+<tr>
+<td align="center">Yes</td>
+<td align="center">dynamic</td>
+<td align="center">custom error type</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>参考：<a target="_blank" rel="noopener" href="https://github.com/xxjwxc/uber_go_guide_cn#Errors">Uber Go 语言编码规范</a></p>
+</blockquote>
+<h2 id="TDD-概念介绍与学习课程"><a href="#TDD-概念介绍与学习课程" class="headerlink" title="TDD 概念介绍与学习课程"></a>TDD 概念介绍与学习课程</h2><blockquote>
+<p>在接触 TDD (测试驱动开发) 之后，发现自己的确很能认同测试驱动开发的理念。所以在加上极客时间中有徐昊老师新开的一门课程，所以就开始自己的 TDD 学习之路。</p>
+</blockquote>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>首先推荐两个课程：</p>
+<p>1、徐昊老师的新课：<a target="_blank" rel="noopener" href="https://time.geekbang.org/column/intro/100109401?tab=catalog">TDD 项目实战 70 讲</a></p>
+<p>2、go 语言的教程：<a target="_blank" rel="noopener" href="https://studygolang.gitbook.io/learn-go-with-tests/">Learn-go-with-test</a>，建议能尽量进行英文阅读，就阅读英文原版</p>
+<h3 id="推荐"><a href="#推荐" class="headerlink" title="推荐"></a>推荐</h3><p>1、郑烨老师的专栏《软件设计之美》</p>
+<p>2、《测试驱动开发的艺术》</p>
+<p>3、《代码整洁之道》与《修改代码的艺术》</p>
+<h3 id="上手训练"><a href="#上手训练" class="headerlink" title="上手训练"></a>上手训练</h3><p>可以查看博主推荐的 github 仓库，查看 TDD 具体的流程是怎么样进行的，以及 TDD 为什么能驱动程序员进行高效的开发：</p>
+<blockquote>
+<p>github: <a target="_blank" rel="noopener" href="https://github.com/longyue0521/TDD-In-Go/commits/main">Alexdown 的 github 仓库</a></p>
+</blockquote>
+<p><img src="/images/go/TDD1.png" srcset="/img/loading.gif" lazyload alt="TDD1"></p>
+<blockquote>
+<p>回看：TDD 的确重要，但是由于自己的工程能力并未到达老师所说的那种高度，所以说自己基础能力存在一定的问题，需要一点前置知识，比如看 uncle Bob 的 clean code、软件工程上的知识，都是对自己的职业发展非常重要的！</p>
+</blockquote>
+<h2 id="TDD-实践"><a href="#TDD-实践" class="headerlink" title="TDD 实践"></a>TDD 实践</h2><blockquote>
+<p>TDD 的项目驱动。</p>
+</blockquote>
+<h3 id="TDD-具体原则"><a href="#TDD-具体原则" class="headerlink" title="TDD 具体原则"></a>TDD 具体原则</h3><p>1、当且仅当存在失败的自动化测试，才开始编写生产代码</p>
+<p>2、消除重复（徐昊老师：消除坏味道）</p>
+<p>经典的红&#x2F;绿&#x2F;重构（Red&#x2F;Green&#x2F;Refactoring）：</p>
+<blockquote>
+<p>红：编写一个失败的小测试，甚至可以是无法编译的测试；</p>
+<p>绿：让这个测试快速通过，甚至不惜犯下任何罪恶；</p>
+<p>重构：消除上一步中产生的所有重复（坏味道）。</p>
+</blockquote>
+<h3 id="TDD-工作流程"><a href="#TDD-工作流程" class="headerlink" title="TDD 工作流程"></a>TDD 工作流程</h3><p>学习过程中，老师建议使用任务分解法，作为 TDD 的核心要素：</p>
+<blockquote>
+<p>1、先构思软件的使用方式，然后把握对外的接口方向</p>
+<p>2、大致的构思方向，划分组件以及组件之间的关系，如果没有头绪，也可以不划分</p>
+<p>3、根据需求的功能描述拆分功能点，功能点要考虑正确路径与边界条件</p>
+<p>4、根据组件与组件的关系，将功能划分到组件中</p>
+<p>5、针对拆分写测试，然后进入红&#x2F;绿&#x2F;重构模式</p>
+</blockquote>
+<p><img src="/images/go/TDD-2.jpg" srcset="/img/loading.gif" lazyload alt="TDD-2"></p>
+<h3 id="2022-6-9-日新增"><a href="#2022-6-9-日新增" class="headerlink" title="2022-6-9 日新增"></a>2022-6-9 日新增</h3><ul>
+<li>1、通过学习 TDD，发现多余的代码会给团队增加编译成本、跑用例的时间成本（这两项影响不大），最重要的是影响理解的成本</li>
+<li>2、好的测试，就应该通过测试用例就能清晰的理解业务逻辑。TDD 的说法是写不出测试代码，就是不能理解整个业务需求。理解业务需求不需要通过一行一行的看代码进行理解</li>
+<li>3、TDD 对程序员来说是一种内功修炼，通过 TDD 会对自己的掌握的知识进行重现，比如语言特性、设计模式、重构手法以及对业务的理解</li>
+<li>4、TDD 是一种对做事方法的极致拆分，一次只做一件事，思考业务逻辑时就不考虑实现和代码坏味道；编写业务代码时，也仅考虑能通过用例的逻辑；而重构时，也是不能改变原来的代码逻辑的。通过一个个极小粒度的操作，实现最终整体的协调</li>
+<li>5、程序员需要对自己的编程的手艺进行匠艺的打磨，比如代码的鲁棒性，就是修改一个模块内部的代码后，需要修改其他的模块多不多。如果不多，证明 code 的鲁棒性良好，反之如果需要修改大量的模块，则证明不好</li>
+</ul>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><p>发现自己花在 TDD 的时间上少了，所以为了保证自己的代码质量以及学习的方式，决定需要花更多的时间在 TDD 上，进行思考。项目选用 Java 先跟着老师的代码思路走，再针对 Go 语言进行自己的项目实现，如果只是自己从老师的项目出发去模仿老师的 Java 风格去写 Go，只会像一道菜一样”串味”而变得难吃。</p>
+<h2 id="Go-Test-的一个小坑"><a href="#Go-Test-的一个小坑" class="headerlink" title="Go Test 的一个小坑"></a>Go Test 的一个小坑</h2><blockquote>
+<p>使用 TDD 的模式驱动自己编写测试、驱动开发后，使用 goland 调试过程中出现的一些小问题，做一些记录。</p>
+</blockquote>
+<h3 id="如何解决-undefined-function"><a href="#如何解决-undefined-function" class="headerlink" title="如何解决 undefined function"></a>如何解决 undefined function</h3><p>首先在确保自己的测试代码与主干代码在同一个软件包下。最合适的办法是采用命令行调试，但是如果喜欢使用 goland 调试，那么在 go test 模板中需要把目录改成软件包，或者是把目录下文件全部添加上（不建议）。</p>
+<p><img src="/images/go/go-test.png" srcset="/img/loading.gif" lazyload alt="go-test"></p>
+<h3 id="Go-mod-init-packagename"><a href="#Go-mod-init-packagename" class="headerlink" title="Go mod init packagename"></a>Go mod init packagename</h3><p>接着上一个问题，goland 进行 go test 测试很难用的原因，是因为自己在 go mod init 的时候，并未使用一个合理的名称，比如使用的 example，而在 function.go 中导入的包是 function name，导致 go mod 模式并未很好的利用，所以 go mod name 建议与文件夹的包名一致，这样不容易出现错误。</p>
+<h2 id="Go-GET-代理"><a href="#Go-GET-代理" class="headerlink" title="Go GET 代理"></a>Go GET 代理</h2><p>Windows 下在安装 github 上的东西时，一般来说建议使用修改 git 配置，使用代理连接 github。即为打开 <code>C:\Users\Lenovo</code> 下的 <code>.gitconfig</code> 文件，加上相关的代理配置。如果是 socks5 连接，把 <code>http:</code> 改为 <code>socks5:</code> 即可，127.0.0.1 为本地回环地址，7890 是端口号，端口号以你的代理工具使用的端口号为准。</p>
+<p><code>go get -u -v github.com/gin-gonic/gin</code> 使用代理的情况下都能下载，唯一一个无法下载的包是 <code>google.golang.org/protobuf</code>，不仅仅只是网址找不到的原因，更多的是在 <code>https://github.com/golang/protobuf</code> 下没有这个包。</p>
+<p><strong>所以那么上面问题又要怎么去解决呢？</strong></p>
+<p>搜索一番后发现，这个包使用了另外一个 github 仓库，地址为如下 <code>https://github.com/protocolbuffers/protobuf-go</code>，我们使用 go get 去下载它：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">go get -v -u github.com/protocolbuffers/protobuf-go<br></code></pre></td></tr></table></figure>
+
+<p>当然，这个源文件是下载在 gopath 里面的，为了方便使用，我们将下载到 gopath 的这个文件放到 gopath 下的 <code>google.golang.org</code> 目录下，而且如果解压后文件有版本号时，去掉这个版本号，与上面包名保持一致即可。这样就解决好问题了。</p>
+<p>其中 go 现在采用 go mod 进行包模式的管理，所以说一般出现包管理问题，使用 <code>go mod tidy</code> 可以解决一些依赖包的问题。</p>
+<h2 id="Go-学习方向（面试总结）"><a href="#Go-学习方向（面试总结）" class="headerlink" title="Go 学习方向（面试总结）"></a>Go 学习方向（面试总结）</h2><blockquote>
+<p>通过几次面试，来总结一些现在阶段，对于自己的职业规划的发展与思考！</p>
+</blockquote>
+<p>经历了三四次面试，收获挺大的。面试不是目的，只是一种过程，要在不断的面试中，找到适合自己发展的领域才是面试的目的！</p>
+<h3 id="现阶段发展的方向"><a href="#现阶段发展的方向" class="headerlink" title="现阶段发展的方向"></a>现阶段发展的方向</h3><p>首先，Go 语言的云原生跟云中间件发展是非常迅速的，而且 Go 语言社区中，讨论最多的也是云计算的发展，docker、K8S集群、普罗米修斯，都是云中间件的代表，所以去学习其中设计的思想、源码的思想是非常重要的！</p>
+<h3 id="Go-面试问题总结"><a href="#Go-面试问题总结" class="headerlink" title="Go 面试问题总结"></a>Go 面试问题总结</h3><blockquote>
+<p>1、数组与链表的区别（数据结构基础知识）</p>
+<p>2、进程、线程、协程有什么区别（操作系统的知识，加 Go 语言特有的协程）</p>
+<p>3、Redis 与 MYSQL 熟悉吗，Redis 有哪几种数据结构，缓存过期（TTL 网络中的生存时间），Redis 一般使用在哪一些场景里面（针对热点数据进行缓存、限时数据缓存、热点权值数据进行缓存）</p>
+<p>4、channel 有几种类型（自己回答是读、写、读写三种，不一定对，也可能 chan int、string、byte）</p>
+<p>5、控制 Goroutine 数量的几种方式（channel 控制，sync.WaitGroup 控制）</p>
+<p>6、Go 语言调度模型：GMP 模型（hand off 机制没回答特别好）</p>
+<p>7、Go 语言的 GC（标记清除法、三色标记法、混合写屏障机制）</p>
+<p>8、Go GC 在什么时候会导致 GC 效率不高（STW 次数多的时候效率不高，毕竟依赖于 STW 机制）</p>
+<p>9、TCP 的 CLOSE_WAIT 状态出现在那一步</p>
+<p>10、slice 与 map 底层源码（slice 底层为指针 Array 类型，Go 中的 map 是 slice + list 数组加链表，而 java 里面是最简单的是数组，规模达到一定程度转换为数组 + 链表或数组 + 红黑树的形式）</p>
+<p>11、Go 语言的内存泄漏、内存逃逸问题（内存逃逸就是栈上开辟空间存放的变量，逃逸到堆上去了，内存泄漏主要是看 OS 的环境，Linux 下使用 top&#x2F;htop）</p>
+<p>12、几道 Go 语言面试的题目：闭包传参、向空 slice append 数等</p>
+<p>13、Go 语言如何 debug（自己回答是采用单元测试的办法、pprof 等方式方法）</p>
+<p>14、算法题目：三数之和，返回二维数组，二维数组内不能有重复值，即数组内元素相等</p>
+</blockquote>
+<h3 id="5-月-21-日温故而知新"><a href="#5-月-21-日温故而知新" class="headerlink" title="5 月 21 日温故而知新"></a>5 月 21 日温故而知新</h3><blockquote>
+<p>1、Go 语言中协程出现了 panic 的情况，有什么样的机制保证协程恢复并继续执行下去？</p>
+<p>2、Go 语言中的调试信息使用什么查看？</p>
+<p>3、Go 语言中的内存模型与内存回收机制</p>
+<p>4、Go 与 Python 语言的协程对比有什么区别</p>
+<p>5、<strong>Mysql 里面执行计划的概念</strong>（之前复盘都没有听出来这个问题，一个劲在说不知道）</p>
+<p>6、redo-log、undo-log、bin-log 三个 log 文件的作用与区别，如何使用 redo 与 bin 两种日志去保证数据的一致性？</p>
+<p>7、<strong>数据库出现过性能问题嘛，千万级数据量的表如何进行一个排查+处理</strong></p>
+<p>8、gorm 操作数据库是如何操作的？</p>
+<p>9、<strong>redis 中 AOF 与 RDB 两种快照日志主要是为了解决什么样的问题？</strong></p>
+<p>10、gin 框架的源码看过吗，里面路由具体的实现机制是怎样的</p>
+<p>11、平时关注哪些开源技术？</p>
+</blockquote>
+<h2 id="Go-面试复盘"><a href="#Go-面试复盘" class="headerlink" title="Go 面试复盘"></a>Go 面试复盘</h2><blockquote>
+<p>先上总结：</p>
+<ul>
+<li>面经光看没用，只有自己不断的面试，然后总结，自己理解性的进行描述才有意义，否则只是像八股文一样去背记，从而未能理解真正的含义。那么，可能下一次面试的时候，上一次面试的问题依然处于一种遗留的状态，这样就无法在技术的关键节点进行成长</li>
+<li>尤其是算法题，如果一两个月不复盘算法问题，那么算法思维存在，但是代码熟练度会下降，从而导致写算法的时间变长，以及相应的心态焦虑</li>
+<li>以下为自己答的不好与没答出的问题</li>
+</ul>
+</blockquote>
+<h3 id="TCP-三次握手"><a href="#TCP-三次握手" class="headerlink" title="TCP 三次握手"></a>TCP 三次握手</h3><blockquote>
+<p>答：TCP 的三次握手为：</p>
+<p>1、客户端发送的报文为 SYN 报文，并选择一个初始的 Seq 序号，之后客户端进入监听状态（SYN-SENT）</p>
+<p>2、服务器在接收到客户端第一次发送的 SYN 报文之后，如果同意连接，即向客户端发送连接确认报文，即 SYN + ACK 报文，也附加一个自选的初始 Seq 序号，并且此序号与客户端的序号无关，之后服务器端继续维持监听状态（SYN-RCVD）</p>
+<p>3、客户端在接收到服务器发送回的报文之后，再向服务器端发送确认报文，确认号为服务器初始的 Seq 序号 + 1，序号为自己初始的 Seq 序号 + 1</p>
+<p>4、此后服务器与客户端正式建立连接，开始发送数据，双方状态为 ESTABLISHED</p>
+</blockquote>
+<p><img src="/images/go/tcp3.png" srcset="/img/loading.gif" lazyload alt="tcp3"></p>
+<h3 id="TCP-需要三次握手的原因"><a href="#TCP-需要三次握手的原因" class="headerlink" title="TCP 需要三次握手的原因"></a>TCP 需要三次握手的原因</h3><blockquote>
+<p>答：采用第三次握手的原因是：</p>
+<p>1、如果第一次客户端的报文中途出现延迟，而客户端开始重发第一次的报文，并且重发报文被服务器正确接收</p>
+<p>2、而此时，第一次客户端发送的报文又到达服务端，服务端接收后，又返回一个报文，相当于服务器同一个客户端建立了两个连接，而客户端只认为自己建立的一个连接，造成了状态不一致，同时服务器的资源也被浪费了</p>
+<p>3、故为了尽可能保证连接的建立及时、有效且资源节约，故采用 TCP 三次握手</p>
+</blockquote>
+<h3 id="TCP-四次挥手"><a href="#TCP-四次挥手" class="headerlink" title="TCP 四次挥手"></a>TCP 四次挥手</h3><blockquote>
+<p>答：TCP 的四次挥手过程为：</p>
+<p>1、首先由客户端向服务器端发送关闭连接请求报文，即 FIN 报文，此时客户端由 ESTABLISHED 状态转变为 FIN-WAIT-1 状态，此时还能继续接收服务器所发送的数据</p>
+<p>2、服务器在接收到客户端发送的 FIN 包后，向客户端发送确认报文，即 ACK 报文，此时服务器的状态由 ESTABLISHED 状态转变为 CLOSED-WAIT 状态，此时服务器端还能继续把未能发送完的数据继续发送</p>
+<p>3、客户端在接收到服务器端发回的 ACK 确认报文之后由 FIN-WAIT-1 转变为 FIN-WAIT-2 状态，并且能继续接收数据，直到服务器发送终止报文，即 FIN 包为止</p>
+<p>4、服务器向客户端发送 FIN 包，此时服务器端由 CLOSED-WAIT 状态转变为 LAST-ACK 状态，等待客户端返回最后一次确认报文，即 ACK 为止</p>
+<p>5、客户端接收到 FIN 包后，由 FIN-WAIT-2 变为 TIME-WAIT 状态，超过一定的时间后自动转变为 CLOSED 状态</p>
+<p>6、服务器端收到客户端的 ACK 报文后，即由 LAST-ACK 状态转变为 CLOSED 状态，不再发送与接收客户端的数据</p>
+</blockquote>
+<p><img src="/images/go/tcp4.png" srcset="/img/loading.gif" lazyload alt="tcp4"></p>
+<h3 id="TCP-需要四次挥手的原因"><a href="#TCP-需要四次挥手的原因" class="headerlink" title="TCP 需要四次挥手的原因"></a>TCP 需要四次挥手的原因</h3><blockquote>
+<p>答：采用第四次挥手的原因是：</p>
+<p>1、如果客户端第四次发送 ACK 报文后就直接进入 CLOSED 状态，那么如果第四次发送的 ACK 报文在传输的过程中丢失，服务器由于一直未能接收客户端发送的 ACK 报文，再次向客户端发送相应的 FIN 报文，而此时客户端已经关闭，接收不到服务器发送的 FIN 报文。即造成了服务器的资源浪费</p>
+<p>2、故为了保证通信尽可能的可靠，采用 TCP 四次挥手，但是在考研中，有种特殊的情况，在确保第三次握手能成立的情况下，第四次挥手可以被省略。若将一个往返视为 RTT 的情况下，最短的释放连接所需要的时间为 1.5 个 RTT 即可，不需要 2 个 RTT，所以这也是为了节省资源所考虑的情况，并不一定视为错误答案</p>
+</blockquote>
+<h3 id="TCP-粘包问题"><a href="#TCP-粘包问题" class="headerlink" title="TCP 粘包问题"></a>TCP 粘包问题</h3><blockquote>
+<p>答：TCP 对比 UDP，前者主要是以字节流的形式传输数据，而 UDP 则以报文的形式传输数据。</p>
+<p>其中报文与字节流的区别主要是，字节流传输是以字节为单位进行数据传输，与每一个数据中的独立的内容无关，而报文传输为传输以报文为单位，保留了报文内容的边界。所以就会导致 TCP 传输字节时候，有可能区分不了数据的边界，导致最后解包数据所造成的解码乱码现象，即 TCP 的粘包的问题。</p>
+<p>解决 TCP 粘包问题的办法有许多种，其中在之前所学的 Zinx 框架中，刘丹冰老师（Aceld 老师）解释了一种 TLV 格式的封包解包办法，即使用 datalen、msgID、data 作为封包解包的字段，首先读取一遍封包的头部长度，即 datalen 与 msgID 字段的大小，此处按照自己设置的来。一般设置是两个 uint32 类型，即为 8 Byte 的。</p>
+<p>其中解析开头的 datalen 为 data 字段的数据长度，msgID 为相应的数据包编号。然后根据开头的 datalen 的具体数值来读取之后的 data 段的数据。至于 TCP 发送数据流中出现的错误，利用好 TCP 的错误重传机制就好。</p>
+</blockquote>
+<p><img src="/images/go/TLV.jpeg" srcset="/img/loading.gif" lazyload alt="TLV"></p>
+<h3 id="写代码：channel"><a href="#写代码：channel" class="headerlink" title="写代码：channel"></a>写代码：channel</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">//多多练习一下代码能力，要脱离相应的视频项目开发，变为生产实际开发。</span><br><span class="hljs-comment">//有些东西，一段时间没用就会忘记，比如算法时间复杂度，以及相应的代码熟练度。</span><br><br><span class="hljs-comment">//实现两个channel，一个 channel 输出 ping，一个channel 输出 pang，并发执行。</span><br><br><span class="hljs-comment">//22-5-13 日再回头看，发现问题很显然了，自己当时写一个经典的并发案例没写出来</span><br><span class="hljs-comment">//就是属于基础不够好，这个代码也不符合面试官需要达到的要求，只是效果达到了。</span><br><br><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span><br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	p := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-type">string</span>)<br>	q := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-type">string</span>)<br><br>	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>		p &lt;- <span class="hljs-string">&quot;ping&quot;</span><br>	&#125;()<br><br>	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>		q &lt;- <span class="hljs-string">&quot;pang&quot;</span><br>	&#125;()<br><br>	c := &lt;-q<br>	a := &lt;-p<br><br>	fmt.Printf(<span class="hljs-string">&quot;type of c : %T\n&quot;</span>, c)<br>	fmt.Printf(<span class="hljs-string">&quot;type of a : %T\n&quot;</span>, a)<br><br>	<span class="hljs-keyword">for</span> &#123;<br>		fmt.Println(a)<br>		fmt.Println(c)<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="Go-中-map-查询的时间复杂度为-O-1"><a href="#Go-中-map-查询的时间复杂度为-O-1" class="headerlink" title="Go 中 map 查询的时间复杂度为 O(1)"></a>Go 中 map 查询的时间复杂度为 O(1)</h3><blockquote>
+<p>答：查看了相应的各种博客，了解到：</p>
+<ul>
+<li><p>1、java 中 map 的底层源代码实现为数组 + 链表 + 红黑树，所以在数据量极小的情况下，相应的<strong>查询时间复杂度为 O(1)</strong>，而在数据量较多的情况，map 的查询时间复杂度应该是大于 O(1)，小于 O(N)，接近 O(logN) 的时间复杂度的</p>
+</li>
+<li><p>2、所以说关于 map 的查询时间复杂度是一个很老的问题了，一般使用情况默认为 O(1) 的时间复杂度。但是这并不意味着就要否认 map 的查询时间复杂度是 O(logN) 的说法</p>
+</li>
+<li><p>3、不懂不理解的问题，一定需要事后进行相关资料的查询，以及总结</p>
+</li>
+</ul>
+</blockquote>
+<p>关于 map 查询的时间复杂度，<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/1055243/is-a-java-hashmap-search-really-o1">StackOverFlow</a> 上给出的说法挺多：</p>
+<p><img src="/images/go/mapsearch.png" srcset="/img/loading.gif" lazyload alt="mapsearch"></p>
+<p><img src="/images/go/mapAnswer1.png" srcset="/img/loading.gif" lazyload alt="mapAnswer1"></p>
+<p><img src="/images/go/mapAnswer2.png" srcset="/img/loading.gif" lazyload alt="mapAnswer2"></p>
+<h3 id="GMP-模型"><a href="#GMP-模型" class="headerlink" title="GMP 模型"></a>GMP 模型</h3><blockquote>
+<p>强烈推荐 Aceld 老师的 GMP 模式详细解释，可以明白调度器的调度行为。GMP 模型已经单独作为一篇博客存在，所以此处不再阐述。</p>
+</blockquote>
+<h3 id="Go-GC-在什么情况下性能比较低"><a href="#Go-GC-在什么情况下性能比较低" class="headerlink" title="Go GC 在什么情况下性能比较低"></a>Go GC 在什么情况下性能比较低</h3><p>1、内存泄露。</p>
+<p>2、小对象，结构体比指针的好。</p>
+<h2 id="开源的思考"><a href="#开源的思考" class="headerlink" title="开源的思考"></a>开源的思考</h2><p>本人曾经的职业规划是，在读研后学习 NLP、CV 等领域的算法论文，而后向着算法工程师的方向进行努力。而近几年的考研难度以及行业的形式导致自己的期待与期望成了泡沫。在二战也未能达到名校的分数线后，自己毅然决定，不调剂，投入社会进行学习与工作。</p>
+<p>但是困扰自己的问题出现了，学习什么样的技术、向什么样的行业发展，成为自己的一大困惑。通过一段时间的自我认知与自我反省，想到了自己曾经大三时候学习的 go 语言，并且使用 beego 框架进行相应的简易博客开发，所以方向是 go 语言工程师，go 语言中的几个方向：云原生、微服务、高性能 API、服务器端开发、游戏开发。自己这几个方向都还是比较喜欢的，更坚定了自己使用 go 语言进行找工作的决心。</p>
+<p>而在今天看到了云原生社区对 APISIX 的联合创始人&amp;CEO 温铭做的采访，其中几个观点，我也是非常认可其中的理念：</p>
+<blockquote>
+<p>1、开源比业务代码更有意义</p>
+<p>2、开源的本质是要拿开发者的杠杆</p>
+<p>3、Apache 的理念是社区比代码更重要</p>
+</blockquote>
+<p>自己的确非常喜欢开源社区，也十分认同开源的理念，就是能让自己的智慧以及不断发展的能力，给开源社区做出贡献。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/go/" class="category-chain-item">go</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/%E9%9D%A2%E8%AF%95/" class="print-no-link">#面试</a>
+      
+        <a href="/tags/Go/" class="print-no-link">#Go</a>
+      
+        <a href="/tags/TDD/" class="print-no-link">#TDD</a>
+      
+        <a href="/tags/%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86/" class="print-no-link">#错误处理</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Go 语言基础与工程实践笔记</div>
+      <div>https://chaggle.github.io/2026/08/10/go/fundamentals-engineering-20260811/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月11日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/10/cpp/stl-containers-20260811/" title="C++ STL 容器学习笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">C++ STL 容器学习笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/10/go/concurrency-memory-20260811/" title="Go 并发与内存学习笔记">
+                        <span class="hidden-mobile">Go 并发与内存学习笔记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '3934e4e7d1dc19e9cdc0a439def5fd04'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

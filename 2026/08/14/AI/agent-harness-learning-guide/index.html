@@ -1,0 +1,1318 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/14/AI/agent-harness-learning-guide/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="本文以 DeepSeek Harness 团队「Agent Harness 研发&#x2F;工程方向」为目标岗位，通过对 bilibili 视频课程与 GitHub 开源项目的调研总结，系统阐述如何训练 Agent 开发与 Harness…">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Agent Harness 岗的核心学习方法">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/14/AI/agent-harness-learning-guide/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="本文以 DeepSeek Harness 团队「Agent Harness 研发&#x2F;工程方向」为目标岗位，通过对 bilibili 视频课程与 GitHub 开源项目的调研总结，系统阐述如何训练 Agent 开发与 Harness…">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-09-01T16:53:38.175Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="Agent">
+<meta property="article:tag" content="DeepSeek">
+<meta property="article:tag" content="Harness">
+<meta property="article:tag" content="多智能体">
+<meta property="article:tag" content="求职">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Agent Harness 岗的核心学习方法 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Agent Harness 岗的核心学习方法"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-14 00:00" pubdate>
+          2026年8月14日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          11k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          88 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Agent Harness 岗的核心学习方法</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-09-02T00:53:38+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>本文以 DeepSeek Harness 团队「Agent Harness 研发&#x2F;工程方向」为目标岗位，通过对 bilibili 视频课程与 GitHub 开源项目的调研总结，系统阐述如何训练 Agent 开发与 Harness 工程能力。文章给出从基础到进阶的分阶段实操路线、可复现实验与阶段目标，避免泛泛而谈。</p>
+</blockquote>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ol>
+<li><a href="#1-%E5%B2%97%E4%BD%8D%E5%AE%9A%E4%BD%8D">岗位定位：Harness 是什么、为什么重要</a></li>
+<li><a href="#2-%E6%A0%B8%E5%BF%83%E6%8A%80%E8%83%BD%E6%A0%91">核心技能树：从 LLM 基础到 Harness 工程</a></li>
+<li><a href="#3-bilibili-%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90">bilibili 学习资源：入门到进阶的视频路线</a></li>
+<li><a href="#4-github-%E9%A1%B9%E7%9B%AE%E7%B2%BE%E8%AF%BB">GitHub 项目精读：读源码、学架构</a></li>
+<li><a href="#5-%E8%AE%AD%E7%BB%83%E8%B7%AF%E7%BA%BF">训练路线：分阶段实操与可复现实验</a></li>
+<li><a href="#6-%E5%AF%B9%E6%A0%87%E6%8B%9B%E8%81%98%E8%A6%81%E6%B1%82">对标招聘要求：能力映射与面试准备</a></li>
+</ol>
+<hr>
+<h1 id="1-岗位定位"><a href="#1-岗位定位" class="headerlink" title="1. 岗位定位"></a>1. 岗位定位</h1><h2 id="1-1-一个公式：Model-Harness-Agent"><a href="#1-1-一个公式：Model-Harness-Agent" class="headerlink" title="1.1 一个公式：Model + Harness &#x3D; Agent"></a>1.1 一个公式：Model + Harness &#x3D; Agent</h2><p>这是目标团队（DeepSeek Harness 团队）写在招聘里的<strong>团队使命</strong>。理解这个公式，就理解了整份 JD：</p>
+<ul>
+<li><strong>Model（模型）</strong>：经过预训练&#x2F;后训练的 LLM，提供”智能”本身——推理、知识、代码生成。</li>
+<li><strong>Agent（智能体）</strong>：能自主完成任务的系统，会拆解目标、调用工具、迭代执行、自我纠错。</li>
+<li><strong>Harness（中间那一层）</strong>：把模型”装”起来，让它变成 Agent 的<strong>全部工程脚手架</strong>——Agent Loop、工具调用、上下文管理、记忆、多智能体编排、评测、沙箱、可观测性。</li>
+</ul>
+<p>打个比方：模型是”发动机”，Harness 是”整车底盘 + 变速箱 + 方向盘 + 仪表盘”。没有 Harness，模型只能回答问题；有了 Harness，模型才能<strong>做事</strong>。这正是为什么这个岗位叫 “Harness” 而不是 “Agent 应用开发”——它关注的是<strong>让 Agent 可靠跑起来的底层系统</strong>，而不是用框架搭一个聊天机器人。</p>
+<h2 id="1-2-岗位职责拆解"><a href="#1-2-岗位职责拆解" class="headerlink" title="1.2 岗位职责拆解"></a>1.2 岗位职责拆解</h2><p>JD 里明确列出了研究&#x2F;工程&#x2F;产品三个方向，核心职责可以归纳为四条：</p>
+<ol>
+<li><strong>定义并实现 Harness 前沿能力</strong>：上下文管理、长期记忆、Subagent 与 Multi-Agent、自进化 Agent、超长程任务。</li>
+<li><strong>模型与 Harness 的深度适配</strong>：与模型训练团队协作，让 Harness 和模型”共同进化”（而不是 Harness 单向适配模型）。</li>
+<li><strong>构建评测体系</strong>：提出基准测试与评测方法、构建评测数据、制定标注策略，从 Harness 角度持续优化 Agent 智能水平。</li>
+<li><strong>以真实任务为反馈源</strong>：把用户反馈、真实世界任务变成数据与实验，持续迭代 Agent 在真实场景的表现。</li>
+</ol>
+<h2 id="1-3-核心价值：Harness-是-Agent-的”护城河”"><a href="#1-3-核心价值：Harness-是-Agent-的”护城河”" class="headerlink" title="1.3 核心价值：Harness 是 Agent 的”护城河”"></a>1.3 核心价值：Harness 是 Agent 的”护城河”</h2><p>为什么专门设一个 Harness 团队，而不是让普通后端工程师顺便做？因为<strong>模型能力在快速平价化，而 Harness 工程是差异化竞争点</strong>：</p>
+<ul>
+<li>同样的模型，Harness 的好坏直接决定 Agent 能不能处理<strong>超长程、多步骤、需记忆、需协作</strong>的真实任务。</li>
+<li>评测（eval）决定了团队能不能<strong>量化</strong>“Agent 是否真的变强了”，这是模型与 Harness 共同进化的前提。</li>
+<li>上下文管理与记忆机制，直接决定 Agent 在真实工作流里的”续航能力”和”智商天花板”。</li>
+</ul>
+<p>一句话总结：<strong>Harness 工程师是”模型之上的系统工程师”</strong>，既要有算法品味（理解模型行为），又要有工程硬功（状态管理、并发、沙箱、可观测性）。</p>
+<hr>
+<h1 id="2-核心技能树"><a href="#2-核心技能树" class="headerlink" title="2. 核心技能树"></a>2. 核心技能树</h1><p>对照 JD 的关键词，可以把 Harness 岗的技能树拆成七层，从下到上：</p>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>技能域</th>
+<th>关键知识点（JD 原词）</th>
+<th>掌握标准</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L1 基础</td>
+<td>LLM 机制</td>
+<td>LLM API、<strong>KV Cache</strong>、token、上下文窗口、推理&#x2F;思考模型</td>
+<td>能解释 KV Cache 为何是长上下文&#x2F;长任务的性能瓶颈</td>
+</tr>
+<tr>
+<td>L2 核心</td>
+<td>Agent 机制</td>
+<td><strong>Agent Loop</strong>、<strong>Tool Use</strong>、<strong>Reasoning</strong>、<strong>Planning</strong></td>
+<td>能手写 ReAct Loop，理解 ReAct&#x2F;CoT&#x2F;Reflexion&#x2F;ToT 的差异</td>
+</tr>
+<tr>
+<td>L3 上下文</td>
+<td>上下文工程</td>
+<td><strong>Prompt Engineering</strong>、<strong>Context Engineering</strong>、<strong>Memory</strong>、上下文压缩&#x2F;卸载</td>
+<td>能设计记忆分层 + 上下文窗口管理策略</td>
+</tr>
+<tr>
+<td>L4 工具</td>
+<td>工具与协议</td>
+<td><strong>Skills</strong>、<strong>MCP</strong>、工具注册&#x2F;沙箱&#x2F;权限</td>
+<td>能写 MCP Server、封装工具、设计工具 schema</td>
+</tr>
+<tr>
+<td>L5 编排</td>
+<td>多智能体</td>
+<td><strong>Subagent</strong>、<strong>Multi-Agent</strong>、编排模式、通信</td>
+<td>能手写 supervisor &#x2F; handoff &#x2F; 图编排三种模式</td>
+</tr>
+<tr>
+<td>L6 评测</td>
+<td>评测体系</td>
+<td>benchmark、eval harness、trajectory scoring、pass@k</td>
+<td>能搭一套可复现评测 + 做 error analysis</td>
+</tr>
+<tr>
+<td>L7 工程</td>
+<td>工程化</td>
+<td>框架选型、状态持久化、checkpoint、可观测性、沙箱、部署</td>
+<td>能做 durable execution、human-in-the-loop</td>
+</tr>
+</tbody></table>
+<h2 id="2-1-三个-Engineering-课题（JD-反复强调）"><a href="#2-1-三个-Engineering-课题（JD-反复强调）" class="headerlink" title="2.1 三个 Engineering 课题（JD 反复强调）"></a>2.1 三个 Engineering 课题（JD 反复强调）</h2><p>JD 里把三个概念并列提出，这是 Harness 岗的<strong>理论主线</strong>，值得单独拎出来：</p>
+<ul>
+<li><strong>Prompt Engineering（提示词工程）</strong>：让单次调用输出高质量结果。入门门槛低，但天花板在于”结构化输出、少样本、指令设计”。</li>
+<li><strong>Context Engineering（上下文工程）</strong>：<strong>把”给模型什么上下文”当成一个系统问题来设计</strong>——哪些历史要保留、哪些工具结果要压缩、如何分层记忆、如何做上下文卸载（offload）。这是 Harness 岗与普通 Agent 教程的核心分野。</li>
+<li><strong>Harness Engineering（Harness 工程）</strong>：把上面所有东西做成<strong>可靠、可评测、可观测、可复现</strong>的系统——状态图、checkpoint、并发、沙箱、评测闭环。</li>
+</ul>
+<p>一句话记忆：<strong>Prompt 管”一次调用”，Context 管”一个会话”，Harness 管”整个系统”。</strong></p>
+<h2 id="2-2-一个隐藏技能：成为-Agent-产品”重度用户”"><a href="#2-2-一个隐藏技能：成为-Agent-产品”重度用户”" class="headerlink" title="2.2 一个隐藏技能：成为 Agent 产品”重度用户”"></a>2.2 一个隐藏技能：成为 Agent 产品”重度用户”</h2><p>JD 每个方向都要求”深度使用过代码类及通用类 Agent 产品”（Claude Code、Cursor、Codex、Manus、OpenClaw、Hermes 等），并且”把使用融入工作生活”。这不是客套话——<strong>对模型行为有品味、有判断力，只能靠大量真实使用积累</strong>。这也是后面训练路线里”阶段 0”要做的第一件事。</p>
+<hr>
+<h1 id="3-bilibili-学习资源"><a href="#3-bilibili-学习资源" class="headerlink" title="3. bilibili 学习资源"></a>3. bilibili 学习资源</h1><p>调研结论：B 站上的 Agent 课程主要分<strong>四类</strong>，各自解决不同问题。按学习顺序推荐如下。</p>
+<table>
+<thead>
+<tr>
+<th>优先级</th>
+<th>资源 &#x2F; UP主</th>
+<th>BV 号 &#x2F; 链接</th>
+<th>解决什么问题</th>
+<th>适合阶段</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>★★★</td>
+<td>吴恩达《Agentic AI》</td>
+<td><code>BV1aaxyz8ELY</code>、<code>BV1DfrdByE2H</code></td>
+<td>四大设计模式（反思&#x2F;工具&#x2F;规划&#x2F;多智能体）、<strong>evals 评估</strong>、MCP，官方中英字幕</td>
+<td>入门→进阶</td>
+</tr>
+<tr>
+<td>★★★</td>
+<td>李宏毅《AI Agent 系统设计》2025&#x2F;2026</td>
+<td><code>BV1o3wvzUEDD</code></td>
+<td>零基础概念入门，”复仇者联盟”类比多智能体，生动易懂</td>
+<td>零基础</td>
+</tr>
+<tr>
+<td>★★★</td>
+<td>微软《AI Agents for Beginners》</td>
+<td><code>BV18TZYY8EuJ</code>（GitHub 5万+星，12 课时中文）</td>
+<td>系统性：从概念到工具调用、记忆、多智能体全覆盖</td>
+<td>零基础→入门</td>
+</tr>
+<tr>
+<td>★★☆</td>
+<td>李沐《动手学 AI Agent》</td>
+<td>B 站搜”李沐 Agent”</td>
+<td>从零手搓多智能体框架，<strong>ReAct&#x2F;AutoGPT 论文逐句精读</strong></td>
+<td>进阶</td>
+</tr>
+<tr>
+<td>★★☆</td>
+<td>尚硅谷 LangChain &#x2F; LangGraph 实战</td>
+<td>B 站搜”尚硅谷 LangChain”</td>
+<td>框架 API 实战，工程落地</td>
+<td>入门→进阶</td>
+</tr>
+<tr>
+<td>★★☆</td>
+<td>Hugging Face《Agents Course》</td>
+<td>B 站搜”HF Agents Course”（官网 huggingface.co&#x2F;learn&#x2F;agents-course）</td>
+<td>生产级框架 smolagents &#x2F; LangGraph 实战，补”跑得起来”的缺口</td>
+<td>进阶</td>
+</tr>
+<tr>
+<td>★☆☆</td>
+<td>各类 MCP &#x2F; Claude Code 实战视频</td>
+<td>如 <code>BV1oecTzKELA</code>（86 集 LLM+MCP 实战）</td>
+<td>工具协议与真实 Agent 产品上手</td>
+<td>全程穿插</td>
+</tr>
+</tbody></table>
+<p><strong>几点选课建议（避免踩坑）</strong>：</p>
+<ol>
+<li><strong>先刷吴恩达《Agentic AI》</strong>：它把”反思、工具使用、规划、多智能体”四个设计模式和 <strong>evals（评估）</strong> 讲得最清楚，而 evals 恰恰是 Harness 岗最核心、也是绝大多数教程最缺的一块。</li>
+<li><strong>李宏毅负责”建立直觉”</strong>，微软《AI Agents for Beginners》负责”系统覆盖”——两个二选一即可，都看完反而拖节奏。</li>
+<li><strong>框架类视频（LangChain&#x2F;LangGraph）不要只看不写</strong>。B 站教程普遍”演示多、原理解释少”，看完一定要配合第 5 节的动手项目。</li>
+<li><strong>警惕”全 X 百集、七天成大神”类搬运合集</strong>：这类视频多为营销搬运，结构松散、无版权标注。优先选 UP 主本人或官方频道（DeepLearning.AI、Hugging Face、Datawhale 等）的内容。</li>
+</ol>
+<hr>
+<h1 id="4-GitHub-项目精读"><a href="#4-GitHub-项目精读" class="headerlink" title="4. GitHub 项目精读"></a>4. GitHub 项目精读</h1><p>GitHub 项目分三类精读：<strong>评测 Harness</strong>（对标 “harness” 本义，最重要）、<strong>Agent 框架</strong>（学架构）、<strong>手搓&#x2F;教学项目</strong>（练工程感）。</p>
+<h2 id="4-1-评测-Harness：理解-“harness”-一词的出处"><a href="#4-1-评测-Harness：理解-“harness”-一词的出处" class="headerlink" title="4.1 评测 Harness：理解 “harness” 一词的出处"></a>4.1 评测 Harness：理解 “harness” 一词的出处</h2><p><strong>EleutherAI&#x2F;lm-evaluation-harness</strong>（11k+ star）</p>
+<ul>
+<li><strong>架构</strong>：把评测拆成”模型接口”与”任务定义”两半。任何模型只需实现 <code>lm_eval.api.model.LM</code> 的三个原语——<code>loglikelihood</code>（多选题对数概率）、<code>loglikelihood_rolling</code>（困惑度）、<code>generate_until</code>（自由生成）——即可接入 60+ 标准基准。任务从 v0.4.0 起从 Python 子类迁移到 <strong>YAML 配置</strong>，降低加新 benchmark 门槛。</li>
+<li><strong>可借鉴的 Harness 实践</strong>：① 统一抽象（模型后端与任务解耦）；② YAML 声明式任务定义；③ 结果缓存保证可复现；④ 任务版本号（task version）确保跨时间对比公平。它是 Hugging Face Open LLM Leaderboard 的评测后端，是”评测 harness”的事实标准。</li>
+</ul>
+<p><strong>SWE-bench &#x2F; SWE-agent</strong>（Princeton）</p>
+<ul>
+<li><strong>架构</strong>：SWE-bench 收集 2294 个真实 GitHub issue + 对应 PR，用 <strong>FAIL_TO_PASS &#x2F; PASS_TO_PASS</strong> 测试作为评测信号——模型要改代码让原本失败的测试通过。SWE-agent 是第一个基于 Agent 的系统，用 ReAct 循环 + <strong>Agent-Computer Interface（ACI）</strong> 设计（精简的文件&#x2F;编辑&#x2F;搜索工具）刷出 12.47% 的 baseline。</li>
+<li><strong>可借鉴的 Harness 实践</strong>：① <strong>执行即评测</strong>（execution-graded，跑测试而不是看文本相似度）；② 工具接口设计（ACI）对 Agent 性能影响巨大；③ 轨迹打分（trajectory scoring）能区分”差一步就对”和”完全跑偏”两种失败——这是比”最终对错”更细粒度的评测信号。</li>
+</ul>
+<p><strong>All-Hands-AI&#x2F;OpenHands（原 OpenDevin）</strong></p>
+<ul>
+<li><strong>架构</strong>：代码 Agent 平台，基于 <strong>事件流（event stream）架构</strong>，Agent 的每个 action&#x2F;observation 都是事件，可回放、可注入、可评测。内置 CodeActAgent（统一 action space：把”动作”统一为”执行一段代码”）。</li>
+<li><strong>可借鉴的 Harness 实践</strong>：事件流让 Agent 执行<strong>完全可审计、可回放、可作为训练数据</strong>——这正是”以真实任务为反馈源、持续迭代”的落地形态。</li>
+</ul>
+<p>其他值得扫一眼的评测项目：<code>UKGovernmentBEIS/inspect_ai</code>（自定义 agent eval 的框架，标准化推荐）、<code>ServiceNow/BrowserGym</code> + <code>AgentLab</code>（Web 环境评测）、<code>sierra-research/tau-bench</code>（工具+用户仿真，pass^k 可靠性指标）、<code>GAIA</code>&#x2F;<code>WebArena</code>&#x2F;<code>AgentBench</code>&#x2F;<code>OSWorld</code>（多环境基准）。</p>
+<h2 id="4-2-Agent-框架：读架构、学取舍"><a href="#4-2-Agent-框架：读架构、学取舍" class="headerlink" title="4.2 Agent 框架：读架构、学取舍"></a>4.2 Agent 框架：读架构、学取舍</h2><p>调研结论（2026 年年中，star 数与版本随时变动，以下为方向性结论）：</p>
+<table>
+<thead>
+<tr>
+<th>框架</th>
+<th>心智模型</th>
+<th>核心原语</th>
+<th>何时用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>LangGraph</strong>（langchain-ai）</td>
+<td>状态图</td>
+<td>StateGraph、checkpointer、human-in-the-loop</td>
+<td>生产级多智能体、需持久化&#x2F;恢复&#x2F;审批</td>
+</tr>
+<tr>
+<td><strong>AutoGen → Microsoft Agent Framework</strong></td>
+<td>对话&#x2F;actor</td>
+<td>GroupChat、异步事件</td>
+<td>开放讨论、红队、辩论（成本偏高）</td>
+</tr>
+<tr>
+<td><strong>CrewAI</strong>（crewAIInc）</td>
+<td>角色分工</td>
+<td>role&#x2F;goal&#x2F;backstory + crew + process</td>
+<td>内容流水线、快速原型</td>
+</tr>
+<tr>
+<td><strong>OpenAI Agents SDK</strong></td>
+<td>handoff 交接</td>
+<td>Agent + handoffs + guardrails + sessions</td>
+<td>快速交付、OpenAI 生态</td>
+</tr>
+<tr>
+<td><strong>smolagents</strong>（huggingface）</td>
+<td>code-first</td>
+<td>CodeAgent（让 LLM 写 Python）</td>
+<td>可审计、极简、HF 生态</td>
+</tr>
+</tbody></table>
+<p><strong>关键取舍（面试常考）</strong>：</p>
+<ul>
+<li><strong>LangGraph 是生产默认</strong>：durable execution（crash 后从 checkpoint 恢复）、human-in-the-loop、时间旅行调试。代价是学习曲线陡、对简单 agent 显得重。</li>
+<li><strong>AutoGen 的 GroupChat 成本失控</strong>：同一任务可能多出 5~6 倍 token 调用，因为每轮都拉全量 transcript 进上下文——这是”编排方式决定成本”的典型例证。</li>
+<li><strong>smolagents 的”code-first”是趋势</strong>：让 LLM 直接写代码而非走严格的 function-calling 格式，动作空间更灵活、可审计性更好，值得精读其 ~1000 行核心源码。</li>
+<li><strong>OpenAI Agents SDK 的 handoff 是”委派即原语”</strong>：triage agent 判断意图后交接给专家 agent，状态通过对话历史流动，心智模型干净但状态默认短暂。</li>
+</ul>
+<p><strong>读源码建议</strong>：不要五个都读。<strong>精读 smolagents（最小可读）→ 精读 LangGraph（生产代表）</strong>，其余读文档 + 跑 demo 即可。</p>
+<h2 id="4-3-手搓-教学项目：练-“harness-工程感”"><a href="#4-3-手搓-教学项目：练-“harness-工程感”" class="headerlink" title="4.3 手搓&#x2F;教学项目：练 “harness 工程感”"></a>4.3 手搓&#x2F;教学项目：练 “harness 工程感”</h2><ul>
+<li><strong>datawhalechina&#x2F;hello-agents</strong>：从零手搓一个 Agent 框架，无第三方依赖。<strong>强烈推荐</strong>——只有自己搭过状态图、持久化、工作流编排，出问题才知道断在哪。</li>
+<li><strong>microsoft&#x2F;ai-agents-for-beginners</strong>：12 课时的系统入门，含完整中文，覆盖 Agent 概念、工具、记忆、多智能体。</li>
+<li><strong>MCP（modelcontextprotocol）</strong>：不是”项目”而是”协议”，但 <code>modelcontextprotocol/servers</code> 是理解 Skills&#x2F;MCP 工具生态的必读。JD 明确把 MCP、Skills 列为知识点。</li>
+</ul>
+<hr>
+<h1 id="5-训练路线"><a href="#5-训练路线" class="headerlink" title="5. 训练路线"></a>5. 训练路线</h1><p>从零到对标岗位，按 6 个阶段推进。每阶段给出<strong>目标、动手项目、可复现实验、验收标准</strong>。总周期建议 3~6 个月（有后端&#x2F;算法基础可压缩）。</p>
+<h2 id="阶段-0：成为-Agent-重度用户-补-LLM-基础（1-2-周）"><a href="#阶段-0：成为-Agent-重度用户-补-LLM-基础（1-2-周）" class="headerlink" title="阶段 0：成为 Agent 重度用户 + 补 LLM 基础（1~2 周）"></a>阶段 0：成为 Agent 重度用户 + 补 LLM 基础（1~2 周）</h2><ul>
+<li><strong>目标</strong>：建立”对模型行为的品味”，这是 JD 反复要求、面试最难伪装的能力。</li>
+<li><strong>动手</strong>：把 Claude Code &#x2F; Cursor 接入你的日常——用它们写代码、读代码库、重构。记录：什么时候它”神”，什么时候它”蠢”（死循环、改错文件、忘记目标）。</li>
+<li><strong>实验</strong>：同一个任务，分别用 Cursor、Claude Code、Manus 跑，对比工具调用轨迹、失败模式、token 消耗。</li>
+<li><strong>验收</strong>：能写出 200 字的”Agent 行为观察笔记”，能解释 KV Cache 为什么是长任务瓶颈。</li>
+</ul>
+<h2 id="阶段-1：手搓最小-Agent-Loop（2-3-周）"><a href="#阶段-1：手搓最小-Agent-Loop（2-3-周）" class="headerlink" title="阶段 1：手搓最小 Agent Loop（2~3 周）"></a>阶段 1：手搓最小 Agent Loop（2~3 周）</h2><ul>
+<li><strong>目标</strong>：不依赖任何框架，理解 Agent Loop &#x2F; Tool Use &#x2F; ReAct 的底层。</li>
+<li><strong>动手项目</strong>：用 Python 写一个 ReAct Agent——LLM 输出 <code>Thought → Action → Observation</code> 循环，调用 2~3 个真实工具（搜索、计算器、文件读写）。</li>
+<li><strong>可复现实验</strong>：① 对比”带 ReAct 循环” vs “单次生成”解决多步任务的正确率；② 加入 max_iteration &#x2F; 循环检测，观察死循环如何被切断。</li>
+<li><strong>验收</strong>：核心循环 &lt; 200 行可读代码；能画出 ReAct 的状态机图。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 最小 ReAct 循环（伪代码，用于理解，非生产实现）</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">react_loop</span>(<span class="hljs-params">task: <span class="hljs-built_in">str</span>, tools: <span class="hljs-built_in">dict</span>, llm, max_iter: <span class="hljs-built_in">int</span> = <span class="hljs-number">10</span></span>):<br>    messages = [&#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;system&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: SYS_PROMPT&#125;]  <span class="hljs-comment"># 包含工具 schema</span><br>    messages.append(&#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: task&#125;)<br>    <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(max_iter):<br>        out = llm(messages)                    <span class="hljs-comment"># Thought + Action(JSON)</span><br>        thought, action = parse(out)           <span class="hljs-comment"># 解析出动作与参数</span><br>        <span class="hljs-keyword">if</span> action.name == <span class="hljs-string">&quot;finish&quot;</span>:<br>            <span class="hljs-keyword">return</span> action.args[<span class="hljs-string">&quot;answer&quot;</span>]       <span class="hljs-comment"># 终止</span><br>        obs = tools[action.name](**action.args)  <span class="hljs-comment"># 执行工具，得到 Observation</span><br>        messages.append(&#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;assistant&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: out&#125;)<br>        messages.append(&#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">f&quot;Observation: <span class="hljs-subst">&#123;obs&#125;</span>&quot;</span>&#125;)<br>    <span class="hljs-keyword">raise</span> TimeoutError(<span class="hljs-string">&quot;agent loop 超过最大迭代&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h2 id="阶段-2：框架实战-上下文工程（3-4-周）"><a href="#阶段-2：框架实战-上下文工程（3-4-周）" class="headerlink" title="阶段 2：框架实战 + 上下文工程（3~4 周）"></a>阶段 2：框架实战 + 上下文工程（3~4 周）</h2><ul>
+<li><strong>目标</strong>：用 LangGraph 落地，重点攻克<strong>记忆与上下文管理</strong>。</li>
+<li><strong>动手项目</strong>：把阶段 1 的 Agent 用 LangGraph 重写，加入 ① <code>checkpointer</code>（持久化，crash 后恢复）；② 短期记忆（滑动窗口）+ 长期记忆（向量库&#x2F;摘要）；③ human-in-the-loop 审批节点。</li>
+<li><strong>可复现实验</strong>：对比”无记忆 vs 滑动窗口 vs 摘要压缩”在长对话任务中的 token 消耗与正确率，量化上下文管理收益。</li>
+<li><strong>验收</strong>：能解释 StateGraph 的状态流；能实现 checkpoint 恢复与时间旅行调试。</li>
+</ul>
+<h2 id="阶段-3：多智能体编排-MCP-工具生态（3-4-周）"><a href="#阶段-3：多智能体编排-MCP-工具生态（3-4-周）" class="headerlink" title="阶段 3：多智能体编排 + MCP 工具生态（3~4 周）"></a>阶段 3：多智能体编排 + MCP 工具生态（3~4 周）</h2><ul>
+<li><strong>目标</strong>：掌握 Subagent &#x2F; Multi-Agent 与工具协议。</li>
+<li><strong>动手项目</strong>：实现一个 supervisor 模式的多智能体（研究员 + 写手 + 评审），并写一个自定义 <strong>MCP Server</strong> 让 Agent 调用。</li>
+<li><strong>可复现实验</strong>：对比”单 Agent” vs “supervisor 多 Agent” vs “GroupChat 多 Agent”在同一任务上的成功率与成本，验证”编排方式决定成本”。</li>
+<li><strong>验收</strong>：能手写 handoff &#x2F; 图编排 &#x2F; supervisor 三种模式并说清取舍。</li>
+</ul>
+<h2 id="阶段-4：评测体系（4-6-周，Harness-岗核心）"><a href="#阶段-4：评测体系（4-6-周，Harness-岗核心）" class="headerlink" title="阶段 4：评测体系（4~6 周，Harness 岗核心）"></a>阶段 4：评测体系（4~6 周，Harness 岗核心）</h2><ul>
+<li><strong>目标</strong>：搭一套<strong>可复现的 eval harness</strong>，这是与普通 Agent 开发者拉开差距的关键。</li>
+<li><strong>动手项目</strong>：① 用 <code>lm-evaluation-harness</code> 的 YAML 自定义一个任务；② 用 SWE-bench Lite 跑一个基线 Agent（可参考 smolagents 或 SWE-agent 的最小实现）；③ 自建 20<del>50 题的个人 benchmark，对阶段 1</del>3 的 Agent 做 error analysis。</li>
+<li><strong>可复现实验</strong>：对同一 Agent 分别做 outcome 打分 vs trajectory 打分，验证”最终对错”如何掩盖”差一步就对”。</li>
+<li><strong>验收</strong>：能写出一份 eval 报告，含失败模式分类 + 下一步改进优先级（这正是吴恩达《Agentic AI》模块 4 讲的”误差分析”）。</li>
+</ul>
+<h2 id="阶段-5：真实项目-开源贡献（长期）"><a href="#阶段-5：真实项目-开源贡献（长期）" class="headerlink" title="阶段 5：真实项目 + 开源贡献（长期）"></a>阶段 5：真实项目 + 开源贡献（长期）</h2><ul>
+<li><strong>目标</strong>：把能力沉淀为<strong>可展示的开源作品</strong>（JD 加分项）。</li>
+<li><strong>动手项目</strong>：做一个端到端的 Agent 产品（如代码维护 Agent、研究 Agent、数据分析 Agent），开源并写好 README、eval 结果、trace 回放。</li>
+<li><strong>复现实验</strong>：提交 PR 给 smolagents &#x2F; LangGraph &#x2F; lm-eval &#x2F; SWE-bench 等社区（哪怕修文档、加 test）。</li>
+<li><strong>验收</strong>：有 1~2 个能放进简历的开源项目 + 若干社区 PR。</li>
+</ul>
+<hr>
+<h1 id="6-对标招聘要求"><a href="#6-对标招聘要求" class="headerlink" title="6. 对标招聘要求"></a>6. 对标招聘要求</h1><p>把 JD 的任职要求逐条映射成”学习完成后应具备的能力”，并给出面试准备方向。</p>
+<h2 id="6-1-能力映射表"><a href="#6-1-能力映射表" class="headerlink" title="6.1 能力映射表"></a>6.1 能力映射表</h2><table>
+<thead>
+<tr>
+<th>JD 要求（研发&#x2F;工程方向）</th>
+<th>对应训练阶段</th>
+<th>面试验证方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>熟悉 LLM + Agent 机制（LLM API、KV Cache、Agent Loop、Tool Use、Reasoning、Planning、Skills、MCP、Memory、Subagent、Multi-Agent）</td>
+<td>阶段 0~3</td>
+<td>白板画 Agent Loop 状态机；解释 KV Cache；比较编排模式</td>
+</tr>
+<tr>
+<td>深入理解 Prompt &#x2F; Context &#x2F; Harness Engineering</td>
+<td>阶段 2、4</td>
+<td>现场设计一个记忆分层 + 上下文窗口管理方案</td>
+</tr>
+<tr>
+<td>熟练使用 AI Agent 工具做软件开发</td>
+<td>阶段 0 贯穿全程</td>
+<td>展示你用 Claude Code&#x2F;Cursor 做项目的实际经历与效率收益</td>
+</tr>
+<tr>
+<td>是 Agent 产品重度用户，对模型行为有品味</td>
+<td>阶段 0</td>
+<td>谈对某个 Agent 产品”神&#x2F;蠢”时刻的具体观察</td>
+</tr>
+<tr>
+<td>技术水平过硬、眼界广阔（架构与选型）</td>
+<td>阶段 2~4</td>
+<td>框架选型题：什么场景选 LangGraph 还是 smolagents</td>
+</tr>
+<tr>
+<td>真实任务作反馈源、持续迭代产品</td>
+<td>阶段 4、5</td>
+<td>讲你的 eval → error analysis → 改进闭环</td>
+</tr>
+</tbody></table>
+<h2 id="6-2-面试准备清单"><a href="#6-2-面试准备清单" class="headerlink" title="6.2 面试准备清单"></a>6.2 面试准备清单</h2><ol>
+<li><strong>三个必答理论题</strong>：① 什么是 Harness，Model + Harness &#x3D; Agent 怎么理解；② Prompt &#x2F; Context &#x2F; Harness Engineering 三者的边界；③ 评测的 outcome vs trajectory 打分差异。</li>
+<li><strong>一个必带的项目</strong>：一个<strong>带评测、带 trace、开源</strong>的 Agent 项目（阶段 5 的产出），重点讲”我怎么评测它、怎么改进它”。</li>
+<li><strong>三个可现场手撕的小题</strong>：手写 ReAct Loop、设计一个 MCP 工具 schema、画一个 supervisor 多智能体的状态图。</li>
+<li><strong>一页”产品观察”</strong>：你深度使用过的 2~3 个 Agent 产品，各自的优点、失败模式、你作为 Harness 工程师会怎么改。</li>
+</ol>
+<h2 id="6-3-简历项目建议（按含金量排序）"><a href="#6-3-简历项目建议（按含金量排序）" class="headerlink" title="6.3 简历项目建议（按含金量排序）"></a>6.3 简历项目建议（按含金量排序）</h2><ol>
+<li>一个<strong>自建 eval harness + benchmark + error analysis 报告</strong>（最稀缺、最对味）。</li>
+<li>一个<strong>多智能体 + 记忆 + 持久化的端到端产品</strong>（LangGraph 实现）。</li>
+<li>一个<strong>最小可读的 ReAct&#x2F;CodeAct Agent 框架</strong>（手搓，展示工程功底）。</li>
+<li>开源社区 PR（哪怕小，证明能跟社区协作）。</li>
+</ol>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>Harness 岗的本质是：<strong>在模型之上做”可靠系统”的人</strong>。学习路径的底层逻辑只有一条——<strong>先成为 Agent 的重度用户（建立品味），再手搓理解底层（建立直觉），然后上框架做工程（建立硬功），最后用评测闭环迭代（建立判断力）</strong>。B 站负责补”概念与直觉”，GitHub 源码负责补”架构与工程感”，而真正拉开差距的，永远是你自己搭的那套 eval harness 和那份 error analysis 报告。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><strong>岗位</strong></p>
+<ul>
+<li>DeepSeek Harness 团队招聘（mokahr）：<code>https://app.mokahr.com/social-recruitment/high-flyer/140576#/job/8d40c764-d2b2-49b1-826c-e3f2adb75c01</code></li>
+</ul>
+<p><strong>bilibili 视频</strong></p>
+<ul>
+<li>吴恩达《Agentic AI》：<code>BV1aaxyz8ELY</code>、<code>BV1DfrdByE2H</code></li>
+<li>李宏毅《AI Agent 系统设计》2026：<code>BV1o3wvzUEDD</code></li>
+<li>微软《AI Agents for Beginners》B 站版：<code>BV18TZYY8EuJ</code></li>
+<li>李沐《动手学 AI Agent》：B 站搜”李沐 Agent”</li>
+<li>Hugging Face Agents Course：<code>huggingface.co/learn/agents-course</code></li>
+</ul>
+<p><strong>GitHub 项目</strong></p>
+<ul>
+<li>评测 Harness：<code>EleutherAI/lm-evaluation-harness</code>、<code>SWE-bench/SWE-bench</code>、<code>SWE-agent/SWE-agent</code>、<code>All-Hands-AI/OpenHands</code>、<code>UKGovernmentBEIS/inspect_ai</code></li>
+<li>Agent 框架：<code>langchain-ai/langgraph</code>、<code>microsoft/autogen</code>（→ Microsoft Agent Framework）、<code>crewAIInc/crewAI</code>、<code>openai/openai-agents-python</code>、<code>huggingface/smolagents</code></li>
+<li>教学&#x2F;手搓：<code>datawhalechina/hello-agents</code>、<code>microsoft/ai-agents-for-beginners</code></li>
+<li>协议：<code>modelcontextprotocol/servers</code></li>
+</ul>
+<p><strong>经典论文（按需精读）</strong></p>
+<ul>
+<li>ReAct（arXiv:2210.03629）、Chain-of-Thought（arXiv:2201.11903）、Reflexion、Tree of Thoughts</li>
+<li>SWE-bench（Jimenez et al., ICLR 2024）、CodeAct（OpenHands）、GAIA、WebArena、τ-bench、AgentBench</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/AI/" class="category-chain-item">AI</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AI/" class="print-no-link">#AI</a>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/DeepSeek/" class="print-no-link">#DeepSeek</a>
+      
+        <a href="/tags/Agent/" class="print-no-link">#Agent</a>
+      
+        <a href="/tags/Harness/" class="print-no-link">#Harness</a>
+      
+        <a href="/tags/%E5%A4%9A%E6%99%BA%E8%83%BD%E4%BD%93/" class="print-no-link">#多智能体</a>
+      
+        <a href="/tags/%E6%B1%82%E8%81%8C/" class="print-no-link">#求职</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Agent Harness 岗的核心学习方法</div>
+      <div>https://chaggle.github.io/2026/08/14/AI/agent-harness-learning-guide/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月14日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年9月2日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/14/windows/wsl2-restore-on-stripped-windows/" title="在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/13/AI/deepseek-rd-jobs-scan/" title="DeepSeek 研发岗位全量扫描与自我匹配评估">
+                        <span class="hidden-mobile">DeepSeek 研发岗位全量扫描与自我匹配评估</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'b2958e7c38317678a719329289b36a68'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

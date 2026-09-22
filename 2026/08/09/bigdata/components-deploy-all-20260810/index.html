@@ -1,0 +1,1568 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/09/bigdata/components-deploy-all-20260810/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="本文汇总 HDFS、YARN、Hive、Spark、Flink、Zookeeper、Kafka、MySQL、Redis、Nacos、RocketMQ 共 11 个组件的安装部署文档，统一了目录导航，便于对照查阅。各组件更深入的生产调优（8C16G &#x2F; 32C256G &#x2F; 64C512G 三档规格参数、集群规模优化、容灾备份）见对应组件各自的《XXX 生产调优实践》文章；K8S">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大数据与中间件组件部署总览">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/09/bigdata/components-deploy-all-20260810/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="本文汇总 HDFS、YARN、Hive、Spark、Flink、Zookeeper、Kafka、MySQL、Redis、Nacos、RocketMQ 共 11 个组件的安装部署文档，统一了目录导航，便于对照查阅。各组件更深入的生产调优（8C16G &#x2F; 32C256G &#x2F; 64C512G 三档规格参数、集群规模优化、容灾备份）见对应组件各自的《XXX 生产调优实践》文章；K8S">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-09T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T16:02:21.194Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="bigdata">
+<meta property="article:tag" content="部署">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>大数据与中间件组件部署总览 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="大数据与中间件组件部署总览"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-09 16:00" pubdate>
+          2026年8月9日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          30k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          252 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">大数据与中间件组件部署总览</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-11T00:02:21+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>本文汇总 HDFS、YARN、Hive、Spark、Flink、Zookeeper、Kafka、MySQL、Redis、Nacos、RocketMQ 共 11 个组件的安装部署文档，统一了目录导航，便于对照查阅。各组件更深入的<strong>生产调优</strong>（8C16G &#x2F; 32C256G &#x2F; 64C512G 三档规格参数、集群规模优化、容灾备份）见对应组件各自的《XXX 生产调优实践》文章；K8S 环境下的部署见《Kubernetes 底层原理》《Kubernetes 常见问题排查》《Kubernetes 部署参数优化》三篇。</p>
+</blockquote>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ul>
+<li>第一部分：大数据组件（HDFS、YARN、Hive、Spark、Flink）</li>
+<li>第二部分：中间件组件（Zookeeper、Kafka、MySQL、Redis、Nacos、RocketMQ）</li>
+</ul>
+<hr>
+<h1 id="第一部分：大数据组件"><a href="#第一部分：大数据组件" class="headerlink" title="第一部分：大数据组件"></a>第一部分：大数据组件</h1><h2 id="HDFS（分布式文件系统）"><a href="#HDFS（分布式文件系统）" class="headerlink" title="HDFS（分布式文件系统）"></a>HDFS（分布式文件系统）</h2><blockquote>
+<p>HDFS 是 Hadoop 的分布式文件系统，安装部署的核心是搞清楚三个角色的分工：NameNode（元数据）、DataNode（数据）、SecondaryNameNode（辅助检查点）。本文以 Hadoop 3.x 为例，记录从下载解压到启动验证的完整过程，单节点起步，扩展为集群只需加节点。</p>
+</blockquote>
+<h3 id="前置条件"><a href="#前置条件" class="headerlink" title="前置条件"></a>前置条件</h3><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>要求</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>操作系统</td>
+<td>Linux（CentOS 7+&#x2F;Ubuntu 均可用）</td>
+</tr>
+<tr>
+<td>JDK</td>
+<td>1.8 或 11（Hadoop 3.x 要求）</td>
+</tr>
+<tr>
+<td>免密登录</td>
+<td>主节点到所有 DataNode 节点 SSH 免密</td>
+</tr>
+<tr>
+<td>时间同步</td>
+<td>集群节点统一时间（NTP&#x2F;chrony）</td>
+</tr>
+<tr>
+<td>hosts 解析</td>
+<td>所有节点 hostname 与 IP 写入 <code>/etc/hosts</code></td>
+</tr>
+</tbody></table>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 免密配置（主节点执行）</span><br>ssh-keygen -t rsa<br>ssh-copy-id user@node1<br>ssh-copy-id user@node2<br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>HDFS 单点起步时免密不是必须的，但集群模式（主节点用 ssh 拉起从节点进程）必须配置。</p> 
+          </div>
+
+<h3 id="下载与解压"><a href="#下载与解压" class="headerlink" title="下载与解压"></a>下载与解压</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 下载 Hadoop 3.x 二进制包（以 3.3.6 为例，建议从 Apache 镜像站获取）</span><br>wget https://dlcdn.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz<br><br><span class="hljs-comment"># 统一解压到 /opt 并建立软链</span><br>tar -zxvf hadoop-3.3.6.tar.gz -C /opt<br><span class="hljs-built_in">ln</span> -s /opt/hadoop-3.3.6 /opt/hadoop<br></code></pre></td></tr></table></figure>
+
+<p>配置环境变量（<code>/etc/profile</code> 或 <code>~/.bashrc</code>）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">export</span> JAVA_HOME=/usr/local/jdk1.8.0_xxx<br><span class="hljs-built_in">export</span> HADOOP_HOME=/opt/hadoop<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$HADOOP_HOME</span>/bin:<span class="hljs-variable">$HADOOP_HOME</span>/sbin<br><span class="hljs-built_in">export</span> HADOOP_CONF_DIR=<span class="hljs-variable">$HADOOP_HOME</span>/etc/hadoop<br><span class="hljs-built_in">source</span> /etc/profile<br></code></pre></td></tr></table></figure>
+
+<h3 id="核心配置"><a href="#核心配置" class="headerlink" title="核心配置"></a>核心配置</h3><p>配置文件都在 <code>$HADOOP_HOME/etc/hadoop/</code> 下，集群模式需要同步到所有节点。</p>
+<h4 id="1-core-site-xml：文件系统入口"><a href="#1-core-site-xml：文件系统入口" class="headerlink" title="1. core-site.xml：文件系统入口"></a>1. <code>core-site.xml</code>：文件系统入口</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>fs.defaultFS<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>hdfs://node1:8020<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>hadoop.tmp.dir<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>/data/hadoop/tmp<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="2-hdfs-site-xml：存储目录与副本"><a href="#2-hdfs-site-xml：存储目录与副本" class="headerlink" title="2. hdfs-site.xml：存储目录与副本"></a>2. <code>hdfs-site.xml</code>：存储目录与副本</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span><br>  <span class="hljs-comment">&lt;!-- NameNode 元数据目录（建议配多目录，不同磁盘） --&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>dfs.namenode.name.dir<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>/data/hadoop/namenode<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br>  <span class="hljs-comment">&lt;!-- DataNode 数据目录（多块盘逗号分隔） --&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>dfs.datanode.data.dir<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>/data/hadoop/datanode<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br>  <span class="hljs-comment">&lt;!-- 副本数：3 节点集群配 2 或 3 --&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>dfs.replication<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>2<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<div class="note note-warning">
+            <p><strong>生产铁律</strong>：<code>dfs.namenode.name.dir</code> 配多个目录并放在不同磁盘（甚至两台机器），元数据是 HDFS 的命根子，目录损坏等于文件系统报废。</p> 
+          </div>
+
+<h4 id="3-workers-文件：DataNode-清单"><a href="#3-workers-文件：DataNode-清单" class="headerlink" title="3. workers 文件：DataNode 清单"></a>3. <code>workers</code> 文件：DataNode 清单</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 每行一个 DataNode 主机名</span><br>node1<br>node2<br>node3<br></code></pre></td></tr></table></figure>
+
+<h4 id="4-环境配置-hadoop-env-sh"><a href="#4-环境配置-hadoop-env-sh" class="headerlink" title="4. 环境配置 hadoop-env.sh"></a>4. 环境配置 <code>hadoop-env.sh</code></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">export</span> JAVA_HOME=/usr/local/jdk1.8.0_xxx<br></code></pre></td></tr></table></figure>
+
+<h3 id="格式化与启动"><a href="#格式化与启动" class="headerlink" title="格式化与启动"></a>格式化与启动</h3><div class="note note-danger">
+            <p><strong>NameNode 只能格式化一次</strong>（单节点首次部署时）。格式化会清空元数据目录，重复格式化会导致集群 DataNode 上报的集群 ID 不一致而启动失败。</p> 
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 创建数据目录</span><br><span class="hljs-built_in">mkdir</span> -p /data/hadoop/&#123;namenode,datanode,tmp&#125;<br><br><span class="hljs-comment"># 2. 首次部署时格式化 NameNode</span><br>hdfs namenode -format<br><br><span class="hljs-comment"># 3. 启动 HDFS（主节点执行，自动 ssh 到 workers 拉起 DataNode）</span><br>start-dfs.sh<br><br><span class="hljs-comment"># 4. 检查进程</span><br>jps<br><span class="hljs-comment"># 主节点应有：NameNode、SecondaryNameNode</span><br><span class="hljs-comment"># 从节点应有：DataNode</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 查看集群状态：Live nodes 数量、块情况</span><br>hdfs dfsadmin -report<br><br><span class="hljs-comment"># 基本读写测试</span><br>hdfs dfs -<span class="hljs-built_in">mkdir</span> -p /test<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;hello hdfs&quot;</span> &gt; /tmp/test.txt<br>hdfs dfs -put /tmp/test.txt /test/<br>hdfs dfs -<span class="hljs-built_in">cat</span> /test/test.txt<br></code></pre></td></tr></table></figure>
+
+<p>Web UI：<code>http://&lt;NameNode节点&gt;:9870</code>（Hadoop 3.x；2.x 为 50070），可查看节点状态、文件系统浏览、NameNode 日志。</p>
+<h3 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h3><ul>
+<li><strong>DataNode 一直处于 Decommissioned&#x2F;Down</strong>：检查 <code>dfs.datanode.data.dir</code> 目录权限（属主应为运行用户）、磁盘空间、节点间 hostname 解析</li>
+<li><strong>集群 ID 不一致</strong>（<code>java.io.IOException: Incompatible clusterIDs</code>）：多为重复格式化或从备份恢复元数据导致，需要比对 <code>VERSION</code> 文件中的 clusterID 或清理 DataNode 数据目录重新启动</li>
+<li><strong>块副本不足</strong>：<code>dfs.replication</code> 与存活 DataNode 数不匹配，或部分节点掉线；<code>hdfs fsck / -files -blocks</code> 排查</li>
+<li><strong>安全模式（Safe mode）</strong>：刚启动短暂处于安全模式属正常，长时间不退出检查 <code>hdfs dfsadmin -safemode get</code> 与数据目录空间</li>
+</ul>
+<h3 id="扩展为集群"><a href="#扩展为集群" class="headerlink" title="扩展为集群"></a>扩展为集群</h3><p>单节点验证通过后，把 <code>hdfs-site.xml</code>、<code>core-site.xml</code>、<code>workers</code> 同步到其他节点，在各节点准备相同路径的 <code>dfs.datanode.data.dir</code> 目录，重启 DataNode 即可加入集群。HA（双 NameNode + JournalNode）属于进阶部署，后续单独写文档。</p>
+<h2 id="YARN（资源调度）"><a href="#YARN（资源调度）" class="headerlink" title="YARN（资源调度）"></a>YARN（资源调度）</h2><blockquote>
+<p>YARN 是 Hadoop 的资源调度框架，负责给 MapReduce、Spark、Flink 等作业分配 CPU 与内存。它的安装包和 HDFS 是同一个 Hadoop 发行版，只需额外配置两个文件：<code>mapred-site.xml</code>（把计算框架指向 YARN）和 <code>yarn-site.xml</code>（定义 ResourceManager 与资源参数）。本文接 HDFS 安装文档，记录 YARN 的配置、启动与验证。</p>
+</blockquote>
+<h3 id="角色说明"><a href="#角色说明" class="headerlink" title="角色说明"></a>角色说明</h3><table>
+<thead>
+<tr>
+<th>角色</th>
+<th>职责</th>
+<th>部署位置</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ResourceManager（RM）</td>
+<td>全局资源调度，分配 Container</td>
+<td>主节点（可 HA 两台）</td>
+</tr>
+<tr>
+<td>NodeManager（NM）</td>
+<td>单机资源管理与任务执行</td>
+<td>每个计算节点</td>
+</tr>
+<tr>
+<td>ApplicationMaster（AM）</td>
+<td>每个应用一个，向 RM 申请资源</td>
+<td>由 NM 拉起，无需手动部署</td>
+</tr>
+<tr>
+<td>TimelineServer &#x2F; JobHistoryServer</td>
+<td>作业历史记录</td>
+<td>主节点（可选）</td>
+</tr>
+</tbody></table>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>沿用 HDFS 部署时的 Hadoop 安装目录，在 <code>$HADOOP_HOME/etc/hadoop/</code> 下配置。</p>
+<h4 id="1-mapred-site-xml：计算框架对接-YARN"><a href="#1-mapred-site-xml：计算框架对接-YARN" class="headerlink" title="1. mapred-site.xml：计算框架对接 YARN"></a>1. <code>mapred-site.xml</code>：计算框架对接 YARN</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>mapreduce.framework.name<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>yarn<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>mapreduce.jobhistory.address<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>node1:10020<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="2-yarn-site-xml：资源调度与单机资源"><a href="#2-yarn-site-xml：资源调度与单机资源" class="headerlink" title="2. yarn-site.xml：资源调度与单机资源"></a>2. <code>yarn-site.xml</code>：资源调度与单机资源</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span><br>  <span class="hljs-comment">&lt;!-- ResourceManager 地址 --&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>yarn.resourcemanager.hostname<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>node1<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br>  <span class="hljs-comment">&lt;!-- 调度器：容量调度器 --&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>yarn.resourcemanager.scheduler.class<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br>  <span class="hljs-comment">&lt;!-- 单节点可分配内存与核数（按机器实际配置调整） --&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>yarn.nodemanager.resource.memory-mb<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>8192<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>yarn.nodemanager.resource.cpu-vcores<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>4<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br>  <span class="hljs-comment">&lt;!-- 日志聚合：作业日志汇总到 HDFS --&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>yarn.log-aggregation-enable<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>true<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<div class="note note-warning">
+            <p><code>yarn.nodemanager.resource.memory-mb</code> 是 NodeManager 可分配给容器（Container）的内存总量，<strong>必须给操作系统留出余量</strong>。8GB 内存的机器建议配 6~7GB，配满会导致操作系统内存耗尽被 OOM 杀掉。</p> 
+          </div>
+
+<h4 id="3-yarn-env-sh-补充-JDK"><a href="#3-yarn-env-sh-补充-JDK" class="headerlink" title="3. yarn-env.sh 补充 JDK"></a>3. <code>yarn-env.sh</code> 补充 JDK</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">export</span> JAVA_HOME=/usr/local/jdk1.8.0_xxx<br></code></pre></td></tr></table></figure>
+
+<h3 id="启动与验证"><a href="#启动与验证" class="headerlink" title="启动与验证"></a>启动与验证</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 启动 YARN（主节点执行）</span><br>start-yarn.sh<br><br><span class="hljs-comment"># 检查进程</span><br>jps<br><span class="hljs-comment"># 主节点：ResourceManager</span><br><span class="hljs-comment"># 从节点：NodeManager</span><br><br><span class="hljs-comment"># 查看节点资源</span><br>yarn node -list<br><span class="hljs-comment"># 输出应显示每个 NodeManager 的 IP 与可用资源</span><br></code></pre></td></tr></table></figure>
+
+<p>Web UI：<code>http://&lt;ResourceManager节点&gt;:8088</code>。集群概览页能看到：</p>
+<ul>
+<li>Active Nodes 数量</li>
+<li>各节点内存&#x2F;核数（与 <code>yarn.nodemanager.resource.*</code> 配置对应）</li>
+<li>正在运行与已完成的 Application</li>
+</ul>
+<h3 id="跑一个-MR-作业验证"><a href="#跑一个-MR-作业验证" class="headerlink" title="跑一个 MR 作业验证"></a>跑一个 MR 作业验证</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 官方示例：统计 /test 目录下单词（先确认 HDFS 上已有文件）</span><br>hadoop jar <span class="hljs-variable">$HADOOP_HOME</span>/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.3.6.jar \<br>  wordcount /test /test-output<br><br><span class="hljs-comment"># 查看结果</span><br>hdfs dfs -<span class="hljs-built_in">cat</span> /test-output/part-r-00000<br></code></pre></td></tr></table></figure>
+
+<p>作业提交后在 8088 页面能看到 Application 从 ACCEPTED → RUNNING → SUCCEEDED 的变化过程。</p>
+<h3 id="常见问题-1"><a href="#常见问题-1" class="headerlink" title="常见问题"></a>常见问题</h3><ul>
+<li><strong>ResourceManager 无法启动</strong>：检查 8088 端口占用、<code>yarn.resourcemanager.hostname</code> 是否被主机名解析、<code>yarn-site.xml</code> 是否有残留配置</li>
+<li><strong>作业一直 ACCEPTED 不运行</strong>：NodeManager 上报资源为 0（内存配置异常）、或集群总资源被其他作业占满</li>
+<li><strong>Container 启动即失败（Exited with exit code 127&#x2F;1）</strong>：节点上 JAVA_HOME 配置错误、或 <code>yarn.nodemanager.resource.memory-mb</code> 过小导致容器分配不足</li>
+<li><strong>日志看不到</strong>：<code>yarn.log-aggregation-enable</code> 未开启时作业日志留在 NodeManager 本地，开启后可通过 8088 页面 <code>Logs</code> 入口查看</li>
+<li><strong>核数设置大于物理核数</strong>：会导致超卖，任务互相抢占 CPU，一般按物理核数配置</li>
+</ul>
+<h3 id="扩展：ResourceManager-HA（可选）"><a href="#扩展：ResourceManager-HA（可选）" class="headerlink" title="扩展：ResourceManager HA（可选）"></a>扩展：ResourceManager HA（可选）</h3><p>两个 ResourceManager 节点 + Zookeeper 实现故障自动切换，配置 <code>yarn.resourcemanager.ha.enabled=true</code>、<code>yarn.resourcemanager.zk-address</code> 后重启生效。单节点起步阶段可暂缓。</p>
+<h2 id="Hive（数仓-SQL-引擎）"><a href="#Hive（数仓-SQL-引擎）" class="headerlink" title="Hive（数仓 SQL 引擎）"></a>Hive（数仓 SQL 引擎）</h2><blockquote>
+<p>Hive 本身不存储数据、不执行计算，它把 SQL 翻译成 MapReduce&#x2F;Tez&#x2F;Spark 作业丢给 YARN 跑，表结构（元数据）存在数据库里。安装 Hive 的核心就是两件事：<strong>把元数据从默认的 Derby 换成 MySQL</strong>（生产必须），以及处理它与 Hadoop 的版本兼容。本文以 Hive 3.1.3 + Hadoop 3.x 为例。</p>
+</blockquote>
+<h3 id="安装前必须理解的架构"><a href="#安装前必须理解的架构" class="headerlink" title="安装前必须理解的架构"></a>安装前必须理解的架构</h3><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs nix">HiveServer2（提供 JDBC 服务）<br>   │<br>   ├── 元数据 → MySQL（Metastore）<br>   └── 计算引擎 → YARN（MapReduce <span class="hljs-symbol">/</span> Tez <span class="hljs-symbol">/</span> Spark）<br></code></pre></td></tr></table></figure>
+
+<div class="note note-warning">
+            <p>Hive 自带的内嵌 Derby 元数据库只适合本地演示：同一时间只允许一个会话连接，并发一多就锁表。<strong>生产环境必须外置 MySQL 作为 Metastore</strong>。</p> 
+          </div>
+
+<h3 id="前置条件-1"><a href="#前置条件-1" class="headerlink" title="前置条件"></a>前置条件</h3><ul>
+<li>Hadoop 集群已部署（HDFS + YARN）</li>
+<li>JDK 1.8</li>
+<li>MySQL 5.7&#x2F;8.0 可用（提前建好库与账号）</li>
+</ul>
+<h3 id="下载与解压-1"><a href="#下载与解压-1" class="headerlink" title="下载与解压"></a>下载与解压</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget https://dlcdn.apache.org/hive/hive-3.1.3/apache-hive-3.1.3-bin.tar.gz<br>tar -zxvf apache-hive-3.1.3-bin.tar.gz -C /opt<br><span class="hljs-built_in">ln</span> -s /opt/apache-hive-3.1.3-bin /opt/hive<br><br><span class="hljs-comment"># 环境变量</span><br><span class="hljs-built_in">export</span> HIVE_HOME=/opt/hive<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$HIVE_HOME</span>/bin<br></code></pre></td></tr></table></figure>
+
+<h3 id="配置-Metastore（MySQL）"><a href="#配置-Metastore（MySQL）" class="headerlink" title="配置 Metastore（MySQL）"></a>配置 Metastore（MySQL）</h3><h4 id="1-准备-MySQL-库"><a href="#1-准备-MySQL-库" class="headerlink" title="1. 准备 MySQL 库"></a>1. 准备 MySQL 库</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> DATABASE IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> hive <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CHARACTER SET</span> utf8;<br><span class="hljs-keyword">GRANT</span> <span class="hljs-keyword">ALL</span> PRIVILEGES <span class="hljs-keyword">ON</span> hive.<span class="hljs-operator">*</span> <span class="hljs-keyword">TO</span> <span class="hljs-string">&#x27;hive&#x27;</span>@<span class="hljs-string">&#x27;%&#x27;</span> IDENTIFIED <span class="hljs-keyword">BY</span> <span class="hljs-string">&#x27;hive123&#x27;</span>;<br>FLUSH PRIVILEGES;<br></code></pre></td></tr></table></figure>
+
+<h4 id="2-添加-MySQL-驱动"><a href="#2-添加-MySQL-驱动" class="headerlink" title="2. 添加 MySQL 驱动"></a>2. 添加 MySQL 驱动</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 将 mysql-connector-java 的 jar（如 mysql-connector-j-8.0.33.jar）放到 lib 目录</span><br><span class="hljs-built_in">cp</span> mysql-connector-j-8.0.33.jar <span class="hljs-variable">$HIVE_HOME</span>/lib/<br></code></pre></td></tr></table></figure>
+
+<h4 id="3-修改-conf-hive-site-xml"><a href="#3-修改-conf-hive-site-xml" class="headerlink" title="3. 修改 conf/hive-site.xml"></a>3. 修改 <code>conf/hive-site.xml</code></h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span><br>  <span class="hljs-comment">&lt;!-- 数据库连接 --&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>javax.jdo.option.ConnectionURL<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>jdbc:mysql://localhost:3306/hive?useSSL=false<span class="hljs-symbol">&amp;amp;</span>characterEncoding=UTF-8<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>javax.jdo.option.ConnectionDriverName<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>com.mysql.cj.jdbc.Driver<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>javax.jdo.option.ConnectionUserName<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>hive<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>javax.jdo.option.ConnectionPassword<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>hive123<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br>  <span class="hljs-comment">&lt;!-- HiveServer2 服务地址（供 beeline/客户端连接） --&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>hive.server2.thrift.bind.host<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>node1<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>hive.server2.thrift.port<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>10000<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br>  <span class="hljs-comment">&lt;!-- 执行引擎：MR / tez / spark 三选一 --&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>hive.execution.engine<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>mr<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>Hive 元数据会存放文件在 HDFS 的 <code>/user/hive/warehouse</code>（默认建表目录），启动前确认 HDFS 上有对应目录及写权限，或在配置中指定 <code>hive.metastore.warehouse.dir</code>。</p> 
+          </div>
+
+<h3 id="初始化元数据库"><a href="#初始化元数据库" class="headerlink" title="初始化元数据库"></a>初始化元数据库</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 初始化 schema（首次部署执行一次，向 MySQL 建 60+ 张元数据表）</span><br>schematool -initSchema -dbType mysql<br><span class="hljs-comment"># 看到 &quot;schemaTool completed&quot; 即成功</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="启动与验证-1"><a href="#启动与验证-1" class="headerlink" title="启动与验证"></a>启动与验证</h3><h4 id="方式一：本地-CLI（快速验证）"><a href="#方式一：本地-CLI（快速验证）" class="headerlink" title="方式一：本地 CLI（快速验证）"></a>方式一：本地 CLI（快速验证）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">hive<br><span class="hljs-comment"># 执行验证</span><br>show databases;<br>create table t_test(<span class="hljs-built_in">id</span> int, name string);<br>insert into t_test values (1, <span class="hljs-string">&#x27;hello&#x27;</span>);<br><span class="hljs-keyword">select</span> * from t_test;<br></code></pre></td></tr></table></figure>
+
+<h4 id="方式二：独立-Metastore-HiveServer2（生产模式）"><a href="#方式二：独立-Metastore-HiveServer2（生产模式）" class="headerlink" title="方式二：独立 Metastore + HiveServer2（生产模式）"></a>方式二：独立 Metastore + HiveServer2（生产模式）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 后台启动元数据服务（共享元数据、允许多客户端）</span><br><span class="hljs-built_in">nohup</span> hive --service metastore &gt; /opt/hive/logs/metastore.log 2&gt;&amp;1 &amp;<br><br><span class="hljs-comment"># 启动 HiveServer2（JDBC 服务）</span><br><span class="hljs-built_in">nohup</span> hive --service hiveserver2 &gt; /opt/hive/logs/hiveserver2.<span class="hljs-built_in">log</span> 2&gt;&amp;1 &amp;<br><br><span class="hljs-comment"># beeline 客户端连接验证</span><br>beeline -u jdbc:hive2://node1:10000 -n root<br></code></pre></td></tr></table></figure>
+
+<h3 id="常见问题-2"><a href="#常见问题-2" class="headerlink" title="常见问题"></a>常见问题</h3><ul>
+<li><strong><code>Could not resolve org.apache.hadoop:hadoop-client</code> &#x2F; guava 冲突</strong>：Hive 与 Hadoop 的 guava jar 版本不一致，删除 Hive lib 下的低版本 guava，替换为 Hadoop lib 下的版本</li>
+<li><strong>初始化报 <code>Access denied for user</code></strong>：MySQL 账号权限未授权 <code>hive.*</code>，或连接串中的 <code>useSSL=false</code> 未生效</li>
+<li><strong>HiveServer2 启动后连不上</strong>：检查 10000 端口是否监听（<code>ss -lntp | grep 10000</code>）、<code>hive.server2.thrift.bind.host</code> 是否被正确解析</li>
+<li><strong>insert 很慢</strong>：MR 引擎作业冷启动开销大，可用 <code>set hive.execution.engine=tez;</code> 切换（需安装 Tez）；表数据量大时优先考虑分区表</li>
+<li><strong><code>warehouse</code> 目录权限不足</strong>：<code>hdfs dfs -chmod -R 755 /user/hive/warehouse</code> 或直接 <code>hdfs dfs -chown -R hive:hive /user/hive</code></li>
+</ul>
+<h3 id="部署建议"><a href="#部署建议" class="headerlink" title="部署建议"></a>部署建议</h3><ul>
+<li>生产将 Metastore 独立部署（可多实例），HiveServer2 前挂 Kyuubi&#x2F;LB 供多业务共用</li>
+<li>建表规范：分区表 + 合理的文件格式（ORC&#x2F;Parquet），避免小文件堆积</li>
+<li>计算引擎：数据量大建议 Tez&#x2F;Spark，MR 作为兜底</li>
+</ul>
+<h2 id="Spark（内存计算引擎）"><a href="#Spark（内存计算引擎）" class="headerlink" title="Spark（内存计算引擎）"></a>Spark（内存计算引擎）</h2><blockquote>
+<p>Spark 是内存计算引擎，安装方式按资源管理模式分三种：Local（单机调试）、Standalone（Spark 自带集群）、YARN（复用 Hadoop 资源池）。生产环境几乎都是 <strong>on YARN</strong>，但部署上反而是最简单的——只需要客户端 + 配置，不用起任何常驻进程。本文三种模式都讲清楚，重点落在 YARN 模式。</p>
+</blockquote>
+<h3 id="部署模式对比"><a href="#部署模式对比" class="headerlink" title="部署模式对比"></a>部署模式对比</h3><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>部署动作</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Local</td>
+<td>解压即用</td>
+<td>开发调试、学习</td>
+</tr>
+<tr>
+<td>Standalone</td>
+<td>启动 Master + Worker 常驻进程</td>
+<td>无 Hadoop 的小集群</td>
+</tr>
+<tr>
+<td>on YARN</td>
+<td>只需客户端，作业提交后由 YARN 调度</td>
+<td>生产（与 Hadoop 共用资源）</td>
+</tr>
+</tbody></table>
+<h3 id="前置条件-2"><a href="#前置条件-2" class="headerlink" title="前置条件"></a>前置条件</h3><ul>
+<li>JDK 1.8&#x2F;11</li>
+<li>Hadoop 3.x（on YARN 模式需要，且 <code>YARN_CONF_DIR</code> 指向有效配置）</li>
+<li>Scala 无需单独安装（发行包自带）</li>
+</ul>
+<h3 id="下载与解压-2"><a href="#下载与解压-2" class="headerlink" title="下载与解压"></a>下载与解压</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 选择与 Hadoop 大版本匹配的预编译包（hadoop3 版）</span><br>wget https://dlcdn.apache.org/spark/spark-3.5.1/spark-3.5.1-bin-hadoop3.tgz<br>tar -zxvf spark-3.5.1-bin-hadoop3.tgz -C /opt<br><span class="hljs-built_in">ln</span> -s /opt/spark-3.5.1-bin-hadoop3 /opt/spark<br><br><span class="hljs-built_in">export</span> SPARK_HOME=/opt/spark<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$SPARK_HOME</span>/bin:<span class="hljs-variable">$SPARK_HOME</span>/sbin<br></code></pre></td></tr></table></figure>
+
+<h3 id="配置-1"><a href="#配置-1" class="headerlink" title="配置"></a>配置</h3><p>配置目录 <code>$SPARK_HOME/conf/</code>，官方自带模板，复制后修改。</p>
+<h4 id="1-spark-env-sh"><a href="#1-spark-env-sh" class="headerlink" title="1. spark-env.sh"></a>1. <code>spark-env.sh</code></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">export</span> JAVA_HOME=/usr/local/jdk1.8.0_xxx<br><span class="hljs-comment"># on YARN 模式：让 YARN 知道 Hadoop 配置位置</span><br><span class="hljs-built_in">export</span> HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop<br><span class="hljs-comment"># Standalone 模式：本机作为 Master 时指定</span><br><span class="hljs-built_in">export</span> SPARK_MASTER_HOST=node1<br></code></pre></td></tr></table></figure>
+
+<h4 id="2-spark-defaults-conf（on-YARN-常用参数）"><a href="#2-spark-defaults-conf（on-YARN-常用参数）" class="headerlink" title="2. spark-defaults.conf（on YARN 常用参数）"></a>2. <code>spark-defaults.conf</code>（on YARN 常用参数）</h4><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-comment"># 默认资源模式：用 YARN</span><br><span class="hljs-attr">spark.master</span>=<span class="hljs-string">yarn</span><br><span class="hljs-attr">spark.deploy.mode</span>=<span class="hljs-string">client</span><br><span class="hljs-comment"># 单 Executor 资源（内存与核数按数据量调整）</span><br><span class="hljs-attr">spark.executor.memory</span>=<span class="hljs-string">4g</span><br><span class="hljs-attr">spark.executor.cores</span>=<span class="hljs-string">2</span><br><span class="hljs-attr">spark.driver.memory</span>=<span class="hljs-string">2g</span><br><span class="hljs-comment"># 动态资源分配（可选）</span><br><span class="hljs-attr">spark.dynamicAllocation.enabled</span>=<span class="hljs-string">true</span><br><span class="hljs-attr">spark.dynamicAllocation.minExecutors</span>=<span class="hljs-string">1</span><br><span class="hljs-attr">spark.dynamicAllocation.maxExecutors</span>=<span class="hljs-string">10</span><br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>注意区分两类内存：<code>spark.driver.memory</code> 在 client 模式是本地 JVM 内存，在 cluster 模式是 YARN 容器内存；Driver 端用 <code>collect()</code> 汇总大数据量时容易 OOM。另外 YARN 容器的资源上限受 <code>yarn.nodemanager.resource.memory-mb</code> 约束，Executor 数量、内存、核数的乘积不能超过集群总资源，否则作业提交后一直处于 PENDING。</p> 
+          </div>
+
+<h3 id="三种模式的启动"><a href="#三种模式的启动" class="headerlink" title="三种模式的启动"></a>三种模式的启动</h3><h4 id="Local-模式（零部署）"><a href="#Local-模式（零部署）" class="headerlink" title="Local 模式（零部署）"></a>Local 模式（零部署）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">spark-shell<br><span class="hljs-comment"># 或提交作业</span><br>spark-submit --master <span class="hljs-built_in">local</span>[*] your_app.jar<br></code></pre></td></tr></table></figure>
+
+<h4 id="Standalone-模式"><a href="#Standalone-模式" class="headerlink" title="Standalone 模式"></a>Standalone 模式</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 主节点</span><br>start-master.sh      <span class="hljs-comment"># Web UI: http://node1:8080</span><br><span class="hljs-comment"># 各从节点（Master 节点执行，会 ssh 拉起）</span><br>start-workers.sh<br><span class="hljs-comment"># 提交</span><br>spark-submit --master spark://node1:7077 your_app.jar<br></code></pre></td></tr></table></figure>
+
+<h4 id="on-YARN-模式（生产）"><a href="#on-YARN-模式（生产）" class="headerlink" title="on YARN 模式（生产）"></a>on YARN 模式（生产）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 不需要启动任何 Spark 进程！直接提交即可</span><br>spark-submit --master yarn --deploy-mode cluster \<br>  --class org.apache.spark.examples.SparkPi \<br>  <span class="hljs-variable">$SPARK_HOME</span>/examples/jars/spark-examples_2.12-3.5.1.jar 10<br></code></pre></td></tr></table></figure>
+
+<h3 id="验证-1"><a href="#验证-1" class="headerlink" title="验证"></a>验证</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># YARN 模式：任务运行情况去 YARN 8088 页面看</span><br><span class="hljs-comment"># 提交后：</span><br>yarn application -list          <span class="hljs-comment"># 看到 SparkPi 的 Application</span><br>yarn logs -applicationId &lt;<span class="hljs-built_in">id</span>&gt;   <span class="hljs-comment"># 查看作业日志</span><br><br><span class="hljs-comment"># Standalone 模式：访问 http://node1:8080 查看 Worker 与执行中的应用</span><br></code></pre></td></tr></table></figure>
+
+<div class="note note-warning">
+            <p>YARN 模式的验证要点：<strong>Spark 有没有真正用上 YARN，看 8088 页面</strong>。如果作业出现在 YARN 的 Application 列表里，说明资源管理器接管成功；如果提交时报 <code>java.io.IOException: Connecting to ResourceManager failed</code>，检查 <code>YARN_CONF_DIR</code> 与 <code>yarn-site.xml</code>。</p> 
+          </div>
+
+<h3 id="常见问题-3"><a href="#常见问题-3" class="headerlink" title="常见问题"></a>常见问题</h3><ul>
+<li><strong><code>ClassNotFoundException: org.apache.hadoop.fs.FileSystem</code></strong>：Hadoop 依赖未加入 classpath，确认 <code>HADOOP_CONF_DIR</code> 已导出，或提交时加 <code>--jars</code> 补齐</li>
+<li><strong>作业一直 PENDING</strong>：资源不足（Executors 需求超过集群资源）或 YARN 队列容量不足；调小 <code>spark.executor.memory/cores</code>，或检查 <code>yarn.scheduler.capacity</code> 队列配置</li>
+<li><strong>Driver OOM</strong>：client 模式下 <code>collect()</code> 大结果集；改用 <code>saveAsTextFile</code> 写 HDFS，或加大 driver 内存</li>
+<li><strong>Executor 丢失（Lost executor）</strong>：节点内存被打满被系统 OOM Kill，对照 <code>yarn.nodemanager.resource.memory-mb</code> 与 Executor 配置排查</li>
+<li><strong>Spark 版本与 Hadoop 不匹配</strong>：<code>spark-x.y.z-bin-hadoop2</code> 与 hadoop3 混用会报 RPC 协议错误，必须选 <code>bin-hadoop3</code> 包</li>
+</ul>
+<h3 id="部署建议-1"><a href="#部署建议-1" class="headerlink" title="部署建议"></a>部署建议</h3><ul>
+<li>生产统一走 <strong>on YARN + client 或 cluster 模式</strong>：cluster 模式 Driver 由 YARN 托管更稳，适合定时作业；交互式开发用 client</li>
+<li>动态资源分配建议开启：波峰波谷明显的作业能省一半资源</li>
+<li>历史记录服务（SparkHistoryServer）配合 <code>spark.eventLog.enabled=true</code> 开启，便于排查历史作业</li>
+</ul>
+<h2 id="Flink（流式计算引擎）"><a href="#Flink（流式计算引擎）" class="headerlink" title="Flink（流式计算引擎）"></a>Flink（流式计算引擎）</h2><blockquote>
+<p>Flink 是流批一体的分布式计算引擎，常与 Kafka 搭配做实时数仓。部署模式比 Spark 简单直观：解压后改一个配置文件，<code>start-cluster.sh</code> 就能起一个可用集群（Standalone 模式）；生产环境也可以跑在 YARN 上，让资源调度统一归 YARN 管理。本文以 Flink 1.17 为例，覆盖 Standalone 与 on YARN 两种方式。</p>
+</blockquote>
+<h3 id="前置条件-3"><a href="#前置条件-3" class="headerlink" title="前置条件"></a>前置条件</h3><ul>
+<li>JDK 1.8 或 11（Flink 1.17 要求 JDK 8&#x2F;11）</li>
+<li>on YARN 模式：Hadoop 3.x 集群 + <code>HADOOP_CLASSPATH</code> 配置</li>
+<li>建议关闭节点防火墙或放行 Web UI 端口</li>
+</ul>
+<h3 id="下载与解压-3"><a href="#下载与解压-3" class="headerlink" title="下载与解压"></a>下载与解压</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 选择 with-hadoop 预编译包，省去手动集成 Hadoop 依赖</span><br>wget https://dlcdn.apache.org/flink/flink-1.17.2/flink-1.17.2-bin-scala_2.12.tgz<br>tar -zxvf flink-1.17.2-bin-scala_2.12.tgz -C /opt<br><span class="hljs-built_in">ln</span> -s /opt/flink-1.17.2 /opt/flink<br><br><span class="hljs-built_in">export</span> FLINK_HOME=/opt/flink<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$FLINK_HOME</span>/bin<br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>Flink 1.17 之前的老版本（如 1.13）预编译包不带 hadoop 集成，需要手动把 <code>flink-shaded-hadoop-uber</code> jar 拷进 <code>lib/</code> 才能在 YARN 上跑。新版省掉了这一步。</p> 
+          </div>
+
+<h3 id="Standalone-模式配置"><a href="#Standalone-模式配置" class="headerlink" title="Standalone 模式配置"></a>Standalone 模式配置</h3><p>核心配置文件 <code>conf/flink-conf.yaml</code>（重点三个：内存、并行度、Web 端口）：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-comment"># JobManager 与 TaskManager 内存（按机器实际调整）</span><br><span class="hljs-attr">jobmanager.memory.process.size:</span> <span class="hljs-string">2048m</span><br><span class="hljs-attr">taskmanager.memory.process.size:</span> <span class="hljs-string">4096m</span><br><br><span class="hljs-comment"># 每个 TaskManager 的并行度（Slot 数）</span><br><span class="hljs-attr">taskmanager.numberOfTaskSlots:</span> <span class="hljs-number">4</span><br><br><span class="hljs-comment"># 默认并行度（建议不超过总 Slot 数）</span><br><span class="hljs-attr">parallelism.default:</span> <span class="hljs-number">4</span><br><br><span class="hljs-comment"># Web UI 端口</span><br><span class="hljs-attr">rest.port:</span> <span class="hljs-number">8081</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 主节点启动集群（JobManager + 本机 TaskManager）</span><br>start-cluster.sh<br><br><span class="hljs-comment"># 检查进程</span><br>jps   <span class="hljs-comment"># 应看到 StandaloneSessionClusterEntrypoint 与 TaskManagerExecutor</span><br><br><span class="hljs-comment"># 停止</span><br>stop-cluster.sh<br></code></pre></td></tr></table></figure>
+
+<p>Web UI：<code>http://&lt;主节点&gt;:8081</code>，能看到 JobManager 状态、TaskManager 列表、运行中的作业。</p>
+<h3 id="on-YARN-模式"><a href="#on-YARN-模式" class="headerlink" title="on YARN 模式"></a>on YARN 模式</h3><p>Flink 跑在 YARN 上有三种会话形态，区别在于作业生命周期：</p>
+<table>
+<thead>
+<tr>
+<th>形态</th>
+<th>说明</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Application 模式（推荐）</td>
+<td>每个作业一个专用 Flink 集群，用完即释放</td>
+<td>生产作业、长任务</td>
+</tr>
+<tr>
+<td>Per-Job 模式</td>
+<td>旧模式，作业结束集群释放（1.15+ 已弃用）</td>
+<td>不推荐</td>
+</tr>
+<tr>
+<td>Session 模式</td>
+<td>共享集群，多个作业复用</td>
+<td>短小临时作业多、希望快速提交</td>
+</tr>
+</tbody></table>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 先让 Flink 客户端拿到 Hadoop 依赖</span><br><span class="hljs-built_in">export</span> HADOOP_CLASSPATH=$(hadoop classpath)<br><br><span class="hljs-comment"># Application 模式提交（作业常驻）</span><br>flink run-application -t yarn-application \<br>  -Djobmanager.memory.process.size=2048m \<br>  -Dtaskmanager.memory.process.size=4096m \<br>  -Dtaskmanager.numberOfTaskSlots=4 \<br>  -Dyarn.application.name=flink-etl-job \<br>  -c com.example.YourJob your-app.jar<br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>Application 模式的作业在 YARN 8088 页面能看到独立的 Application。作业失败时整个集群自动销毁，由外部调度（如 DolphinScheduler&#x2F;定时任务）负责重启，这正是它适合生产的原因。</p> 
+          </div>
+
+<h3 id="验证-2"><a href="#验证-2" class="headerlink" title="验证"></a>验证</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># Standalone：提交内置示例（流式词频统计）</span><br>flink run <span class="hljs-variable">$FLINK_HOME</span>/examples/streaming/WordCount.jar \<br>  --input /tmp/input.txt --output /tmp/out<br><br><span class="hljs-comment"># 运行后在 8081 页面点击作业，能看到算子执行图与吞吐量</span><br><br><span class="hljs-comment"># on YARN：同样提交，作业出现在 YARN 8088 页面</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="常见问题-4"><a href="#常见问题-4" class="headerlink" title="常见问题"></a>常见问题</h3><ul>
+<li><strong>TaskManager 启动失败&#x2F;OOM</strong>：<code>taskmanager.memory.process.size</code> 与机器内存不匹配，或与 <code>yarn.nodemanager.resource.memory-mb</code> 冲突；JVM 堆内堆外内存（managed memory）分配不合理也会导致启动即死</li>
+<li><strong><code>Could not resolve KeeperErrorCode</code></strong>：使用 Kafka connector 时配置错误导致连不上 Kafka；检查 <code>bootstrap.servers</code> 与 topic 权限</li>
+<li><strong>反压（Backpressure）高</strong>：下游处理不过来，通过 Web UI 的 BackPressure 标签页定位慢算子，调大并行度或优化算子逻辑</li>
+<li><strong>检查点（Checkpoint）失败</strong>：state.backend（RocksDB）存储路径磁盘不足，或 HDFS 目录权限问题；<code>flink run</code> 加 <code>-Dstate.checkpoints.dir=hdfs://node1:8020/flink-cp</code> 指定</li>
+<li><strong>on YARN 提交报 <code>NoSuchMethodError</code> 等版本冲突</strong>：<code>HADOOP_CLASSPATH</code> 未配置或混入了错误版本的 hadoop 依赖</li>
+</ul>
+<h3 id="部署建议-2"><a href="#部署建议-2" class="headerlink" title="部署建议"></a>部署建议</h3><ul>
+<li>生产用 <strong>Application 模式 + 检查点 + 重启策略</strong>（<code>restart-strategy: failure-rate</code>），配合监控报警（Web UI 或接入 Prometheus）</li>
+<li>状态后端选 RocksDB（大状态），checkpoint 目录放 HDFS 保证可恢复</li>
+<li>Standalone 适合测试；正式环境资源统一归 YARN 管理，避免两套资源池互相争抢</li>
+</ul>
+<hr>
+<h1 id="第二部分：中间件组件"><a href="#第二部分：中间件组件" class="headerlink" title="第二部分：中间件组件"></a>第二部分：中间件组件</h1><h2 id="Zookeeper（分布式协调）"><a href="#Zookeeper（分布式协调）" class="headerlink" title="Zookeeper（分布式协调）"></a>Zookeeper（分布式协调）</h2><blockquote>
+<p>Zookeeper 是分布式协调服务，Kafka、HBase、HDFS HA、Dubbo 注册中心等大量中间件都依赖它做选主与元数据存储。它的部署模式很简单：单机（演示）、伪集群、真集群（3&#x2F;5&#x2F;7 台奇数）。真集群的关键就两件事：<code>zoo.cfg</code> 里声明所有节点、每个节点写自己的 <code>myid</code>。本文以 Zookeeper 3.8 为例。</p>
+</blockquote>
+<h3 id="前置条件-4"><a href="#前置条件-4" class="headerlink" title="前置条件"></a>前置条件</h3><ul>
+<li>JDK 1.8+</li>
+<li>集群节点数建议奇数（3、5、7）：选主需要过半机制，奇数台才能容忍一半以下的节点故障</li>
+</ul>
+<h3 id="下载与解压-4"><a href="#下载与解压-4" class="headerlink" title="下载与解压"></a>下载与解压</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget https://dlcdn.apache.org/zookeeper/zookeeper-3.8.4/apache-zookeeper-3.8.4-bin.tar.gz<br>tar -zxvf apache-zookeeper-3.8.4-bin.tar.gz -C /opt<br><span class="hljs-built_in">ln</span> -s /opt/apache-zookeeper-3.8.4-bin /opt/zookeeper<br><br><span class="hljs-built_in">export</span> ZOOKEEPER_HOME=/opt/zookeeper<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$ZOOKEEPER_HOME</span>/bin<br></code></pre></td></tr></table></figure>
+
+<h3 id="配置-2"><a href="#配置-2" class="headerlink" title="配置"></a>配置</h3><h4 id="1-核心配置-conf-zoo-cfg"><a href="#1-核心配置-conf-zoo-cfg" class="headerlink" title="1. 核心配置 conf/zoo.cfg"></a>1. 核心配置 <code>conf/zoo.cfg</code></h4><p>模板 <code>zoo_sample.cfg</code> 复制而来：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-comment"># 基础心跳时间单位（毫秒），其他时间参数都是它的倍数</span><br><span class="hljs-attr">tickTime</span>=<span class="hljs-string">2000</span><br><span class="hljs-comment"># 初始化连接时的最大心跳数：follower 与 leader 初始同步最长 10*tickTime</span><br><span class="hljs-attr">initLimit</span>=<span class="hljs-string">10</span><br><span class="hljs-comment"># 运行中 leader 与 follower 心跳最大间隔，超过则判死</span><br><span class="hljs-attr">syncLimit</span>=<span class="hljs-string">5</span><br><span class="hljs-comment"># 数据目录（快照），务必放数据盘；事务日志目录可另配 dataLogDir</span><br><span class="hljs-attr">dataDir</span>=<span class="hljs-string">/data/zookeeper/data</span><br><span class="hljs-attr">dataLogDir</span>=<span class="hljs-string">/data/zookeeper/logs</span><br><span class="hljs-comment"># 客户端连接端口</span><br><span class="hljs-attr">clientPort</span>=<span class="hljs-string">2181</span><br><span class="hljs-comment"># 集群节点声明：server.&lt;myid&gt;=&lt;host&gt;:&lt;选举端口&gt;:&lt;数据同步端口&gt;</span><br><span class="hljs-attr">server.1</span>=<span class="hljs-string">node1:2888:3888</span><br><span class="hljs-attr">server.2</span>=<span class="hljs-string">node2:2888:3888</span><br><span class="hljs-attr">server.3</span>=<span class="hljs-string">node3:2888:3888</span><br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>三个端口的区分：2181 是客户端连接，2888 是 leader 与 follower 的数据同步，3888 是选举通信端口。防火墙放行时三个都要开。</p> 
+          </div>
+
+<h4 id="2-每个节点写-myid"><a href="#2-每个节点写-myid" class="headerlink" title="2. 每个节点写 myid"></a>2. 每个节点写 <code>myid</code></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 在 dataDir 目录下创建 myid 文件，内容与 zoo.cfg 中的 server 编号一致</span><br><span class="hljs-built_in">mkdir</span> -p /data/zookeeper/data<br><span class="hljs-comment"># node1 上：</span><br><span class="hljs-built_in">echo</span> 1 &gt; /data/zookeeper/data/myid<br><span class="hljs-comment"># node2 上：</span><br><span class="hljs-built_in">echo</span> 2 &gt; /data/zookeeper/data/myid<br><span class="hljs-comment"># node3 上：</span><br><span class="hljs-built_in">echo</span> 3 &gt; /data/zookeeper/data/myid<br></code></pre></td></tr></table></figure>
+
+<div class="note note-warning">
+            <p><strong>myid 与 zoo.cfg 的 server 编号必须一一对应</strong>，写错会导致节点加入不了集群，日志报 <code>Failed to sync</code> 或反复切换 Leader。</p> 
+          </div>
+
+<h3 id="启动与验证-2"><a href="#启动与验证-2" class="headerlink" title="启动与验证"></a>启动与验证</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 每个节点启动</span><br>zkServer.sh start<br><br><span class="hljs-comment"># 查看状态（会输出该节点是 leader 还是 follower）</span><br>zkServer.sh status<br><br><span class="hljs-comment"># 客户端连接验证</span><br>zkCli.sh -server node1:2181<br><span class="hljs-comment"># 连接成功后执行：</span><br><span class="hljs-built_in">ls</span> /                    <span class="hljs-comment"># 根节点（应存在 /zookeeper 内置节点）</span><br>create /test hello      <span class="hljs-comment"># 创建节点</span><br>get /test               <span class="hljs-comment"># 读取节点</span><br></code></pre></td></tr></table></figure>
+
+<p>3 台节点启动后，<code>zkServer.sh status</code> 应显示 1 台 leader、2 台 follower。</p>
+<h3 id="常用运维命令"><a href="#常用运维命令" class="headerlink" title="常用运维命令"></a>常用运维命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">zkServer.sh status              <span class="hljs-comment"># 角色状态</span><br>zkServer.sh restart             <span class="hljs-comment"># 重启</span><br><span class="hljs-built_in">echo</span> srvr | nc localhost 2181   <span class="hljs-comment"># 查看运行统计（4lw 命令，需开启）</span><br></code></pre></td></tr></table></figure>
+
+<p><code>conf/zoo.cfg</code> 追加 <code>4lw.commands.whitelist=*</code> 可开启四字命令（生产建议按需白名单）。</p>
+<h3 id="常见问题-5"><a href="#常见问题-5" class="headerlink" title="常见问题"></a>常见问题</h3><ul>
+<li><strong>启动报 <code>Address already in use</code></strong>：端口被占用，<code>ss -lntp | grep 2181</code> 排查</li>
+<li><strong>集群全部变成 standalone &#x2F; 一直 leader 选举中</strong>：节点间 2888&#x2F;3888 不通（防火墙）或 myid 冲突</li>
+<li><strong><code>Session expired</code></strong>：客户端与服务器之间心跳超时，tickTime 与 sessionTimeout 配置过小，或网络抖动</li>
+<li><strong>磁盘打满</strong>：<code>dataDir</code> 下快照不断增长，Zookeeper 3.6+ 默认自动清理（<code>autopurge.snapRetainCount</code>、<code>autopurge.purgeInterval</code>），老版本需手动清</li>
+<li><strong>CPU 飙高</strong>：连接数过多或 watcher 数量过大，用 4lw 命令 <code>mntr</code>、<code>wchs</code> 排查</li>
+</ul>
+<h3 id="部署建议-3"><a href="#部署建议-3" class="headerlink" title="部署建议"></a>部署建议</h3><ul>
+<li>生产 3 台起步，ZK 与业务节点混部时注意隔离（它吃磁盘 IO 和网络）</li>
+<li><code>dataLogDir</code> 独立磁盘放事务日志，能显著提升写性能</li>
+<li>快照与事务日志定期检查清理策略，防止磁盘写满导致集群不可用</li>
+</ul>
+<h2 id="Kafka（消息队列）"><a href="#Kafka（消息队列）" class="headerlink" title="Kafka（消息队列）"></a>Kafka（消息队列）</h2><blockquote>
+<p>Kafka 是分布式消息队列，也是实时数仓的事实标准：上游 Flink 消费它做计算，下游 sink 到 HDFS&#x2F;Doris。安装的核心配置在 <code>server.properties</code> 一个文件里：broker 身份、监听地址、数据目录、集群协调方式（Zookeeper 或 3.x 的 KRaft）。本文以 Kafka 3.x 为例，先讲最常用的 Zookeeper 协调模式，再补充 KRaft 模式。</p>
+</blockquote>
+<h3 id="架构与依赖"><a href="#架构与依赖" class="headerlink" title="架构与依赖"></a>架构与依赖</h3><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">Kafka</span> Broker（消息存储与分发）<br>   ├── 集群协调：Zookeeper（传统模式）/ KRaft（<span class="hljs-number">3</span>.x 新架构，去 ZK）<br>   ├── 客户端：producer / consumer<br>   └── 管理：kafka-topics.sh、kafka-console-<span class="hljs-regexp">*.sh</span><br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>Kafka 3.x 引入 KRaft 模式后可以完全脱离 Zookeeper，但主流生产（尤其是与 Hadoop 生态共存）仍大量使用 Zookeeper 协调。KRaft 部署更轻，适合新建集群。</p> 
+          </div>
+
+<h3 id="前置条件-5"><a href="#前置条件-5" class="headerlink" title="前置条件"></a>前置条件</h3><ul>
+<li>JDK 1.8+（Kafka 3.x 需要 JDK 8&#x2F;11&#x2F;17）</li>
+<li>Zookeeper 集群可用（传统模式）</li>
+<li>多 broker 节点建议奇数台</li>
+</ul>
+<h3 id="下载与解压-5"><a href="#下载与解压-5" class="headerlink" title="下载与解压"></a>下载与解压</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget https://dlcdn.apache.org/kafka/3.6.2/kafka_2.13-3.6.2.tgz<br>tar -zxvf kafka_2.13-3.6.2.tgz -C /opt<br><span class="hljs-built_in">ln</span> -s /opt/kafka_2.13-3.6.2 /opt/kafka<br><br><span class="hljs-built_in">export</span> KAFKA_HOME=/opt/kafka<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$KAFKA_HOME</span>/bin<br></code></pre></td></tr></table></figure>
+
+<h3 id="配置（Zookeeper-协调模式）"><a href="#配置（Zookeeper-协调模式）" class="headerlink" title="配置（Zookeeper 协调模式）"></a>配置（Zookeeper 协调模式）</h3><p>编辑 <code>config/server.properties</code>：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-comment"># 每台 broker 唯一</span><br><span class="hljs-attr">broker.id</span>=<span class="hljs-string">0</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 监听地址：生产必须显式指定，否则注册给客户端的地址是内网主机名，客户端解析失败</span><br><span class="hljs-attr">listeners</span>=<span class="hljs-string">PLAINTEXT://node1:9092</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 数据目录：日志段文件存放位置，多块盘逗号分隔</span><br><span class="hljs-attr">log.dirs</span>=<span class="hljs-string">/data/kafka/logs</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 分区数与副本数的默认值（单分区默认即可，多分区按吞吐调整）</span><br><span class="hljs-attr">num.partitions</span>=<span class="hljs-string">3</span><br><span class="hljs-attr">default.replication.factor</span>=<span class="hljs-string">2</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># Zookeeper 连接（传统模式）</span><br><span class="hljs-attr">zookeeper.connect</span>=<span class="hljs-string">node1:2181,node2:2181,node3:2181</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 数据保留时间与大小（生产按业务设置）</span><br><span class="hljs-attr">log.retention.hours</span>=<span class="hljs-string">72</span><br><span class="hljs-attr">log.retention.bytes</span>=<span class="hljs-string">-1</span><br></code></pre></td></tr></table></figure>
+
+<div class="note note-warning">
+            <p><code>listeners</code> 是最容易踩的坑：不显式配置时，broker 会把自己注册为 <code>主机名:9092</code>，客户端在别的机器上无法解析该主机名而连接失败。生产建议同时配 <code>advertised.listeners</code> 指向客户端可达的地址。</p> 
+          </div>
+
+<h3 id="启动与验证-3"><a href="#启动与验证-3" class="headerlink" title="启动与验证"></a>启动与验证</h3><h4 id="1-启动-Zookeeper（若未部署，单机演示可先用-Kafka-自带的）"><a href="#1-启动-Zookeeper（若未部署，单机演示可先用-Kafka-自带的）" class="headerlink" title="1. 启动 Zookeeper（若未部署，单机演示可先用 Kafka 自带的）"></a>1. 启动 Zookeeper（若未部署，单机演示可先用 Kafka 自带的）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 仅单机演示：kafka 自带的单机 ZK</span><br>zookeeper-server-start.sh config/zookeeper.properties<br></code></pre></td></tr></table></figure>
+
+<h4 id="2-启动-Broker"><a href="#2-启动-Broker" class="headerlink" title="2. 启动 Broker"></a>2. 启动 Broker</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 每台节点执行（后台运行）</span><br><span class="hljs-built_in">nohup</span> kafka-server-start.sh config/server.properties &gt; /opt/kafka/logs/kafka.out 2&gt;&amp;1 &amp;<br><br><span class="hljs-comment"># 查看集群成员</span><br>kafka-broker-api-versions.sh --bootstrap-server node1:9092<br><span class="hljs-comment"># 或 kafka-metadata.sh（旧版用 zookeeper-shell 查 /brokers/ids）</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="3-消息收发验证"><a href="#3-消息收发验证" class="headerlink" title="3. 消息收发验证"></a>3. 消息收发验证</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建 topic：3 分区 2 副本</span><br>kafka-topics.sh --create --topic test-topic \<br>  --partitions 3 --replication-factor 2 \<br>  --bootstrap-server node1:9092<br><br><span class="hljs-comment"># 查看 topic 详情（确认分区与副本状态）</span><br>kafka-topics.sh --describe --topic test-topic --bootstrap-server node1:9092<br><br><span class="hljs-comment"># 生产消息</span><br>kafka-console-producer.sh --topic test-topic --bootstrap-server node1:9092<br>&gt; hello kafka<br><br><span class="hljs-comment"># 消费消息（另开终端）</span><br>kafka-console-consumer.sh --topic test-topic \<br>  --from-beginning --bootstrap-server node1:9092<br></code></pre></td></tr></table></figure>
+
+<h3 id="KRaft-模式（去-Zookeeper，可选）"><a href="#KRaft-模式（去-Zookeeper，可选）" class="headerlink" title="KRaft 模式（去 Zookeeper，可选）"></a>KRaft 模式（去 Zookeeper，可选）</h3><p>3.x 新建集群可以直接用 KRaft，少维护一套 ZK：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 生成集群唯一 ID</span><br>KAFKA_CLUSTER_ID=<span class="hljs-string">&quot;<span class="hljs-subst">$(kafka-storage.sh random-uuid)</span>&quot;</span><br><br><span class="hljs-comment"># 2. 格式化存储目录（每台节点）</span><br>kafka-storage.sh format -t <span class="hljs-variable">$KAFKA_CLUSTER_ID</span> -c config/kraft/server.properties<br><br><span class="hljs-comment"># 3. 启动（controller 与 broker 合一角色，3 台起步）</span><br>kafka-server-start.sh config/kraft/server.properties<br></code></pre></td></tr></table></figure>
+
+<p><code>server.properties</code> 中相应配置改为 <code>process.roles=broker,controller</code>、<code>controller.quorum.voters=1@node1:9093,2@node2:9093,3@node3:9093</code>。</p>
+<h3 id="常见问题-6"><a href="#常见问题-6" class="headerlink" title="常见问题"></a>常见问题</h3><ul>
+<li><strong>客户端报 <code>Failed to construct kafka consumer / Connection refused</code></strong>：<code>listeners</code>&#x2F;<code>advertised.listeners</code> 未配或配错；防火墙 9092 未放行</li>
+<li><strong><code>LEADER_NOT_AVAILABLE</code></strong>：topic 刚创建 leader 选举未完成，稍等重试；持续出现则检查 broker 是否全部加入集群</li>
+<li><strong>磁盘 IO 高&#x2F;吞吐上不去</strong>：<code>log.dirs</code> 只配了一块盘；副本因子高、acks 配置过严（<code>acks=all</code> + <code>min.insync.replicas</code> 不匹配）</li>
+<li><strong>消费组 lag 持续增长</strong>：消费者处理速度跟不上生产速度，或分区数少于消费者并行度</li>
+<li><strong><code>Replication factor: 2 larger than available brokers: 1</code></strong>：副本数超过存活 broker 数，单机演示时把副本因子改成 1</li>
+</ul>
+<h3 id="部署建议-4"><a href="#部署建议-4" class="headerlink" title="部署建议"></a>部署建议</h3><ul>
+<li>生产 3+ broker，<code>default.replication.factor</code> 与 <code>min.insync.replicas</code>（建议 2）配合使用，保证消息不丢</li>
+<li>数据盘单独挂载，<code>log.dirs</code> 多盘分担 IO</li>
+<li>监控：JMX 指标（kafka.server 的 BytesInPerSec、UnderReplicatedPartitions）接入 Prometheus&#x2F;Grafana</li>
+<li>消息体大小、保留时长按业务定，避免无脑调大导致磁盘膨胀</li>
+</ul>
+<h2 id="MySQL（关系型数据库）"><a href="#MySQL（关系型数据库）" class="headerlink" title="MySQL（关系型数据库）"></a>MySQL（关系型数据库）</h2><blockquote>
+<p>MySQL 是使用最广的关系型数据库，安装方式很多：yum&#x2F;apt 源安装、官方二进制包（tar.xz）、源码编译。二进制包方式最可控、与发行版无关，本文以 MySQL 8.0 官方二进制包为例，覆盖从初始化、启动到安全配置的完整流程。服务化使用 systemd 管理，保证重启自愈。</p>
+</blockquote>
+<h3 id="前置条件-6"><a href="#前置条件-6" class="headerlink" title="前置条件"></a>前置条件</h3><ul>
+<li>Linux（CentOS 7+&#x2F;Ubuntu），glibc 2.17+（8.0 二进制包要求）</li>
+<li>依赖库：<code>libaio</code>、<code>libncurses</code>（可用 yum&#x2F;apt 安装）</li>
+<li>数据盘建议独立挂载</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># CentOS 依赖</span><br>yum install -y libaio ncurses-libs<br></code></pre></td></tr></table></figure>
+
+<h3 id="下载与解压-6"><a href="#下载与解压-6" class="headerlink" title="下载与解压"></a>下载与解压</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 8.0 二进制包（约 250MB，选择 Linux-Generic 版本）</span><br>wget https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.36-linux-glibc2.17-x86_64.tar.xz<br>tar -xvf mysql-8.0.36-linux-glibc2.17-x86_64.tar.xz -C /opt<br><span class="hljs-built_in">ln</span> -s /opt/mysql-8.0.36-linux-glibc2.17-x86_64 /opt/mysql<br></code></pre></td></tr></table></figure>
+
+<h3 id="创建运行用户与目录"><a href="#创建运行用户与目录" class="headerlink" title="创建运行用户与目录"></a>创建运行用户与目录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># MySQL 禁止以 root 运行，创建专用用户</span><br>useradd -r -s /sbin/nologin mysql<br><span class="hljs-built_in">mkdir</span> -p /data/mysql<br><span class="hljs-built_in">chown</span> -R mysql:mysql /opt/mysql /data/mysql<br></code></pre></td></tr></table></figure>
+
+<h3 id="初始化数据目录"><a href="#初始化数据目录" class="headerlink" title="初始化数据目录"></a>初始化数据目录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 8.0 初始化方式（--initialize-insecure：root 初始密码为空）</span><br>/opt/mysql/bin/mysqld --initialize-insecure \<br>  --user=mysql --datadir=/data/mysql<br><br><span class="hljs-comment"># 如想生成随机初始密码，用 --initialize（密码在错误日志里）</span><br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>5.7 时代用 <code>mysql_install_db</code> 初始化，8.0 统一用 <code>mysqld --initialize</code>。初始化只需执行一次，重复执行会报 <code>datadir already exists</code>。</p> 
+          </div>
+
+<h3 id="配置文件-my-cnf"><a href="#配置文件-my-cnf" class="headerlink" title="配置文件 my.cnf"></a>配置文件 my.cnf</h3><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-section">[mysqld]</span><br><span class="hljs-attr">basedir</span>=/opt/mysql<br><span class="hljs-attr">datadir</span>=/data/mysql<br><span class="hljs-attr">port</span>=<span class="hljs-number">3306</span><br><span class="hljs-attr">socket</span>=/data/mysql/mysql.sock<br><span class="hljs-comment"># 服务端字符集</span><br><span class="hljs-attr">character-set-server</span>=utf8mb4<br><span class="hljs-attr">collation-server</span>=utf8mb4_general_ci<br><span class="hljs-comment"># 数据目录环境（8.0 区分大小写必须在初始化前定）</span><br><span class="hljs-attr">lower_case_table_names</span>=<span class="hljs-number">0</span><br><span class="hljs-comment"># 连接数（按业务调整）</span><br><span class="hljs-attr">max_connections</span>=<span class="hljs-number">500</span><br><span class="hljs-comment"># 日志</span><br><span class="hljs-attr">log-error</span>=/data/mysql/error.log<br><span class="hljs-attr">pid-file</span>=/data/mysql/mysql.pid<br></code></pre></td></tr></table></figure>
+
+<div class="note note-warning">
+            <p><code>lower_case_table_names</code> 决定表名是否大小写敏感，<strong>必须在初始化前确定</strong>，8.0 之后运行时修改会直接报错。Linux 生产环境一般保持默认（敏感，值为 0），迁移自 Windows 环境的库注意此坑。</p> 
+          </div>
+
+<h3 id="启动并注册-systemd"><a href="#启动并注册-systemd" class="headerlink" title="启动并注册 systemd"></a>启动并注册 systemd</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建 systemd 服务</span><br><span class="hljs-built_in">cat</span> &gt; /etc/systemd/system/mysqld.service &lt;&lt;<span class="hljs-string">&#x27;EOF&#x27;</span><br>[Unit]<br>Description=MySQL Server<br>After=network.target<br><br>[Service]<br>User=mysql<br>Group=mysql<br>ExecStart=/opt/mysql/bin/mysqld --defaults-file=/etc/my.cnf<br>LimitNOFILE=65535<br><br>[Install]<br>WantedBy=multi-user.target<br>EOF<br><br>systemctl daemon-reload<br>systemctl <span class="hljs-built_in">enable</span> --now mysqld<br>systemctl status mysqld<br></code></pre></td></tr></table></figure>
+
+<h3 id="安全配置"><a href="#安全配置" class="headerlink" title="安全配置"></a>安全配置</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 首次连接（初始密码为空）</span><br>/opt/mysql/bin/mysql -uroot<br><br><span class="hljs-comment"># 设置 root 密码并删除匿名用户</span><br>ALTER USER <span class="hljs-string">&#x27;root&#x27;</span>@<span class="hljs-string">&#x27;localhost&#x27;</span> IDENTIFIED BY <span class="hljs-string">&#x27;StrongPass!123&#x27;</span>;<br>DELETE FROM mysql.user WHERE User=<span class="hljs-string">&#x27;&#x27;</span>;<br>FLUSH PRIVILEGES;<br><br><span class="hljs-comment"># 允许 root 远程访问（生产不推荐 root 远程，建议专用账号）</span><br>CREATE USER <span class="hljs-string">&#x27;root&#x27;</span>@<span class="hljs-string">&#x27;%&#x27;</span> IDENTIFIED BY <span class="hljs-string">&#x27;StrongPass!123&#x27;</span>;<br>GRANT ALL PRIVILEGES ON *.* TO <span class="hljs-string">&#x27;root&#x27;</span>@<span class="hljs-string">&#x27;%&#x27;</span> WITH GRANT OPTION;<br>FLUSH PRIVILEGES;<br></code></pre></td></tr></table></figure>
+
+<h3 id="验证-3"><a href="#验证-3" class="headerlink" title="验证"></a>验证</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">mysql -uroot -p<br>SELECT VERSION();          <span class="hljs-comment"># 版本</span><br>SHOW VARIABLES LIKE <span class="hljs-string">&#x27;%datadir%&#x27;</span>;   <span class="hljs-comment"># 数据目录</span><br><span class="hljs-comment"># 建库建表压力测试</span><br>CREATE DATABASE testdb DEFAULT CHARACTER SET utf8mb4;<br>USE testdb; CREATE TABLE t(<span class="hljs-built_in">id</span> INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(50));<br>INSERT INTO t(name) VALUES (<span class="hljs-string">&#x27;mysql&#x27;</span>);<br>SELECT * FROM t;<br></code></pre></td></tr></table></figure>
+
+<h3 id="常见问题-7"><a href="#常见问题-7" class="headerlink" title="常见问题"></a>常见问题</h3><ul>
+<li><strong>启动报 <code>libaio.so.1: cannot open shared object file</code></strong>：未装 libaio 依赖</li>
+<li><strong><code>Can&#39;t connect to local MySQL server through socket</code></strong>：mysqld 没起来，先看 <code>/data/mysql/error.log</code>；socket 路径不一致也常见</li>
+<li><strong>忘记 root 密码</strong>：<code>--skip-grant-tables</code> 跳过权限表启动，重置后再正常重启</li>
+<li><strong><code>Authentication plugin &#39;caching_sha2_password&#39;</code> 连接失败</strong>：8.0 默认认证插件，老客户端（5.7 及以下 JDBC 驱动）不支持；给账号指定 <code>IDENTIFIED WITH mysql_native_password BY &#39;...&#39;</code>，或升级驱动</li>
+<li><strong><code>Too many connections</code></strong>：<code>max_connections</code> 不够，同时排查是否有连接泄漏</li>
+</ul>
+<h3 id="部署建议-5"><a href="#部署建议-5" class="headerlink" title="部署建议"></a>部署建议</h3><ul>
+<li>生产：主从复制（binlog 开启 <code>log-bin</code> + <code>server-id</code>）+ 定时物理备份，从库可读扩展</li>
+<li>数据目录放数据盘，日志（binlog&#x2F;error log）单独盘位更好</li>
+<li>8.0 默认 <code>caching_sha2_password</code> 认证，客户端组件版本要匹配</li>
+</ul>
+<h2 id="Redis（缓存）"><a href="#Redis（缓存）" class="headerlink" title="Redis（缓存）"></a>Redis（缓存）</h2><blockquote>
+<p>Redis 是高性能的内存键值数据库，安装过程在中间件里算简单的：源码编译三步走（configure&#x2F;make&#x2F;make install），核心工作量全在 <code>redis.conf</code> 的取舍上——是否开启持久化、保护模式与密码、内存淘汰策略。本文以 Redis 7.x 为例，覆盖单机部署与主从复制的配置要点。</p>
+</blockquote>
+<h3 id="前置条件-7"><a href="#前置条件-7" class="headerlink" title="前置条件"></a>前置条件</h3><ul>
+<li>gcc、make（编译工具）</li>
+<li>内存规划：Redis 数据全在内存，数据量 ×2 的内存预算比较稳妥（内存峰值 + 持久化缓冲）</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install -y gcc make<br></code></pre></td></tr></table></figure>
+
+<h3 id="下载与编译安装"><a href="#下载与编译安装" class="headerlink" title="下载与编译安装"></a>下载与编译安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget https://download.redis.io/releases/redis-7.2.4.tar.gz<br>tar -zxvf redis-7.2.4.tar.gz -C /opt<br><span class="hljs-built_in">cd</span> /opt/redis-7.2.4<br><br><span class="hljs-comment"># 编译并安装（默认安装到 /usr/local/bin：redis-server、redis-cli 等）</span><br>make -j4<br>make install<br><br><span class="hljs-comment"># 目录规划</span><br><span class="hljs-built_in">mkdir</span> -p /data/redis<br><span class="hljs-built_in">cp</span> redis.conf /etc/redis.conf<br></code></pre></td></tr></table></figure>
+
+<h3 id="核心配置-redis-conf"><a href="#核心配置-redis-conf" class="headerlink" title="核心配置 redis.conf"></a>核心配置 redis.conf</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs conf"># 后台运行<br>daemonize yes<br><br># 监听地址：生产只绑内网地址，避免暴露公网<br>bind 0.0.0.0<br><br># 端口<br>port 6379<br><br># 保护模式：开启时只允许本机回环地址连接<br>protected-mode yes<br><br># 设置访问密码（生产必须）<br>requirepass YourPass123<br><br># 持久化：AOF（默认关闭）与 RDB（默认开启）同时使用更稳<br>appendonly yes<br>appendfilename &quot;appendonly.aof&quot;<br><br># 内存淘汰策略：到达 maxmemory 后如何清理<br>maxmemory 4gb<br>maxmemory-policy allkeys-lru<br><br># 日志与数据目录<br>dir /data/redis<br>logfile /data/redis/redis.log<br></code></pre></td></tr></table></figure>
+
+<div class="note note-danger">
+            <p><strong>公网裸奔事故</strong>：Redis 默认无密码 + 绑定所有网卡，暴露到公网后几分钟内就会被扫描器攻破，被植入挖矿程序。生产必须：<code>requirepass</code> 设密码 + <code>bind</code> 内网 IP + <code>protected-mode yes</code>。</p> 
+          </div>
+
+<h3 id="启动与验证-4"><a href="#启动与验证-4" class="headerlink" title="启动与验证"></a>启动与验证</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 启动</span><br>redis-server /etc/redis.conf<br><br><span class="hljs-comment"># 验证连接与读写</span><br>redis-cli -a YourPass123 ping<br><span class="hljs-comment"># 输出 PONG</span><br><br>redis-cli -a YourPass123<br>&gt; <span class="hljs-built_in">set</span> name redis<br>&gt; get name<br>&gt; info memory<br></code></pre></td></tr></table></figure>
+
+<h3 id="主从复制（可选）"><a href="#主从复制（可选）" class="headerlink" title="主从复制（可选）"></a>主从复制（可选）</h3><p>从节点在 <code>redis.conf</code> 中配置一行即可：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs conf"># 从节点指向主节点<br>replicaof 192.168.1.10 6379<br># 主节点有密码时从节点也要配<br>masterauth YourPass123<br></code></pre></td></tr></table></figure>
+
+<p>验证：主节点 <code>info replication</code> 应显示从节点在线；从节点 <code>role:slave</code>。</p>
+<h3 id="常见问题-8"><a href="#常见问题-8" class="headerlink" title="常见问题"></a>常见问题</h3><ul>
+<li><strong><code>(error) NOAUTH Authentication required</code></strong>：未带密码认证，<code>redis-cli -a &lt;密码&gt;</code> 或连接后 <code>AUTH &lt;密码&gt;</code></li>
+<li><strong><code>Could not connect to Redis at 127.0.0.1:6379</code></strong>：服务没起来（看 <code>/data/redis/redis.log</code>）或 bind 地址不对</li>
+<li><strong><code>MISCONF Redis is configured to save RDB snapshots but is currently not able to persist</code></strong>：磁盘权限或空间不足，RDB 保存失败；修复 <code>dir</code> 目录权限，必要时 <code>CONFIG SET stop-writes-on-bgsave-error no</code> 临时顶住</li>
+<li><strong>内存打满 OOM</strong>：<code>maxmemory</code> 未设置导致 Redis 吃满内存被内核 OOM Kill；设置 maxmemory + 淘汰策略</li>
+<li><strong>主从延迟大</strong>：网络延迟、从节点磁盘慢或 AOF 同步策略（<code>appendfsync</code>）过严；<code>info replication</code> 的 <code>master_repl_offset</code> 对比</li>
+</ul>
+<h3 id="部署建议-6"><a href="#部署建议-6" class="headerlink" title="部署建议"></a>部署建议</h3><ul>
+<li>生产：主从 + 哨兵（Sentinel）或集群（Cluster）模式，单机是学习起点</li>
+<li>持久化：AOF + RDB 双开，<code>appendfsync everysec</code> 平衡性能与安全</li>
+<li>缓存场景务必配 <code>maxmemory</code> 与淘汰策略，防止缓存打满拖垮服务</li>
+<li>监控：<code>INFO</code> 命令的 memory&#x2F;connected_clients&#x2F;keyspace 指标接入监控系统</li>
+</ul>
+<h2 id="Nacos（注册与配置中心）"><a href="#Nacos（注册与配置中心）" class="headerlink" title="Nacos（注册与配置中心）"></a>Nacos（注册与配置中心）</h2><blockquote>
+<p>Nacos 是阿里开源的服务注册中心与配置中心，微服务架构（Spring Cloud Alibaba、Dubbo）的核心依赖。安装分单机与集群两种模式：单机内置 Derby 数据库开箱即用，集群必须外接 MySQL 并至少 3 节点。部署的关键参数就两个：<strong>启动模式</strong>（standalone 还是集群）和<strong>数据库配置</strong>。本文以 Nacos 2.3.x 为例。</p>
+</blockquote>
+<h3 id="架构与端口"><a href="#架构与端口" class="headerlink" title="架构与端口"></a>架构与端口</h3><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs arduino">Nacos <span class="hljs-built_in">Server</span>（注册中心 + 配置中心）<br>   ├── 单机：内嵌 Derby（开箱即用，仅测试）<br>   └── 集群：外接 MySQL（生产必须）+ <span class="hljs-number">3</span> 节点 + 一致性协议<br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>端口</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>8848</td>
+<td>主端口（HTTP 控制台与 API）</td>
+</tr>
+<tr>
+<td>9848&#x2F;9849</td>
+<td>gRPC 端口（2.x 客户端长连接，<strong>必须放行</strong>）</td>
+</tr>
+</tbody></table>
+<div class="note note-warning">
+            <p>Nacos 2.x 客户端通过 gRPC 通信，只放行 8848 会导致服务注册成功但心跳续约失败。9848（客户端 gRPC）与 9849（集群间 gRPC）都要放行。</p> 
+          </div>
+
+<h3 id="前置条件-8"><a href="#前置条件-8" class="headerlink" title="前置条件"></a>前置条件</h3><ul>
+<li>JDK 1.8+（2.x 需要 JDK 8+）</li>
+<li>集群模式：MySQL 5.7&#x2F;8.0 + 3 台节点</li>
+<li>建议与业务同内网，8848&#x2F;9848 不暴露公网</li>
+</ul>
+<h3 id="下载与解压-7"><a href="#下载与解压-7" class="headerlink" title="下载与解压"></a>下载与解压</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget https://github.com/alibaba/nacos/releases/download/2.3.2/nacos-server-2.3.2.tar.gz<br>tar -zxvf nacos-server-2.3.2.tar.gz -C /opt<br><span class="hljs-built_in">ln</span> -s /opt/nacos-server-2.3.2 /opt/nacos<br><br><span class="hljs-comment"># 数据目录</span><br><span class="hljs-built_in">mkdir</span> -p /data/nacos<br><span class="hljs-built_in">export</span> NACOS_HOME=/opt/nacos<br></code></pre></td></tr></table></figure>
+
+<h3 id="单机模式（快速体验）"><a href="#单机模式（快速体验）" class="headerlink" title="单机模式（快速体验）"></a>单机模式（快速体验）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 直接启动（默认 standalone 模式，使用内嵌 Derby）</span><br>sh bin/startup.sh -m standalone<br><br><span class="hljs-comment"># 访问控制台</span><br><span class="hljs-comment"># http://&lt;IP&gt;:8848/nacos   默认账号：nacos / nacos</span><br><br><span class="hljs-comment"># 查看日志确认启动成功</span><br><span class="hljs-built_in">tail</span> -f logs/start.out<br></code></pre></td></tr></table></figure>
+
+<h3 id="集群模式（生产）"><a href="#集群模式（生产）" class="headerlink" title="集群模式（生产）"></a>集群模式（生产）</h3><h4 id="1-初始化-MySQL"><a href="#1-初始化-MySQL" class="headerlink" title="1. 初始化 MySQL"></a>1. 初始化 MySQL</h4><p>Nacos 自带建表 SQL，2.x 是 <code>mysql-schema.sql</code>（与 <code>conf/nacos-mysql.sql</code> 同源，按版本选择）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">mysql -uroot -p &lt; /opt/nacos/conf/mysql-schema.sql<br><span class="hljs-comment"># 执行后生成 nacos_config 库及其表</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="2-配置-conf-application-properties"><a href="#2-配置-conf-application-properties" class="headerlink" title="2. 配置 conf/application.properties"></a>2. 配置 <code>conf/application.properties</code></h4><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-comment"># 指定外部 MySQL</span><br><span class="hljs-attr">spring.datasource.platform</span>=<span class="hljs-string">mysql</span><br><span class="hljs-attr">db.num</span>=<span class="hljs-string">1</span><br><span class="hljs-attr">db.url.0</span>=<span class="hljs-string">jdbc:mysql://192.168.1.10:3306/nacos_config?characterEncoding=utf8&amp;connectTimeout=1000&amp;socketTimeout=3000&amp;autoReconnect=true&amp;useUnicode=true&amp;useSSL=false&amp;serverTimezone=Asia/Shanghai</span><br><span class="hljs-attr">db.user.0</span>=<span class="hljs-string">nacos</span><br><span class="hljs-attr">db.password.0</span>=<span class="hljs-string">nacos123</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="3-配置集群节点-conf-cluster-conf"><a href="#3-配置集群节点-conf-cluster-conf" class="headerlink" title="3. 配置集群节点 conf/cluster.conf"></a>3. 配置集群节点 <code>conf/cluster.conf</code></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 每行一个节点 IP:port（注意与 node.id 对应；2.2+ 版本需配置 node.id）</span><br><span class="hljs-comment"># node.id=1,192.168.1.10:8848</span><br><span class="hljs-comment"># node.id=2,192.168.1.11:8848</span><br>192.168.1.10:8848<br>192.168.1.11:8848<br>192.168.1.12:8848<br></code></pre></td></tr></table></figure>
+
+<h4 id="4-三节点启动"><a href="#4-三节点启动" class="headerlink" title="4. 三节点启动"></a>4. 三节点启动</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">sh bin/startup.sh      <span class="hljs-comment"># 默认集群模式</span><br><span class="hljs-comment"># 各节点日志确认集群成员：</span><br><span class="hljs-comment"># logs/naming-server.log 中应看到对等节点列表</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="验证-4"><a href="#验证-4" class="headerlink" title="验证"></a>验证</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 控制台：http://&lt;IP&gt;:8848/nacos</span><br><span class="hljs-comment"># 服务列表/配置管理页面正常、各节点数据一致即部署成功</span><br><br><span class="hljs-comment"># API 验证（服务注册）</span><br>curl -X POST <span class="hljs-string">&#x27;http://192.168.1.10:8848/nacos/v1/ns/instance?serviceName=test-service&amp;ip=192.168.1.20&amp;port=8080&#x27;</span><br><span class="hljs-comment"># 返回 ok 表示注册成功</span><br><br><span class="hljs-comment"># 查看节点状态（集群模式下确认全部在线）</span><br>curl <span class="hljs-string">&#x27;http://192.168.1.10:8848/nacos/v1/ns/operator/servers&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="常见问题-9"><a href="#常见问题-9" class="headerlink" title="常见问题"></a>常见问题</h3><ul>
+<li><strong>启动报 <code>Unable to start web server</code> &#x2F; 端口冲突</strong>：8848 被占用；或 JDK 版本过低</li>
+<li><strong>集群节点互相看不到</strong>：<code>cluster.conf</code> 配置错误、9849 gRPC 端口不通、各节点 <code>nacos.core.auth</code> 或节点 ID 不一致</li>
+<li><strong>配置发布失败报 Derby 相关错误</strong>：运行的是单机内嵌 Derby 但多实例同时连，或本该集群却起了多个单机实例；检查 <code>application.properties</code> 的 MySQL 配置是否生效（启动日志会打印 <code>Database</code> 类型）</li>
+<li><strong>服务注册成功但客户端调用 503</strong>：服务健康检查（心跳）失败，客户端与 9848 端口不通</li>
+<li><strong><code>nacos</code> 默认密码登录后必须改</strong>：控制台首次登录用 nacos&#x2F;nacos，生产第一时间修改</li>
+</ul>
+<h3 id="部署建议-7"><a href="#部署建议-7" class="headerlink" title="部署建议"></a>部署建议</h3><ul>
+<li>生产至少 3 节点集群 + 外接 MySQL（单机 Derby 只用于测试）</li>
+<li>2.x 客户端与服务端版本尽量一致，gRPC 协议跨大版本不兼容</li>
+<li>配置变更通过控制台&#x2F;API 操作，变更记录存 MySQL，天然可审计</li>
+<li>与 Kubernetes 结合时可用 nacos-k8s 方案，但传统部署仍是主流</li>
+</ul>
+<h2 id="RocketMQ（消息队列）"><a href="#RocketMQ（消息队列）" class="headerlink" title="RocketMQ（消息队列）"></a>RocketMQ（消息队列）</h2><blockquote>
+<p>RocketMQ 是阿里开源的消息中间件，特点是高吞吐、低延迟、事务消息与顺序消息支持好，国内互联网与政企项目使用广泛。它分 NameServer（路由注册）与 Broker（消息存储）两个角色，部署模板化：装 JDK、解压、改内存参数、起两个进程。本文以 RocketMQ 5.x 为例，覆盖单机与集群两种形态。</p>
+</blockquote>
+<h3 id="架构角色"><a href="#架构角色" class="headerlink" title="架构角色"></a>架构角色</h3><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">Producer</span> / Consumer（业务）<br>        │<br>        ▼<br>NameServer（路由中心，轻量，可多台）<br>        ▲<br>        │ 心跳 + 路由<br>Broker（消息存储，一主一从或多主多从）<br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>职责</th>
+<th>端口</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NameServer</td>
+<td>管理 Broker 路由，客户端先连它拿地址</td>
+<td>9876</td>
+</tr>
+<tr>
+<td>Broker</td>
+<td>消息存储与分发，向 NameServer 注册</td>
+<td>10911（主端口）</td>
+</tr>
+<tr>
+<td>Broker VIP</td>
+<td>客户端访问 Broker 的 VIP 端口</td>
+<td>10909（默认开放）</td>
+</tr>
+</tbody></table>
+<h3 id="前置条件-9"><a href="#前置条件-9" class="headerlink" title="前置条件"></a>前置条件</h3><ul>
+<li>JDK 1.8+（RocketMQ 官方推荐 JDK 8，5.x 支持到 JDK 11+ 但以 8 最稳）</li>
+<li>内存：官方建议 4GB+（默认启动脚本 Xmx 4g，机器小需调低）</li>
+<li>Linux 建议调大文件句柄与进程数限制</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&#x27;* soft nofile 655350&#x27;</span> &gt;&gt; /etc/security/limits.conf<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&#x27;* hard nofile 655350&#x27;</span> &gt;&gt; /etc/security/limits.conf<br></code></pre></td></tr></table></figure>
+
+<h3 id="下载与解压-8"><a href="#下载与解压-8" class="headerlink" title="下载与解压"></a>下载与解压</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget https://dlcdn.apache.org/rocketmq/5.1.4/rocketmq-all-5.1.4-bin-release.zip<br>unzip rocketmq-all-5.1.4-bin-release.zip -d /opt<br><span class="hljs-built_in">ln</span> -s /opt/rocketmq-all-5.1.4-bin-release /opt/rocketmq<br><br><span class="hljs-built_in">export</span> ROCKETMQ_HOME=/opt/rocketmq<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$ROCKETMQ_HOME</span>/bin<br></code></pre></td></tr></table></figure>
+
+<h3 id="单机部署（快速体验）"><a href="#单机部署（快速体验）" class="headerlink" title="单机部署（快速体验）"></a>单机部署（快速体验）</h3><h4 id="1-启动-NameServer"><a href="#1-启动-NameServer" class="headerlink" title="1. 启动 NameServer"></a>1. 启动 NameServer</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">nohup</span> sh bin/mqnamesrv &gt; /opt/rocketmq/logs/namesrv.log 2&gt;&amp;1 &amp;<br><span class="hljs-comment"># 看到 &quot;The Name Server boot success&quot; 即成功</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="2-启动-Broker（使用默认配置）"><a href="#2-启动-Broker（使用默认配置）" class="headerlink" title="2. 启动 Broker（使用默认配置）"></a>2. 启动 Broker（使用默认配置）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">nohup</span> sh bin/mqbroker -n localhost:9876 \<br>  -c conf/broker.conf &gt; /opt/rocketmq/logs/broker.log 2&gt;&amp;1 &amp;<br><span class="hljs-comment"># 看到 &quot;The broker boot success&quot; 即成功</span><br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>内存不足的机器启动失败时，先改启动脚本里的 JVM 参数：<code>bin/runserver.sh</code>（NameServer 的 Xmx 默认 4g）与 <code>bin/runbroker.sh</code>（Broker 的 Xmx 默认 8g）调小，例如 <code>-Xms1g -Xmx1g</code>。</p> 
+          </div>
+
+<h3 id="生产配置要点（broker-conf）"><a href="#生产配置要点（broker-conf）" class="headerlink" title="生产配置要点（broker.conf）"></a>生产配置要点（broker.conf）</h3><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-comment"># Broker 集群名与自身名字</span><br><span class="hljs-attr">brokerClusterName</span>=<span class="hljs-string">DefaultCluster</span><br><span class="hljs-attr">brokerName</span>=<span class="hljs-string">broker-a</span><br><span class="hljs-attr">brokerId</span>=<span class="hljs-string">0</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 注册给客户端/NameServer 的地址：生产必须填内网 IP，不能留空</span><br><span class="hljs-attr">brokerIP1</span>=<span class="hljs-string">192.168.1.20</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># NameServer 列表</span><br><span class="hljs-attr">namesrvAddr</span>=<span class="hljs-string">192.168.1.10:9876;192.168.1.11:9876</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 消息存储目录（放数据盘）</span><br><span class="hljs-attr">storePathRootDir</span>=<span class="hljs-string">/data/rocketmq/store</span><br><span class="hljs-attr">storePathCommitLog</span>=<span class="hljs-string">/data/rocketmq/store/commitlog</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 删除策略：磁盘使用率阈值与保留时长</span><br><span class="hljs-attr">deleteWhen</span>=<span class="hljs-string">04</span><br><span class="hljs-attr">fileReservedTime</span>=<span class="hljs-string">72</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 自动创建 topic（生产建议关闭，Topic 走后台创建）</span><br><span class="hljs-attr">autoCreateTopicEnable</span>=<span class="hljs-string">true</span><br></code></pre></td></tr></table></figure>
+
+<div class="note note-warning">
+            <p><code>brokerIP1</code> 不配置时 Broker 会注册自己的主机名&#x2F;IP，客户端在其他机器解析不了就连接失败。这是 RocketMQ 最常见的部署坑，同 Kafka 的 <code>listeners</code> 一个道理。</p> 
+          </div>
+
+<h3 id="验证-5"><a href="#验证-5" class="headerlink" title="验证"></a>验证</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 查看集群与 Broker 状态</span><br>mqadmin clusterList -n localhost:9876<br><span class="hljs-comment"># 应显示 broker-a 与对应的地址、版本</span><br><br><span class="hljs-comment"># 命令行收发消息测试</span><br>sh bin/tools.sh org.apache.rocketmq.example.quickstart.Producer \<br>  -n localhost:9876<br><span class="hljs-comment"># 输出 &quot;Send Result: SEND_OK&quot;</span><br><br>sh bin/tools.sh org.apache.rocketmq.example.quickstart.Consumer \<br>  -n localhost:9876<br><span class="hljs-comment"># 应消费到刚才生产的消息</span><br></code></pre></td></tr></table></figure>
+
+<p>生产环境建议额外部署 <code>rocketmq-dashboard</code>（官方 Web 控制台，spring boot 应用）查看 topic、消费组积压与消息详情。</p>
+<h3 id="集群模式（主从，可扩展）"><a href="#集群模式（主从，可扩展）" class="headerlink" title="集群模式（主从，可扩展）"></a>集群模式（主从，可扩展）</h3><ul>
+<li><strong>一主一从</strong>：两个 Broker 节点 <code>brokerName</code> 相同、<code>brokerId</code> 分别为 0 和 1（从节点同配置起 mqbroker 即可），从节点自动同步</li>
+<li><strong>多主多从</strong>：多组 brokerName 独立的主从对，分担 topic 流量</li>
+<li>NameServer 部署 2~3 台，业务侧 <code>namesrvAddr</code> 写全</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 从节点只需 broker.conf 中 brokerId=1 并指向同一集群</span><br><span class="hljs-built_in">nohup</span> sh bin/mqbroker -n &lt;namesrv&gt;:9876 -c conf/broker-s.conf &gt; broker-s.log 2&gt;&amp;1 &amp;<br></code></pre></td></tr></table></figure>
+
+<h3 id="常见问题-10"><a href="#常见问题-10" class="headerlink" title="常见问题"></a>常见问题</h3><ul>
+<li><strong><code>connect to 127.0.0.1:9876 failed</code></strong>：NameServer 没启动或 <code>namesrvAddr</code> 写错</li>
+<li><strong>启动报内存不足（<code>Could not reserve enough space</code>）</strong>：默认 JVM 参数 Xmx 太大，改 <code>runserver.sh</code>&#x2F;<code>runbroker.sh</code></li>
+<li><strong>客户端连不上 Broker（<code>sendDefaultImpl call timeout</code>）</strong>：<code>brokerIP1</code> 未配置导致注册地址不可达；防火墙 10911&#x2F;10909 未放行</li>
+<li><strong>消费积压持续增加</strong>：消费端处理慢或消费失败重试死循环，查看消费组 <code>mqadmin consumerProgress -n &lt;ns&gt; -g &lt;group&gt;</code></li>
+<li><strong>消息堆积磁盘暴涨</strong>：<code>fileReservedTime</code> 保留时间过长、<code>autoCreateTopicEnable=true</code> 导致无限自动建 topic</li>
+</ul>
+<h3 id="部署建议-8"><a href="#部署建议-8" class="headerlink" title="部署建议"></a>部署建议</h3><ul>
+<li>生产：主从成组 + 2 台以上 NameServer，Topic 划分业务隔离</li>
+<li>存储目录独立数据盘，commitlog 与 consumequeue 分开磁盘效果更好</li>
+<li>事务消息、延迟消息测试先行，确认 5.x 与业务 SDK 版本兼容</li>
+<li>监控：Broker 的 <code>mqadmin</code> 指标 + 消费积压告警（dashboard 自带）</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/%E9%83%A8%E7%BD%B2/" class="print-no-link">#部署</a>
+      
+        <a href="/tags/bigdata/" class="print-no-link">#bigdata</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>大数据与中间件组件部署总览</div>
+      <div>https://chaggle.github.io/2026/08/09/bigdata/components-deploy-all-20260810/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月9日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月11日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/10/summary/weekly-summaries-2022-20260811/" title="2022 年周总结合集">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">2022 年周总结合集</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/09/bigdata/datasophon-deploy-params-20260810/" title="DataSophon 部署大数据组件：参数说明与优化实践">
+                        <span class="hidden-mobile">DataSophon 部署大数据组件：参数说明与优化实践</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '1ad10191da08bb288906818100da6c2c'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

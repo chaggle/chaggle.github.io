@@ -1,0 +1,1247 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/14/windows/wsl2-restore-on-stripped-windows/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="一台 &quot;Ghost 精简版&quot; Windows 11 专业版机器，想用 WSL2 + Docker，结果发现系统镜像把虚拟化组件全部精简掉了。本文完整记录了两个阶段的战斗：第一阶段是检测与原地升级（2026-08-14 深夜），把系统从 26200.7705 完整升级到…">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/14/windows/wsl2-restore-on-stripped-windows/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="一台 &quot;Ghost 精简版&quot; Windows 11 专业版机器，想用 WSL2 + Docker，结果发现系统镜像把虚拟化组件全部精简掉了。本文完整记录了两个阶段的战斗：第一阶段是检测与原地升级（2026-08-14 深夜），把系统从 26200.7705 完整升级到…">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-14T15:00:00.000Z">
+<meta property="article:modified_time" content="2026-09-01T16:53:38.179Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="DISM">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="MSI">
+<meta property="article:tag" content="WSL2">
+<meta property="article:tag" content="Windows">
+<meta property="article:tag" content="容器">
+<meta property="article:tag" content="系统重装">
+<meta property="article:tag" content="踩坑">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-14 23:00" pubdate>
+          2026年8月14日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          7.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          62 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-09-02T00:53:38+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>一台 “Ghost 精简版” Windows 11 专业版机器，想用 WSL2 + Docker，结果发现系统镜像把虚拟化组件全部精简掉了。本文完整记录了两个阶段的战斗：第一阶段是检测与原地升级（2026-08-14 深夜），把系统从 26200.7705 完整升级到 26200.9168；第二阶段是重启后的 WSL 升级灾难修复与 Docker Desktop 落地（2026-08-15 凌晨），最终 <code>docker run hello-world</code> 点亮引擎。</p>
+</blockquote>
+<h2 id="一、任务背景"><a href="#一、任务背景" class="headerlink" title="一、任务背景"></a>一、任务背景</h2><p>目标机器：Intel i5-14600KF &#x2F; 32GB &#x2F; NVMe 2TB，Windows 11 专业版（Build 26200.7705）。需求：<strong>确认系统是否具备 WSL2 与容器化能力</strong>，并完成 Docker 环境搭建。</p>
+<h2 id="二、检测阶段：看起来正常，实则千疮百孔"><a href="#二、检测阶段：看起来正常，实则千疮百孔" class="headerlink" title="二、检测阶段：看起来正常，实则千疮百孔"></a>二、检测阶段：看起来正常，实则千疮百孔</h2><p>第一轮检测结果：</p>
+<table>
+<thead>
+<tr>
+<th>检查项</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CPU 虚拟化 (VT-x &#x2F; SLAT)</td>
+<td>✅ BIOS 已开启</td>
+</tr>
+<tr>
+<td>WSL 版本（Store 版 2.7.11）</td>
+<td>✅ 已安装</td>
+</tr>
+<tr>
+<td><code>wsl --status</code> &#x2F; <code>wsl -l -v</code></td>
+<td>❌ 报错 <code>Wsl/0x8007041d</code>（服务超时），无任何发行版</td>
+</tr>
+<tr>
+<td>LxssManager &#x2F; vmcompute &#x2F; vmms 服务</td>
+<td>❌ 全部不存在</td>
+</tr>
+<tr>
+<td>Windows 功能清单（102 项）</td>
+<td>❌ 无 WSL、VirtualMachinePlatform、Hyper-V、Containers</td>
+</tr>
+</tbody></table>
+<p><strong>根因确认</strong>：这是一台被深度精简的 Windows 镜像（典型 Ghost 版），组件仓库（WinSxS&#x2F;CBS）里根本没有虚拟化相关功能包。连恢复环境（reagentc &#x2F; WinRE）都被删了。硬件没问题，是软件层”缺零件”。</p>
+<h2 id="三、第一阶段：修复尝试全记录（失败路线图）"><a href="#三、第一阶段：修复尝试全记录（失败路线图）" class="headerlink" title="三、第一阶段：修复尝试全记录（失败路线图）"></a>三、第一阶段：修复尝试全记录（失败路线图）</h2><blockquote>
+<p>这一路踩的坑比预想的多得多，每一步都值得记录。</p>
+</blockquote>
+<h3 id="3-1-直接启用功能-→-功能名未知"><a href="#3-1-直接启用功能-→-功能名未知" class="headerlink" title="3.1 直接启用功能 → 功能名未知"></a>3.1 直接启用功能 → 功能名未知</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs text">Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux, VirtualMachinePlatform -All<br># 错误: 0x800f080c 功能名称 Microsoft-Windows-Subsystem-Linux 未知<br></code></pre></td></tr></table></figure>
+
+<p><code>wsl --install</code> 也是同样的结局（<code>WSL_E_INSTALL_COMPONENT_FAILED</code>）。<strong>“功能名未知”意味着功能包彻底不在镜像里，不是”未启用”</strong>。</p>
+<h3 id="3-2-下载官方-ISO：一条-8-5GB-的下载历险"><a href="#3-2-下载官方-ISO：一条-8-5GB-的下载历险" class="headerlink" title="3.2 下载官方 ISO：一条 8.5GB 的下载历险"></a>3.2 下载官方 ISO：一条 8.5GB 的下载历险</h3><ul>
+<li>Fido 脚本（Rufus 作者维护）生成微软官方直链：<code>software.download.prss.microsoft.com</code>，带 24 小时时效令牌。</li>
+<li><strong>单连接被限速 1.5MB&#x2F;s</strong> → 实测发现 CDN 支持 Range 请求 → <strong>分段并行下载</strong>，聚合速度冲到 <strong>74MB&#x2F;s</strong>，8.5GB 几分钟搞定。</li>
+<li>中途 <strong>D: 盘（挂载的虚拟盘）神秘消失</strong>，所有下载写入失败（curl 退出码 23），才意识到 D: 不是物理分区——<strong>下载目标必须选稳定盘</strong>。</li>
+</ul>
+<h3 id="3-3-从-ISO-补装组件-→-没有载荷"><a href="#3-3-从-ISO-补装组件-→-没有载荷" class="headerlink" title="3.3 从 ISO 补装组件 → 没有载荷"></a>3.3 从 ISO 补装组件 → 没有载荷</h3><ul>
+<li><code>dism /Online /Enable-Feature /Source:WIM:...</code> → 依然 <code>0x800f080c</code>（在线镜像的清单里没有该功能，给源也没用）。</li>
+<li>挂载 wim 提取功能包 → 发现 wim 的 Packages 目录里<strong>只有 .mum&#x2F;.cat 清单，没有 .cab 载荷</strong>；而且 WSL 在 25H2 里是”按需功能”(FOD)，<strong>根本不随安装镜像分发</strong>。手术式补装路线宣告失败。</li>
+</ul>
+<h3 id="3-4-原地升级修复（setup-auto-upgrade）→-七连败"><a href="#3-4-原地升级修复（setup-auto-upgrade）→-七连败" class="headerlink" title="3.4 原地升级修复（setup &#x2F;auto upgrade）→ 七连败"></a>3.4 原地升级修复（setup &#x2F;auto upgrade）→ 七连败</h3><p>微软官方对”精简系统”的正规修复是<strong>原地升级</strong>（保留文件和应用）。ISO（26200.8037）比当前系统（7705）新，版本匹配没问题，但每次都在不同步骤暴毙：</p>
+<table>
+<thead>
+<tr>
+<th>次数</th>
+<th>卡住的步骤</th>
+<th>报错</th>
+<th>解决</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>v1</td>
+<td>EULA</td>
+<td><code>User did not accept EULA</code> (0xC190010E)</td>
+<td>需要应答文件</td>
+</tr>
+<tr>
+<td>v2</td>
+<td>语言选择</td>
+<td><code>GetInternationalSettingsFromUnattend 0x8007000D</code></td>
+<td>应答文件补 <code>Microsoft-Windows-International-Core-WinPE</code></td>
+</tr>
+<tr>
+<td>v3</td>
+<td>产品密钥</td>
+<td><code>ProductKeyValidate 0x80070490</code></td>
+<td>系统是 KMS 卷激活，加 <code>/pkey W269N-...</code>（Pro GVLK）</td>
+</tr>
+<tr>
+<td>v4</td>
+<td>驱动安装</td>
+<td><code>DriverInstallation 0x80070490</code></td>
+<td>补 WinRE（winre.wim + reagentc.exe 从 wim 提取）</td>
+</tr>
+<tr>
+<td>v5</td>
+<td>驱动安装</td>
+<td>同上</td>
+<td>加 <code>/migratedrivers none</code>，无效</td>
+</tr>
+<tr>
+<td>v6</td>
+<td>驱动安装</td>
+<td>同上</td>
+<td>WinRE 已就位，仍无效</td>
+</tr>
+<tr>
+<td>v7</td>
+<td>驱动安装</td>
+<td>同上</td>
+<td>补迁移框架 DLL（migcore.dll 等，从 ISO sources 复制）</td>
+</tr>
+<tr>
+<td>v8（交互式）</td>
+<td>迁移收集</td>
+<td><code>Gather data 0x8007042B</code>，<code>ServiceModelRegMigPlugin.dll does not exist</code></td>
+<td>补全 migration 插件目录（33 个 DLL）+ acmigration.dll</td>
+</tr>
+<tr>
+<td><strong>v9（交互式）</strong></td>
+<td>—</td>
+<td>—</td>
+<td><strong>✅ 全程通过，升级成功</strong></td>
+</tr>
+</tbody></table>
+<p><strong>关键洞察</strong>：升级程序在 downlevel 阶段要从<strong>当前系统</strong>加载迁移框架（<code>migcore.dll</code>）、迁移插件（<code>%SYSTEM32%\migration\</code>）和 WinRE——精简镜像把这类”运行时才需要”的组件也删了。<strong>把这些组件从官方 wim 补齐后，交互式升级可以成功</strong>。</p>
+<h3 id="3-5-转机：交互式升级-补齐运行时组件"><a href="#3-5-转机：交互式升级-补齐运行时组件" class="headerlink" title="3.5 转机：交互式升级 + 补齐运行时组件"></a>3.5 转机：交互式升级 + 补齐运行时组件</h3><p>期间也制作了 UEFI 启动 U 盘（FAT32 + <code>dism /Split-Image</code> 拆分 7GB 的 install.wim），但用户否决了 U 盘&#x2F;双系统路线，于是回到升级修复。<strong>静默模式（&#x2F;quiet）对每个 DLP 动作失败即中止，换成图形化交互式升级后同一套管线走得更远</strong>：</p>
+<ul>
+<li><strong>v8（交互式第 1 次）</strong>：镜像应用、驱动迁移全部通过，最终卡在<strong>迁移收集</strong>（<code>Gather data 0x8007042B</code>，根因是 <code>ServiceModelRegMigPlugin.dll</code> 等迁移插件缺失）。</li>
+<li><strong>v9（交互式第 2 次）</strong>：从 wim 补全整个 <code>C:\Windows\System32\migration\</code> 插件目录（33 个 DLL）+ <code>acmigration.dll</code> 后，<strong>全程通过</strong>：迁移收集 → 驱动迁移 → 组件分期 → 迁移应用 → 自动重启。</li>
+</ul>
+<p><strong>第一阶段成果</strong>：系统从 26200.7705 升级到 <strong>26200.9168</strong>（动态更新自动带上最新累积更新），个人文件与应用设置完整迁移，旧系统完整保留在 <code>Windows.old</code>（确认无误后可删除）。WSL + VirtualMachinePlatform 两个功能随后启用成功，系统提示重启生效。</p>
+<h2 id="四、第二阶段：重启后的-WSL-升级灾难"><a href="#四、第二阶段：重启后的-WSL-升级灾难" class="headerlink" title="四、第二阶段：重启后的 WSL 升级灾难"></a>四、第二阶段：重启后的 WSL 升级灾难</h2><blockquote>
+<p>重启之后，WSL 并没有如预期那样恢复可用，反而抛出了一个更隐蔽的错误。这一阶段的排查对象从”缺失组件”变成了”残留状态”。</p>
+</blockquote>
+<h3 id="4-1-表面恢复-≠-真正可用"><a href="#4-1-表面恢复-≠-真正可用" class="headerlink" title="4.1 表面恢复 ≠ 真正可用"></a>4.1 表面恢复 ≠ 真正可用</h3><p>重启后功能已生效，但所有 wsl 命令——<code>wsl --version</code>、<code>wsl --install</code>、甚至 <code>wsl --shutdown</code>——一律输出：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text">WSL 正在完成升级...<br>灾难性故障<br>错误代码: Wsl/CallMsi/Install/E_UNEXPECTED<br></code></pre></td></tr></table></figure>
+
+<p>注意两点：其一，错误发生在”<strong>完成升级</strong>“这个动作上，说明系统认为有一次升级处于未完成状态；其二，Windows Installer 事件日志显示，<strong>每次调用 wsl.exe 都会触发一次 WSL MSI 的”重配置”事务，且状态码为 0（成功）</strong>——MSI 本身没坏，坏的是触发它之前的判定逻辑。</p>
+<h3 id="4-2-逐层排查：五个检查点"><a href="#4-2-逐层排查：五个检查点" class="headerlink" title="4.2 逐层排查：五个检查点"></a>4.2 逐层排查：五个检查点</h3><ol>
+<li><strong>功能与组件层</strong>：DISM 查询确认 <code>Microsoft-Windows-Subsystem-Linux</code> 与 <code>VirtualMachinePlatform</code> 均已启用；Appx 包（2.7.11.0）状态 Ok；<code>C:\Program Files\WSL\</code> 下 wsl.exe、wslservice.exe 等组件齐全且版本一致。<strong>不是缺组件</strong>。</li>
+<li><strong>MSI 注册层</strong>：产品注册信息里 <code>DisplayVersion</code> 为 2.7.11.0、<code>InstallState</code> 为 5（已安装），但 <strong><code>InstallLocation</code> 为空</strong>——这与 WSL 官方仓库 issue #12623 中 WSL 团队确认的根因完全吻合：<strong>InstallLocation 注册表值缺失，手动重装可解</strong>。</li>
+<li><strong>手动安装 MSI</strong>：从 GitHub Releases 下载同版本 MSI（wsl.2.7.11.0.x64.msi）执行 <code>msiexec /i</code>，<strong>退出码 1603</strong>。verbose 日志给出两个关键信号：属性表里 <code>MsiSystemRebootPending = 1</code>（安装器判定系统存在待重启状态），以及自定义操作 <code>ValidateInstall</code> 返回 3（失败）。</li>
+<li><strong>追踪待重启状态来源</strong>：常见的重启标记（CBS RebootPending、WU RebootRequired、RunOnce）都不存在，真正的来源是 <strong><code>PendingFileRenameOperations</code>——里面有 70 条 Norton 卸载残留的删除队列</strong>（这台封装镜像里 Norton 服务早已停用，但删除队列一直没清）。MSI 正是据此判定”系统待重启”。</li>
+<li><strong>镜像封装残留</strong>：<code>WindowsUpdate\Auto Update</code> 下的 <strong><code>IsOOBEInProgress = 1</code></strong>（首次开机流程标记）也是封装遗留，同样会干扰系统级安装。</li>
+</ol>
+<h3 id="4-3-三个修复动作"><a href="#4-3-三个修复动作" class="headerlink" title="4.3 三个修复动作"></a>4.3 三个修复动作</h3><p>按”从轻到重”的顺序执行：</p>
+<ol>
+<li><strong>清除 <code>IsOOBEInProgress</code> 残留标记</strong>（置 0）→ 重试，无效，错误依旧。</li>
+<li><strong>备份并清空 <code>PendingFileRenameOperations</code></strong>（先 <code>reg export</code> 备份整个 Session Manager 键到 <code>session_manager_backup.reg</code>，再删除该值）→ <code>MsiSystemRebootPending</code> 消失，但 <code>ValidateInstall</code> 仍然返回 3，1603 依旧。</li>
+<li><strong>关键一步：先卸载、再全新安装</strong>。既然同版本 MSI 进入的是”维护模式&#x2F;重配置”路径（日志里 <code>Skipping RemoveExistingProducts: current configuration is maintenance mode or an uninstall</code>），那就 <code>msiexec /x {497CB23D-8747-4047-A079-DD98E0EDFC18}</code> 彻底卸载产品，随后 <code>msiexec /i</code> 全新安装 → <strong>退出码 0，安装成功</strong>。</li>
+</ol>
+<p>修复效果立竿见影：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text">$ wsl --version<br>WSL 版本: 2.7.11.0<br>内核版本: 6.18.33.2-2<br>WSLg 版本: 1.0.73.2<br>默认版本: 2<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-4-Docker-Desktop-落地"><a href="#4-4-Docker-Desktop-落地" class="headerlink" title="4.4 Docker Desktop 落地"></a>4.4 Docker Desktop 落地</h3><p>WSL 恢复后，Docker 安装一路顺畅：</p>
+<ol>
+<li><strong>安装</strong>：<code>winget install -e --id Docker.DockerDesktop</code>（4.86.0），安装器自动校验哈希，一次成功。</li>
+<li><strong>启动</strong>：启动 Docker Desktop 后引擎数分钟内就绪——Server: Docker Desktop 4.86.0，Engine 29.7.2（linux&#x2F;amd64），containerd v2.2.5。</li>
+<li><strong>验证</strong>：<code>docker run --rm hello-world</code> 成功拉取镜像并运行，输出 “Hello from Docker!”。</li>
+<li><strong>PATH</strong>：安装器已将 <code>C:\Program Files\Docker\Docker\resources\bin</code> 写入系统 PATH。若在旧终端里遇到 <code>docker-credential-desktop: executable file not found</code>，是会话 PATH 未刷新的表象，新开终端即正常。</li>
+</ol>
+<h2 id="五、经验总结"><a href="#五、经验总结" class="headerlink" title="五、经验总结"></a>五、经验总结</h2><ol>
+<li><strong>“功能名未知”（0x800f080c）≠ “功能未启用”</strong>：前者说明镜像里根本没这个功能，任何 &#x2F;Source 都救不了。</li>
+<li><strong>深度精简镜像（Ghost 版）的升级修复并非无解，但要补齐运行时组件</strong>：setup 的 downlevel 阶段强依赖当前系统的迁移框架（migcore.dll）、迁移插件（<code>%SYSTEM32%\migration\</code>）和 WinRE，精简系统删掉的恰恰是这些。报错 <code>0x80070490</code>（找不到元素）几乎总是”某个被删的运行时组件”的信号，去 <code>migration</code> 和 <code>Recovery</code> 目录与官方 wim 对账补齐即可。</li>
+<li><strong>静默升级失败 ≠ 升级无望</strong>：<code>/quiet</code> 模式下任意 DLP 动作失败即中止；改用<strong>交互式升级</strong>（GUI）后同一套管线能走得更远，错误信息也更明确。</li>
+<li><strong>硬件虚拟化支持 ≠ 系统能用 WSL2</strong>：WSL2 需要 <code>Microsoft-Windows-Subsystem-Linux</code> + <code>VirtualMachinePlatform</code> 两个系统功能，缺一个都是 0x8007041d。</li>
+<li><strong>“灾难性故障 E_UNEXPECTED” 的排查顺序</strong>：先看 MSI verbose 日志（<code>msiexec /i ... /l*v</code>），定位失败的 custom action 与 <code>MsiSystemRebootPending</code> 属性；再反向追踪待重启标记的来源（<code>PendingFileRenameOperations</code>、CBS、WU），清掉残留后再重试。<strong>“升级进行中”的判定卡死，往往不是缺文件，而是残留状态没清</strong>。</li>
+<li><strong>同版本 MSI 修复失败时，先卸载再装</strong>：维护模式（重配置）走的是另一条执行路径，<code>ValidateInstall</code> 等自定义操作的行为与全新安装不同；卸载后全新安装常常直接绕开问题。</li>
+<li><strong>封装&#x2F;克隆镜像的残留标记会以奇怪的方式阻塞系统级安装</strong>：<code>IsOOBEInProgress</code>、Norton 删除队列这类与”当前任务”无关的残留，会通过待重启判定间接导致 MSI 安装失败（1603）。排查系统级安装失败时，值得把这类”体检项”纳入检查清单。</li>
+<li><strong>自动化排查的黄金法则</strong>：每一步都留日志、验证产物、先小样后大样（先下 10MB 验内容再下 8.5GB）。</li>
+</ol>
+<h2 id="六、最终结果与数据"><a href="#六、最终结果与数据" class="headerlink" title="六、最终结果与数据"></a>六、最终结果与数据</h2><h3 id="6-1-时间线（2026-08-14-→-08-15）"><a href="#6-1-时间线（2026-08-14-→-08-15）" class="headerlink" title="6.1 时间线（2026-08-14 → 08-15）"></a>6.1 时间线（2026-08-14 → 08-15）</h3><table>
+<thead>
+<tr>
+<th>时间</th>
+<th>事件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>21:26</td>
+<td>任务开始：检测 WSL2 &#x2F; 容器化能力</td>
+</tr>
+<tr>
+<td>21:30-21:45</td>
+<td>检测完成，定位精简镜像根因；并行加速下载官方 ISO</td>
+</tr>
+<tr>
+<td>22:00-23:20</td>
+<td>DISM 补装三路失败；静默升级 v1-v7 七连败（EULA→语言→密钥→驱动）</td>
+</tr>
+<tr>
+<td>23:28</td>
+<td>交互式升级 v8 → 卡迁移收集（缺迁移插件）</td>
+</tr>
+<tr>
+<td>00:10</td>
+<td>补全 35 个迁移组件（33 插件 + acmigration.dll + ServiceModelRegMigPlugin.dll）</td>
+</tr>
+<tr>
+<td>00:24</td>
+<td>交互式升级 v9 启动</td>
+</tr>
+<tr>
+<td>00:55</td>
+<td><strong>升级完成，自动重启进入新系统（26200.9168）</strong></td>
+</tr>
+<tr>
+<td>01:18</td>
+<td>WSL + VirtualMachinePlatform 功能启用成功（重启生效）</td>
+</tr>
+<tr>
+<td>02:20</td>
+<td>第二阶段开始：wsl 全部命令报 <code>Wsl/CallMsi/Install/E_UNEXPECTED</code></td>
+</tr>
+<tr>
+<td>02:21-02:33</td>
+<td>逐层排查：功能&#x2F;组件&#x2F;注册层均正常；确认 <code>InstallLocation</code> 缺失、<code>MsiSystemRebootPending=1</code></td>
+</tr>
+<tr>
+<td>02:33-02:42</td>
+<td>清除 <code>IsOOBEInProgress</code> 与 Norton 删除队列残留；MSI 仍 1603</td>
+</tr>
+<tr>
+<td>02:43</td>
+<td><strong>卸载后全新安装 WSL MSI 2.7.11.0 → 成功，wsl 命令恢复</strong></td>
+</tr>
+<tr>
+<td>02:44-02:53</td>
+<td>winget 安装 Docker Desktop 4.86.0 → 引擎就绪 → <code>hello-world</code> 验证通过</td>
+</tr>
+<tr>
+<td>总耗时</td>
+<td><strong>约 5.5 小时</strong>（两阶段合计，含 8.5GB 镜像下载与两次安装尝试）</td>
+</tr>
+</tbody></table>
+<h3 id="6-2-会话消耗（AI-助手侧）"><a href="#6-2-会话消耗（AI-助手侧）" class="headerlink" title="6.2 会话消耗（AI 助手侧）"></a>6.2 会话消耗（AI 助手侧）</h3><p>第一阶段（精简镜像升级）会话消耗：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>数值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>输入 tokens（累计）</td>
+<td>约 15.4 万</td>
+</tr>
+<tr>
+<td>输出 tokens（累计）</td>
+<td>约 25.6 万（其中推理 tokens 13.5 万）</td>
+</tr>
+<tr>
+<td>缓存读取 tokens</td>
+<td>约 5471 万</td>
+</tr>
+<tr>
+<td>LLM 用量记录（工具步骤）</td>
+<td>259 条</td>
+</tr>
+</tbody></table>
+<p>第二阶段（WSL 修复 + Docker 落地）会话消耗未单独统计，工具调用主要集中在：DISM&#x2F;注册表查询与修改、MSI 安装与日志分析、GitHub API 取包、winget 安装与引擎验证。</p>
+<h3 id="6-3-解决的问题（16-项）"><a href="#6-3-解决的问题（16-项）" class="headerlink" title="6.3 解决的问题（16 项）"></a>6.3 解决的问题（16 项）</h3><p>第一阶段（10 项）：</p>
+<ol>
+<li>定位 WSL2 不可用根因：<code>0x8007041d</code> → 精简镜像缺失 WSL&#x2F;VMP 功能组件</li>
+<li>微软 CDN 单连接限速 1.5MB&#x2F;s → 分段并行下载提速至 74MB&#x2F;s</li>
+<li>D 盘虚拟盘中途消失导致下载失败 → 换稳定盘并绕过</li>
+<li>澄清”功能名未知”（0x800f080c）≠ “未启用”，DISM &#x2F;Source 无法补装</li>
+<li>静默升级 EULA 失败 → autounattend.xml 应答文件</li>
+<li>语言选择失败 → 应答文件补 International-Core-WinPE</li>
+<li>产品密钥校验失败 → &#x2F;pkey 传入 Pro GVLK</li>
+<li>驱动安装 0x80070490 → 部署 WinRE + 迁移框架 DLL</li>
+<li>迁移收集 0x8007042B → 补全 35 个迁移组件 → <strong>升级成功</strong></li>
+<li>WSL + VirtualMachinePlatform 功能启用成功</li>
+</ol>
+<p>第二阶段（6 项）：</p>
+<ol start="11">
+<li><code>Wsl/CallMsi/Install/E_UNEXPECTED</code>（升级完成判定卡死）→ 定位为 MSI 判定链问题而非组件缺失</li>
+<li><code>MsiSystemRebootPending=1</code> 干扰安装 → 备份并清空 <code>PendingFileRenameOperations</code> 中 70 条 Norton 删除队列残留</li>
+<li>封装镜像残留 <code>IsOOBEInProgress=1</code> → 清除</li>
+<li>同版本 MSI 维护模式重配置失败（1603）→ 先卸载再全新安装 → <strong>WSL 2.7.11.0 恢复可用</strong></li>
+<li>Docker Desktop 安装与启动 → winget 一次成功，引擎 29.7.2 就绪</li>
+<li>端到端验证 → <code>docker run hello-world</code> 通过</li>
+</ol>
+<h3 id="6-4-当前状态与待办"><a href="#6-4-当前状态与待办" class="headerlink" title="6.4 当前状态与待办"></a>6.4 当前状态与待办</h3><ul>
+<li>✅ 系统：Windows 11 <strong>26200.9168</strong>（完整镜像，非精简）</li>
+<li>✅ WSL2：2.7.11.0 正常可用（内核 6.18.33.2-2，默认版本 2）</li>
+<li>✅ Docker Desktop：4.86.0 已安装并启动，<code>hello-world</code> 验证通过，<code>docker</code> 命令已入系统 PATH</li>
+<li>✅ 遗留清理：<code>session_manager_backup.reg</code> 保留在 <code>C:\Users\Administrator\</code>（PendingFileRenameOperations 备份，确认无误后可删）</li>
+<li>📦 <code>C:\iso\Win11_25H2.iso</code> 按用户要求保留不删；<code>Windows.old</code> 确认无误后可删除释放空间</li>
+<li>📝 后续可选：<code>wsl --install -d Ubuntu</code> 安装发行版、配置 Docker 镜像加速</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/windows/" class="category-chain-item">windows</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Windows/" class="print-no-link">#Windows</a>
+      
+        <a href="/tags/DISM/" class="print-no-link">#DISM</a>
+      
+        <a href="/tags/%E8%B8%A9%E5%9D%91/" class="print-no-link">#踩坑</a>
+      
+        <a href="/tags/WSL2/" class="print-no-link">#WSL2</a>
+      
+        <a href="/tags/Docker/" class="print-no-link">#Docker</a>
+      
+        <a href="/tags/%E5%AE%B9%E5%99%A8/" class="print-no-link">#容器</a>
+      
+        <a href="/tags/MSI/" class="print-no-link">#MSI</a>
+      
+        <a href="/tags/%E7%B3%BB%E7%BB%9F%E9%87%8D%E8%A3%85/" class="print-no-link">#系统重装</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录</div>
+      <div>https://chaggle.github.io/2026/08/14/windows/wsl2-restore-on-stripped-windows/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月14日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年9月2日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/14/powershell/powershell-pitfalls/" title="PowerShell 实战踩坑大全：从 GBK 乱码到引号地狱的二十个真实案例">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">PowerShell 实战踩坑大全：从 GBK 乱码到引号地狱的二十个真实案例</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/14/AI/agent-harness-learning-guide/" title="Agent Harness 岗的核心学习方法">
+                        <span class="hidden-mobile">Agent Harness 岗的核心学习方法</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '2068d0e6ded2573d5801d6e87cce0f12'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

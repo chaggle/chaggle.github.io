@@ -1,0 +1,1217 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/08/bigdata/hive-20260809/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="Hive 是大数据圈”SQL 化”的起点：把 HDFS 上的数据抽象成表，把 SQL 翻译成 MapReduce&#x2F;Tez&#x2F;Spark 作业。它不存数据、不跑计算，只做翻译和元数据管理。搞懂 Hive 的架构和优化手段，是数据开发的基本功。  核心架构Hive 由三个关键部分组成：MetaStore（元数据）、HiveServer2（服务入口）、Driver（SQL 解析与执行">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hive 底层原理与知识要点">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/08/bigdata/hive-20260809/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="Hive 是大数据圈”SQL 化”的起点：把 HDFS 上的数据抽象成表，把 SQL 翻译成 MapReduce&#x2F;Tez&#x2F;Spark 作业。它不存数据、不跑计算，只做翻译和元数据管理。搞懂 Hive 的架构和优化手段，是数据开发的基本功。  核心架构Hive 由三个关键部分组成：MetaStore（元数据）、HiveServer2（服务入口）、Driver（SQL 解析与执行">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-08T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T15:33:41.412Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="hive">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Hive 底层原理与知识要点 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Hive 底层原理与知识要点"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-08 16:00" pubdate>
+          2026年8月8日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          51 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Hive 底层原理与知识要点</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-10T23:33:41+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>Hive 是大数据圈”SQL 化”的起点：把 HDFS 上的数据抽象成表，把 SQL 翻译成 MapReduce&#x2F;Tez&#x2F;Spark 作业。它不存数据、不跑计算，只做翻译和元数据管理。搞懂 Hive 的架构和优化手段，是数据开发的基本功。</p>
+</blockquote>
+<h2 id="核心架构"><a href="#核心架构" class="headerlink" title="核心架构"></a>核心架构</h2><p>Hive 由三个关键部分组成：MetaStore（元数据）、HiveServer2（服务入口）、Driver（SQL 解析与执行）。</p>
+<h3 id="MetaStore（元数据库）"><a href="#MetaStore（元数据库）" class="headerlink" title="MetaStore（元数据库）"></a>MetaStore（元数据库）</h3><ul>
+<li>存储表结构、分区信息、字段类型、存储格式、表与数据文件的对应关系（元数据）</li>
+<li>默认用内嵌 Derby 数据库（只支持单连接，仅测试用），生产用 MySQL&#x2F;PostgreSQL</li>
+<li>是 Hive 的”目录册”：Spark SQL、Impala、Presto 等都可以共用同一个 MetaStore</li>
+</ul>
+<div class="note note-danger">
+            <p>MetaStore 是中心依赖：它挂了所有 SQL 查询都进不来。生产环境要么用独立部署的 metastore 服务（<code>hive --service metastore</code>），要么直接用 HiveServer2 内置的 metastore，并务必把元数据存到 MySQL 而不是 Derby。</p> 
+          </div>
+
+<h3 id="HiveServer2（HS2）"><a href="#HiveServer2（HS2）" class="headerlink" title="HiveServer2（HS2）"></a>HiveServer2（HS2）</h3><ul>
+<li>对外提供 JDBC&#x2F;ODBC 接口的服务，客户端（beeline、DBeaver、代码）都连它</li>
+<li>多用户、多会话支持，带身份认证与授权</li>
+<li>每个会话在 HS2 里完成 SQL 的解析、编译、提交</li>
+</ul>
+<h3 id="Driver（SQL-处理引擎）"><a href="#Driver（SQL-处理引擎）" class="headerlink" title="Driver（SQL 处理引擎）"></a>Driver（SQL 处理引擎）</h3><p>一个 SQL 的生命周期在 Driver 中完成：</p>
+<ol>
+<li><strong>解析（Parse）</strong>：SQL 文本 → 抽象语法树（AST），做语法检查</li>
+<li><strong>语义分析（Semantic Analyze）</strong>：AST → 校验表、字段是否存在（查 MetaStore），类型检查</li>
+<li><strong>逻辑计划（Logical Plan）</strong>：生成逻辑执行计划（操作符树，如 TS、FIL、JOIN、AGG）</li>
+<li><strong>物理计划（Physical Plan）</strong>：逻辑计划 → MapReduce&#x2F;Tez&#x2F;Spark 物理执行计划，切分阶段（Stage）</li>
+<li><strong>执行（Execute）</strong>：提交给 Yarn 执行，监控进度，返回结果</li>
+</ol>
+<h3 id="与-Hadoop-组件的关系"><a href="#与-Hadoop-组件的关系" class="headerlink" title="与 Hadoop 组件的关系"></a>与 Hadoop 组件的关系</h3><ul>
+<li>数据存在 <strong>HDFS</strong> 上，元数据在 <strong>MetaStore</strong>（MySQL），计算跑在 <strong>Yarn</strong> 上（MapReduce&#x2F;Tez&#x2F;Spark on Yarn）</li>
+<li>Hive 本身不存数据：删表 ≠ 删文件，取决于是不是外部表</li>
+</ul>
+<h2 id="核心原理"><a href="#核心原理" class="headerlink" title="核心原理"></a>核心原理</h2><h3 id="SQL-到执行的完整链路"><a href="#SQL-到执行的完整链路" class="headerlink" title="SQL 到执行的完整链路"></a>SQL 到执行的完整链路</h3><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">SQL → AST（解析）→ 逻辑计划（语义分析）→ 物理计划（阶段划分）→ MapReduce<span class="hljs-regexp">/Tez/</span>Spark 作业 → Yarn 执行<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>一个 SQL 可能拆成多个 Stage（比如先 join 再 group by 就是两个 stage），stage 之间串行或并行</li>
+<li>Tez 相比 MapReduce 的优势：DAG 化，阶段间不走落盘（shuffle 优化、顶点复用），小作业明显更快</li>
+<li>执行引擎通过 <code>hive.execution.engine</code> 配置（mr&#x2F;tez&#x2F;spark）</li>
+</ul>
+<h3 id="分区（Partition）"><a href="#分区（Partition）" class="headerlink" title="分区（Partition）"></a>分区（Partition）</h3><ul>
+<li>按分区列在 HDFS 上建目录：<code>/warehouse/t_orders/dt=2026-08-09/</code></li>
+<li>好处：<strong>分区裁剪</strong>——查询只扫命中的分区目录，数据量小几个数量级</li>
+<li>分区不是越多越好：分区数过多会导致 MetaStore 元数据膨胀、文件碎片化</li>
+</ul>
+<h3 id="分桶（Bucket）"><a href="#分桶（Bucket）" class="headerlink" title="分桶（Bucket）"></a>分桶（Bucket）</h3><ul>
+<li>按某列哈希（<code>clustered by (id) into 8 buckets</code>），数据均匀分布到 8 个文件</li>
+<li>好处：采样（tablesample）、map 侧 join 优化（SMB Join 前身）、桶内数据分布均匀</li>
+<li>分桶表桶数基本固定，后续变更麻烦，设计时要规划好</li>
+</ul>
+<h3 id="内部表与外部表"><a href="#内部表与外部表" class="headerlink" title="内部表与外部表"></a>内部表与外部表</h3><ul>
+<li><strong>内部表（Managed Table）</strong>：<code>drop table</code> 会同时删 HDFS 数据；建表时数据被移动到 Hive 管理的目录</li>
+<li><strong>外部表（External Table）</strong>：<code>drop table</code> 只删元数据，HDFS 数据保留；适合指向已有数据（日志、其他系统写入的数据）</li>
+<li>判断标准：数据是谁的。生产上日志&#x2F;ods 层数据强烈建议外部表，防止误删</li>
+</ul>
+<div class="note note-warning">
+            <p>内部表 <code>truncate</code> 直接清数据、<code>drop</code> 直接删数据，且不可恢复（回收站对内部表 drop 不生效是历史行为）。误删事故里内部表占了大头，重要数据一律外部表。</p> 
+          </div>
+
+<h3 id="存储格式"><a href="#存储格式" class="headerlink" title="存储格式"></a>存储格式</h3><table>
+<thead>
+<tr>
+<th>格式</th>
+<th>特点</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TextFile</td>
+<td>纯文本，可读，无压缩无列式，最费 IO</td>
+<td>临时表、导入导出</td>
+</tr>
+<tr>
+<td>SequenceFile</td>
+<td>二进制、行式、支持块压缩</td>
+<td>老的中间数据</td>
+</tr>
+<tr>
+<td>ORC</td>
+<td>列式、内置索引、压缩率高（Snappy&#x2F;Zlib）、支持复杂类型</td>
+<td>大表、分析查询（Hive 亲儿子）</td>
+</tr>
+<tr>
+<td>Parquet</td>
+<td>列式、跨生态（Spark&#x2F;Impala&#x2F;Presto 通用）</td>
+<td>多引擎共用的大表</td>
+</tr>
+</tbody></table>
+<p>列式存储（ORC&#x2F;Parquet）的核心优势：只读需要的列 + 高压缩比 + 列内编码（字典、游程），全列扫描大表时性能差距是数量级的。</p>
+<h2 id="优化要点"><a href="#优化要点" class="headerlink" title="优化要点"></a>优化要点</h2><h3 id="分区裁剪与谓词下推"><a href="#分区裁剪与谓词下推" class="headerlink" title="分区裁剪与谓词下推"></a>分区裁剪与谓词下推</h3><ul>
+<li>分区裁剪：<code>where dt=&#39;2026-08-09&#39;</code> 只扫该分区（SQL 层面自动做，但要写对分区字段过滤）</li>
+<li>谓词下推：<code>where</code> 条件尽量下推到数据读取阶段（ORC 能跳过不符合的行组），join 前先过滤小数据量</li>
+<li>经验：过滤条件能写在子查询里就在子查询里写，让大数据量先瘦身</li>
+</ul>
+<h3 id="MapJoin-与-SMB-Join"><a href="#MapJoin-与-SMB-Join" class="headerlink" title="MapJoin 与 SMB Join"></a>MapJoin 与 SMB Join</h3><ul>
+<li><strong>MapJoin</strong>：小表（默认 &lt; 25M，<code>hive.mapjoin.smalltable.filesize</code>）加载进内存，Map 阶段直接完成 join，不走 reduce，避免 shuffle</li>
+<li>自动开关：<code>hive.auto.convert.join=true</code>，小表 join 大表自动转 map join</li>
+<li><strong>SMB Join（Sort Merge Bucket Join）</strong>：两个分桶表（同字段、同桶数），join 时只匹配对应桶，可以大表 join 大表时减少 shuffle，还能 map 侧直接做</li>
+<li>注意：MapJoin 小表要放 join 左侧（或开启自动转换后无所谓）</li>
+</ul>
+<h3 id="数据倾斜处理"><a href="#数据倾斜处理" class="headerlink" title="数据倾斜处理"></a>数据倾斜处理</h3><ul>
+<li>表现：reduce 大部分秒完，个别 reduce 卡很久（长尾）</li>
+<li>常见场景：join 的 key 集中（如 null、热点商品 id）、group by 的 key 倾斜、distinct 计数</li>
+<li>处理手段：<ul>
+<li>空值：<code>coalesce(uid, rand())</code> 打散</li>
+<li>热点 key：拆分后 union，或加随机前缀再第二轮聚合</li>
+<li><code>hive.groupby.skewindata=true</code>：group by 自动两阶段聚合（先随机分桶预聚合）</li>
+<li>倾斜 join：<code>hive.optimize.skewjoin=true</code>（运行时检测）</li>
+</ul>
+</li>
+<li>根治思路：先定位倾斜 key（<code>group by key having count(*) &gt; N</code> 查出来），再对症下药</li>
+</ul>
+<h3 id="小文件合并"><a href="#小文件合并" class="headerlink" title="小文件合并"></a>小文件合并</h3><ul>
+<li>危害：文件多 → 元数据多、Map 启动开销大、NameNode 压力大、查询慢</li>
+<li>手段：<ul>
+<li>写入侧：<code>hive.merge.mapfiles=true</code> &#x2F; <code>hive.merge.mapredfiles=true</code> &#x2F; <code>hive.merge.size.per.task</code>（合并目标文件大小，默认 256M）</li>
+<li>动态分区小文件多时配合 <code>hive.optimize.sort.dynamic.partition=true</code></li>
+<li>存量侧：<code>insert overwrite</code> 重写一遍表（用 reduce 数控制输出文件数）</li>
+<li>Spark 侧：<code>coalesce</code> &#x2F; <code>repartition</code> 控制分区数</li>
+</ul>
+</li>
+</ul>
+<h3 id="动态分区"><a href="#动态分区" class="headerlink" title="动态分区"></a>动态分区</h3><ul>
+<li>自动按分区列值写入对应分区，<code>hive.exec.dynamic.partition=true</code>，<code>hive.exec.dynamic.partition.mode=nonstrict</code>（允许所有分区列都是动态的）</li>
+<li>坑：单次作业动态分区数太多（默认 1000，<code>hive.exec.max.dynamic.partitions</code>）会报错；数据倾斜到一个分区会引发小文件</li>
+<li>建议：按天&#x2F;按小时的场景用动态分区，小维度（省份等）用静态分区</li>
+</ul>
+<h2 id="重要参数介绍"><a href="#重要参数介绍" class="headerlink" title="重要参数介绍"></a>重要参数介绍</h2><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>hive.execution.engine</code></td>
+<td>mr</td>
+<td>执行引擎：mr&#x2F;tez&#x2F;spark</td>
+</tr>
+<tr>
+<td><code>hive.exec.parallel</code></td>
+<td>false</td>
+<td>无依赖的 stage 并行执行，多个 union&#x2F;多表 join 场景提速明显</td>
+</tr>
+<tr>
+<td><code>hive.exec.parallel.thread.number</code></td>
+<td>8</td>
+<td>并行 stage 上限</td>
+</tr>
+<tr>
+<td><code>hive.auto.convert.join</code></td>
+<td>true</td>
+<td>自动把小表 join 转 MapJoin</td>
+</tr>
+<tr>
+<td><code>hive.mapjoin.smalltable.filesize</code></td>
+<td>25000000 (25M)</td>
+<td>MapJoin 小表大小阈值</td>
+</tr>
+<tr>
+<td><code>hive.exec.dynamic.partition</code></td>
+<td>true</td>
+<td>开启动态分区</td>
+</tr>
+<tr>
+<td><code>hive.exec.dynamic.partition.mode</code></td>
+<td>strict</td>
+<td>strict 要求至少一个静态分区列；大数据量全动态需改 nonstrict</td>
+</tr>
+<tr>
+<td><code>hive.exec.max.dynamic.partitions</code></td>
+<td>1000</td>
+<td>动态分区上限</td>
+</tr>
+<tr>
+<td><code>hive.fetch.task.conversion</code></td>
+<td>more</td>
+<td>简单查询（无聚合&#x2F;limit 的 select）不启 MapReduce，直接本地拉取，体验差距巨大</td>
+</tr>
+<tr>
+<td><code>hive.groupby.skewindata</code></td>
+<td>false</td>
+<td>group by 两阶段聚合，缓解倾斜</td>
+</tr>
+<tr>
+<td><code>hive.optimize.skewjoin</code></td>
+<td>false</td>
+<td>join 倾斜检测与优化</td>
+</tr>
+</tbody></table>
+<h3 id="与-MapReduce-资源相关的参数"><a href="#与-MapReduce-资源相关的参数" class="headerlink" title="与 MapReduce 资源相关的参数"></a>与 MapReduce 资源相关的参数</h3><ul>
+<li><code>mapreduce.map.memory.mb</code> &#x2F; <code>mapreduce.reduce.memory.mb</code>：Map&#x2F;Reduce 容器内存（默认 1024M），大表聚合&#x2F;排序不够会 OOM</li>
+<li><code>mapreduce.map.java.opts</code> &#x2F; <code>mapreduce.reduce.java.opts</code>：JVM 堆内存（一般 &#x3D; 容器内存 × 0.8）</li>
+<li><code>mapreduce.map.cpu.vcores</code> &#x2F; <code>mapreduce.reduce.cpu.vcores</code>：容器 vcore 数</li>
+<li><code>mapreduce.job.reduces</code>：reduce 数，不设置时由 Hive 按数据量估算</li>
+<li><code>mapreduce.input.fileinputformat.split.maxsize</code>：控制分片大小，间接控制 map 数</li>
+<li>注意：容器申请内存不能超过 <code>yarn.scheduler.maximum-allocation-mb</code>，否则直接失败</li>
+</ul>
+<h2 id="常见问题排查"><a href="#常见问题排查" class="headerlink" title="常见问题排查"></a>常见问题排查</h2><h3 id="数据倾斜的定位"><a href="#数据倾斜的定位" class="headerlink" title="数据倾斜的定位"></a>数据倾斜的定位</h3><ul>
+<li>现象：作业卡在最后几个 reduce，进度条 99% 不动</li>
+<li>定位：<ul>
+<li>HS2 里 <code>explain</code> 看 reduce 逻辑；HiveServer2 UI &#x2F; Yarn UI 看各 task 耗时</li>
+<li>用 <code>group by key having count(*) &gt; 1000</code> 查候选倾斜 key</li>
+<li>看任务日志中 shuffle 数据量：个别 reduce 数据量异常大</li>
+</ul>
+</li>
+<li>处理：按上文倾斜手段（打散 null、两阶段聚合、skewjoin）</li>
+</ul>
+<h3 id="内存溢出（OOM）"><a href="#内存溢出（OOM）" class="headerlink" title="内存溢出（OOM）"></a>内存溢出（OOM）</h3><ul>
+<li>现象：<code>Container killed by the ApplicationMaster</code>、<code>Java heap space</code>、<code>GC overhead limit exceeded</code></li>
+<li>排查顺序：<ul>
+<li>是 reducer OOM：调大 <code>mapreduce.reduce.memory.mb</code> 及对应 <code>java.opts</code></li>
+<li>是 MapJoin 内存不足：小表调大 <code>hive.mapjoin.smalltable.filesize</code> 前先确认内存；或把大 key 多的 join 拆小</li>
+<li>聚合类任务：先压缩输入（列式+过滤），再考虑调资源</li>
+<li>注意 vmem 检查：容器内存调大时同步调大 <code>java.opts</code>，否则堆占不满容器还被误杀</li>
+</ul>
+</li>
+</ul>
+<h3 id="小文件过多"><a href="#小文件过多" class="headerlink" title="小文件过多"></a>小文件过多</h3><ul>
+<li>现象：<code>Number of files: xxx</code> 巨大、map 数爆炸、NameNode 告警</li>
+<li>处理：合并参数 + <code>insert overwrite</code> 重写；源头治理（控制动态分区数、reduce 数）</li>
+<li>检查：<code>dfs -count</code> 看目录文件数，或用 <code>show tblproperties</code> 看表文件信息</li>
+</ul>
+<h3 id="MetaStore-连接问题"><a href="#MetaStore-连接问题" class="headerlink" title="MetaStore 连接问题"></a>MetaStore 连接问题</h3><ul>
+<li>现象：<code>Unable to connect to metastore</code>、<code>RetryingMetaStoreClient</code>、<code>Access denied for user &#39;hive&#39;@&#39;host&#39;</code></li>
+<li>排查：<ul>
+<li>MySQL 连接是否通：<code>mysql -h &lt;metastore_host&gt; -u hive -p</code> 手测</li>
+<li>最大连接数是否打满（<code>max_connections</code>），HS2 并发会话多时常见</li>
+<li>元数据表锁死：<code>HiveMetaStore</code> 表 DDL 冲突（分区操作并发）</li>
+<li>版本匹配：客户端 hive 版本与服务端 metastore 版本差异过大</li>
+</ul>
+</li>
+<li>处理：重启 metastore 服务、清理连接、检查 MySQL 磁盘与慢查询</li>
+</ul>
+<h3 id="查询慢"><a href="#查询慢" class="headerlink" title="查询慢"></a>查询慢</h3><ul>
+<li>排查思路（从便宜到贵）：<ol>
+<li>是否走了分区裁剪（explain 看读哪个分区）</li>
+<li>是否触发全表扫描（过滤条件没下推）</li>
+<li>存储格式是否列式（TextFile 换 ORC 收益巨大）</li>
+<li><code>fetch.task.conversion</code> 是否被关闭（简单查询被拖进 MapReduce）</li>
+<li>数据倾斜（见上）</li>
+<li>join 顺序与小表处理是否合理</li>
+</ol>
+</li>
+<li>通用手段：<code>explain</code> &#x2F; <code>explain extended</code> 看执行计划，先读计划再优化，别瞎调参数</li>
+</ul>
+<h3 id="动态分区失败"><a href="#动态分区失败" class="headerlink" title="动态分区失败"></a>动态分区失败</h3><ul>
+<li>现象：<code>Too many dynamic partitions</code>、<code>Exception while processing to map</code>、<code>Specified partition already exists</code></li>
+<li>处理：<ul>
+<li>分区数超限：调大 <code>hive.exec.max.dynamic.partitions</code></li>
+<li>strict 模式要求至少一个静态分区：写 <code>partition(dt=&#39;2026-08-09&#39;, xxx)</code> 或改 nonstrict</li>
+<li>插入数据里存在分区列乱值（null&#x2F;异常）导致目标目录非法：先过滤脏数据</li>
+<li>同名分区并发写冲突：串行化该作业</li>
+</ul>
+</li>
+</ul>
+<h3 id="UDF-报错"><a href="#UDF-报错" class="headerlink" title="UDF 报错"></a>UDF 报错</h3><ul>
+<li>现象：<code>Class not found</code>、<code>Method not supported</code>、<code>Invalid return type</code></li>
+<li>排查：<ul>
+<li>jar 是否 <code>add jar</code> 且路径在 HS2 节点可访问</li>
+<li>临时函数 vs 永久函数：<code>create temporary function</code> 仅当前会话；永久函数要 <code>create function ... using jar &#39;hdfs://...&#39;</code></li>
+<li>UDF 的类签名（<code>evaluate</code> 方法的入参类型）与调用参数类型是否匹配，Hive 类型和 Java 类型映射要一致</li>
+<li>看 HS2 日志中的异常栈，一般一眼能看出是反射错误还是业务代码问题</li>
+</ul>
+</li>
+</ul>
+<div class="note note-success">
+            <p>Hive 优化的两条主线：<strong>先少读数据</strong>（分区裁剪、列式存储、谓词下推、过滤前置），<strong>再少 shuffle</strong>（MapJoin、SMB、两阶段聚合、合并小文件）。参数只是辅助，数据流设计才是根。</p> 
+          </div>
+
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>Hive 的心智模型：<strong>元数据在 MetaStore、数据在 HDFS、计算在 Yarn、Driver 负责把 SQL 翻译成执行计划</strong>。优化的本质是让翻译出来的执行计划”读得更少、shuffle 更少”。遇到问题先 explain、再定位倾斜、最后才调参，这条路走通，Hive 基本就吃透了。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/hive/" class="print-no-link">#hive</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Hive 底层原理与知识要点</div>
+      <div>https://chaggle.github.io/2026/08/08/bigdata/hive-20260809/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月8日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/08/bigdata/flink-20260809/" title="Flink 底层原理与知识要点">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Flink 底层原理与知识要点</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/08/bigdata/hdfs-20260809/" title="HDFS 底层原理与知识要点">
+                        <span class="hidden-mobile">HDFS 底层原理与知识要点</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'f53f4db4681270d3220c29ce1a40b75e'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

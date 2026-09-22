@@ -1,0 +1,1232 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/10/middleware/jenkins-deploy-tuning-20260811/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="大数据底座的迭代思路里提到”引入 CI&#x2F;CD，把组件部署从手工变为流水线”，落地首选就是 Jenkins。本文按”原理 → 部署 → 调优”三步整理企业级使用指南，延续《Kerberos 部署与调优指南》等系列的结构。  一、Jenkins 核心原理1、Jenkins 是什么Jenkins 是 Java 编写的开源 CI&#x2F;CD 工具，负责”自动化的构建、测试、发布”。它的核心">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jenkins 原理、部署与调优指南">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/10/middleware/jenkins-deploy-tuning-20260811/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="大数据底座的迭代思路里提到”引入 CI&#x2F;CD，把组件部署从手工变为流水线”，落地首选就是 Jenkins。本文按”原理 → 部署 → 调优”三步整理企业级使用指南，延续《Kerberos 部署与调优指南》等系列的结构。  一、Jenkins 核心原理1、Jenkins 是什么Jenkins 是 Java 编写的开源 CI&#x2F;CD 工具，负责”自动化的构建、测试、发布”。它的核心">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-10T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T16:16:25.829Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="ci&#x2F;cd">
+<meta property="article:tag" content="devops">
+<meta property="article:tag" content="jenkins">
+<meta property="article:tag" content="middleware">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Jenkins 原理、部署与调优指南 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Jenkins 原理、部署与调优指南"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-10 16:00" pubdate>
+          2026年8月10日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          54 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Jenkins 原理、部署与调优指南</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-11T00:16:25+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>大数据底座的迭代思路里提到”引入 CI&#x2F;CD，把组件部署从手工变为流水线”，落地首选就是 Jenkins。本文按”原理 → 部署 → 调优”三步整理企业级使用指南，延续《Kerberos 部署与调优指南》等系列的结构。</p>
+</blockquote>
+<h2 id="一、Jenkins-核心原理"><a href="#一、Jenkins-核心原理" class="headerlink" title="一、Jenkins 核心原理"></a>一、Jenkins 核心原理</h2><h3 id="1、Jenkins-是什么"><a href="#1、Jenkins-是什么" class="headerlink" title="1、Jenkins 是什么"></a>1、Jenkins 是什么</h3><p>Jenkins 是 Java 编写的开源 CI&#x2F;CD 工具，负责”自动化的构建、测试、发布”。它的核心价值不是某个功能，而是<strong>可编程的流水线</strong>：把”拉代码 → 编译 → 测试 → 打包 → 发布”整条链路用代码表达、可重复执行。</p>
+<h3 id="2、整体架构：Master-Agent"><a href="#2、整体架构：Master-Agent" class="headerlink" title="2、整体架构：Master &#x2F; Agent"></a>2、整体架构：Master &#x2F; Agent</h3><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">                ┌────────────────────────┐<br>Git / SVN ──→   │        <span class="hljs-keyword">Master</span>          <span class="hljs-title">│   ← 调度中心（控制器）</span><br><span class="hljs-title">Webhook</span>/定时 ──→ │  Queue → Executors 调度│<br>                └──────┬─────────┬───────┘<br>                       │ SSH/协议 │<br>                ┌──────┴─────┐ ┌─┴────────────┐<br>                │  Agent <span class="hljs-number">1</span>   │ │  Agent N     │   ← 执行节点<br>                │ (Linux)    │ │ (K8s/Docker) │<br>                └────────────┘ └──────────────┘<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>Master</strong>：负责任务调度、配置存储、Web 界面、权限。默认自带执行器，生产建议设 0（只调度不干活）</li>
+<li><strong>Agent</strong>：真正执行构建的节点，一个 master 可以挂大量 agent，按标签（label）分组，比如 <code>bigdata</code>、<code>java17</code>、<code>k8s-node</code></li>
+<li><strong>JENKINS_HOME</strong>：一切状态的家——配置、构建记录、凭据、插件都在这里，是备份与迁移的核心</li>
+</ul>
+<h3 id="3、核心对象"><a href="#3、核心对象" class="headerlink" title="3、核心对象"></a>3、核心对象</h3><table>
+<thead>
+<tr>
+<th>对象</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Job &#x2F; Item</td>
+<td>一个任务（freestyle &#x2F; pipeline &#x2F; multibranch）</td>
+</tr>
+<tr>
+<td>Build</td>
+<td>一次构建执行，有编号（#1、#2…）和状态</td>
+</tr>
+<tr>
+<td>Workspace</td>
+<td>agent 上的工作目录，代码和构建产物都在里面</td>
+</tr>
+<tr>
+<td>Executor</td>
+<td>执行器，一个 agent 上可以配多个（并发数）</td>
+</tr>
+<tr>
+<td>Queue</td>
+<td>等待队列，executor 空闲才被调度</td>
+</tr>
+<tr>
+<td>Node &#x2F; Label</td>
+<td>节点与标签，用于把任务路由到特定 agent</td>
+</tr>
+<tr>
+<td>Credentials</td>
+<td>凭据（SSH 密钥、token、密码），加密存在 JENKINS_HOME&#x2F;secrets</td>
+</tr>
+<tr>
+<td>SCM</td>
+<td>源码管理：Git &#x2F; SVN 集成，轮询或 webhook 触发</td>
+</tr>
+</tbody></table>
+<h3 id="4、一次构建的完整流程"><a href="#4、一次构建的完整流程" class="headerlink" title="4、一次构建的完整流程"></a>4、一次构建的完整流程</h3><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs nix">触发（Webhook <span class="hljs-symbol">/</span> 定时 <span class="hljs-symbol">/</span> 手动 <span class="hljs-symbol">/</span> API）<br>  → 进入 Queue 等待空闲 Executor<br>  → Agent 上创建<span class="hljs-operator">/</span>复用 Workspace，拉取源码<br>  → 按 Pipeline 执行阶段：构建（Maven<span class="hljs-operator">/</span>Gradle<span class="hljs-operator">/</span>npm）→ 测试 → 归档制品<br>  → 发布：SSH 推包 <span class="hljs-symbol">/</span> 上传 Nexus <span class="hljs-symbol">/</span> kubectl 滚动更新<br>  → 结果通知（邮件 <span class="hljs-symbol">/</span> 企业微信 <span class="hljs-symbol">/</span> DingTalk）并记录构建历史<br></code></pre></td></tr></table></figure>
+
+<h3 id="5、Pipeline-原理"><a href="#5、Pipeline-原理" class="headerlink" title="5、Pipeline 原理"></a>5、Pipeline 原理</h3><p>Pipeline 是 Jenkins 的”一等公民”，用 Groovy 编写，两种写法：</p>
+<ul>
+<li><strong>Declarative（声明式）</strong>：结构化，推荐生产使用</li>
+</ul>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs groovy">pipeline &#123;<br>    agent &#123; label <span class="hljs-string">&#x27;bigdata&#x27;</span> &#125;          <span class="hljs-comment">// 指定执行节点</span><br>    stages &#123;<br>        stage(<span class="hljs-string">&#x27;拉取代码&#x27;</span>) &#123; steps &#123; checkout scm &#125; &#125;<br>        stage(<span class="hljs-string">&#x27;构建&#x27;</span>)    &#123; steps &#123; sh <span class="hljs-string">&#x27;mvn -q clean package&#x27;</span> &#125; &#125;<br>        stage(<span class="hljs-string">&#x27;发布&#x27;</span>)    &#123; steps &#123; sh <span class="hljs-string">&#x27;./deploy.sh&#x27;</span> &#125; &#125;<br>    &#125;<br>    post &#123; success &#123; emailext <span class="hljs-attr">subject:</span> <span class="hljs-string">&#x27;构建成功&#x27;</span> &#125; &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>Scripted（脚本式）</strong>：自由但难维护</li>
+</ul>
+<p>Pipeline 的核心机制是 <strong>CPS（Continuation Passing Style）</strong>：脚本被翻译成可暂停&#x2F;恢复的状态机，每次构建的执行状态持久化，所以能支持”构建被打断后恢复”、Blue Ocean 可视化、以及跨重启的 stage 视图。</p>
+<p><strong>Jenkins Shared Library（共享库）</strong>：把通用逻辑（部署脚本、参数校验、通知封装）抽成公共 Groovy 库，各流水线引用，解决”流水线代码重复”的问题。</p>
+<h3 id="6、分布式构建的三种-Agent-形态"><a href="#6、分布式构建的三种-Agent-形态" class="headerlink" title="6、分布式构建的三种 Agent 形态"></a>6、分布式构建的三种 Agent 形态</h3><table>
+<thead>
+<tr>
+<th>形态</th>
+<th>原理</th>
+<th>适用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SSH Agent</td>
+<td>master 通过 SSH 连 agent 节点，按需拉起 slave.jar</td>
+<td>固定物理&#x2F;虚机节点</td>
+</tr>
+<tr>
+<td>Inbound Agent（JNLP&#x2F;WebSocket）</td>
+<td>agent 主动连 master（可跨 NAT），Java Web Start 已废弃</td>
+<td>跨网络、容器内节点</td>
+</tr>
+<tr>
+<td>云 Agent（Docker &#x2F; Kubernetes）</td>
+<td>构建时动态起一个容器跑任务，跑完销毁</td>
+<td>弹性场景，资源利用最省</td>
+</tr>
+</tbody></table>
+<div class="note note-info">
+            <p><strong>K8s Agent 是企业级弹性的关键</strong>：构建高峰期自动起 20 个 pod 并行，空闲时归零，比固定 agent 池省一半以上资源。配合共享存储（PVC）挂 maven 仓库、npm 缓存，构建速度接近本地。</p> 
+          </div>
+
+<h3 id="7、高可用与制品管理"><a href="#7、高可用与制品管理" class="headerlink" title="7、高可用与制品管理"></a>7、高可用与制品管理</h3><ul>
+<li><strong>HA 思路</strong>：Jenkins 本身无内置集群，企业做法是”NFS 共享 JENKINS_HOME + 双实例 active&#x2F;standby + 前端负载均衡”，或”单实例 + 定期备份（tar JENKINS_HOME）”降级方案</li>
+<li><strong>制品</strong>：构建产物归档到 Nexus&#x2F;Artifactory（Maven、Docker registry），发布环境从制品库拉取，而不是从构建机拷贝——保证”构建一次，处处部署”</li>
+</ul>
+<h2 id="二、部署（企业级，Linux）"><a href="#二、部署（企业级，Linux）" class="headerlink" title="二、部署（企业级，Linux）"></a>二、部署（企业级，Linux）</h2><h3 id="1、前置准备"><a href="#1、前置准备" class="headerlink" title="1、前置准备"></a>1、前置准备</h3><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JDK</td>
+<td>Jenkins 当前 LTS 要求 Java 11+，推荐 <strong>Java 17 LTS</strong>；K8s&#x2F;Docker agent 场景再加 JDK 21 工具链</td>
+</tr>
+<tr>
+<td>内存</td>
+<td>Master 建议 2G+，构建任务多的 4G；JENKINS_HOME 放独立磁盘（SSD）</td>
+</tr>
+<tr>
+<td>时区</td>
+<td>JVM 加 <code>-Duser.timezone=Asia/Shanghai</code>，否则日志&#x2F;时间戳差 8 小时</td>
+</tr>
+<tr>
+<td>镜像</td>
+<td>插件更新中心走清华镜像，Maven&#x2F;npm 走国内源，否则初始化极慢</td>
+</tr>
+</tbody></table>
+<h3 id="2、部署方式对比"><a href="#2、部署方式对比" class="headerlink" title="2、部署方式对比"></a>2、部署方式对比</h3><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>优点</th>
+<th>缺点</th>
+<th>推荐度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>war + systemd（原生）</td>
+<td>可控、易调 JVM、无额外依赖</td>
+<td>手工步骤多</td>
+<td>★★★ 推荐</td>
+</tr>
+<tr>
+<td>Docker Compose</td>
+<td>环境隔离、迁移方便</td>
+<td>数据卷管理、JVM 调参绕</td>
+<td>★★</td>
+</tr>
+<tr>
+<td>Tomcat 部署 war</td>
+<td>复用现有 Tomcat</td>
+<td>多一层依赖</td>
+<td>★</td>
+</tr>
+</tbody></table>
+<h3 id="3、war-systemd-部署步骤"><a href="#3、war-systemd-部署步骤" class="headerlink" title="3、war + systemd 部署步骤"></a>3、war + systemd 部署步骤</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1) 创建用户与目录</span><br>useradd -r -s /bin/bash jenkins<br><span class="hljs-built_in">mkdir</span> -p /data/jenkins_home /data/jenkins &amp;&amp; <span class="hljs-built_in">chown</span> -R jenkins:jenkins /data/jenkins*<br><br><span class="hljs-comment"># 2) 下载 LTS war 包（清华镜像更快）</span><br>wget https://mirrors.tuna.tsinghua.edu.cn/jenkins/war-stable/latest/jenkins.war \<br>  -O /data/jenkins/jenkins.war<br><br><span class="hljs-comment"># 3) systemd 服务（/etc/systemd/system/jenkins.service）</span><br>[Unit]<br>Description=Jenkins CI<br>After=network.target<br><br>[Service]<br>User=jenkins<br>Environment=<span class="hljs-string">&quot;JENKINS_HOME=/data/jenkins_home&quot;</span><br>Environment=<span class="hljs-string">&quot;JAVA_OPTS=-Xms2g -Xmx4g -XX:MaxMetaspaceSize=512m \</span><br><span class="hljs-string">  -Duser.timezone=Asia/Shanghai -Dfile.encoding=UTF-8 \</span><br><span class="hljs-string">  -Dhudson.model.WorkspaceCleanupThread.interval=3600&quot;</span><br>ExecStart=/usr/bin/java <span class="hljs-variable">$JAVA_OPTS</span> -jar /data/jenkins/jenkins.war --httpPort=8080<br>Restart=always<br><br>[Install]<br>WantedBy=multi-user.target<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 4) 启动并初始化</span><br>systemctl daemon-reload &amp;&amp; systemctl start jenkins<br><span class="hljs-built_in">cat</span> /data/jenkins_home/secrets/initialAdminPassword   <span class="hljs-comment"># 初始解锁密码</span><br><br><span class="hljs-comment"># 5) 配置插件镜像（/data/jenkins_home/hudson.model.UpdateCenter.xml）</span><br><span class="hljs-comment">#    清华镜像：https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4、初始化配置清单"><a href="#4、初始化配置清单" class="headerlink" title="4、初始化配置清单"></a>4、初始化配置清单</h3><ul>
+<li>解锁后用<strong>管理员账号</strong>（不要用 admin 默认密码）登录</li>
+<li>必装插件：<code>Chinese</code>、<code>Git/Subversion</code>、<code>Pipeline</code>、<code>Blue Ocean</code>、<code>Credentials Binding</code>、<code>SSH Pipeline Steps</code>、<code>Docker/Kubernetes</code>、<code>Email Extension</code></li>
+<li>全局工具：JDK（17&#x2F;21）、Maven（配 settings.xml 阿里云镜像）、Node.js</li>
+<li>凭据：Git 账号（token）、SSH 私钥（部署用）、Nexus&#x2F;Registry 账号，全部用 <strong>Credential 管理</strong>，不写死在脚本里</li>
+<li>权限：按团队建用户&#x2F;角色，用<strong>矩阵授权</strong>（Matrix Authorization Strategy），Master 上禁用匿名访问</li>
+<li>反向代理 HTTPS（nginx）：</li>
+</ul>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;<br>    <span class="hljs-attribute">listen</span> <span class="hljs-number">443</span> ssl;<br>    <span class="hljs-attribute">server_name</span> ci.example.com;<br>    <span class="hljs-attribute">ssl_certificate</span>     /etc/nginx/cert/server.crt;<br>    <span class="hljs-attribute">ssl_certificate_key</span> /etc/nginx/cert/server.key;<br>    <span class="hljs-section">location</span> / &#123;<br>        <span class="hljs-attribute">proxy_pass</span> http://127.0.0.1:8080;<br>        <span class="hljs-attribute">proxy_set_header</span> Host <span class="hljs-variable">$host</span>;<br>        <span class="hljs-attribute">proxy_set_header</span> X-Forwarded-For <span class="hljs-variable">$proxy_add_x_forwarded_for</span>;<br>        <span class="hljs-attribute">proxy_set_header</span> X-Forwarded-Proto <span class="hljs-variable">$scheme</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="5、Agent-节点接入"><a href="#5、Agent-节点接入" class="headerlink" title="5、Agent 节点接入"></a>5、Agent 节点接入</h3><p><strong>SSH Agent（固定节点）</strong>：系统管理 → 节点 → 新建节点 → 填写 SSH 地址与凭据 → 指定标签（如 <code>bigdata</code>）与执行器数量（按 CPU 核数的一半）。注意 agent 上也要装 JDK 与工具链。</p>
+<p><strong>Kubernetes Agent（弹性）</strong>：装 <code>Kubernetes</code> 插件 → 配置集群地址、命名空间、Pod 模板（镜像含 JDK&#x2F;Maven）→ Pipeline 里 <code>agent &#123; kubernetes &#123; label &#39;ephemeral&#39; &#125; &#125;</code>，构建结束 Pod 自动销毁。</p>
+<p><strong>验证</strong>：在节点页点”连接”，能看到节点图标为绿色并显示空闲执行器数。</p>
+<h2 id="三、调优"><a href="#三、调优" class="headerlink" title="三、调优"></a>三、调优</h2><h3 id="1、JVM-调优"><a href="#1、JVM-调优" class="headerlink" title="1、JVM 调优"></a>1、JVM 调优</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>建议</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-Xms &#x2F; -Xmx</td>
+<td>2G &#x2F; 4G（任务多可 4G&#x2F;8G）</td>
+<td>相等可避免动态伸缩抖动</td>
+</tr>
+<tr>
+<td>-XX:MaxMetaspaceSize</td>
+<td>512m-1G</td>
+<td>插件与 Groovy 脚本大量加载类</td>
+</tr>
+<tr>
+<td>GC</td>
+<td>默认 G1 即可</td>
+<td>不要轻易换 GC 算法</td>
+</tr>
+<tr>
+<td>-Duser.timezone</td>
+<td>Asia&#x2F;Shanghai</td>
+<td>时区问题最常见</td>
+</tr>
+</tbody></table>
+<div class="note note-warning">
+            <p>JENKINS_HOME 磁盘 IO 是最大的性能瓶颈：构建记录、日志、workspace 都在它下面。放 SSD、预留 20% 以上空间、监控 inode，比调 JVM 更见效。</p> 
+          </div>
+
+<h3 id="2、系统级调优"><a href="#2、系统级调优" class="headerlink" title="2、系统级调优"></a>2、系统级调优</h3><ul>
+<li><strong>Master 执行器设 0</strong>：调度与执行分离，避免主控被构建任务拖垮</li>
+<li><strong>构建记录保留策略</strong>：按分支&#x2F;标签保留最近 N 次，开启 SCM 保留策略（有改动才留）</li>
+<li><strong>制品保留</strong>：归档制品设保留天数，配合 Nexus 做长期存储</li>
+<li><strong>Workspace 清理</strong>：开启自动清理（<code>WorkspaceCleanupThread</code>），未用 workspace 定时删除</li>
+<li><strong>插件瘦身</strong>：只装用到的插件，禁用（不卸载）低频插件，减少启动与内存开销</li>
+<li><strong>日志轮转</strong>：<code>/var/log/jenkins</code> 与构建日志启用 logrotate，避免撑爆磁盘</li>
+</ul>
+<h3 id="3、Pipeline-性能优化"><a href="#3、Pipeline-性能优化" class="headerlink" title="3、Pipeline 性能优化"></a>3、Pipeline 性能优化</h3><ul>
+<li><strong>触发用 Webhook 替代轮询</strong>：SCM 轮询浪费 master 资源，Git 仓库配 webhook 即时触发</li>
+<li><strong>并行阶段</strong>：<code>stage(&#39;并行&#39;) &#123; parallel &#123; ... &#125; &#125;</code>，测试分片、多平台构建并行</li>
+<li><strong>构建缓存</strong>：Maven 本地仓库、npm cache、Gradle 缓存挂到共享卷（NFS&#x2F;PVC），避免每次全量下载依赖</li>
+<li><strong>减小日志</strong>：生产关闭 DEBUG 日志输出，构建脚本避免无意义的大打印</li>
+<li><strong>共享库管理</strong>：常用逻辑抽到 Shared Library，流水线文件保持精简</li>
+</ul>
+<h3 id="4、规模扩展"><a href="#4、规模扩展" class="headerlink" title="4、规模扩展"></a>4、规模扩展</h3><ul>
+<li>固定 Agent 池 + 标签分组：不同技术栈（java&#x2F;node&#x2F;python）分池，避免互相污染 workspace</li>
+<li>高峰期弹性：Kubernetes Agent 按队列长度动态伸缩，高峰期 20 并发、低峰归零</li>
+<li>多 master 拆分：业务线多、任务量大时按业务拆 master（或 Team&#x2F;文件夹隔离），避免单点排队</li>
+</ul>
+<h3 id="5、安全加固"><a href="#5、安全加固" class="headerlink" title="5、安全加固"></a>5、安全加固</h3><ul>
+<li>CSRF 保护默认开启；禁用匿名读</li>
+<li>Agent 接入只放行内网网段，SSH 端口最小化暴露</li>
+<li>凭据只用 <strong>Jenkins Credential</strong> 管理，脚本里禁止明文密码；开启凭据加密（默认 AES）</li>
+<li>共享库走代码评审，流水线里禁止 <code>eval</code> 等危险操作</li>
+<li>生产环境 HTTPS 必须（反向代理或证书直配）</li>
+</ul>
+<h3 id="6、常见问题排查"><a href="#6、常见问题排查" class="headerlink" title="6、常见问题排查"></a>6、常见问题排查</h3><table>
+<thead>
+<tr>
+<th>现象</th>
+<th>原因</th>
+<th>处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>任务一直排队</td>
+<td>执行器满 &#x2F; agent 离线 &#x2F; 标签不匹配</td>
+<td>节点页看连接状态与执行器占用；标签写错会永远等不到 agent</td>
+</tr>
+<tr>
+<td>构建卡死无输出</td>
+<td>网络、等待锁、脚本死循环</td>
+<td>看线程转储（Thread Dump），检查 SCM 与制品库连通性</td>
+</tr>
+<tr>
+<td>内存溢出（OOM）</td>
+<td>JVM 太小或插件泄漏</td>
+<td>调 Xmx，禁用可疑插件</td>
+</tr>
+<tr>
+<td>磁盘满</td>
+<td>构建日志、workspace、备份堆积</td>
+<td>清理 + 轮转 + 保留策略</td>
+</tr>
+<tr>
+<td>插件升级后功能异常</td>
+<td>插件兼容性</td>
+<td>升级前备份 JENKINS_HOME，异常时回退版本</td>
+</tr>
+<tr>
+<td>时间&#x2F;日志差 8 小时</td>
+<td>JVM 时区未设置</td>
+<td>加 -Duser.timezone&#x3D;Asia&#x2F;Shanghai 重启</td>
+</tr>
+<tr>
+<td>Agent 频繁断连</td>
+<td>网络抖动 &#x2F; 版本不匹配</td>
+<td>升级 agent.jar 与 master 同版本，检查防火墙</td>
+</tr>
+</tbody></table>
+<h2 id="四、总结"><a href="#四、总结" class="headerlink" title="四、总结"></a>四、总结</h2><ul>
+<li><strong>原理</strong>：Master&#x2F;Agent 架构 + JENKINS_HOME 状态存储 + Pipeline（CPS 状态机）+ 插件生态；HA 靠共享存储双实例或备份</li>
+<li><strong>部署</strong>：war + systemd 最可控；初始化三件套（国内镜像、插件清单、凭据与权限）一次配好</li>
+<li><strong>调优</strong>：先磁盘与 IO，再 JVM 与保留策略，再 Pipeline 缓存与弹性 Agent；安全加固与备份是长期责任</li>
+<li><strong>落地建议</strong>：Jenkins 接回大数据底座迭代思路——组件参数变更、服务构建、发布脚本全部流水线化，让”平台现代化”真正跑起来</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/middleware/" class="print-no-link">#middleware</a>
+      
+        <a href="/tags/jenkins/" class="print-no-link">#jenkins</a>
+      
+        <a href="/tags/ci-cd/" class="print-no-link">#ci/cd</a>
+      
+        <a href="/tags/devops/" class="print-no-link">#devops</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Jenkins 原理、部署与调优指南</div>
+      <div>https://chaggle.github.io/2026/08/10/middleware/jenkins-deploy-tuning-20260811/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月11日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/10/bigdata/starrocks-deploy-tuning-20260811/" title="StarRocks 原理、部署与调优指南">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">StarRocks 原理、部署与调优指南</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/10/middleware/mysql-notes-20260811/" title="MySQL 学习笔记：SQL 复习、原理与优化">
+                        <span class="hidden-mobile">MySQL 学习笔记：SQL 复习、原理与优化</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '07602baf5c905972a1063998bc0077f1'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

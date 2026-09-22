@@ -1,0 +1,1298 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/10/middleware/mysql-notes-20260811/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="2022 年学习 MySQL 的三篇笔记（SQL 语法复习、MySQL 原理、MySQL 优化）合并整理。原理先行，实践在后。  一、SQL 语法复习轻量化复盘一下 SQL 操作，以及 MySQL。 SELECT 语句数据查询是关系运算理论在 SQL 语言中的主要体现。SQL 的数据查询只有一条 SELECT 语句，其使用最广泛。一个完整的 SELECT 语句包含了六个子句，前两个子句是必备的，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL 学习笔记：SQL 复习、原理与优化">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/10/middleware/mysql-notes-20260811/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="2022 年学习 MySQL 的三篇笔记（SQL 语法复习、MySQL 原理、MySQL 优化）合并整理。原理先行，实践在后。  一、SQL 语法复习轻量化复盘一下 SQL 操作，以及 MySQL。 SELECT 语句数据查询是关系运算理论在 SQL 语言中的主要体现。SQL 的数据查询只有一条 SELECT 语句，其使用最广泛。一个完整的 SELECT 语句包含了六个子句，前两个子句是必备的，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chaggle.github.io/images/SQL/redo_log.png">
+<meta property="og:image" content="https://chaggle.github.io/images/SQL/MySQL-isolation1.png">
+<meta property="og:image" content="https://chaggle.github.io/images/SQL/index1.png">
+<meta property="og:image" content="https://chaggle.github.io/images/SQL/explain1.png">
+<meta property="og:image" content="https://chaggle.github.io/images/SQL/explain2.png">
+<meta property="og:image" content="https://chaggle.github.io/images/SQL/explain3.png">
+<meta property="og:image" content="https://chaggle.github.io/images/SQL/explain4.png">
+<meta property="og:image" content="https://chaggle.github.io/images/SQL/explain5.png">
+<meta property="og:image" content="https://chaggle.github.io/images/SQL/explain6.png">
+<meta property="og:image" content="https://chaggle.github.io/images/SQL/explain7.png">
+<meta property="og:image" content="https://chaggle.github.io/images/SQL/slow-query.png">
+<meta property="article:published_time" content="2026-08-10T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T16:07:13.781Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="innodb">
+<meta property="article:tag" content="middleware">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="sql">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://chaggle.github.io/images/SQL/redo_log.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>MySQL 学习笔记：SQL 复习、原理与优化 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="MySQL 学习笔记：SQL 复习、原理与优化"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-10 16:00" pubdate>
+          2026年8月10日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          14k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          116 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">MySQL 学习笔记：SQL 复习、原理与优化</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-11T00:07:13+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>2022 年学习 MySQL 的三篇笔记（SQL 语法复习、MySQL 原理、MySQL 优化）合并整理。原理先行，实践在后。</p>
+</blockquote>
+<h2 id="一、SQL-语法复习"><a href="#一、SQL-语法复习" class="headerlink" title="一、SQL 语法复习"></a>一、SQL 语法复习</h2><p>轻量化复盘一下 SQL 操作，以及 MySQL。</p>
+<h3 id="SELECT-语句"><a href="#SELECT-语句" class="headerlink" title="SELECT 语句"></a>SELECT 语句</h3><p>数据查询是关系运算理论在 SQL 语言中的主要体现。SQL 的数据查询只有一条 SELECT 语句，其使用最广泛。一个完整的 SELECT 语句包含了六个子句，前两个子句是必备的，其他子句可以省略：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> [<span class="hljs-keyword">DISTINCT</span>] 目标列名序列 <span class="hljs-comment">------ 查看的列 [distinct] 为去重操作</span><br><span class="hljs-keyword">FROM</span> 表名或视图名 <span class="hljs-comment">------------------- 数据来源</span><br>[<span class="hljs-keyword">WHERE</span> 条件表达式] <span class="hljs-comment">------------------ 查询条件</span><br>[<span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> <span class="hljs-operator">+</span> 列名] <span class="hljs-comment">------------------ 分组依据</span><br>[<span class="hljs-keyword">HAVING</span> <span class="hljs-operator">+</span> 组条件表达式] <span class="hljs-comment">------------- 分组条件</span><br>[<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> <span class="hljs-operator">+</span> 列名 <span class="hljs-operator">+</span> [<span class="hljs-keyword">ASC</span><span class="hljs-operator">|</span><span class="hljs-keyword">DESC</span>]序列]<span class="hljs-comment">--- 排序依据</span><br></code></pre></td></tr></table></figure>
+
+<p>其中使用 distinct 时要注意列名要放在 distinct 的后面，而使用聚合函数时，则是 <code>count(DISTINCT 列名)</code> 语法。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span><br>	<span class="hljs-keyword">DISTINCT</span> device_id<br><span class="hljs-keyword">FROM</span> usr_profile<br></code></pre></td></tr></table></figure>
+
+<p>查询列后，将列取别名操作，要使用 as，但是也能省略：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span><br>	device_id <span class="hljs-keyword">as</span> user_infos_example<br><span class="hljs-keyword">FROM</span> user_profile<br><br># 等同于<br><span class="hljs-keyword">SELECT</span><br>	device_id user_infos_example<br><span class="hljs-keyword">FROM</span> user_profile<br></code></pre></td></tr></table></figure>
+
+<h3 id="LIMIT-语句"><a href="#LIMIT-语句" class="headerlink" title="LIMIT 语句"></a>LIMIT 语句</h3><p>在大表中，一般很少一次性查出所有数据，这样对数据库的压力太大。如果只是抽查一些数据，就可以使用 LIMIT 关键字来查询。LIMIT 子句用于强制 SELECT 语句返回指定的记录数，其接受一个或两个数字参数，且参数必须为整型常量。</p>
+<p>如果只给定一个参数，则返回指定数目的记录行；如果给定两个参数，第一个参数是行数序号（从 0 开始表示第一行），第二个参数是数量：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">table</span> LIMIT <span class="hljs-number">5</span>,<span class="hljs-number">5</span>   # 检索记录行 <span class="hljs-number">6</span><span class="hljs-number">-10</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">table</span> LIMIT <span class="hljs-number">10</span>,<span class="hljs-number">-1</span><br><br># 也能结合 <span class="hljs-keyword">offset</span> 一起使用：跳过 <span class="hljs-number">0</span> 条，从第一条开始取两条<br><span class="hljs-keyword">select</span> device_id <span class="hljs-keyword">from</span> user_profile limit <span class="hljs-number">2</span> <span class="hljs-keyword">offset</span> <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="BETWEEN-语句"><a href="#BETWEEN-语句" class="headerlink" title="BETWEEN 语句"></a>BETWEEN 语句</h3><p>当需要查询某个范围值的时候，一般使用两种语句：between and，以及 and 语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> device_id, gender, age <span class="hljs-keyword">FROM</span> user_profile<br><span class="hljs-keyword">where</span> age <span class="hljs-keyword">between</span> <span class="hljs-number">20</span> <span class="hljs-keyword">and</span> <span class="hljs-number">23</span><br># 等价于<br><span class="hljs-keyword">SELECT</span> device_id, gender, age <span class="hljs-keyword">FROM</span> user_profile<br><span class="hljs-keyword">where</span> age <span class="hljs-operator">&gt;=</span> <span class="hljs-number">20</span> <span class="hljs-keyword">and</span> age <span class="hljs-operator">&lt;=</span> <span class="hljs-number">23</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="NOT-IN-语句"><a href="#NOT-IN-语句" class="headerlink" title="NOT IN 语句"></a>NOT IN 语句</h3><p>当需要查询集合中指定属性值时，使用 IN，除此属性值之外的所有值使用 NOT IN。</p>
+<ul>
+<li>IN：当列中的值与 IN 中的某个常量值相等时，则结果为 True，表明此记录为符合查询条件的记录</li>
+<li>NOT IN：当列中的值与 NOT IN 中的某个常量值相等时，结果为 False，表明此记录为不符合查询条件的记录</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> user_profile<br><span class="hljs-keyword">where</span> university <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">IN</span> <span class="hljs-string">&#x27;复旦大学&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>当需要过滤空值时：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> device_id, gender, age, university <span class="hljs-keyword">FROM</span> user_profile<br><span class="hljs-keyword">WHERE</span> age <span class="hljs-operator">!=</span> <span class="hljs-string">&#x27;&#x27;</span>;<br># 或者<br><span class="hljs-keyword">SELECT</span> device_id, gender, age, university <span class="hljs-keyword">FROM</span> user_profile<br><span class="hljs-keyword">WHERE</span> age <span class="hljs-keyword">is</span> <span class="hljs-keyword">NOT NULL</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="AND、OR-语句"><a href="#AND、OR-语句" class="headerlink" title="AND、OR 语句"></a>AND、OR 语句</h3><p>bool 值运算关系，混合使用时注意 <strong>AND 的优先级大于 OR</strong>：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> device_id, gender, age, university, gpa <span class="hljs-keyword">FROM</span> user_profile<br><span class="hljs-keyword">WHERE</span> gpa <span class="hljs-operator">&gt;</span> <span class="hljs-number">3.5</span> <span class="hljs-keyword">AND</span> gender <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;male&#x27;</span><br><br><span class="hljs-keyword">SELECT</span> device_id, gender, age, university, gpa <span class="hljs-keyword">FROM</span> user_profile<br><span class="hljs-keyword">WHERE</span> (gpa <span class="hljs-operator">&gt;</span> <span class="hljs-number">3.5</span> <span class="hljs-keyword">and</span> university <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;山东大学&#x27;</span>) <span class="hljs-keyword">OR</span> (gpa <span class="hljs-operator">&gt;</span> <span class="hljs-number">3.8</span> <span class="hljs-keyword">and</span> university <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;复旦大学&#x27;</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="模糊匹配"><a href="#模糊匹配" class="headerlink" title="模糊匹配"></a>模糊匹配</h3><p>数据库中要进行模糊查询，主要使用以下操作：</p>
+<blockquote>
+<ol>
+<li><code>_</code>：下划线，代表匹配任意一个字符</li>
+<li><code>%</code>：百分号，代表匹配 0 个或多个字符</li>
+<li><code>[]</code>：中括号，代表匹配其中的任意一个字符</li>
+<li><code>[^]</code>：取反，不匹配其中的任意一个字符</li>
+</ol>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">like</span> 模糊查询用法：<br>  <span class="hljs-string">&#x27;%北京&#x27;</span>   北京开头的<br>  <span class="hljs-string">&#x27;_北京%&#x27;</span>  第二三个字为北京<br>  <span class="hljs-string">&#x27;%北京%&#x27;</span>  含有北京的<br><br><span class="hljs-keyword">SELECT</span> device_id, age, university <span class="hljs-keyword">FROM</span> user_profile<br><span class="hljs-keyword">WHERE</span> university <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;%北京%&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<div class="note note-warning">
+            <p>like 模糊查询会引起全表扫描，速度比较慢，应该尽量避免使用 like 关键字进行模糊查询。</p> 
+          </div>
+
+<h3 id="SQL-中的常用函数"><a href="#SQL-中的常用函数" class="headerlink" title="SQL 中的常用函数"></a>SQL 中的常用函数</h3><p><strong>max</strong>：查找某个条件下最大值的时候，一般有两种方法：第一种为使用降序排序，取第一位；第二种为使用 max 函数：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">max</span>(gpa) <span class="hljs-keyword">FROM</span> user_profile <span class="hljs-keyword">WHERE</span> university <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;复旦大学&#x27;</span><br><br># 上为第二种，下为第一种方法<br><span class="hljs-keyword">SELECT</span> gpa <span class="hljs-keyword">FROM</span> user_profile <span class="hljs-keyword">WHERE</span> university <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;复旦大学&#x27;</span> <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> gpa <span class="hljs-keyword">DESC</span> limit <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>count、round、avg</strong>：count 用于统计某个值的数量，round 用于保留几位小数，avg 用于求某一列的平均值：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-built_in">COUNT</span>(gender) <span class="hljs-keyword">as</span> male_num, round(<span class="hljs-built_in">avg</span>(gpa), <span class="hljs-number">1</span>) <span class="hljs-keyword">as</span> avg_gpa<br><span class="hljs-keyword">from</span> user_profile <span class="hljs-keyword">where</span> gender <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;male&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>having</strong>：聚合函数结果作为筛选条件时，不能用 where，而是用 having 语法，配合重命名即可：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> university, <span class="hljs-built_in">avg</span>(question_cnt) <span class="hljs-keyword">as</span> avg_question_cnt, <span class="hljs-built_in">avg</span>(answer_cnt) <span class="hljs-keyword">as</span> avg_answer_cnt<br><span class="hljs-keyword">FROM</span> user_profile<br><span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> university<br><span class="hljs-keyword">HAVING</span> avg_question_cnt <span class="hljs-operator">&lt;</span> <span class="hljs-number">5</span> <span class="hljs-keyword">OR</span> avg_answer_cnt <span class="hljs-operator">&lt;</span> <span class="hljs-number">20</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="多表查询"><a href="#多表查询" class="headerlink" title="多表查询"></a>多表查询</h3><p>若一个查询同时涉及两个或两个以上的表，则称之为连接查询。连接查询是关系数据库中最主要的查询，包括内连接、外连接、交叉连接等，用于连接两个表的条件称为连接条件或者连接谓词。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> … <span class="hljs-keyword">FROM</span> 表名 [<span class="hljs-keyword">INNER</span>] <span class="hljs-keyword">JOIN</span> 被连接表 <span class="hljs-keyword">ON</span> 连接条件<br><br># 以上结果中会包含重复的列<br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> 学生表 <span class="hljs-keyword">INNER</span> <span class="hljs-keyword">JOIN</span> 班级表 <span class="hljs-keyword">ON</span> 学生表.班号<span class="hljs-operator">=</span>班级表.班号<br><br># 去除重复列<br><span class="hljs-keyword">SELECT</span> 学号, 姓名, 班级表.班号, 班名 <span class="hljs-keyword">FROM</span> 学生表 <span class="hljs-keyword">JOIN</span> 班级表 <span class="hljs-keyword">ON</span> 学生表.班号<span class="hljs-operator">=</span>班级表.班号<br><br># 多表连接示例<br><span class="hljs-keyword">select</span> u.university, <span class="hljs-built_in">count</span>(q.question_id) <span class="hljs-operator">/</span> <span class="hljs-built_in">count</span>(<span class="hljs-keyword">DISTINCT</span> (q.device_id)) <span class="hljs-keyword">as</span> avg_answer_cnt<br><span class="hljs-keyword">from</span> user_profile <span class="hljs-keyword">as</span> u<br><span class="hljs-keyword">right</span> <span class="hljs-keyword">join</span> question_practice_detail <span class="hljs-keyword">as</span> q<br><span class="hljs-keyword">on</span> u.device_id <span class="hljs-operator">=</span> q.device_id<br><span class="hljs-keyword">group</span> <span class="hljs-keyword">by</span> u.university<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>right join 联结结果保留右表的全部数据；left join 保留左表的全部数据；inner join 保留两表的公共数据。</p>
+</blockquote>
+<h3 id="组合查询"><a href="#组合查询" class="headerlink" title="组合查询"></a>组合查询</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> device_id, gender, age, gpa<br><span class="hljs-keyword">from</span> user_profile<br><span class="hljs-keyword">where</span> university <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;山东大学&#x27;</span><br><span class="hljs-keyword">union</span> <span class="hljs-keyword">all</span><br><span class="hljs-keyword">select</span> device_id, gender, age, gpa<br><span class="hljs-keyword">from</span> user_profile<br><span class="hljs-keyword">where</span> gender <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;male&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>union 会去重，union all 不会去重；如果直接用 <code>where university = &#39;山东大学&#39; or gender = &#39;male&#39;</code> 也会去重。</p>
+<blockquote>
+<p>练习参考：<a target="_blank" rel="noopener" href="https://www.nowcoder.com/exam/oj?tab=SQL%E7%AF%87&topicId=199">https://www.nowcoder.com/exam/oj?tab=SQL%E7%AF%87&amp;topicId=199</a></p>
+</blockquote>
+<h2 id="二、MySQL-原理"><a href="#二、MySQL-原理" class="headerlink" title="二、MySQL 原理"></a>二、MySQL 原理</h2><h3 id="redo-log-与-bin-log-两种日志的区别"><a href="#redo-log-与-bin-log-两种日志的区别" class="headerlink" title="redo-log 与 bin-log 两种日志的区别"></a>redo-log 与 bin-log 两种日志的区别</h3><p>redo-log 与 bin-log 两种日志是 InnoDB 数据库引擎为了满足事务的持久性与原子性而引入的。其中，redo-log 是 InnoDB 的特性，bin-log 是 MySQL 中 Server 层的日志。</p>
+<h4 id="redo-log-日志"><a href="#redo-log-日志" class="headerlink" title="redo-log 日志"></a>redo-log 日志</h4><blockquote>
+<p>在更新一条记录时，先将其写入 redo-log 中，然后更新内存，此时的记录就算更新完毕。等待数据库引擎空闲时，再将其更新至磁盘中。</p>
+<p>redo-log 大小固定，由 innodb_log_file_size 设置大小和 innodb_log_files_in_group 设置个数，若要修改，则需重启服务。</p>
+<p>一旦更新的数据条数达到 redo-log 日志记录数的上限，数据库引擎则先停止手中的活，将一部分的 redo-log 日志中的数据更新入磁盘，再继续运行。</p>
+</blockquote>
+<p>本质上来说，redo-log 就是一个循环队列，如下图所示（原图来自极客时间专栏）：</p>
+<p><img src="/images/SQL/redo_log.png" srcset="/img/loading.gif" lazyload alt="redo-log"></p>
+<p>其中 write_pos 为当前记录日志的地址，checkpoint 为当前要擦除的地址，擦除记录前需要将记录更新到数据库文件。write_pos 和 checkpoint 之间是 redo-log 空闲的地址块，可以用来记录新的操作。如果 write_pos 追上 checkpoint，说明 redo-log 记录操作已满，不能再执行新的更新，需要数据库引擎先擦除一些记录。</p>
+<p>redo-log 可以防止因为数据库异常重启而导致提交记录丢失的问题——这种特性称为 “crash-safe”。</p>
+<h4 id="bin-log-日志"><a href="#bin-log-日志" class="headerlink" title="bin-log 日志"></a>bin-log 日志</h4><blockquote>
+<p>最开始的时候，MySQL 中没有 InnoDB 数据库引擎，其自带的引擎为 MyISAM，而 MyISAM 没有 “crash-safe” 的能力，bin-log 日志只是归档记录的功能。</p>
+</blockquote>
+<p>两种日志的区别：</p>
+<ul>
+<li>redo-log 是 <strong>InnoDB 引擎特有</strong> 的；bin-log 是 MySQL 的 Server 层实现的，所有引擎都可以使用</li>
+<li>redo-log 是 <strong>物理日志</strong>，记录 “在某个数据页上的修改”；bin-log 是逻辑日志，记录的是这个语句的 <strong>原始逻辑</strong>，比如 “给 ID&#x3D;2 这一行的 c 字段加 1”</li>
+<li>redo-log 是 <strong>循环写的，空间固定</strong>；bin-log 是以 <strong>追加</strong> 的方式写入的，”追加写” 是 bin-log 文件达到一定大小后，会切换到下一个 bin-log 日志文件，并不会覆盖以前的日志</li>
+</ul>
+<p>所以可得到以下结论：</p>
+<blockquote>
+<p>1、redo-log 的写盘时间会直接影响系统的吞吐，所以 redo-log 的数据量要尽量少。</p>
+<p>2、由于系统崩溃的不确定性，重启重放 redo-log 文件时，系统不会知道 redo-log 中的那个 page 页已经修改入磁盘，所以 redo-log 的重放必须是可重复的。</p>
+<p>3、一般来说，<strong>建议一个 redo-log 只涉及一个内存 page 页来进行修改</strong>，这样就可以兼顾逻辑日志与物理日志的优势。</p>
+</blockquote>
+<p>而 redo-log 提交是有两个阶段的：<strong>prepare 和 commit 阶段</strong>。之所以进行两个阶段的提交，也是为了达到 “crash-safe” 的目的。</p>
+<h4 id="两阶段提交的情景"><a href="#两阶段提交的情景" class="headerlink" title="两阶段提交的情景"></a>两阶段提交的情景</h4><p>假设 redo-log 都是一次性提交，不分两个阶段，此时我们对一个字段 c 值进行更新，让 c 值从当前的 0 更新为 1。</p>
+<p><strong>情景 1</strong>：我们先写 redo-log 后写 bin-log。假设在 redo-log 写完、bin-log 并未写完时，MySQL 进程异常重启。</p>
+<blockquote>
+<p>redo-log 写完之后，虽然系统崩溃也能将 MySQL 异常启动前的数据恢复回来。但是 bin-log 并未写完，此时记录的 bin-log 文件就没有记录之前操作的语句。之后用于备份的 bin-log 中也没有相应的操作语句，而若我们需要恢复临时库，由于 bin-log 记录的语句丢失，临时库恢复出来的这一行 c 的值就是 0，与原库的值不同。</p>
+</blockquote>
+<p><strong>情景 2</strong>：我们先写 bin-log，后写 redo-log。假设在 bin-log 写完、redo-log 并未写完时，MySQL 进程异常重启。</p>
+<blockquote>
+<p>如果在 bin-log 写完之后系统崩溃，由于 bin-log 不具备 “crash-safe” 的功能，而 redo-log 没写，所以崩溃恢复以后这个事务无效。但是 bin-log 里面已经记录了 “c 从 0 改为 1” 的日志，所以在之后用 bin-log 恢复临时库时，就会多出一个事务，恢复出来的 c 的值就是 1，与原库的值不同。</p>
+</blockquote>
+<p>所以两阶段提交就是让 redo-log 与 bin-log 两个状态保持逻辑上的一致。针对于异常重启，在 MySQL 设置中的 <code>innodb_flush_log_at_trx_commit</code>、<code>sync_binlog</code> 均设置为 1，能保证 MySQL 异常重启之后数据不丢失与 bin-log 文件不丢失。</p>
+<h4 id="一些补充"><a href="#一些补充" class="headerlink" title="一些补充"></a>一些补充</h4><p>1、MySQL 的 bin-log 完整性：</p>
+<blockquote>
+<p>1、statement 格式，最后会有 COMMIT；</p>
+<p>2、row 格式，最后会有 XID event；</p>
+<p>3、MySQL 5.6.5 版本后也引入了 bin-log checksum 用于验证 bin-log 内容的正确性，所以一旦 bin-log 所在的磁盘出现故障，可以通过验证 checksum 来确定准确性。</p>
+</blockquote>
+<p>2、关于 bin-log 备份建议：</p>
+<p>一般建议在一周一备份与一日一备份之间进行选择，具体看业务的评估，比如 RTO（恢复目标时间）指标。一周一备份存储成本小，但是 RTO 长；而一日一备份 RTO 时间小，但是存储的成本大。</p>
+<h3 id="事务中的隔离性"><a href="#事务中的隔离性" class="headerlink" title="事务中的隔离性"></a>事务中的隔离性</h3><p>事务是数据库在操作数据时，为了保证其逻辑一致性而划分的最小单位。</p>
+<blockquote>
+<p>事务的特性：<strong>A（Atomicity）、C（Consistency）、I（Isolation）、D（Durability）</strong>，即原子性、一致性、隔离性、持久性。</p>
+</blockquote>
+<p>事务是保持逻辑一致性、可恢复性的重要方法，而锁是保证事务的完整性与并发性的重要概念。</p>
+<h4 id="隔离性的概念"><a href="#隔离性的概念" class="headerlink" title="隔离性的概念"></a>隔离性的概念</h4><p>隔离性的存在主要是为了<strong>区分多个事务并行执行的顺序问题</strong>，比如多个事务并行执行时，出现脏读、不可重复读、幻读等。</p>
+<blockquote>
+<p>脏读：读取到其他事务未提交的数据</p>
+<p>不可重复读：前后读取记录内容不一致</p>
+<p>幻读：前后读取记录数量不一致</p>
+</blockquote>
+<p>所以隔离性针对于以上的情况，分成如下几个级别的隔离：<strong>读未提交、读提交、可重复读与串行化</strong>：</p>
+<ul>
+<li>读未提交：一个事务还未提交，其所做的变更可以被其他事务读取</li>
+<li>读提交：一个事务提交之后，其所做的变更才能被其他事务读取</li>
+<li>可重复读：一个事务执行过程中看到的数据是一致的，未提交时其所做的变更对其余事务不可见</li>
+<li>串行化：对一个记录进行加读写锁，若其发生冲突，后访问的事务需要等前一个事务执行完毕时，才能继续执行</li>
+</ul>
+<p>上面四种情况，并行性逐步降低，但是安全性逐步升高。</p>
+<div class="note note-info">
+            <p>Oracle 数据库的默认隔离级别是读提交，所以从 Oracle 数据库迁移到 MySQL 数据库中，需要将 MySQL 的启动参数 <code>transaction-isolation</code> 的值设置成 READ-COMMITTED。MySQL 数据库默认的隔离级别是可重复读，但是可重复读会导致幻读的情况。</p> 
+          </div>
+
+<h4 id="隔离性的实现"><a href="#隔离性的实现" class="headerlink" title="隔离性的实现"></a>隔离性的实现</h4><p>在 MySQL 数据库中，为了控制并发执行的语句的顺序，引入了多版本并发控制 MVCC（Multi-Version Concurrency Control）。</p>
+<p>其具体内容可以概括如下：每条记录在更新的时候都会同时记录一条回滚日志：undo-log，同一条记录在系统中可以存在多个版本：</p>
+<p><img src="/images/SQL/MySQL-isolation1.png" srcset="/img/loading.gif" lazyload alt="isolation"></p>
+<p>若我们需要将当前 4 的值恢复到 1 时，需要执行 3 次 undo-log 回滚。而当系统中不存在比回滚日志更早的 read-view 时，undo-log 则会被删除。以上图为例子，当 read-viewA 视图被删除后，将 3 改为 2 之前的 undo-log 即会被删除。所以说一般开发时，MySQL 数据层的事务尽量避免过长。</p>
+<h4 id="事务的启动方式"><a href="#事务的启动方式" class="headerlink" title="事务的启动方式"></a>事务的启动方式</h4><p>MySQL 中的事务启动方式一般为两种：</p>
+<blockquote>
+<p>1、显式启动：使用 begin 或 start transaction，配套的提交语句为 commit，回滚语句为 rollback</p>
+<p>2、set autocommit &#x3D; 0：此命令会关闭自动提交，只有手动执行上述配套的语句，才能进行一个事务的提交，或者断开连接时提交</p>
+</blockquote>
+<p>所以建议使用 <strong>set autocommit &#x3D; 1</strong>，通过显式语句来启动事务，而 commit 命令一般使用 <strong>commit work and chain</strong> 命令，即提交并且启动下一个事务。带来的效果是从程序开发的角度可以明确的知道每个语句是否存在于事务中。</p>
+<h2 id="三、MySQL-优化"><a href="#三、MySQL-优化" class="headerlink" title="三、MySQL 优化"></a>三、MySQL 优化</h2><h3 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h3><p>索引只是一种数据结构而已，具体看 MySQL 的数据库引擎。比如 MyISAM 使用 B 树，InnoDB 使用的是 B+ 树。</p>
+<div class="note note-info">
+            <p>聚簇索引与非聚簇索引就是 B 树与 B+ 树的两个别名。</p> 
+          </div>
+
+<p>缺点：</p>
+<ul>
+<li>少量数据不需要索引</li>
+<li>频繁更新的数据不适合作为索引</li>
+<li>很少使用的字段不需要索引</li>
+<li>索引提升查询效率，但会降低增删改的效率</li>
+<li>索引占用空间很大</li>
+</ul>
+<p>优点：</p>
+<ul>
+<li>查询效率高</li>
+<li>CPU 占用少（order by XXX desc 时，B 树、B+ 树不用排序，所以 CPU 计算少）</li>
+</ul>
+<h4 id="索引细节"><a href="#索引细节" class="headerlink" title="索引细节"></a>索引细节</h4><p><strong>分类</strong>：索引一般有三种：单值索引、唯一索引、复合索引。</p>
+<ul>
+<li>单值索引：单列的索引，一个表可以有很多单值索引</li>
+<li>唯一索引：所有值不能重复，即 distinct</li>
+<li>复合索引：多个列组成的二级索引</li>
+</ul>
+<p><strong>创建索引</strong>：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs sql"># 方式一：<span class="hljs-keyword">create</span><br><span class="hljs-keyword">create</span> index 索引名称 <span class="hljs-keyword">on</span> 表(字段名称)                    # 单值<br><span class="hljs-keyword">create</span> <span class="hljs-keyword">unique</span> index 索引名称 <span class="hljs-keyword">on</span> 表(字段名称)             # 唯一<br><span class="hljs-keyword">create</span> index 索引名称 <span class="hljs-keyword">on</span> 表(字段名称)                    # 复合<br><br># 方式二：<span class="hljs-keyword">alter</span><br><span class="hljs-keyword">alter table</span> 表名 <span class="hljs-keyword">add</span> index 索引名称(字段名称)            # 单值<br><span class="hljs-keyword">alter table</span> 表名 <span class="hljs-keyword">add</span> <span class="hljs-keyword">unique</span> index 索引名称(字段名称)     # 唯一<br><span class="hljs-keyword">alter table</span> 表名 <span class="hljs-keyword">add</span> index 索引名称(字段名称, 字段名称)   # 复合<br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>primary key 设置后自动就是主键索引。主键与唯一索引均不能为 null。</p> 
+          </div>
+
+<p><strong>查询&#x2F;删除索引</strong>：<code>show index from 表名</code> &#x2F; <code>drop index 索引名 on 表名</code></p>
+<h3 id="SQL-优化之执行计划"><a href="#SQL-优化之执行计划" class="headerlink" title="SQL 优化之执行计划"></a>SQL 优化之执行计划</h3><p>SQL 优化的主要原因即是：性能低、SQL 语句执行时间长、等待时间长、索引失效、服务器参数不合理等。</p>
+<div class="note note-warning">
+            <p>有索引才能涉及到 SQL 优化，没有索引一般都是 ALL 级别。</p> 
+          </div>
+
+<p>先说 SQL 语句的执行。在 MySQL 数据库引擎进行数据解析的过程中，识别 SQL 语句后，实际的执行过程与编写的语句不一致，一般执行过程如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql">from...on...join...where...group by...<br>having...select (<span class="hljs-keyword">distinct</span>)...<span class="hljs-keyword">order</span> by... limit<br></code></pre></td></tr></table></figure>
+
+<p>优化时，必须解决的问题就是 SQL 语句的执行计划。SQL 执行计划的关键字：<strong>explain</strong>，可以模拟 SQL 优化器执行 SQL 语句，从而让开发人员具体知道自己写的 SQL 语句是如何执行的。</p>
+<p><strong>使用方法</strong>：<code>explain + SQL 语句</code>，如 <code>explain select * from tables</code>：</p>
+<p><img src="/images/SQL/index1.png" srcset="/img/loading.gif" lazyload></p>
+<h4 id="id-值相同的执行计划"><a href="#id-值相同的执行计划" class="headerlink" title="id 值相同的执行计划"></a>id 值相同的执行计划</h4><p>id 值相同，即按照 table 字段从上到下的顺序进行执行。而此种情况下的表查询的顺序，会因为表内数据量的多少而改变。原因是计算权重的算法就是笛卡尔积，笛卡尔积是连乘，产生的中间过程的数据量，理应越小越好。所以在执行计划中，在表最终的结果集一致的情况下，表遵循表内数据从小到大的顺序进行执行。</p>
+<h4 id="id-值不同的执行计划"><a href="#id-值不同的执行计划" class="headerlink" title="id 值不同的执行计划"></a>id 值不同的执行计划</h4><p>id 值不同时，id 值越大越优先执行。本质即是多表联结查询转变为子查询，子查询是先执行最内层查询，再执行外层查询，所以即是 id 值越大，越优先执行。</p>
+<h4 id="select-type-查询类型"><a href="#select-type-查询类型" class="headerlink" title="select_type 查询类型"></a>select_type 查询类型</h4><blockquote>
+<p>1、primary：主查询方法，为最外层的查询</p>
+<p>2、subquery：主查询的对立方法，即子查询方法，为内层查询</p>
+<p>3、simple：简单查询，即不涉及子查询与 union 查询</p>
+<p>4、derived：衍生查询，会创建一个临时表。（如果在 from 子查询中只涉及一个表，则该表为临时表；如果在 from 子查询中涉及两个表，则左表是临时表）</p>
+</blockquote>
+<h4 id="type-索引类型"><a href="#type-索引类型" class="headerlink" title="type 索引类型"></a>type 索引类型</h4><p>一般企业中常用的索引类型如下：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">system</span> &gt;&gt; const &gt;&gt; eq_ref &gt;&gt; <span class="hljs-keyword">ref</span> &gt;&gt; range &gt;&gt; <span class="hljs-keyword">index</span> &gt;&gt; <span class="hljs-keyword">all</span><br></code></pre></td></tr></table></figure>
+
+<p>以上类型的索引效率越往左越高。其中 system 与 const 只是理想情况下的效果，一般 SQL 优化，在 ref ~ range 之间。</p>
+<ul>
+<li>system（忽略）：只有一条数据的系统表，或衍生表只有一条数据的主查询</li>
+<li>const（忽略）：仅仅能查到一条数据，只能用于 primary key 或 unique index</li>
+<li>eq_ref（尽量满足，但是可遇不可求）：唯一性索引，对于每个索引键的查询，返回匹配的唯一行数据（只能为 1，不能多、也不能是 0），常见于主键索引与唯一索引。即查询的主数据表与临时的表内的数据数量必须一致，才能达到 eq_ref 的效果</li>
+<li>ref：非唯一性索引，对于每一个索引键的查询，返回匹配的所有行（0 或 多）</li>
+<li>range：检索指定范围的行，where 后面为范围查询的情况（between、in、&gt;、&lt; 等），但是 in 有时候会索引失效，转变为 ALL 级别</li>
+<li>index：查询全部索引的数据，索引查询肯定要小于等于全表查询</li>
+<li>all：查询全部表中数据</li>
+</ul>
+<p>总结：system、const 结果只能有一条数据；eq_ref 结果是多条，但是每条数据具有唯一性；ref 结果多条，但是每条数据是 0 或 多条。</p>
+<h4 id="possible-keys、key、key-len、ref、rows、Extra"><a href="#possible-keys、key、key-len、ref、rows、Extra" class="headerlink" title="possible_keys、key、key_len、ref、rows、Extra"></a>possible_keys、key、key_len、ref、rows、Extra</h4><ul>
+<li>possible_keys 为预测的索引值，不准确</li>
+<li>key 为实际使用的索引。<strong>注意</strong>：如果 possible_keys &#x2F; key 均为 null，则没使用索引</li>
+<li>判断复合索引是否完全被使用。如果复合索引有一个索引允许为空，那么 key_len 长度会默认 +1B，作为空标识符；2B 标识 varchar 的可变长度</li>
+<li>ref 为：指明当前表所参照的字段。<strong>注意</strong>：与 type 中的 ref 进行区分</li>
+<li>rows 为：被索引优化查询的个数，即量级</li>
+</ul>
+<p>Extra 常见有以下字段：</p>
+<ul>
+<li>using filesort：性能消耗大，需要进行额外一次排序（查询）。对于单索引，如果排序查找的是同一字段，则不会出现 filesort；如果排序与查找的不是同一字段，则需要使用 using filesort。在复合索引下，避免使用 using filesort，就使用 where 与 order by 按照复合索引的顺序使用，不要跨列就不用使用（最佳左前缀）</li>
+<li>using temporary：出现性能损耗，用到了临时表，一般出现在 group by 语句中</li>
+<li>using index：性能提升，覆盖索引。原因：不读取原文件，只从索引文件读取数据，不需要回表查询。但是使用 using index 时，会对 possible_keys 和 key 造成影响：没有 where 时，索引出现在 key 中；有 where 时，索引出现在 key 和 possible_keys 中</li>
+<li>using where：既查索引，又查原表（即回表查询）</li>
+<li>impossible where：where 子句永远为 false</li>
+</ul>
+<h3 id="单表优化"><a href="#单表优化" class="headerlink" title="单表优化"></a>单表优化</h3><p>在进行单表优化时，主要注意以下几点：</p>
+<ul>
+<li>where 与 order by 联合使用索引查询，尽量不要跨列进行搜索</li>
+<li>如果复合索引的使用顺序全部一致（且不跨列使用），则复合索引全部使用；如果部分使用（且不跨列使用），则使用部分索引</li>
+</ul>
+<p>举个例子，假设我们有一张 book 表，建表语句如下所示，我们也先添加四个数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">create table</span> book<br>(<br>	bid <span class="hljs-type">int</span>(<span class="hljs-number">4</span>) <span class="hljs-keyword">primary key</span>,<br>	name <span class="hljs-type">varchar</span>(<span class="hljs-number">20</span>) <span class="hljs-keyword">not null</span>,<br>	authorid <span class="hljs-type">int</span>(<span class="hljs-number">4</span>) <span class="hljs-keyword">not null</span>,<br>	publicid <span class="hljs-type">int</span>(<span class="hljs-number">4</span>) <span class="hljs-keyword">not null</span>,<br>	typeid <span class="hljs-type">int</span>(<span class="hljs-number">4</span>) <span class="hljs-keyword">not null</span><br>);<br><br><span class="hljs-keyword">insert into</span> book <span class="hljs-keyword">values</span>(<span class="hljs-number">1</span>, <span class="hljs-string">&#x27;tjava&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>);<br><span class="hljs-keyword">insert into</span> book <span class="hljs-keyword">values</span>(<span class="hljs-number">2</span>, <span class="hljs-string">&#x27;tc&#x27;</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>);<br><span class="hljs-keyword">insert into</span> book <span class="hljs-keyword">values</span>(<span class="hljs-number">3</span>, <span class="hljs-string">&#x27;wx&#x27;</span>, <span class="hljs-number">3</span>, <span class="hljs-number">2</span>, <span class="hljs-number">2</span>);<br><span class="hljs-keyword">insert into</span> book <span class="hljs-keyword">values</span>(<span class="hljs-number">4</span>, <span class="hljs-string">&#x27;math&#x27;</span>, <span class="hljs-number">4</span>, <span class="hljs-number">3</span>, <span class="hljs-number">2</span>);<br></code></pre></td></tr></table></figure>
+
+<p>然后我们想查询 authorid &#x3D; 1 且 typeid 为 2 或 3 的 bid：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> bid <span class="hljs-keyword">from</span> book <span class="hljs-keyword">where</span> typeid <span class="hljs-keyword">in</span> (<span class="hljs-number">2</span>,<span class="hljs-number">3</span>) <span class="hljs-keyword">and</span> authorid <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;<br>explain <span class="hljs-keyword">select</span> bid <span class="hljs-keyword">from</span> book <span class="hljs-keyword">where</span> typeid <span class="hljs-keyword">in</span> (<span class="hljs-number">2</span>,<span class="hljs-number">3</span>) <span class="hljs-keyword">and</span> authorid <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/images/SQL/explain1.png" srcset="/img/loading.gif" lazyload></p>
+<p>发现没有索引的情况下，默认发生的是全表查询，即 explain 执行计划 type 字段值为 all，extra 字段为 using where。而后我们为了让优化的效果更加明显一点，再配合 order by desc 来使用：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> bid <span class="hljs-keyword">from</span> book <span class="hljs-keyword">where</span> typeid <span class="hljs-keyword">in</span> (<span class="hljs-number">2</span>,<span class="hljs-number">3</span>) <span class="hljs-keyword">and</span> authorid <span class="hljs-operator">=</span> <span class="hljs-number">1</span> <span class="hljs-keyword">order</span> <span class="hljs-keyword">by</span> typeid <span class="hljs-keyword">desc</span>;<br>explain <span class="hljs-keyword">select</span> bid <span class="hljs-keyword">from</span> book <span class="hljs-keyword">where</span> typeid <span class="hljs-keyword">in</span> (<span class="hljs-number">2</span>,<span class="hljs-number">3</span>) <span class="hljs-keyword">and</span> authorid <span class="hljs-operator">=</span> <span class="hljs-number">1</span> <span class="hljs-keyword">order</span> <span class="hljs-keyword">by</span> typeid <span class="hljs-keyword">desc</span>;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/images/SQL/explain2.png" srcset="/img/loading.gif" lazyload></p>
+<p>此时我们会发现，extra 字段会出现 using filesort 字段值，即查询全表后还对返回的数据重新排序，这样很浪费性能，所以我们对其添加索引优化：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">alter table</span> book <span class="hljs-keyword">add</span> index idx_bta (bid, typeid, authorid);<br></code></pre></td></tr></table></figure>
+
+<p>然后再执行上述的 SQL 语句：</p>
+<p><img src="/images/SQL/explain3.png" srcset="/img/loading.gif" lazyload></p>
+<p>可见，增加索引后可以将全表查询变为索引查询，type 等字段发生改变，但是 using where 与 using filesort 还是未能优化掉，所以说此条 SQL 语句还能继续进行相应的优化。</p>
+<p>而 SQL 语句的优化，即是我们之前说的，理解 SQL 语句在 MySQL 中的执行顺序，那么按照执行顺序进行索引的优化即是最好。比如我们这里是先查 bid，再查 typeid 与 authorid。但是 MySQL 中，select 语句执行时在 where 之后，所以优化时，索引应为 (typeid, authorid, bid)。</p>
+<p>**那么索引 bid 是否能去除呢？**这里我选择不去除，因为虽然删除 bid 索引后，根据索引也能回表进行查询，但是如果只查一次索引即可得到数据，还是建议只查索引。虽然这样会导致索引很大，但是牺牲空间换时间也是一种常用的做法。</p>
+<p>继续回到原 SQL 语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> bid <span class="hljs-keyword">from</span> book <span class="hljs-keyword">where</span> typeid <span class="hljs-keyword">in</span> (<span class="hljs-number">2</span>,<span class="hljs-number">3</span>) <span class="hljs-keyword">and</span> authorid <span class="hljs-operator">=</span> <span class="hljs-number">1</span> <span class="hljs-keyword">order</span> <span class="hljs-keyword">by</span> typeid <span class="hljs-keyword">desc</span>;<br>explain <span class="hljs-keyword">select</span> bid <span class="hljs-keyword">from</span> book <span class="hljs-keyword">where</span> typeid <span class="hljs-keyword">in</span> (<span class="hljs-number">2</span>,<span class="hljs-number">3</span>) <span class="hljs-keyword">and</span> authorid <span class="hljs-operator">=</span> <span class="hljs-number">1</span> <span class="hljs-keyword">order</span> <span class="hljs-keyword">by</span> typeid <span class="hljs-keyword">desc</span>;<br></code></pre></td></tr></table></figure>
+
+<p><strong>这里注意</strong>：如果是范围查询的 <code>in</code> 语句，有时候会生效，有时候会失效，所以我们需要在开始使用索引时就走一个必定生效的索引，更改语句如下。同时，我们需要先删除之前添加的索引，防止之前的索引干扰：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">drop</span> index idx_bta <span class="hljs-keyword">on</span> book;<br><br><span class="hljs-keyword">select</span> bid <span class="hljs-keyword">from</span> book <span class="hljs-keyword">where</span> authorid <span class="hljs-operator">=</span> <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> typeid <span class="hljs-keyword">in</span> (<span class="hljs-number">2</span>,<span class="hljs-number">3</span>) <span class="hljs-keyword">order</span> <span class="hljs-keyword">by</span> typeid <span class="hljs-keyword">desc</span>;<br>explain <span class="hljs-keyword">select</span> bid <span class="hljs-keyword">from</span> book <span class="hljs-keyword">where</span> authorid <span class="hljs-operator">=</span> <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> typeid <span class="hljs-keyword">in</span> (<span class="hljs-number">2</span>,<span class="hljs-number">3</span>) <span class="hljs-keyword">order</span> <span class="hljs-keyword">by</span> typeid <span class="hljs-keyword">desc</span>;<br><br><span class="hljs-keyword">alter table</span> book <span class="hljs-keyword">add</span> index idx_atb (authorid, typeid, bid);<br></code></pre></td></tr></table></figure>
+
+<p><img src="/images/SQL/explain4.png" srcset="/img/loading.gif" lazyload></p>
+<p>通过 explain 查看相应的执行计划，可见 type 级别从 index 变为了 range，提升了一个级别。其中有字段 <code>Backward index scan</code>，这是 MySQL 8 的新特性，叫做降序索引。在 MySQL 5.x 中执行计划显示 type 优化为 ref 级别，而在 MySQL 8 中则是 range 级别，可见在 MySQL 8 中，这样优化达不到 MySQL 5.x 的优化效果。</p>
+<p>using where 与 using index 最大的区别即是需不需要回原表进行查询。而两者同时出现，即是 in 范围查询有时候失效、有时候不失效的情况。所以为了消除这种情况，一般情况用其他有效条件替换 in 即可：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> bid <span class="hljs-keyword">from</span> book <span class="hljs-keyword">where</span> authorid <span class="hljs-operator">=</span> <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> typeid <span class="hljs-operator">=</span> <span class="hljs-number">3</span> <span class="hljs-keyword">order</span> <span class="hljs-keyword">by</span> typeid <span class="hljs-keyword">desc</span>;<br>explain <span class="hljs-keyword">select</span> bid <span class="hljs-keyword">from</span> book <span class="hljs-keyword">where</span> authorid <span class="hljs-operator">=</span> <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> typeid <span class="hljs-operator">=</span> <span class="hljs-number">3</span> <span class="hljs-keyword">order</span> <span class="hljs-keyword">by</span> typeid <span class="hljs-keyword">desc</span>;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/images/SQL/explain5.png" srcset="/img/loading.gif" lazyload></p>
+<p>其 explain 结果可见 type 字段变为 ref 值，优化上升两个级别，而一般达到 ref 或者 eq_ref 级别，已经是比较好的一种情况了。</p>
+<h3 id="多表优化"><a href="#多表优化" class="headerlink" title="多表优化"></a>多表优化</h3><p>创建两个表 teacher2 与 course2：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">create table</span> teacher2<br>(<br>	id <span class="hljs-type">int</span>(<span class="hljs-number">4</span>) <span class="hljs-keyword">primary key</span>,<br>	cid <span class="hljs-type">int</span>(<span class="hljs-number">4</span>) <span class="hljs-keyword">not null</span><br>);<br><br><span class="hljs-keyword">create table</span> course2<br>(<br>	cid <span class="hljs-type">int</span>(<span class="hljs-number">4</span>),<br>	cname <span class="hljs-type">varchar</span>(<span class="hljs-number">20</span>)<br>);<br><br><span class="hljs-keyword">insert into</span> teacher2 <span class="hljs-keyword">values</span> (<span class="hljs-number">1</span>,<span class="hljs-number">2</span>);<br><span class="hljs-keyword">insert into</span> teacher2 <span class="hljs-keyword">values</span> (<span class="hljs-number">2</span>,<span class="hljs-number">1</span>);<br><span class="hljs-keyword">insert into</span> teacher2 <span class="hljs-keyword">values</span> (<span class="hljs-number">3</span>,<span class="hljs-number">3</span>);<br><br><span class="hljs-keyword">insert into</span> course2 <span class="hljs-keyword">values</span> (<span class="hljs-number">1</span>,<span class="hljs-string">&#x27;java&#x27;</span>);<br><span class="hljs-keyword">insert into</span> course2 <span class="hljs-keyword">values</span> (<span class="hljs-number">1</span>,<span class="hljs-string">&#x27;python&#x27;</span>);<br><span class="hljs-keyword">insert into</span> course2 <span class="hljs-keyword">values</span> (<span class="hljs-number">1</span>,<span class="hljs-string">&#x27;kotlin&#x27;</span>);<br></code></pre></td></tr></table></figure>
+
+<p>然后我们将两表通过左连接进行两表连接，查询 cname &#x3D; ‘java’ 的值：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> teacher2 <span class="hljs-keyword">as</span> t <span class="hljs-keyword">left</span> <span class="hljs-keyword">outer</span> <span class="hljs-keyword">join</span> course2 <span class="hljs-keyword">as</span> c <span class="hljs-keyword">on</span> t.cid <span class="hljs-operator">=</span> c.cid <span class="hljs-keyword">where</span> c.cname <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;java&#x27;</span>;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/images/SQL/explain6.png" srcset="/img/loading.gif" lazyload></p>
+<p>可见 type 为 all，即全表查询，而且 extra 出现一个新的字段值：using join buffer。出现此字段就说明 SQL 写得很差，MySQL 底层使用优化器对 SQL 进行了优化，即使用连接缓存。但是由于不涉及索引查询，所以必然还是很慢。</p>
+<p>所以两表的索引应该如何去加呢？直接上结论：<strong>小表驱动大表</strong>，写法如 <strong>小表.X &#x3D; 大表.X</strong>。原理就是根据 CPU 与内存的空间局部性原理，不用频繁进入磁盘访存拿出数据。</p>
+<p>所以，关于两表索引的增加，一般是先看连接，比如左外连接在左表上加索引、右外连接在右表上加索引。小表中使用频繁的字段加索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">alter table</span> teacher2 <span class="hljs-keyword">add</span> index index_teacher2_cid(cid);<br><span class="hljs-keyword">alter table</span> course2 <span class="hljs-keyword">add</span> index index_course2_cname(cname);<br></code></pre></td></tr></table></figure>
+
+<p><img src="/images/SQL/explain7.png" srcset="/img/loading.gif" lazyload></p>
+<p>此后执行效果直接提升为 ref 级别，而且不再出现 using join buffer，证明 SQL 语句优化得还行。</p>
+<p>而关于三表优化只需要记住两个原则即可：</p>
+<ul>
+<li>小表驱动大表</li>
+<li>索引建立在经常查询的字段上</li>
+</ul>
+<div class="note note-warning">
+            <p>注意：SQL 优化是一种概率事件！是否实际使用了我们的优化，需要通过 explain 进行查看。</p> 
+          </div>
+
+<h3 id="避免索引失效的一些原则"><a href="#避免索引失效的一些原则" class="headerlink" title="避免索引失效的一些原则"></a>避免索引失效的一些原则</h3><ul>
+<li>复合索引不跨列或者无序使用（最佳左前缀匹配），尽量使用全索引匹配</li>
+<li>不要在索引上进行任何操作（函数计算、类型转换等），否则都会使索引失效：<ul>
+<li>复合索引中，如果对左侧的索引进行操作，那么包括此索引的右侧索引全部失效</li>
+<li>复合索引不能使用不等于（!&#x3D;、&gt;、&lt;）或 is null（is not null），否则自身以及右侧的索引全部失效</li>
+<li>复合索引使用等于（&#x3D;、&gt;、&lt;）有部分概率使自身以及右侧的索引全部失效</li>
+<li>SQL 优化由于 SQL 优化器等原因，并非 100% 成立。一般而言，范围查询的（&gt;、&lt;、in）之后的索引失效</li>
+<li>补救方式：尽量使用覆盖索引</li>
+</ul>
+</li>
+<li>like 后尽量以 “常量” 开头，不要以 % 开头，否则索引失效</li>
+<li>尽量不要使用类型转换（显式、隐式），否则索引失效</li>
+<li>尽量不要使用 or，否则索引失效，左右的索引都会失效</li>
+</ul>
+<h3 id="索引优化方法"><a href="#索引优化方法" class="headerlink" title="索引优化方法"></a>索引优化方法</h3><ul>
+<li>exist 与 in 使用情况：主查询数据集大用 in，子查询数据集大用 exist</li>
+<li>order by 优化：<ul>
+<li>using filesort 有两种算法：双路排序与单路排序（根据 I&#x2F;O 的次数）</li>
+<li>选择使用单路、双路，调整 buffer 的容量大小</li>
+<li>避免使用 select *</li>
+<li>复合索引不跨列</li>
+<li>保证全部的排序字段排序的一致性（都是升序或降序）</li>
+</ul>
+</li>
+</ul>
+<h3 id="SQL-排查之慢查询"><a href="#SQL-排查之慢查询" class="headerlink" title="SQL 排查之慢查询"></a>SQL 排查之慢查询</h3><p>慢查询日志是 MySQL 提供的一种日志记录，用于记录 MySQL 中响应时间超过阈值的 SQL 语句。配置文件中显示为：long_query_time，默认为 10s。慢查询日志默认是关闭的：开发时建议打开，部署时关闭：</p>
+<p><img src="/images/SQL/slow-query.png" srcset="/img/loading.gif" lazyload alt="默认关闭"></p>
+<p>一般是临时开启，如果需要永久开启，直接在配置文件中追加配置即可。</p>
+<p>Linux 上也能通过使用 mysqldumpslow 工具对慢 SQL 语句进行排查，可以通过设置，对 SQL 语句进行快速筛选。使用命令 <code>mysqldumpslow --help</code>：</p>
+<blockquote>
+<ul>
+<li>s：排序方式</li>
+<li>r：逆序</li>
+<li>l：锁定时间</li>
+<li>g：正则匹配</li>
+</ul>
+</blockquote>
+<p>参考 bash 写法如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 获取返回记录最多的 3 个 SQL</span><br>mysqldumpslow -s r -t 3 /var/lib/mysql/localhost-slow.log<br><br><span class="hljs-comment"># 获取访问次数最多的 3 个 SQL</span><br>mysqldumpslow -s c -t 3 /var/lib/mysql/localhost-slow.log<br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>一般来说，实际的生产过程中有挺多复杂的场景，但是在业务量没有提升的时候，具体问题可以不进行优化，待业务量与使用量上来后，再进行优化，毕竟做事都是有时间成本的。</p> 
+          </div>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/middleware/" class="print-no-link">#middleware</a>
+      
+        <a href="/tags/mysql/" class="print-no-link">#mysql</a>
+      
+        <a href="/tags/sql/" class="print-no-link">#sql</a>
+      
+        <a href="/tags/innodb/" class="print-no-link">#innodb</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>MySQL 学习笔记：SQL 复习、原理与优化</div>
+      <div>https://chaggle.github.io/2026/08/10/middleware/mysql-notes-20260811/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月11日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/10/middleware/jenkins-deploy-tuning-20260811/" title="Jenkins 原理、部署与调优指南">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Jenkins 原理、部署与调优指南</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/10/middleware/redis-notes-20260811/" title="Redis 学习笔记：概念、持久化与底层">
+                        <span class="hidden-mobile">Redis 学习笔记：概念、持久化与底层</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '61eaa3b4471aed1635c1b3d9ae23282b'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

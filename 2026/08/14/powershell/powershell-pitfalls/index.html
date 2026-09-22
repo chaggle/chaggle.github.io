@@ -1,0 +1,1157 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/14/powershell/powershell-pitfalls/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="本文是《在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录》的姊妹篇。那次任务在 PowerShell 上踩的坑，单独值得写一篇。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PowerShell 实战踩坑大全：从 GBK 乱码到引号地狱的二十个真实案例">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/14/powershell/powershell-pitfalls/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="本文是《在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录》的姊妹篇。那次任务在 PowerShell 上踩的坑，单独值得写一篇。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-14T15:00:00.000Z">
+<meta property="article:modified_time" content="2026-09-01T16:53:38.178Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="DISM">
+<meta property="article:tag" content="PowerShell">
+<meta property="article:tag" content="Windows">
+<meta property="article:tag" content="脚本">
+<meta property="article:tag" content="踩坑">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>PowerShell 实战踩坑大全：从 GBK 乱码到引号地狱的二十个真实案例 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="PowerShell 实战踩坑大全：从 GBK 乱码到引号地狱的二十个真实案例"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-14 23:00" pubdate>
+          2026年8月14日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          51 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">PowerShell 实战踩坑大全：从 GBK 乱码到引号地狱的二十个真实案例</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-09-02T00:53:38+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>本文是《<a href="/2026/08/14/windows/wsl2-restore-on-stripped-windows/">在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录</a>》的姊妹篇。那次任务在 PowerShell 上踩的坑，单独值得写一篇。</p>
+</blockquote>
+<blockquote>
+<p>文章按主题分五组：<strong>① 语法与解析 → ② 字符串、转义与输出 → ③ 外部命令与进程调用 → ④ Windows 组件与 DISM → ⑤ 数据与迭代</strong>；每一节都标注了对应的检查规则编号（R1–R19），文末是沉淀成的检查插件与完整映射表。</p>
+</blockquote>
+<h2 id="第一部分-·-语法与解析（语言本身的坑）"><a href="#第一部分-·-语法与解析（语言本身的坑）" class="headerlink" title="第一部分 · 语法与解析（语言本身的坑）"></a>第一部分 · 语法与解析（语言本身的坑）</h2><h2 id="1-1、-var-被解析成”驱动器限定变量”（R2）"><a href="#1-1、-var-被解析成”驱动器限定变量”（R2）" class="headerlink" title="1-1、$var: 被解析成”驱动器限定变量”（R2）"></a>1-1、<code>$var:</code> 被解析成”驱动器限定变量”（R2）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-string">&quot;attempt <span class="hljs-variable">$attempt:</span> downloading...&quot;</span>   <span class="hljs-comment"># 报错: &#x27;:&#x27; was not followed by a valid variable name</span><br></code></pre></td></tr></table></figure>
+
+<p>PowerShell 把 <code>$attempt:</code> 当成 <code>$env:Path</code> 那种带作用域&#x2F;驱动器的语法。解法：<strong>用 ${} 显式界定</strong>：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-string">&quot;attempt <span class="hljs-variable">$</span>&#123;attempt&#125;: downloading...&quot;</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="1-2、PowerShell-5-1-没有三元运算符（R3）"><a href="#1-2、PowerShell-5-1-没有三元运算符（R3）" class="headerlink" title="1-2、PowerShell 5.1 没有三元运算符（R3）"></a>1-2、PowerShell 5.1 没有三元运算符（R3）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-variable">$v</span> = (<span class="hljs-variable">$a</span> <span class="hljs-operator">-gt</span> <span class="hljs-number">0</span>) ? <span class="hljs-string">&quot;yes&quot;</span> : <span class="hljs-string">&quot;no&quot;</span>   <span class="hljs-comment"># PS 5.1 直接解析错误！</span><br><span class="hljs-variable">$v</span> = <span class="hljs-keyword">if</span> (<span class="hljs-variable">$a</span> <span class="hljs-operator">-gt</span> <span class="hljs-number">0</span>) &#123; <span class="hljs-string">&quot;yes&quot;</span> &#125; <span class="hljs-keyword">else</span> &#123; <span class="hljs-string">&quot;no&quot;</span> &#125;  <span class="hljs-comment"># 正确</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="1-3、PowerShell-5-1-没有-链式运算符（R11）"><a href="#1-3、PowerShell-5-1-没有-链式运算符（R11）" class="headerlink" title="1-3、PowerShell 5.1 没有 &amp;&amp; &#x2F; || 链式运算符（R11）"></a>1-3、PowerShell 5.1 没有 <code>&amp;&amp;</code> &#x2F; <code>||</code> 链式运算符（R11）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell">git commit &amp;&amp; git push   <span class="hljs-comment"># PS 5.1 直接解析报错；这是 PS 7+ 才有的语法</span><br>git commit; git push     <span class="hljs-comment"># 用分号链式执行</span><br></code></pre></td></tr></table></figure>
+
+<p><code>&amp;&amp;</code>&#x2F;<code>||</code> 是 PowerShell 7 才引入的；5.1 里链式执行用分号，或按退出码判断：<code>if ($LASTEXITCODE -eq 0) { git push }</code>。注意 <code>cmd /c &quot;a &amp;&amp; b&quot;</code> 这类 cmd&#x2F;bash 内部字符串不受影响。</p>
+<h2 id="1-4、if-while-条件里用-当比较（R14）"><a href="#1-4、if-while-条件里用-当比较（R14）" class="headerlink" title="1-4、if&#x2F;while 条件里用 = 当比较（R14）"></a>1-4、if&#x2F;while 条件里用 <code>=</code> 当比较（R14）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-keyword">if</span> (<span class="hljs-variable">$x</span> = <span class="hljs-number">5</span>) &#123; ... &#125;   <span class="hljs-comment"># 赋值！条件恒真，静默逻辑 bug</span><br><span class="hljs-keyword">if</span> (<span class="hljs-variable">$x</span> <span class="hljs-operator">-eq</span> <span class="hljs-number">5</span>) &#123; ... &#125; <span class="hljs-comment"># 正确：PowerShell 比较运算符是 -eq</span><br></code></pre></td></tr></table></figure>
+
+<p>AI 常把 C&#x2F;JS 习惯的 <code>==</code> 简化成 <code>=</code> 写进条件；PowerShell 里 <code>=</code> 是赋值，条件恒真且修起来很难找。</p>
+<h2 id="1-5、PowerShell-7-专属语法混入-5-1（R15）"><a href="#1-5、PowerShell-7-专属语法混入-5-1（R15）" class="headerlink" title="1-5、PowerShell 7+ 专属语法混入 5.1（R15）"></a>1-5、PowerShell 7+ 专属语法混入 5.1（R15）</h2><p><code>-AsHashtable</code>、<code>ForEach-Object -Parallel</code>、<code>-AsByteStream</code>、<code>??</code>（空合并）、<code>?.</code>（可选链）都是 PowerShell 7+ 才有；目标机若是 5.1（Windows 自带版本）直接解析报错。AI 默认按 7 写，先确认运行环境或用 5.1 等价写法（如 <code>-Encoding Byte</code>）。</p>
+<h2 id="第二部分-·-字符串、转义与输出（文本层）"><a href="#第二部分-·-字符串、转义与输出（文本层）" class="headerlink" title="第二部分 · 字符串、转义与输出（文本层）"></a>第二部分 · 字符串、转义与输出（文本层）</h2><h2 id="2-1、双引号里的-WINDOWS-被当成变量展开（R4）"><a href="#2-1、双引号里的-WINDOWS-被当成变量展开（R4）" class="headerlink" title="2-1、双引号里的 $WINDOWS 被当成变量展开（R4）"></a>2-1、双引号里的 <code>$WINDOWS</code> 被当成变量展开（R4）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-built_in">Get-Content</span> <span class="hljs-string">&quot;C:\<span class="hljs-variable">$WINDOWS</span>.~BT\Sources\Panther\setupact.log&quot;</span>  <span class="hljs-comment"># 路径变成 C:\.~BT\...，$WINDOWS 是未定义变量！</span><br><span class="hljs-built_in">Get-Content</span> <span class="hljs-string">&#x27;C:\$WINDOWS.~BT\Sources\Panther\setupact.log&#x27;</span>  <span class="hljs-comment"># 单引号才对</span><br></code></pre></td></tr></table></figure>
+
+<p>这个坑导致排查时一度以为日志文件”神秘消失”，浪费了不少时间。</p>
+<h2 id="2-2、用-JS-模板字符串生成-PowerShell-脚本时的转义地狱（写作侧规则）"><a href="#2-2、用-JS-模板字符串生成-PowerShell-脚本时的转义地狱（写作侧规则）" class="headerlink" title="2-2、用 JS 模板字符串生成 PowerShell 脚本时的转义地狱（写作侧规则）"></a>2-2、用 JS 模板字符串生成 PowerShell 脚本时的转义地狱（写作侧规则）</h2><p>在 JS 里写模板字符串生成 .ps1 时，<code>$($var)</code>、<code>${attempt}</code> 都会被 JS 抢先插值。规则：<strong>所有想保留到 PS 里的 <code>$</code> 都要写成 <code>\$</code></strong>，否则报 <code>attempt is not defined</code> 这类 JS 错误。</p>
+<h2 id="2-3、中文控制台-GBK-乱码（R1）"><a href="#2-3、中文控制台-GBK-乱码（R1）" class="headerlink" title="2-3、中文控制台 GBK 乱码（R1）"></a>2-3、中文控制台 GBK 乱码（R1）</h2><p>wsl&#x2F;dism 输出的中文全是乱码（形如 <code>g?R?l g?S?e?T?^/T?R?</code>）。原因是控制台代码页是 GBK 而程序输出 UTF-8。每次开头加：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs powershell">chcp <span class="hljs-number">65001</span> | <span class="hljs-built_in">Out-Null</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="2-4、Write-Host-输出不进管道（R17）"><a href="#2-4、Write-Host-输出不进管道（R17）" class="headerlink" title="2-4、Write-Host 输出不进管道（R17）"></a>2-4、Write-Host 输出不进管道（R17）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-built_in">Write-Host</span> <span class="hljs-string">&quot;done&quot;</span>    <span class="hljs-comment"># 只写控制台，下游 | 捕获不到</span><br><span class="hljs-built_in">Write-Output</span> <span class="hljs-string">&quot;done&quot;</span>  <span class="hljs-comment"># 结果进管道，可被捕获/拼接</span><br></code></pre></td></tr></table></figure>
+
+<p>AI 喜欢用 Write-Host「打印」结果，但它的输出不进成功流；需要返回&#x2F;捕获结果用 Write-Output 或直接表达式，Write-Host 只适合进度提示。</p>
+<h2 id="2-5、含中文的-ps1-没存-UTF-8-BOM：PS-5-1-按-ANSI-解析直接语法错误（R18）"><a href="#2-5、含中文的-ps1-没存-UTF-8-BOM：PS-5-1-按-ANSI-解析直接语法错误（R18）" class="headerlink" title="2-5、含中文的 .ps1 没存 UTF-8 BOM：PS 5.1 按 ANSI 解析直接语法错误（R18）"></a>2-5、含中文的 .ps1 没存 UTF-8 BOM：PS 5.1 按 ANSI 解析直接语法错误（R18）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-comment"># 文件是 UTF-8 无 BOM，里面有中文注释/字符串</span><br><span class="hljs-variable">$msg</span> = <span class="hljs-string">&#x27;构建失败：dist/pagefind 不存在&#x27;</span><br><span class="hljs-comment"># ↑ Windows PowerShell 5.1 把它当 ANSI(GBK) 读 → 中文变乱码（如 鏋勫缓澶辫触），</span><br><span class="hljs-comment">#   乱码里可能混进引号字节 → 整段解析失败：Unexpected token / ParserError</span><br></code></pre></td></tr></table></figure>
+
+<p>文本编辑器默认「UTF-8 无 BOM」，AI 工具写 .ps1 也常这样；而 Windows PowerShell 5.1 对无 BOM 文件按 ANSI 解码。<strong>含中文的 .ps1 必须保存为 UTF-8 with BOM</strong>（一行 <code>node -e &quot;fs.writeFileSync(p,&#39;\uFEFF&#39;+fs.readFileSync(p,&#39;utf8&#39;))&quot;</code> 即可补上）。检查器识别到 UTF-8→GBK 乱码特征字符（<code>锟斤拷</code>、U+FFFD 等）会直接报 R18；读取&#x2F;检查无 BOM 文件时也可用 <code>Get-Content -Encoding UTF8</code> 避免误读。</p>
+<h2 id="第三部分-·-外部命令与进程调用（调用层）"><a href="#第三部分-·-外部命令与进程调用（调用层）" class="headerlink" title="第三部分 · 外部命令与进程调用（调用层）"></a>第三部分 · 外部命令与进程调用（调用层）</h2><h2 id="3-1、Start-Process-ArgumentList-的引号与沙箱坑（R5）"><a href="#3-1、Start-Process-ArgumentList-的引号与沙箱坑（R5）" class="headerlink" title="3-1、Start-Process -ArgumentList 的引号与沙箱坑（R5）"></a>3-1、Start-Process -ArgumentList 的引号与沙箱坑（R5）</h2><ul>
+<li><code>-ArgumentList</code> 拼接时<strong>不会自动加引号</strong>，路径含空格会碎参数。</li>
+<li>后台任务里 <code>Start-Process curl</code> 下载的文件<strong>内容损坏</strong>（大小正确、字节全错），直接 <code>&amp; curl.exe</code> 则正常。能直接调用就别包一层。</li>
+</ul>
+<h2 id="3-2、Windows-上-npm-被-ExecutionPolicy-拦截（R10）"><a href="#3-2、Windows-上-npm-被-ExecutionPolicy-拦截（R10）" class="headerlink" title="3-2、Windows 上 npm 被 ExecutionPolicy 拦截（R10）"></a>3-2、Windows 上 <code>npm</code> 被 ExecutionPolicy 拦截（R10）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs powershell">npm run build   <span class="hljs-comment"># 报错: File C:\nvm4w\nodejs\npm.ps1 cannot be loaded because running scripts is disabled on this system</span><br></code></pre></td></tr></table></figure>
+
+<p>Windows 装 Node 后 PATH 里同时存在 <code>npm.ps1</code> 与 <code>npm.cmd</code>，PowerShell 优先解析到 <code>.ps1</code>，而默认执行策略禁止运行脚本。解法：<strong>显式调用 <code>npm.cmd</code></strong>（<code>npx.cmd</code>、<code>pnpm.cmd</code> 同理）：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs powershell">npm.cmd run build<br></code></pre></td></tr></table></figure>
+
+<h2 id="3-3、cmd-风格命令与-VAR-环境变量混入（R16）"><a href="#3-3、cmd-风格命令与-VAR-环境变量混入（R16）" class="headerlink" title="3-3、cmd 风格命令与 %VAR% 环境变量混入（R16）"></a>3-3、cmd 风格命令与 <code>%VAR%</code> 环境变量混入（R16）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-built_in">del</span> /f /q file.txt   <span class="hljs-comment"># cmd 风格：/f /q 会被当成参数，语义与 Remove-Item 不同</span><br>%PATH%               <span class="hljs-comment"># 在 PowerShell 里不会展开！要用 $env:PATH</span><br></code></pre></td></tr></table></figure>
+
+<p>AI 在 Windows 上经常混用 cmd 语法；裸 <code>del/copy/move/mkdir</code> 虽能命中别名，但参数语义不同，<code>%VAR%</code> 则完全不会展开。</p>
+<h2 id="3-4、微软-CDN-下载加速（R9，正向收获）"><a href="#3-4、微软-CDN-下载加速（R9，正向收获）" class="headerlink" title="3-4、微软 CDN 下载加速（R9，正向收获）"></a>3-4、微软 CDN 下载加速（R9，正向收获）</h2><ul>
+<li>单连接 1.5MB&#x2F;s → 实测 Range 请求单连接 15~20MB&#x2F;s、突发 71MB&#x2F;s。</li>
+<li>做法：HEAD 拿 <code>Content-Length</code> → 切成 N 段 → 并行 <code>curl -r start-end</code> → <code>cmd /c copy /b a+b+c out</code> 合并 → 校验总大小。</li>
+<li>注意 <code>curl -L</code> 与 <code>-C -</code> 组合在部分 CDN 上会拖慢速度，极简参数往往更快。</li>
+</ul>
+<h2 id="第四部分-·-Windows-组件与-DISM（系统层）"><a href="#第四部分-·-Windows-组件与-DISM（系统层）" class="headerlink" title="第四部分 · Windows 组件与 DISM（系统层）"></a>第四部分 · Windows 组件与 DISM（系统层）</h2><h2 id="4-1、Get-WindowsOptionalFeature-的-FeatureName-不支持数组（R6）"><a href="#4-1、Get-WindowsOptionalFeature-的-FeatureName-不支持数组（R6）" class="headerlink" title="4-1、Get-WindowsOptionalFeature 的 FeatureName 不支持数组（R6）"></a>4-1、Get-WindowsOptionalFeature 的 FeatureName 不支持数组（R6）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-built_in">Get-WindowsOptionalFeature</span> <span class="hljs-literal">-Online</span> <span class="hljs-literal">-FeatureName</span> A, B   <span class="hljs-comment"># 报错 Cannot convert &#x27;System.Object[]&#x27;</span><br><span class="hljs-keyword">foreach</span> (<span class="hljs-variable">$n</span> <span class="hljs-keyword">in</span> <span class="hljs-string">&quot;A&quot;</span>,<span class="hljs-string">&quot;B&quot;</span>) &#123; <span class="hljs-built_in">Get-WindowsOptionalFeature</span> <span class="hljs-literal">-Online</span> <span class="hljs-literal">-FeatureName</span> <span class="hljs-variable">$n</span> &#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="4-2、DISM-动词：-Dismount-Image-不存在（R7）"><a href="#4-2、DISM-动词：-Dismount-Image-不存在（R7）" class="headerlink" title="4-2、DISM 动词：&#x2F;Dismount-Image 不存在（R7）"></a>4-2、DISM 动词：&#x2F;Dismount-Image 不存在（R7）</h2><p>正确动词是 <strong><code>/Unmount-Image</code></strong>（<code>/Dismount-Image</code> 报 <code>错误: 87</code>），导致 wim 一直挂着占空间。</p>
+<h2 id="4-3、RestoreHealth-的源版本必须-≤-当前系统（R8）"><a href="#4-3、RestoreHealth-的源版本必须-≤-当前系统（R8）" class="headerlink" title="4-3、RestoreHealth 的源版本必须 ≤ 当前系统（R8）"></a>4-3、RestoreHealth 的源版本必须 ≤ 当前系统（R8）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell">dism /Online /Cleanup<span class="hljs-literal">-Image</span> /RestoreHealth /Source:WIM:install.wim:<span class="hljs-number">1</span><br><span class="hljs-comment"># 错误: 0x800f0915 找不到修复内容 —— 因为 wim 是 8037，系统是 7705，源比系统新</span><br></code></pre></td></tr></table></figure>
+
+<p>修复源要求<strong>同版本或更旧</strong>（或走 Windows Update）。</p>
+<h2 id="第五部分-·-数据与迭代（逻辑层）"><a href="#第五部分-·-数据与迭代（逻辑层）" class="headerlink" title="第五部分 · 数据与迭代（逻辑层）"></a>第五部分 · 数据与迭代（逻辑层）</h2><h2 id="5-1、ConvertTo-Json-未指定-Depth：JSON-被静默截断（R12）"><a href="#5-1、ConvertTo-Json-未指定-Depth：JSON-被静默截断（R12）" class="headerlink" title="5-1、ConvertTo-Json 未指定 -Depth：JSON 被静默截断（R12）"></a>5-1、ConvertTo-Json 未指定 -Depth：JSON 被静默截断（R12）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-variable">$data</span> | <span class="hljs-built_in">ConvertTo-Json</span>                <span class="hljs-comment"># 嵌套超过 2 层直接截断，结果静默损坏</span><br><span class="hljs-variable">$data</span> | <span class="hljs-built_in">ConvertTo-Json</span> <span class="hljs-literal">-Depth</span> <span class="hljs-number">100</span>     <span class="hljs-comment"># 显式指定深度</span><br></code></pre></td></tr></table></figure>
+
+<p>AI 生成的序列化代码几乎从不带 <code>-Depth</code>，而默认深度只有 2——深层对象被静默截断成 <code>&quot;...&quot;</code>，是「AI 输出 JSON 看起来不对」的头号原因。</p>
+<h2 id="5-2、foreach-循环里误用-（R13）"><a href="#5-2、foreach-循环里误用-（R13）" class="headerlink" title="5-2、foreach 循环里误用 $_（R13）"></a>5-2、foreach 循环里误用 <code>$_</code>（R13）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-keyword">foreach</span> (<span class="hljs-variable">$f</span> <span class="hljs-keyword">in</span> <span class="hljs-variable">$files</span>) &#123; <span class="hljs-built_in">Write-Output</span> <span class="hljs-variable">$_</span> &#125;   <span class="hljs-comment"># $_ 不是 $f！是外层管道的当前对象或 $null</span><br><span class="hljs-keyword">foreach</span> (<span class="hljs-variable">$f</span> <span class="hljs-keyword">in</span> <span class="hljs-variable">$files</span>) &#123; <span class="hljs-built_in">Write-Output</span> <span class="hljs-variable">$f</span> &#125;   <span class="hljs-comment"># 正确：用循环变量</span><br></code></pre></td></tr></table></figure>
+
+<p><code>$_</code> 是管道自动变量，只属于 <code>ForEach-Object { }</code> &#x2F; <code>Where-Object { }</code> 管道场景；<code>foreach</code> 语法循环里它是外层上下文（或空），AI 经常把两种迭代混着写。</p>
+<h2 id="5-3、Remove-Item-传文件系统对象：按当前目录解析（R19）"><a href="#5-3、Remove-Item-传文件系统对象：按当前目录解析（R19）" class="headerlink" title="5-3、Remove-Item 传文件系统对象：按当前目录解析（R19）"></a>5-3、Remove-Item 传文件系统对象：按当前目录解析（R19）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-variable">$items</span> = <span class="hljs-built_in">Get-ChildItem</span> <span class="hljs-variable">$target</span> <span class="hljs-literal">-Force</span> | <span class="hljs-built_in">Where-Object</span> &#123; <span class="hljs-variable">$keep</span> <span class="hljs-operator">-notcontains</span> <span class="hljs-variable">$_</span>.Name &#125;<br><span class="hljs-built_in">Remove-Item</span> <span class="hljs-literal">-Recurse</span> <span class="hljs-literal">-Force</span> <span class="hljs-variable">$items</span><br><span class="hljs-comment"># ↑ PS 5.1 把对象经 ToString() 转成 -Path：DirectoryInfo 只返回目录名（如 about），</span><br><span class="hljs-comment">#   相对当前目录解析 → Cannot find path &#x27;C:\&lt;当前目录&gt;\about&#x27;（文件对象同样中招）</span><br><span class="hljs-built_in">Remove-Item</span> <span class="hljs-literal">-Recurse</span> <span class="hljs-literal">-Force</span> <span class="hljs-literal">-Path</span> <span class="hljs-variable">$items</span>.FullName    <span class="hljs-comment"># 正确：显式完整路径</span><br><span class="hljs-built_in">Get-ChildItem</span> <span class="hljs-variable">$target</span> <span class="hljs-literal">-Force</span> | <span class="hljs-built_in">Remove-Item</span> <span class="hljs-literal">-Recurse</span> <span class="hljs-literal">-Force</span>  <span class="hljs-comment"># 或管道传参（按 PSPath 绑定）</span><br></code></pre></td></tr></table></figure>
+
+<p><code>Get-ChildItem</code> 拿到的对象直接塞给 <code>Remove-Item</code> 是 AI 最爱写的形态；在 PS 5.1 上会按当前目录重新解析，<code>DirectoryInfo.ToString()</code> 只返回名字，目录对象必炸。<strong>用 <code>-Path $items.FullName</code> 或管道传参</strong>，别把对象当位置参数。</p>
+<h2 id="第六部分-·-沉淀成检查插件：powershell-check"><a href="#第六部分-·-沉淀成检查插件：powershell-check" class="headerlink" title="第六部分 · 沉淀成检查插件：powershell-check"></a>第六部分 · 沉淀成检查插件：powershell-check</h2><p>这些坑如果只躺在文章里，下次还是会踩。我把它们提取成了一个<strong>检查插件</strong>：<code>powershell-check</code> —— 一个静态检查脚本 + 配套使用规范，位于博客仓库 <code>.dsh/skills/powershell-check/</code> 下。<strong>规则：一旦涉及 PowerShell 的执行（调用 pwsh、生成 .ps1、把命令嵌进脚本模板），先启动插件进行检查，FAIL 修复后再执行。</strong></p>
+<p>该插件已按 DeepSeek Harness 官方插件范式升级为独立仓库：<a target="_blank" rel="noopener" href="https://github.com/chaggle/dsh-powershell-check"><strong>dsh-powershell-check</strong></a> —— 原生 Cordis 插件，通过官方 <code>tools/pre-execute</code> 拦截点对每次 pwsh 调用<strong>自动</strong>检查并拦截（deny reason 即修复指引），同时以 <code>ctx.skills.registerProvider</code> 内置同名技能，无需每次手动启动；可配置 <code>analyzer: psscriptanalyzer</code> 叠加官方 PSScriptAnalyzer 深度检查。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs text"># 检查命令串<br>node .dsh/skills/powershell-check/scripts/check-pwsh.mjs -- &#x27;&lt;命令原文&gt;&#x27;<br><br># 检查 .ps1 脚本文件（无 BOM 的 UTF-8 文件建议加 -Encoding UTF8，避免 PS 5.1 按 ANSI 误读）<br>Get-Content fix.ps1 -Raw -Encoding UTF8 | node .dsh/skills/powershell-check/scripts/check-pwsh.mjs -<br><br># 插件自检（跑内置正反例）<br>node .dsh/skills/powershell-check/scripts/check-pwsh.mjs --selftest<br></code></pre></td></tr></table></figure>
+
+<h3 id="规则总表（R-→-章节）"><a href="#规则总表（R-→-章节）" class="headerlink" title="规则总表（R → 章节）"></a>规则总表（R → 章节）</h3><table>
+<thead>
+<tr>
+<th>规则</th>
+<th>级别</th>
+<th>坑位</th>
+<th>章节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>R1</td>
+<td>建议</td>
+<td>中文控制台 GBK 乱码</td>
+<td>2-3</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>阻断</td>
+<td><code>$var:</code> 驱动器限定解析</td>
+<td>1-1</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>阻断</td>
+<td>PS 5.1 三元运算符</td>
+<td>1-2</td>
+</tr>
+<tr>
+<td>R4</td>
+<td>阻断</td>
+<td>双引号 <code>$WINDOWS</code> 展开</td>
+<td>2-1</td>
+</tr>
+<tr>
+<td>R5</td>
+<td>阻断</td>
+<td>Start-Process 包装外部命令</td>
+<td>3-1</td>
+</tr>
+<tr>
+<td>R6</td>
+<td>阻断</td>
+<td>FeatureName 数组</td>
+<td>4-1</td>
+</tr>
+<tr>
+<td>R7</td>
+<td>阻断</td>
+<td>DISM 动词 &#x2F;Dismount-Image</td>
+<td>4-2</td>
+</tr>
+<tr>
+<td>R8</td>
+<td>阻断</td>
+<td>RestoreHealth 源版本</td>
+<td>4-3</td>
+</tr>
+<tr>
+<td>R9</td>
+<td>阻断</td>
+<td>curl -L 与 -C - 组合</td>
+<td>3-4</td>
+</tr>
+<tr>
+<td>R10</td>
+<td>阻断</td>
+<td>npm 不带 .cmd 后缀</td>
+<td>3-2</td>
+</tr>
+<tr>
+<td>R11</td>
+<td>阻断</td>
+<td><code>&amp;&amp;</code> &#x2F; &#96;</td>
+<td></td>
+</tr>
+<tr>
+<td>R12</td>
+<td>建议</td>
+<td>ConvertTo-Json -Depth</td>
+<td>5-1</td>
+</tr>
+<tr>
+<td>R13</td>
+<td>建议</td>
+<td>foreach 的 <code>$_</code></td>
+<td>5-2</td>
+</tr>
+<tr>
+<td>R14</td>
+<td>阻断</td>
+<td><code>=</code> 当比较</td>
+<td>1-4</td>
+</tr>
+<tr>
+<td>R15</td>
+<td>建议</td>
+<td>PS 7+ 专属语法</td>
+<td>1-5</td>
+</tr>
+<tr>
+<td>R16</td>
+<td>建议</td>
+<td>cmd 风格 &#x2F; %VAR%</td>
+<td>3-3</td>
+</tr>
+<tr>
+<td>R17</td>
+<td>建议</td>
+<td>Write-Host 不进管道</td>
+<td>2-4</td>
+</tr>
+<tr>
+<td>R18</td>
+<td>建议</td>
+<td>.ps1 无 BOM 中文乱码</td>
+<td>2-5</td>
+</tr>
+<tr>
+<td>R19</td>
+<td>建议</td>
+<td>Remove-Item 对象解析</td>
+<td>5-3</td>
+</tr>
+<tr>
+<td>写作侧</td>
+<td>—</td>
+<td>JS 模板转义</td>
+<td>2-2</td>
+</tr>
+</tbody></table>
+<p><strong>维护约定（长期生效）：每次 PowerShell 执行踩到新坑，先给检查器加规则（含 selftest 正反例）并跑通 –selftest，再同步补进本文与 SKILL.md，然后走一轮 commit + push + publish 部署，让知识库与工具保持同步。</strong></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/powershell/" class="category-chain-item">powershell</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/PowerShell/" class="print-no-link">#PowerShell</a>
+      
+        <a href="/tags/Windows/" class="print-no-link">#Windows</a>
+      
+        <a href="/tags/DISM/" class="print-no-link">#DISM</a>
+      
+        <a href="/tags/%E8%84%9A%E6%9C%AC/" class="print-no-link">#脚本</a>
+      
+        <a href="/tags/%E8%B8%A9%E5%9D%91/" class="print-no-link">#踩坑</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>PowerShell 实战踩坑大全：从 GBK 乱码到引号地狱的二十个真实案例</div>
+      <div>https://chaggle.github.io/2026/08/14/powershell/powershell-pitfalls/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月14日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年9月2日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/14/AI/blog-writing-standards/" title="博客写作与维护规范（项目常规操作）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">博客写作与维护规范（项目常规操作）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/14/windows/wsl2-restore-on-stripped-windows/" title="在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录">
+                        <span class="hidden-mobile">在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '99d0d2fda0338ccd35b151664ac462ec'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

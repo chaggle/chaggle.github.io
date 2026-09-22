@@ -1,0 +1,1170 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/08/middleware/zookeeper-20260809/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="本文从 Zookeeper 的数据模型、ZAB 协议、Leader 选举、会话机制出发，梳理分布式协调服务的底层原理，最后给出常见问题的排查思路。  概述Zookeeper 是 Apache 开源的分布式协调服务，用于解决分布式系统中的一致性、数据发布订阅、命名服务、分布式锁、集群管理等问题。              Zookeeper 的核心定位是”小数据的协调”，它存储的数据量很小（一般建">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zookeeper 底层原理与知识要点">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/08/middleware/zookeeper-20260809/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="本文从 Zookeeper 的数据模型、ZAB 协议、Leader 选举、会话机制出发，梳理分布式协调服务的底层原理，最后给出常见问题的排查思路。  概述Zookeeper 是 Apache 开源的分布式协调服务，用于解决分布式系统中的一致性、数据发布订阅、命名服务、分布式锁、集群管理等问题。              Zookeeper 的核心定位是”小数据的协调”，它存储的数据量很小（一般建">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-08T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T15:33:41.428Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="zookeeper">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Zookeeper 底层原理与知识要点 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Zookeeper 底层原理与知识要点"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-08 16:00" pubdate>
+          2026年8月8日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          51 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Zookeeper 底层原理与知识要点</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-10T23:33:41+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>本文从 Zookeeper 的数据模型、ZAB 协议、Leader 选举、会话机制出发，梳理分布式协调服务的底层原理，最后给出常见问题的排查思路。</p>
+</blockquote>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Zookeeper 是 Apache 开源的分布式协调服务，用于解决分布式系统中的<strong>一致性</strong>、<strong>数据发布订阅</strong>、<strong>命名服务</strong>、<strong>分布式锁</strong>、<strong>集群管理</strong>等问题。</p>
+<div class="note note-info">
+            <p>Zookeeper 的核心定位是”小数据的协调”，它存储的数据量很小（一般建议单节点不超过几 MB 到十几 MB），但要求极高的读性能和一致性。不要把 ZK 当数据库用。</p> 
+          </div>
+
+<p>它的典型使用者：Kafka（broker 元数据、Controller 选举、分区副本选主）、HBase（HMaster 选举、meta 表定位）、Dubbo（注册中心）、Eureka&#x2F;Consul 之外的分布式锁实现等。</p>
+<h2 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h2><h3 id="Znode-树形结构"><a href="#Znode-树形结构" class="headerlink" title="Znode 树形结构"></a>Znode 树形结构</h3><p>Zookeeper 的数据模型是一棵<strong>树</strong>，树的每个节点称为 <strong>Znode</strong>。每个 Znode 有唯一的路径，如 <code>/dubbo/service1/providers</code>。</p>
+<ul>
+<li>每个 Znode 可以存储数据（上限默认 1MB，建议小数据量）和挂载子节点</li>
+<li>路径以 <code>/</code> 开头，不允许嵌套 <code>/dubbo//x</code> 这样的写法</li>
+<li>每个 Znode 都有 stat 状态信息：版本号（version）、子节点版本（cversion）、ACL 版本（aversion）、时间戳（ctime&#x2F;mtime）、数据长度、ephemeralOwner 等</li>
+</ul>
+<p>Znode 按生命周期分为四类：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>说明</th>
+<th>应用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>持久节点（Persistent）</td>
+<td>创建后永久存在，除非显式删除</td>
+<td>配置数据、固定目录</td>
+</tr>
+<tr>
+<td>持久顺序节点（Persistent Sequential）</td>
+<td>创建时自动追加递增序号</td>
+<td>分布式队列</td>
+</tr>
+<tr>
+<td>临时节点（Ephemeral）</td>
+<td>会话结束自动删除</td>
+<td>注册中心、分布式锁</td>
+</tr>
+<tr>
+<td>临时顺序节点（Ephemeral Sequential）</td>
+<td>临时 + 顺序</td>
+<td>分布式锁核心</td>
+</tr>
+</tbody></table>
+<div class="note note-warning">
+            <p>临时节点不能有子节点，且它的生命周期与创建它的<strong>会话</strong>绑定：会话失效（不是连接断开），节点即被删除。这是 ZK 做服务注册发现时”宕机自动下线”的根基。</p> 
+          </div>
+
+<h3 id="版本号与乐观锁"><a href="#版本号与乐观锁" class="headerlink" title="版本号与乐观锁"></a>版本号与乐观锁</h3><p>每个 Znode 的 stat 中有 <code>dataVersion</code>（数据版本号），任何写操作都携带版本号：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 携带 version，实现 CAS 式更新</span><br>zk.setData(path, data, version);<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>传入的 version 与当前版本不一致时，抛出 <code>BadVersionException</code>，事务提交失败</li>
+<li>这是 ZK 实现分布式锁”防重入、防误删”的重要手段：删除锁节点时携带创建时读到的 version，避免删掉别人重入创建的节点</li>
+</ul>
+<h3 id="Watch-机制"><a href="#Watch-机制" class="headerlink" title="Watch 机制"></a>Watch 机制</h3><p>Watch（监听）是 ZK 的<strong>发布订阅</strong>实现：</p>
+<ul>
+<li>客户端对某个节点注册 watch：<code>getData(path, watch, ...)</code>、<code>getChildren(path, watch, ...)</code>、<code>exists(path, watch, ...)</code></li>
+<li>节点数据变化、子节点变化、节点删除时，服务端向注册了 watch 的客户端发送通知</li>
+<li>通知是<strong>一次性</strong>的：触发后即失效，需要客户端重新注册</li>
+</ul>
+<div class="note note-danger">
+            <p>Watch 通知只能保证”事件发生了”，不保证事件内容完整：<code>getData</code> 触发的通知里不含新数据，需要客户端再主动 <code>getData</code> 一次拿最新值。且 watch 在 session 过期时全部失效（不会触发 Watcher），回调线程执行过慢还可能触发 <code>Session moved</code> 相关异常。</p> 
+          </div>
+
+<div class="note note-warning">
+            <p>ZK 客户端发起 watch 注册与获得通知之间存在”窗口期”：注册请求没到达服务端之前事件已经发生，就会丢失。这就是常见的”watch 丢失”问题来源，通常通过读锁路径时先 <code>exists</code> 再 <code>getData</code> 之类的二次确认来缓解。</p> 
+          </div>
+
+<h2 id="一致性协议：ZAB"><a href="#一致性协议：ZAB" class="headerlink" title="一致性协议：ZAB"></a>一致性协议：ZAB</h2><p>ZAB（Zookeeper Atomic Broadcast）是 ZK 专属的一致性协议，全称”原子广播协议”。它只解决一个问题：<strong>保证所有副本上的数据变更以事务形式按序提交</strong>。</p>
+<p>ZAB 协议包含两大阶段：</p>
+<h3 id="阶段一：原子广播（正常运行）"><a href="#阶段一：原子广播（正常运行）" class="headerlink" title="阶段一：原子广播（正常运行）"></a>阶段一：原子广播（正常运行）</h3><p>写请求统一交给 Leader，Leader 执行两阶段提交的变体：</p>
+<ol>
+<li>客户端将写请求发给 Leader</li>
+<li>Leader 生成全局唯一的 <strong>ZXID</strong>（事务 id），把提案（Proposal）广播给所有 Follower</li>
+<li>Follower 将提案写入本地事务日志（sync 落盘），返回 ACK</li>
+<li>Leader 收到<strong>过半（法定人数 quorum）</strong> ACK 后提交该提案，并广播 commit 给 Follower</li>
+<li>Follower 应用 commit，返回客户端结果</li>
+</ol>
+<div class="note note-success">
+            <p>过半提交保证了任意两条事务不会在不同机器上以相反顺序被应用：因为任何过半集合必有交集。这就是 ZK 容忍少数节点故障（容忍 2 台挂 1 台）的理论依据。</p> 
+          </div>
+
+<h3 id="阶段二：崩溃恢复（Leader-故障）"><a href="#阶段二：崩溃恢复（Leader-故障）" class="headerlink" title="阶段二：崩溃恢复（Leader 故障）"></a>阶段二：崩溃恢复（Leader 故障）</h3><p>Leader 崩溃后，集群进入崩溃恢复阶段，选出新 Leader，并把旧 Leader 已经提交但未同步的事务通过**截断（truncate）<strong>或</strong>同步（sync）**对齐到新 Leader 的状态：</p>
+<ul>
+<li>新 Leader 必须是<strong>数据最新</strong>（ZXID 最大）的节点</li>
+<li>对落后节点：把超过新 Leader ZXID 的未提交事务截断丢弃</li>
+<li>对可能已经提交的事务：先同步补齐再对外服务</li>
+</ul>
+<div class="note note-info">
+            <p>ZAB 与 Paxos&#x2F;Raft 的异同：</p> <ul> <li>Paxos：没有 Leader 概念（Basic Paxos），通过两阶段 Prepare&#x2F;Accept 达成共识，ZK 的 ZAB 受 Paxos 启发但做了简化：固定 Leader、广播式提交</li> <li>Raft：同样基于 Leader + 日志复制 + 过半提交，但 Raft 有完整的”任期（term）”和随机超时选主；ZAB 的 ZXID 包含 epoch（朝代）+ 计数，等价于 term</li> <li>关键区别：Raft 的日志是”连续性”的（领导者尝试填平日志空洞），ZAB 直接截断多余日志；ZAB 是顺序提交、无日志空洞</li> </ul> 
+          </div>
+
+<h2 id="Leader-选举"><a href="#Leader-选举" class="headerlink" title="Leader 选举"></a>Leader 选举</h2><h3 id="选举算法：Fast-Leader-Election（FLE）"><a href="#选举算法：Fast-Leader-Election（FLE）" class="headerlink" title="选举算法：Fast Leader Election（FLE）"></a>选举算法：Fast Leader Election（FLE）</h3><p>ZK 3.4+ 默认使用 Fast Leader Election。选举触发时机：</p>
+<ul>
+<li>集群启动时</li>
+<li>Leader 崩溃 &#x2F; 失联（Follower 收不到 Leader 心跳）</li>
+<li>节点进入 LOOKING 状态</li>
+</ul>
+<h3 id="投票规则（比较规则）"><a href="#投票规则（比较规则）" class="headerlink" title="投票规则（比较规则）"></a>投票规则（比较规则）</h3><p>每张投票包含 <code>(myid, zxid, epoch)</code>，比较顺序是：</p>
+<ol>
+<li><strong>epoch（朝代）</strong> 大的优先 —— 新的选举周期</li>
+<li><strong>zxid（最新事务 id）</strong> 大的优先 —— 数据新的节点当 Leader</li>
+<li><strong>myid（节点编号）</strong> 大的优先 —— 数据相同时编号大的胜出</li>
+</ol>
+<div class="note note-success">
+            <p>“epoch 优先、zxid 优先、myid 兜底” 保证选出的 Leader 一定是<strong>数据最全</strong>的节点，避免数据回退；myid 兜底保证最终一定能收敛出唯一 Leader。</p> 
+          </div>
+
+<p>选举流程（以 3 节点为例，myid&#x3D;1,2,3）：</p>
+<ol>
+<li>所有节点进入 LOOKING，先投自己（myid, zxid, epoch）</li>
+<li>把投票广播给其他节点</li>
+<li>收到别人的投票后按规则 PK：如果别人”更大”就改投别人，并广播新票</li>
+<li>某节点发现自己的票被<strong>过半</strong>节点认可（包括自己），成为 Leader，其余节点成为 Follower</li>
+<li>Leader 与其他节点建立学习（sync）流程，对齐数据后进入正常广播阶段</li>
+</ol>
+<div class="note note-warning">
+            <p>脑裂场景：ZK 集群必须满足<strong>过半存活</strong>才能选出 Leader。例如 5 台集群，网络分区成 3+2，3 台那边能选出 Leader 继续服务；2 台那边永远无法过半，只能等待恢复。所以 ZK 集群建议奇数台（3、5、7），避免双 Leader。</p> 
+          </div>
+
+<h3 id="myid-zxid-的组成"><a href="#myid-zxid-的组成" class="headerlink" title="myid &#x2F; zxid 的组成"></a>myid &#x2F; zxid 的组成</h3><ul>
+<li><strong>myid</strong>：写在 <code>data/myid</code> 文件里的唯一编号，用于区分节点身份</li>
+<li><strong>zxid</strong>：64 位，高 32 位是 <strong>epoch</strong>（每次选举 +1），低 32 位是当前 epoch 内的事务序号。保证全局单调递增</li>
+<li><strong>epoch</strong> 在选举时互相 PK，只有 epoch 更大或相同才接受对方的投票</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 查看节点角色与状态</span><br>zkServer.sh status<br><span class="hljs-comment"># 输出：Mode: leader / follower</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="会话机制"><a href="#会话机制" class="headerlink" title="会话机制"></a>会话机制</h2><h3 id="Session-与超时"><a href="#Session-与超时" class="headerlink" title="Session 与超时"></a>Session 与超时</h3><ul>
+<li>客户端连接 ZK 建立会话，服务端分配 sessionId（64 位）与 sessionTimeout</li>
+<li>会话以<strong>心跳</strong>维持：客户端定期（sessionTimeout&#x2F;3 左右）发 ping，服务端过期扫描线程按 <code>sessionTimeout/2</code> 的粒度检查</li>
+<li>服务端判定会话超时后：删除该会话的所有临时节点，并广播事件</li>
+</ul>
+<h3 id="临时节点生命周期"><a href="#临时节点生命周期" class="headerlink" title="临时节点生命周期"></a>临时节点生命周期</h3><figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs clean">创建临时节点  -&gt;  会话存活  -&gt;  节点存在<br>              -&gt;  会话超时  -&gt;  节点被删除（与连接断开无关）<br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>关键区别：</p> <ul> <li><strong>连接断开</strong>：TCP 断了，但会话可能还在（超时时间内重连成功，节点还在）</li> <li><strong>会话超时</strong>：超过 sessionTimeout 没恢复心跳，节点永久删除</li> </ul> 
+          </div>
+
+<h3 id="重连与恢复"><a href="#重连与恢复" class="headerlink" title="重连与恢复"></a>重连与恢复</h3><ul>
+<li>客户端断开后，ZK Client 库会按 <code>connectTimeout</code> 重试，尽量重连到<strong>同一台</strong>服务端（会话仍有效）</li>
+<li>连接串配多个地址时，重连成功后如果 session 未过期，无需重新初始化，watch 保留；如果 session 已过期，客户端抛出 <code>SessionExpiredException</code>，应用需自行重建会话、重建 watch、重新注册临时节点</li>
+</ul>
+<div class="note note-warning">
+            <p>临时节点的”存活依赖”陷阱：如果应用进程还在，但 session 超时导致临时节点被删，ZK 不会自动帮你重建。服务注册场景必须捕获 <code>SessionExpiredException</code> 并重连重建，否则会出现”服务还活着、注册信息没了”的现象。</p> 
+          </div>
+
+<h2 id="典型应用"><a href="#典型应用" class="headerlink" title="典型应用"></a>典型应用</h2><h3 id="分布式锁（临时顺序节点-Watch）"><a href="#分布式锁（临时顺序节点-Watch）" class="headerlink" title="分布式锁（临时顺序节点 + Watch）"></a>分布式锁（临时顺序节点 + Watch）</h3><p>核心思路：</p>
+<ol>
+<li>加锁：在锁目录下创建<strong>临时顺序节点</strong>，如 <code>/locks/lock_0000000010</code></li>
+<li>判断自己是否是序号最小的节点：是则获得锁</li>
+<li>不是则注册 watch 监听<strong>前一个节点</strong>的删除事件，被唤醒后重新检查</li>
+<li>解锁：删除自己的节点（携带 version 防误删），会话异常则临时节点自动清理</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 伪代码：加锁流程</span><br><span class="hljs-type">String</span> <span class="hljs-variable">path</span> <span class="hljs-operator">=</span> zk.create(<span class="hljs-string">&quot;/locks/lock-&quot;</span>, data, EPHEMERAL_SEQUENTIAL);<br>List&lt;String&gt; children = zk.getChildren(<span class="hljs-string">&quot;/locks&quot;</span>, <span class="hljs-literal">false</span>);<br><span class="hljs-type">String</span> <span class="hljs-variable">lockId</span> <span class="hljs-operator">=</span> path.substring(path.lastIndexOf(<span class="hljs-string">&quot;/&quot;</span>) + <span class="hljs-number">1</span>);<br><span class="hljs-type">int</span> <span class="hljs-variable">mySeq</span> <span class="hljs-operator">=</span> getSeq(lockId);<br><span class="hljs-type">String</span> <span class="hljs-variable">prev</span> <span class="hljs-operator">=</span> findPrevSmaller(mySeq);   <span class="hljs-comment">// 找序号比自己小的最近节点</span><br><span class="hljs-keyword">if</span> (prev == <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-keyword">return</span> 获得锁;<br>&#125;<br>zk.exists(prev, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Watcher</span>() &#123;        <span class="hljs-comment">// watch 前一个节点</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">process</span><span class="hljs-params">(WatchedEvent e)</span> &#123;<br>        <span class="hljs-keyword">if</span> (e.getType() == NodeDeleted) &#123;<br>            <span class="hljs-comment">// 唤醒抢锁线程，重新走判断流程</span><br>        &#125;<br>    &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<div class="note note-success">
+            <p>与 Redis 锁相比，ZK 锁的优点是”天然防死锁”（会话超时自动释放临时节点）、有事件通知不用自旋轮询；缺点是性能差（每次加锁多次 RTT）、依赖 ZK 集群。</p> 
+          </div>
+
+<h3 id="服务注册发现"><a href="#服务注册发现" class="headerlink" title="服务注册发现"></a>服务注册发现</h3><ul>
+<li>服务提供者启动时在 <code>/services/&#123;service&#125;/providers/&#123;ip:port&#125;</code> 下创建<strong>临时节点</strong>，注册 URL 元数据</li>
+<li>消费者 watch 该服务目录的 <code>getChildren</code>，节点变化（上线&#x2F;下线）实时感知</li>
+<li>提供者宕机 → 会话超时 → 临时节点删除 → 消费者 watch 触发 → 剔除实例</li>
+</ul>
+<h3 id="分布式队列"><a href="#分布式队列" class="headerlink" title="分布式队列"></a>分布式队列</h3><ul>
+<li>FIFO 队列：用持久顺序节点，出队时取序号最小节点（类似分布式锁反向）</li>
+<li>屏障（Barrier）：先注册一个 ready 节点，参与者全部就绪才删除它，实现多节点同步</li>
+</ul>
+<h3 id="大数据组件的协调器"><a href="#大数据组件的协调器" class="headerlink" title="大数据组件的协调器"></a>大数据组件的协调器</h3><ul>
+<li><strong>Kafka</strong>：broker 注册、Controller 选举（谁先抢到临时节点谁是 Controller）、分区 leader 选举、ISR 元数据存储</li>
+<li><strong>HBase</strong>：HMaster 抢注临时节点选举、meta 表位置记录、RegionServer 在线状态上报</li>
+<li><strong>HDFS</strong>（旧版）：NameNode 双机热备的 Active&#x2F;Standby 选举</li>
+</ul>
+<h2 id="常规问题排查"><a href="#常规问题排查" class="headerlink" title="常规问题排查"></a>常规问题排查</h2><h3 id="1-集群脑裂-无法选主"><a href="#1-集群脑裂-无法选主" class="headerlink" title="1. 集群脑裂 &#x2F; 无法选主"></a>1. 集群脑裂 &#x2F; 无法选主</h3><ul>
+<li>检查各节点 <code>zkServer.sh status</code>，是否处于 LOOKING 状态</li>
+<li>网络分区：确认节点之间 2888&#x2F;3888 端口互通，防火墙是否误拦</li>
+<li>集群必须<strong>过半</strong>存活才能选主，<code>server.1=...</code> 配置中节点总数是否与实际一致</li>
+<li>检查 <code>data/myid</code> 是否与配置文件对应、事务日志目录是否可写</li>
+</ul>
+<div class="note note-danger">
+            <p>「无法选主」最常见原因：集群配置里写了 5 台但实际只起了 2 台，永远无法过半；或者磁盘满了事务日志写不进去。</p> 
+          </div>
+
+<h3 id="2-session-过期导致临时节点丢失"><a href="#2-session-过期导致临时节点丢失" class="headerlink" title="2. session 过期导致临时节点丢失"></a>2. session 过期导致临时节点丢失</h3><ul>
+<li>现象：客户端未重启，但注册中心里的临时节点消失了</li>
+<li>排查：查看日志 <code>Session 0x... expired</code>；调大客户端 <code>sessionTimeout</code> 配置（同时服务端需在 <code>maxSessionTimeout</code> 范围内）</li>
+<li>应用层必须监听 <code>SessionExpiredException</code> 做重建逻辑</li>
+</ul>
+<h3 id="3-watch-通知丢失"><a href="#3-watch-通知丢失" class="headerlink" title="3. watch 通知丢失"></a>3. watch 通知丢失</h3><ul>
+<li>原因：watch 一次性 + 注册与事件之间的窗口期</li>
+<li>排查：检查是否在事件回调里重新注册了 watch；不要在回调里做耗时操作（长时间占用 watcher 线程会触发 <code>Session moved</code>&#x2F;<code>Watcher</code> 抛错）</li>
+<li>缓解：先 <code>exists</code> 再 <code>getData</code> 二次确认；业务上以”主动拉取 + watch 兜底”双保险</li>
+</ul>
+<h3 id="4-读写性能瓶颈"><a href="#4-读写性能瓶颈" class="headerlink" title="4. 读写性能瓶颈"></a>4. 读写性能瓶颈</h3><ul>
+<li>ZK 读性能远好于写：写必须过 Leader 且落盘 + 过半 ACK</li>
+<li>客户端连接全部打到 Leader 导致写放大：使用 observer 节点分担读压力（observer 不参与投票）</li>
+<li>单机吞吐提升：将事务日志放在独立磁盘（SSD），与数据快照分离</li>
+</ul>
+<h3 id="5-连接数限制"><a href="#5-连接数限制" class="headerlink" title="5. 连接数限制"></a>5. 连接数限制</h3><ul>
+<li>服务端默认连接数上限 <code>maxClientCnxns</code>（默认 60），连接池&#x2F;多客户端场景容易触发 <code>Connection refused</code> 或 <code>Too many connections</code></li>
+<li>调大配置并重启，或应用侧复用连接池</li>
+</ul>
+<h3 id="6-慢操作：sync-阻塞"><a href="#6-慢操作：sync-阻塞" class="headerlink" title="6. 慢操作：sync 阻塞"></a>6. 慢操作：sync 阻塞</h3><ul>
+<li>写操作必须等待事务日志 fsync 落盘，磁盘 IO 慢 → 写延迟飙高</li>
+<li>现象：<code>sync 耗时高</code>、事务日志增长慢、客户端大量超时</li>
+<li>排查：<code>iostat</code> 看磁盘；保证 <code>/data/version-2</code> 下的 <code>log.*</code> 文件所在盘性能</li>
+<li>配置 <code>fsync.windowsize</code> 批量刷盘可缓解部分压力（牺牲少量可靠性换取吞吐）</li>
+</ul>
+<h3 id="7-磁盘事务日志管理"><a href="#7-磁盘事务日志管理" class="headerlink" title="7. 磁盘事务日志管理"></a>7. 磁盘事务日志管理</h3><ul>
+<li>事务日志默认无限制增长，老日志可通过 <code>autopurge.snapRetainCount</code> + <code>autopurge.purgeInterval</code> 自动清理</li>
+<li>快照（snapshot）与事务日志（log）分别存储；恢复时先加载快照再重放 log</li>
+<li>磁盘写满后 ZK 会停止接受写入，表现为 “Unable to write to transaction log”</li>
+</ul>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ul>
+<li>数据模型上记住”树 + Znode 四种类型 + 版本号 + 一次性 Watch”</li>
+<li>一致性上记住”ZAB &#x3D; 原子广播 + 崩溃恢复，过半提交”</li>
+<li>选举上记住”epoch &gt; zxid &gt; myid”的 PK 规则</li>
+<li>会话上记住”临时节点跟随会话生命周期，超时即删”</li>
+<li>面试&#x2F;实践最关键的一句话：<strong>ZK 适合做协调和小数据强一致，不适合当数据库和无限扩容的注册中心</strong></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/zookeeper/" class="print-no-link">#zookeeper</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Zookeeper 底层原理与知识要点</div>
+      <div>https://chaggle.github.io/2026/08/08/middleware/zookeeper-20260809/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月8日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/08/middleware/rocketmq-20260809/" title="RocketMQ 底层原理与知识要点">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">RocketMQ 底层原理与知识要点</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/08/summary/ai-agent-concepts-20260809/" title="AI Agent 知识概念总结">
+                        <span class="hidden-mobile">AI Agent 知识概念总结</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'ed235333eb77284512291a7f8c7c7fa2'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,1095 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/08/middleware/rocketmq-20260809/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="本文是我学习 RocketMQ 时整理的笔记，围绕四大组件、存储与高可用架构、消息模型，以及线上常见的堆积、丢失、顺序与事务问题展开，适合面试复习和日常排查参考。  核心架构RocketMQ 集群由四大组件构成：  NameServer：轻量级路由中心，维护 Topic 与 Broker 的路由信息，Broker 启动时注册、断开时剔除，不存储消息数据，无状态，可多台部署互为冗余。 Broker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RocketMQ 底层原理与知识要点">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/08/middleware/rocketmq-20260809/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="本文是我学习 RocketMQ 时整理的笔记，围绕四大组件、存储与高可用架构、消息模型，以及线上常见的堆积、丢失、顺序与事务问题展开，适合面试复习和日常排查参考。  核心架构RocketMQ 集群由四大组件构成：  NameServer：轻量级路由中心，维护 Topic 与 Broker 的路由信息，Broker 启动时注册、断开时剔除，不存储消息数据，无状态，可多台部署互为冗余。 Broker">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-08T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T15:33:41.427Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="rocketmq">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>RocketMQ 底层原理与知识要点 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="RocketMQ 底层原理与知识要点"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-08 16:00" pubdate>
+          2026年8月8日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          42 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">RocketMQ 底层原理与知识要点</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-10T23:33:41+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>本文是我学习 RocketMQ 时整理的笔记，围绕四大组件、存储与高可用架构、消息模型，以及线上常见的堆积、丢失、顺序与事务问题展开，适合面试复习和日常排查参考。</p>
+</blockquote>
+<h2 id="核心架构"><a href="#核心架构" class="headerlink" title="核心架构"></a>核心架构</h2><p>RocketMQ 集群由四大组件构成：</p>
+<ul>
+<li><strong>NameServer</strong>：轻量级路由中心，维护 Topic 与 Broker 的路由信息，Broker 启动时注册、断开时剔除，不存储消息数据，<strong>无状态</strong>，可多台部署互为冗余。</li>
+<li><strong>Broker</strong>：消息存储与转发节点，负责接收生产者消息、落盘、向消费者推送&#x2F;拉取消息，每个 Broker 保存全部 Topic 的部分队列数据。多 Broker 组成主从结构。</li>
+<li><strong>Producer</strong>：消息生产者，从 NameServer 拉取路由信息后选择队列发送，支持失败重试、延迟消息、事务消息。</li>
+<li><strong>Consumer</strong>：消息消费者，分为 Push 与 Pull 两种模式，从 Broker 拉取消息消费。</li>
+</ul>
+<h3 id="路由注册与心跳机制"><a href="#路由注册与心跳机制" class="headerlink" title="路由注册与心跳机制"></a>路由注册与心跳机制</h3><ul>
+<li>Broker 启动后<strong>每 30 秒</strong>向所有 NameServer 发送心跳（注册自身信息与 Topic 路由表），NameServer 若 <strong>10 秒</strong>收不到心跳，则将该 Broker 标记为不可用。</li>
+<li>Producer &#x2F; Consumer 在发送&#x2F;消费前先向 NameServer 拉取路由（默认每 30 秒定时更新），因此 <strong>NameServer 与客户端之间的路由不是实时的</strong>，Broker 宕机后客户端最多需要 30 秒左右感知。</li>
+</ul>
+<div class="note note-info">
+            <p>NameServer 之间互不通信，各自独立保存全量路由，Broker 向所有 NameServer 同时注册，保证单台 NameServer 故障不影响集群路由发现。</p> 
+          </div>
+
+<h2 id="存储原理"><a href="#存储原理" class="headerlink" title="存储原理"></a>存储原理</h2><h3 id="CommitLog"><a href="#CommitLog" class="headerlink" title="CommitLog"></a>CommitLog</h3><ul>
+<li>所有 Topic 的消息<strong>共享写入一个文件</strong>：<code>CommitLog</code>，按顺序追加，文件默认 1GB（<code>mapedFileSizeCommitLog</code>），写满后新建文件，文件名即起始物理偏移量。</li>
+<li>顺序写 + 内存映射（mmap）是 RocketMQ 高吞吐的基础：所有消息统一进 CommitLog，彻底避免了多 Topic 各自随机写文件带来的性能损耗。</li>
+</ul>
+<div class="note note-success">
+            <p>“所有消息写一个文件”是 RocketMQ 与 Kafka（按分区文件）最大的存储差异：RocketMQ 牺牲了一点查询灵活性，换取了极致的顺序写性能与极低的文件数。</p> 
+          </div>
+
+<h3 id="ConsumeQueue"><a href="#ConsumeQueue" class="headerlink" title="ConsumeQueue"></a>ConsumeQueue</h3><ul>
+<li>每个 Topic 的每个 Queue 对应一组 <code>ConsumeQueue</code> 文件，记录<strong>消息在 CommitLog 中的偏移量、长度、tag hash</strong> 等索引信息，按顺序递增。</li>
+<li>消费时先查 ConsumeQueue 拿到物理偏移，再去 CommitLog 读取真实消息，实现”索引与数据分离”。</li>
+</ul>
+<h3 id="IndexFile"><a href="#IndexFile" class="headerlink" title="IndexFile"></a>IndexFile</h3><ul>
+<li>按 key 或统一时间戳查询消息时使用 <code>IndexFile</code>（哈希索引），支持”按 key 精确查”与”按时间范围查”，主要用于业务排查与运维工具（如 <code>mqadmin queryMsgByKey</code>）。</li>
+</ul>
+<h3 id="页缓存与-mmap"><a href="#页缓存与-mmap" class="headerlink" title="页缓存与 mmap"></a>页缓存与 mmap</h3><ul>
+<li>Broker 写入与读取都基于 <code>FileChannel</code> + <code>mmap</code>（MappedByteBuffer）读写，数据先进入<strong>页缓存（Page Cache）</strong>，由操作系统统一管理刷盘，命中缓存时读写极快。</li>
+<li>读取路径：先读 ConsumeQueue 索引（常驻页缓存），再读 CommitLog 数据，两者都尽量命中页缓存。</li>
+</ul>
+<h3 id="消息刷盘策略"><a href="#消息刷盘策略" class="headerlink" title="消息刷盘策略"></a>消息刷盘策略</h3><ul>
+<li><strong>同步刷盘（SYNC_FLUSH）</strong>：消息写入 CommitLog 并成功落盘后，才向生产者返回写入成功，可靠性最高，但吞吐下降。</li>
+<li><strong>异步刷盘（ASYNC_FLUSH）</strong>：写入页缓存即返回，由后台线程批量刷盘，吞吐高，机器断电可能丢少量消息（默认配置）。</li>
+</ul>
+<div class="note note-warning">
+            <p>同步&#x2F;异步刷盘关注的是”Broker 本地不丢”，与主从复制关注点不同；生产环境单机数据可靠性要求高时用同步刷盘，重吞吐场景用异步刷盘 + 主从同步复制组合。</p> 
+          </div>
+
+<h2 id="消息模型"><a href="#消息模型" class="headerlink" title="消息模型"></a>消息模型</h2><h3 id="Topic-与-Queue"><a href="#Topic-与-Queue" class="headerlink" title="Topic 与 Queue"></a>Topic 与 Queue</h3><ul>
+<li><strong>Topic</strong>：业务逻辑上的消息类别，一个 Topic 可以分布在多个 Broker 上。</li>
+<li><strong>Queue（队列）</strong>：Topic 的物理切分单元，每个 Broker 上每个 Topic 默认 4 个队列（<code>defaultTopicQueueNums</code>），队列是消息顺序的最小保证单位，也是消费并行度的来源。</li>
+</ul>
+<h3 id="消费模式"><a href="#消费模式" class="headerlink" title="消费模式"></a>消费模式</h3><ul>
+<li><strong>集群消费（Clustering）</strong>：同一消费组内各消费者分摊队列，一条消息只被组内一个消费者消费（默认）。</li>
+<li><strong>广播消费（Broadcasting）</strong>：组内每个消费者都消费全部消息，适合”每台机器都要收到”的场景，如本地缓存刷新。</li>
+</ul>
+<h3 id="消费组与负载均衡"><a href="#消费组与负载均衡" class="headerlink" title="消费组与负载均衡"></a>消费组与负载均衡</h3><ul>
+<li>同一消费组共享消费进度（offset 存在 Broker），Rebalance 时按”消费者数 : 队列数”平均分配队列，消费者数超过队列数则部分消费者空闲。</li>
+<li>消费组内消费者故障或新消费者加入时，会触发 Rebalance 重新分配队列。</li>
+</ul>
+<div class="note note-info">
+            <p>Rebalance 造成队列从消费者 A 迁移到 B 时，B 从”存储的 offset”继续消费，因此可能出现重复消费；消费者数量建议与队列总数成倍数关系，避免分配不均。</p> 
+          </div>
+
+<h3 id="顺序消息"><a href="#顺序消息" class="headerlink" title="顺序消息"></a>顺序消息</h3><ul>
+<li><strong>局部有序</strong>：把需要有序的消息通过选择队列算法（如 MessageQueueSelector 按订单 ID 哈希）送入<strong>同一个队列</strong>，该队列单线程顺序消费，即保证队列内严格有序。</li>
+<li><strong>全局有序</strong>：一个 Topic 只有一个队列，吞吐受限，非必须不采用。</li>
+<li>消费端需避免并发&#x2F;重试导致的乱序：用 MessageListenerOrderly（顺序消费会加锁并严格串行处理）。</li>
+</ul>
+<h3 id="事务消息（半消息-回查）"><a href="#事务消息（半消息-回查）" class="headerlink" title="事务消息（半消息 + 回查）"></a>事务消息（半消息 + 回查）</h3><p>事务消息流程（两阶段）：</p>
+<ol>
+<li>Producer 发送<strong>半消息（half message）</strong>，Broker 暂存，消费者不可见。</li>
+<li>执行本地事务，成功则提交事务消息，失败则回滚。</li>
+<li>若本地事务结果未上报（网络异常等），Broker 定时<strong>回查</strong>（check）Producer 的本地事务状态，Producer 实现 <code>TransactionListener#checkLocalTransaction</code> 返回提交&#x2F;回滚。</li>
+</ol>
+<div class="note note-danger">
+            <p>事务消息解决的是”本地数据库操作与发消息”的一致性问题，但需要业务实现<strong>本地事务表或日志</strong>来支撑回查，否则回查时无法判断业务是否成功，可能造成消息最终状态不确定。</p> 
+          </div>
+
+<h3 id="延迟消息"><a href="#延迟消息" class="headerlink" title="延迟消息"></a>延迟消息</h3><ul>
+<li>内置 18 个延迟级别（<code>messageDelayLevel</code>：1s&#x2F;5s&#x2F;10s&#x2F;30s&#x2F;1m&#x2F;2m&#x2F;3m&#x2F;4m&#x2F;5m&#x2F;6m&#x2F;7m&#x2F;8m&#x2F;9m&#x2F;10m&#x2F;20m&#x2F;30m&#x2F;1h&#x2F;2h），<code>setDelayTimeLevel(3)</code> 即延迟 10 秒。</li>
+<li>实现原理：延迟消息写入<strong>专门的延迟队列（SCHEDULE_TOPIC_XXXX）</strong>，定时任务扫描到期后重新投递到真实 Topic，到期时间只精确到秒级。</li>
+<li>支持自定义时间（5.x 新增）需配置时间跨度较大的 level，或使用定时消息（基于时间轮实现）。</li>
+</ul>
+<h2 id="高可用"><a href="#高可用" class="headerlink" title="高可用"></a>高可用</h2><h3 id="Broker-主从结构"><a href="#Broker-主从结构" class="headerlink" title="Broker 主从结构"></a>Broker 主从结构</h3><ul>
+<li>每个 Broker 分为 Master 与 Slave（可 1 主多从），同一 Broker 组的 Master&#x2F;Slave 数据同步有<strong>同步复制</strong>与<strong>异步复制</strong>两种：<ul>
+<li><strong>同步复制（SYNC_MASTER）</strong>：主从都写入成功才返回，可靠性高，可用性略降（从挂掉会导致主不可用），Broker 主从切换后数据不丢。</li>
+<li><strong>异步复制（ASYNC_MASTER）</strong>：主写入成功即返回，主挂掉时可能丢少量消息，但可用性好。</li>
+</ul>
+</li>
+<li>主从切换：传统模式下需要运维介入切换（更新 namesrv 路由、重启）；5.x 引入 <strong>Controller 模式</strong>（基于 DLedger&#x2F;Raft 的自动切换）可实现自动选主。</li>
+</ul>
+<div class="note note-success">
+            <p>Broker 故障自动恢复优先级：同一 Broker 组内 Slave 可接管读请求（消费端优先读 Slave），Master 宕机后由 Controller（或运维）将 Slave 提升为 Master。</p> 
+          </div>
+
+<h3 id="NameServer-高可用"><a href="#NameServer-高可用" class="headerlink" title="NameServer 高可用"></a>NameServer 高可用</h3><ul>
+<li>NameServer 完全无状态，多台独立部署即高可用，Broker 向所有 NameServer 注册，客户端随机选一台即可获得全量路由。</li>
+</ul>
+<div class="note note-info">
+            <p>RocketMQ 的”高可用”依赖三层：NameServer 无状态多活（路由层）、Broker 主从复制（数据层）、消息消费的 offset 持久化（进度层），三层各自独立设计，故障面被隔离。</p> 
+          </div>
+
+<h2 id="常规问题排查"><a href="#常规问题排查" class="headerlink" title="常规问题排查"></a>常规问题排查</h2><h3 id="消息堆积"><a href="#消息堆积" class="headerlink" title="消息堆积"></a>消息堆积</h3><ul>
+<li>用控制台或 <code>mqadmin consumerProgress -g group</code> 查看消费进度与堆积量。</li>
+<li>堆积原因：消费能力不足（并发线程数小、单条处理慢）、消费者宕机、Rebalance 后队列分配不均、Broker 读性能下降。</li>
+<li>处理：提高消费线程数、优化单条处理耗时、扩容消费者（注意队列数限制）、短期可临时增加队列并扩消费者，快速止血。</li>
+</ul>
+<h3 id="消息丢失"><a href="#消息丢失" class="headerlink" title="消息丢失"></a>消息丢失</h3><p>排查点（按可靠性层级）：</p>
+<ul>
+<li>Producer 发送失败：<code>retryTimesWhenSendFailed</code> 默认 2 次，确认是否重试足够。</li>
+<li>Broker 刷盘策略：异步刷盘 + 机器断电会丢数据，关键业务改同步刷盘。</li>
+<li>主从复制：异步复制下主挂会丢，改同步复制（SYNC_MASTER）。</li>
+<li>消费端：消费失败且重试耗尽会进入死信队列，若 DLQ 无人处理等于”逻辑丢失”。</li>
+</ul>
+<h3 id="重复消费"><a href="#重复消费" class="headerlink" title="重复消费"></a>重复消费</h3><p>重复消费不可避免（至少一次语义），常见原因与对策：</p>
+<ul>
+<li>消费成功但提交 offset 失败（客户端宕机&#x2F;网络闪断）后重新消费。</li>
+<li>Rebalance 迁移队列导致重复。</li>
+<li>对策：消费逻辑幂等（唯一键去重、数据库主键防重、Redis setnx 去重）。</li>
+</ul>
+<h3 id="顺序错乱"><a href="#顺序错乱" class="headerlink" title="顺序错乱"></a>顺序错乱</h3><ul>
+<li>原因 1：业务未保证同一业务键进同一队列（未用 MessageQueueSelector）。</li>
+<li>原因 2：使用了并发消费（MessageListenerConcurrently）。</li>
+<li>原因 3：消费失败重试时跳过失败消息继续消费后续消息。</li>
+<li>对策：selector 选队列 + MessageListenerOrderly 顺序消费；重试需暂停后续消费或把失败消息转死信由专门消费者处理。</li>
+</ul>
+<h3 id="事务消息不回查-卡在半提交"><a href="#事务消息不回查-卡在半提交" class="headerlink" title="事务消息不回查 &#x2F; 卡在半提交"></a>事务消息不回查 &#x2F; 卡在半提交</h3><ul>
+<li>确认 Producer 实现并注册了 <code>TransactionListener</code>。</li>
+<li>回查间隔与次数有限（默认回查 15 次），回查失败会丢弃半消息，需在业务侧查”本地事务表”核对。</li>
+<li>排查：<code>mqadmin queryMsgById</code> 查看半消息状态（Commit&#x2F;ROLLBACK），配合监控半消息数量指标。</li>
+</ul>
+<h3 id="Broker-内存-磁盘告警"><a href="#Broker-内存-磁盘告警" class="headerlink" title="Broker 内存 &#x2F; 磁盘告警"></a>Broker 内存 &#x2F; 磁盘告警</h3><ul>
+<li>磁盘：CommitLog 与 ConsumeQueue 按保留时间（<code>fileReservedTime</code>，默认 72 小时）清理；磁盘写满会导致 broker 停写，关注磁盘使用率告警并合理设置清理策略。</li>
+<li>内存：页缓存占用高是正常现象（RocketMQ 依赖页缓存），主要监控 JVM 堆内存与 GC；大量瞬时消息可能造成内存页缓存压力大，注意 <code>maxMessageSize</code> 与流量规划。</li>
+<li>CPU 高：关注是否发送了大消息、消费端频繁 GC、刷盘线程打满。</li>
+</ul>
+<h3 id="消费重试与死信队列（DLQ）"><a href="#消费重试与死信队列（DLQ）" class="headerlink" title="消费重试与死信队列（DLQ）"></a>消费重试与死信队列（DLQ）</h3><ul>
+<li>消费失败默认<strong>重试 16 次</strong>，间隔按 <code>%RETRY%</code> 队列的延迟等级递增（10s → 5min 逐级增加）。</li>
+<li>重试耗尽后消息转入<strong>死信队列 <code>%DLQ%消费组名</code></strong>，DLQ 默认只读，需要人工（或运维脚本）消费恢复。</li>
+</ul>
+<div class="note note-warning">
+            <p>DLQ 是”最后一道防线”，必须配置告警与人工处理流程，否则消息静默丢失；恢复时注意按消息头里的原 Topic 信息重新投递并处理幂等。</p> 
+          </div>
+
+<h3 id="常用排查命令"><a href="#常用排查命令" class="headerlink" title="常用排查命令"></a>常用排查命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 查看消费进度与堆积</span><br>mqadmin consumerProgress -g &lt;group&gt; -n &lt;namesrvAddr&gt;<br><br><span class="hljs-comment"># 查看 Topic 路由与队列分布</span><br>mqadmin topicRoute -t &lt;topic&gt;<br><br><span class="hljs-comment"># 按 key 查询消息</span><br>mqadmin queryMsgByKey -t &lt;topic&gt; -k &lt;key&gt;<br><br><span class="hljs-comment"># 查看 broker 运行状态与连接数</span><br>mqadmin brokerStatus -b &lt;brokerAddr&gt;<br><br><span class="hljs-comment"># 查看/修改延迟级别配置</span><br>mqadmin updateBrokerConfig -b &lt;brokerAddr&gt; -c messageDelayLevel<br></code></pre></td></tr></table></figure>
+
+<div class="note note-success">
+            <p>RocketMQ 排障思路总结：先看生产端（发送是否成功）→ 再查存储端（刷盘&#x2F;复制&#x2F;磁盘）→ 后看消费端（重试、DLQ、堆积），结合消息轨迹（5.x 支持全链路轨迹）可以快速定位每一跳的问题。</p> 
+          </div>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/rocketmq/" class="print-no-link">#rocketmq</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>RocketMQ 底层原理与知识要点</div>
+      <div>https://chaggle.github.io/2026/08/08/middleware/rocketmq-20260809/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月8日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/08/middleware/redis-20260809/" title="Redis 底层原理与知识要点">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis 底层原理与知识要点</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/08/middleware/zookeeper-20260809/" title="Zookeeper 底层原理与知识要点">
+                        <span class="hidden-mobile">Zookeeper 底层原理与知识要点</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '1ac18110f973dfac7ad83a6b01b564ef'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

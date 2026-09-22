@@ -1,0 +1,1091 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/10/cpp/stl-containers-20260811/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="2020-2021 年算法刷题时期学习的 C++ STL 容器笔记（map、priority_queue&#x2F;multiset、unordered_map、unordered_set）合并整理。除了 bitset、priority_queue（堆）以及 AVL（平衡树相关）之外，其他的都可以进行短时间的手撕代码实现，但熟悉容器用法依然是刷题效率的基础。  map（有序映射）map 简介ma">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ STL 容器学习笔记">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/10/cpp/stl-containers-20260811/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="2020-2021 年算法刷题时期学习的 C++ STL 容器笔记（map、priority_queue&#x2F;multiset、unordered_map、unordered_set）合并整理。除了 bitset、priority_queue（堆）以及 AVL（平衡树相关）之外，其他的都可以进行短时间的手撕代码实现，但熟悉容器用法依然是刷题效率的基础。  map（有序映射）map 简介ma">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-10T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T16:07:51.746Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="C++">
+<meta property="article:tag" content="STL">
+<meta property="article:tag" content="map">
+<meta property="article:tag" content="priority_queue">
+<meta property="article:tag" content="set">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>C++ STL 容器学习笔记 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="C++ STL 容器学习笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-10 16:00" pubdate>
+          2026年8月10日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          14k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          117 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">C++ STL 容器学习笔记</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-11T00:07:51+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>2020-2021 年算法刷题时期学习的 C++ STL 容器笔记（map、priority_queue&#x2F;multiset、unordered_map、unordered_set）合并整理。除了 bitset、priority_queue（堆）以及 AVL（平衡树相关）之外，其他的都可以进行短时间的手撕代码实现，但熟悉容器用法依然是刷题效率的基础。</p>
+</blockquote>
+<h2 id="map（有序映射）"><a href="#map（有序映射）" class="headerlink" title="map（有序映射）"></a>map（有序映射）</h2><h3 id="map-简介"><a href="#map-简介" class="headerlink" title="map 简介"></a>map 简介</h3><p>map 是 STL（Standard Template Library，标准模板库）的一个关联容器。</p>
+<blockquote>
+<ol>
+<li>可以将任何基本类型映射到任何基本类型。如 int array[100] 事实上就是定义了一个 int 型到 int 型的映射</li>
+<li>map 提供一对一的数据处理，key-value 键值对，其类型可以自己定义，第一个称为关键字，第二个为关键字的值</li>
+<li>map 内部是自动排序的</li>
+</ol>
+</blockquote>
+<p>使用 map 前必须引入头文件 <code>#include &lt;map&gt;</code>。</p>
+<h3 id="map-的定义"><a href="#map-的定义" class="headerlink" title="map 的定义"></a>map 的定义</h3><p><code>map&lt;type1name, type2name&gt; maps;</code>，第一个是键的类型，第二个是值的类型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">map&lt;string, <span class="hljs-type">int</span>&gt; maps;<br></code></pre></td></tr></table></figure>
+
+<h3 id="map-容器内元素的访问"><a href="#map-容器内元素的访问" class="headerlink" title="map 容器内元素的访问"></a>map 容器内元素的访问</h3><blockquote>
+<ul>
+<li>通过下标进行访问：<code>maps[&#39;c&#39;] = 5;</code></li>
+<li>通过迭代器进行访问</li>
+</ul>
+</blockquote>
+<p>map 可以使用 <code>it-&gt;first</code> 来访问键，使用 <code>it-&gt;second</code> 访问值：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;map&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>   map&lt;<span class="hljs-type">char</span>,<span class="hljs-type">int</span>&gt; maps;<br>   maps[<span class="hljs-string">&#x27;a&#x27;</span>] = <span class="hljs-number">10</span>;<br>   maps[<span class="hljs-string">&#x27;b&#x27;</span>] = <span class="hljs-number">20</span>;<br>   maps[<span class="hljs-string">&#x27;c&#x27;</span>] = <span class="hljs-number">30</span>;<br>   <span class="hljs-keyword">for</span>(map&lt;<span class="hljs-type">char</span>,<span class="hljs-type">int</span>&gt;::iterator it=maps.<span class="hljs-built_in">begin</span>(); it!=maps.<span class="hljs-built_in">end</span>(); it++)<br>   &#123;<br>       cout&lt;&lt;it -&gt; first&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;it -&gt; second&lt;&lt;endl;<br>   &#125;<br>   <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="map-的常用用法"><a href="#map-的常用用法" class="headerlink" title="map 的常用用法"></a>map 的常用用法</h3><ul>
+<li>maps.insert() 插入：</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// 定义一个map对象</span><br>map&lt;<span class="hljs-type">int</span>, string&gt; m;<br><br><span class="hljs-comment">//用insert函数插入pair</span><br>m.<span class="hljs-built_in">insert</span>(<span class="hljs-built_in">pair</span>&lt;<span class="hljs-type">int</span>, string&gt;(<span class="hljs-number">11</span>, <span class="hljs-string">&quot;kk&quot;</span>));<br><br><span class="hljs-comment">// 用insert函数插入value_type数据</span><br>m.<span class="hljs-built_in">insert</span>(map&lt;<span class="hljs-type">int</span>, string&gt;::<span class="hljs-built_in">value_type</span>(<span class="hljs-number">22</span>, <span class="hljs-string">&quot;pp&quot;</span>));<br><br><span class="hljs-comment">// 用数组方式插入</span><br>m[<span class="hljs-number">12</span>] = <span class="hljs-string">&quot;dd&quot;</span>;<br>m[<span class="hljs-number">34</span>] = <span class="hljs-string">&quot;ff&quot;</span>;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>maps.find() 查找一个元素</li>
+<li>maps.clear() 清空</li>
+<li>maps.erase() 删除一个元素</li>
+<li>maps.size() 长度</li>
+<li>maps.begin() 返回指向 map 头部的迭代器</li>
+<li>maps.end() 返回指向 map 末尾的迭代器</li>
+<li>maps.rbegin() 返回指向 map 尾部的逆向迭代器</li>
+<li>maps.rend() 返回指向 map 头部的逆向迭代器</li>
+<li>maps.empty() 判断其是否为空</li>
+<li>maps.swap() 交换两个 map</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs cpp">map&lt;string, <span class="hljs-type">int</span>&gt;::iterator it;<br><br>it=maps.<span class="hljs-built_in">find</span>(<span class="hljs-string">&quot;123&quot;</span>);<br><br><span class="hljs-comment">//迭代器删除</span><br>it = maps.<span class="hljs-built_in">find</span>(<span class="hljs-string">&quot;123&quot;</span>);<br>maps.<span class="hljs-built_in">erase</span>(it);<br><br><span class="hljs-comment">//关键字删除</span><br><span class="hljs-type">int</span> n = maps.<span class="hljs-built_in">erase</span>(<span class="hljs-string">&quot;123&quot;</span>); <span class="hljs-comment">//如果删除了返回1，否则返回0</span><br><br><span class="hljs-comment">//用迭代器范围删除 : 把整个map清空</span><br>maps.<span class="hljs-built_in">erase</span>(maps.<span class="hljs-built_in">begin</span>(), maps.<span class="hljs-built_in">end</span>());<br><span class="hljs-comment">//等同于maps.clear()</span><br><br><span class="hljs-type">int</span> len = maps.<span class="hljs-built_in">size</span>(); <span class="hljs-comment">//获取到map中映射的个数</span><br><br><span class="hljs-comment">//迭代</span><br>map&lt;string, <span class="hljs-type">int</span>&gt;::iterator it;<br><span class="hljs-keyword">for</span>(it = maps.<span class="hljs-built_in">begin</span>(); it != maps.<span class="hljs-built_in">end</span>(); it++)<br>    cout&lt;&lt; it-&gt; first&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;it -&gt; second&lt;&lt;endl;<span class="hljs-comment">//输出key 和value值</span><br><br><span class="hljs-comment">//反向迭代</span><br>map&lt;string,<span class="hljs-type">int</span>&gt;::reverse_iterator it;<br><span class="hljs-keyword">for</span>(it = maps.<span class="hljs-built_in">rbegin</span>(); it != maps.<span class="hljs-built_in">rend</span>(); it++)<br>    cout&lt;&lt;it -&gt; first&lt;&lt;<span class="hljs-string">&#x27; &#x27;</span>&lt;&lt;it -&gt; second&lt;&lt;endl;<br></code></pre></td></tr></table></figure>
+
+<h2 id="priority-queue-与-multiset（堆与平衡树）"><a href="#priority-queue-与-multiset（堆与平衡树）" class="headerlink" title="priority_queue 与 multiset（堆与平衡树）"></a>priority_queue 与 multiset（堆与平衡树）</h2><h3 id="priority-queue-堆-优先队列"><a href="#priority-queue-堆-优先队列" class="headerlink" title="priority_queue 堆 &#x2F; 优先队列"></a>priority_queue 堆 &#x2F; 优先队列</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs cpp">定义：<br><br>priority_queue&lt;T&gt;<br>priority_queue&lt;<span class="hljs-type">int</span>&gt; 大根堆<br>priority_queue&lt;<span class="hljs-type">int</span>, vector&lt;<span class="hljs-type">int</span>&gt;, less&lt;<span class="hljs-type">int</span>&gt; &gt; 大根堆<br>priority_queue&lt;<span class="hljs-type">int</span>, vector&lt;<span class="hljs-type">int</span>&gt;, greater&lt;<span class="hljs-type">int</span>&gt; &gt; 小根堆<br>priority_queue &lt;<span class="hljs-keyword">struct</span> T&gt;<br><br>基本函数：<br><br><span class="hljs-built_in">push</span>(x)：加入一个元素，可以是数 <span class="hljs-keyword">or</span> 结构体<br><span class="hljs-built_in">pop</span>()：弹出堆顶<br><span class="hljs-built_in">top</span>()：堆顶的元素<br><span class="hljs-built_in">size</span>()：堆的大小<br><span class="hljs-built_in">empty</span>()：是否为空（空即为 <span class="hljs-number">1</span>）<br><br>关于结构体的比较：<br><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">type</span><br>&#123;<br>	<span class="hljs-type">int</span> x,y;<br>	<span class="hljs-keyword">friend</span> <span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span> &lt; (type left, type right)<br>    &#123;<br>        <span class="hljs-keyword">return</span> left.x &lt; right.x;<br>    &#125;<br>&#125;;<br>结构体的赋值可以为&#123;a,b,...&#125;或名称&#123;a,b,...&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="multiset"><a href="#multiset" class="headerlink" title="multiset"></a>multiset</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs cpp">multiset vs set<br>    multiset 可以有重复元素，故一般情况下，（除解决重复元素的集合类问题）都用 multiset<br>	multiset 也进行自实现排序。<br><br>定义：<br><br>multiset&lt;T&gt;<br>multiset&lt;<span class="hljs-type">int</span>&gt; 从小到大<br>multiset&lt;<span class="hljs-type">int</span>, less&lt;<span class="hljs-type">int</span>&gt; &gt; less&lt;<span class="hljs-type">int</span>&gt;表示数字大的优先级大<br>multiset&lt;<span class="hljs-type">int</span>, greater&lt;<span class="hljs-type">int</span>&gt; &gt; greater&lt;<span class="hljs-type">int</span>&gt;表示数字小的优先级大<br>multiset&lt;<span class="hljs-keyword">struct</span> T&gt;<br><br>迭代器：<br><br>multiset&lt;定义和对应的 set 一致&gt; ::iterator，其作用是遍历 set/特别指向某一个元素<br><br>基本函数：<br><br><span class="hljs-built_in">insert</span>(x)：加入一个元素，可以是数/结构体<br><span class="hljs-built_in">erase</span>(x)：当x为数或结构体，即为删掉所有的x；当x 为迭代器，那么只会删掉迭代器对应的元素<br><span class="hljs-built_in">begin</span>()：返回关键值最小的元素指针，指针x对应的值为 *x，如果是结构体则为（*x）.<span class="hljs-function">a</span><br><span class="hljs-function"><span class="hljs-title">end</span><span class="hljs-params">()</span>：返回关键值最大的元素指针的后一位（最大的是<span class="hljs-title">end</span><span class="hljs-params">()</span>--）</span><br><span class="hljs-function"><span class="hljs-title">size</span><span class="hljs-params">()</span>, <span class="hljs-title">empty</span><span class="hljs-params">()</span>：同优先队列</span><br><span class="hljs-function"><span class="hljs-title">lower_bound</span><span class="hljs-params">(x)</span>：第一个大于等于 x 的元素指针</span><br><span class="hljs-function"><span class="hljs-title">upper_bound</span><span class="hljs-params">(x)</span>：第一个大于 x 的元素指针</span><br><span class="hljs-function"></span><br><span class="hljs-function">multiset&lt;T&gt; st</span><br><span class="hljs-function">st.<span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-number">1</span>)</span></span>;<br>st.<span class="hljs-built_in">insert</span>(<span class="hljs-number">2</span>);<br>st.<span class="hljs-built_in">insert</span>(<span class="hljs-number">3</span>);<br>st.<span class="hljs-built_in">insert</span>(<span class="hljs-number">4</span>);<br>st.<span class="hljs-built_in">insert</span>(<span class="hljs-number">5</span>);<br>cout&lt;&lt;*st.<span class="hljs-built_in">lower_bound</span>(<span class="hljs-number">3</span>)&lt;&lt;<span class="hljs-string">&quot; &quot;</span> &lt;&lt;*st.<span class="hljs-built_in">upper_bound</span>(<span class="hljs-number">3</span>)&lt;&lt;endl;    <span class="hljs-comment">//&gt;= &gt;</span><br>cout&lt;&lt;*--st.<span class="hljs-built_in">lower_bound</span>(<span class="hljs-number">3</span>)&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;*--st.<span class="hljs-built_in">upper_bound</span>(<span class="hljs-number">3</span>)&lt;&lt;endl; <span class="hljs-comment">//&lt; &lt;=</span><br><span class="hljs-comment">//3 4</span><br><span class="hljs-comment">//2 3</span><br><br>遍历：<br>可以通过迭代器的移动来遍历（头为 <span class="hljs-built_in">begin</span>()，尾为--<span class="hljs-built_in">end</span>()，最大能走到 <span class="hljs-built_in">end</span>()）<br><br>st.<span class="hljs-built_in">insert</span>(<span class="hljs-number">1</span>);<br>st.<span class="hljs-built_in">insert</span>(<span class="hljs-number">2</span>);<br>st.<span class="hljs-built_in">insert</span>(<span class="hljs-number">3</span>);<br><span class="hljs-keyword">auto</span> a = st.<span class="hljs-built_in">begin</span>();<br><span class="hljs-keyword">while</span> (a != st.<span class="hljs-built_in">end</span>())<br>&#123;<br>    cout&lt;&lt; *a &lt;&lt;<span class="hljs-string">&quot; &quot;</span>;<br>    ++a;<br>	cout&lt;&lt;endl;<br>&#125;<br><span class="hljs-comment">//1 2 3区别</span><br><span class="hljs-comment">//multiset可以遍历、前驱、后继、删除；</span><br><span class="hljs-comment">//而priority_queue的比较机制和set/sort相反</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="完整示例程序"><a href="#完整示例程序" class="headerlink" title="完整示例程序"></a>完整示例程序</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;algorithm&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdlib&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstring&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdio&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;queue&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;set&gt;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> fo(a, b, c) for (a = b; a &lt;= c; a++)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> fd(a, b, c) for (a = b; a &gt;= c; a--)</span><br><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">type</span><br>&#123;<br>	<span class="hljs-type">int</span> x,y;<br>	<span class="hljs-keyword">friend</span> <span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span> &lt; (type left, type right)<br>    &#123;<br>        <span class="hljs-keyword">return</span> left.x &lt; right.x;<span class="hljs-comment">//此处不能重载大于号，在数学上来说重载小于号的作用更好</span><br>    &#125;<br>&#125;;<br><br>multiset&lt;type&gt; a;<br>priority_queue&lt;type&gt; b;<br>type c[<span class="hljs-number">3</span>];<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    a.<span class="hljs-built_in">insert</span>(&#123;<span class="hljs-number">3</span>,<span class="hljs-number">3</span>&#125;);<br>    a.<span class="hljs-built_in">insert</span>(&#123;<span class="hljs-number">2</span>,<span class="hljs-number">2</span>&#125;);<br>    a.<span class="hljs-built_in">insert</span>(&#123;<span class="hljs-number">1</span>,<span class="hljs-number">1</span>&#125;);<br>    b.<span class="hljs-built_in">push</span>(&#123;<span class="hljs-number">1</span>,<span class="hljs-number">1</span>&#125;);<br>    b.<span class="hljs-built_in">push</span>(&#123;<span class="hljs-number">2</span>,<span class="hljs-number">2</span>&#125;);<br>    b.<span class="hljs-built_in">push</span>(&#123;<span class="hljs-number">3</span>,<span class="hljs-number">3</span>&#125;);<br>    c[<span class="hljs-number">0</span>] = &#123;<span class="hljs-number">3</span>,<span class="hljs-number">3</span>&#125;;<br>    c[<span class="hljs-number">1</span>] = &#123;<span class="hljs-number">2</span>,<span class="hljs-number">2</span>&#125;;<br>    c[<span class="hljs-number">2</span>] = &#123;<span class="hljs-number">1</span>,<span class="hljs-number">1</span>&#125;;<br>    <span class="hljs-built_in">sort</span>(c, c + <span class="hljs-number">3</span>);<br>    cout &lt;&lt; (*a.<span class="hljs-built_in">begin</span>()).x &lt;&lt;<span class="hljs-string">&quot; &quot;</span> &lt;&lt; b.<span class="hljs-built_in">top</span>().x &lt;&lt; <span class="hljs-string">&quot; &quot;</span> &lt;&lt; c[<span class="hljs-number">0</span>].x &lt;&lt; endl;<br>    <span class="hljs-comment">//1 3 1</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以发现，priority_queue 得到的结果和 multiset&#x2F;sort 刚好相反。</p>
+<p>实际上 multiset 与 sort 的最终状态满足 a1 &lt; a2 &lt; a3 &lt; … &lt; an（&lt; 可重载）。</p>
+<p>而 priority_queue 应该是当一个元素 x 满足 f(a[x]) &lt; x 时交换，实质上维护的是大根堆。</p>
+<blockquote>
+<p>优先队列 ⇔ 排序后为先大后小。</p>
+</blockquote>
+<h2 id="unordered-map（哈希表实现的映射）"><a href="#unordered-map（哈希表实现的映射）" class="headerlink" title="unordered_map（哈希表实现的映射）"></a>unordered_map（哈希表实现的映射）</h2><blockquote>
+<p>unordered_map 是一个关联容器，内部采用的是 hash 表结构，拥有快速检索的功能。</p>
+</blockquote>
+<h3 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h3><blockquote>
+<ol>
+<li>关联性：通过 key 去检索 value，而不是通过绝对地址（和顺序容器不同）</li>
+<li>无序性：使用 hash 表存储，内部无序</li>
+<li>Map：每个值对应一个键值</li>
+<li>键唯一性：不存在两个元素的键一样</li>
+<li>动态内存管理：使用内存管理模型来动态管理所需要的内存空间</li>
+</ol>
+</blockquote>
+<h3 id="模板"><a href="#模板" class="headerlink" title="模板"></a>模板</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">template</span> &lt; <span class="hljs-keyword">class</span> <span class="hljs-title class_">Key</span>,                                    <span class="hljs-comment">// unordered_map::key_type</span><br>           <span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>,                                      <span class="hljs-comment">// unordered_map::mapped_type</span><br>           <span class="hljs-keyword">class</span> <span class="hljs-title class_">Hash</span> = hash&lt;Key&gt;,                       <span class="hljs-comment">// unordered_map::hasher</span><br>           <span class="hljs-keyword">class</span> Pred = equal_to&lt;Key&gt;,                   <span class="hljs-comment">// unordered_map::key_equal</span><br>           <span class="hljs-keyword">class</span> Alloc = allocator&lt; pair&lt;<span class="hljs-type">const</span> Key,T&gt; &gt;  <span class="hljs-comment">// unordered_map::allocator_type</span><br>           &gt; <span class="hljs-keyword">class</span> unordered_map;<br></code></pre></td></tr></table></figure>
+
+<p>一般只使用模板前 2 个参数 <code>&lt;Key, T&gt;</code>，即 <code>unordered_map&lt;const Key, T&gt; map;</code>。</p>
+<h3 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h3><p>unordered_map 的迭代器是一个指针，指向这个元素，通过迭代器来取得它的值：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs cpp">unordered_map&lt;Key, T&gt;::iterator it;<br>(*it).first;             <span class="hljs-comment">// the key value (of type Key)</span><br>(*it).second;            <span class="hljs-comment">// the mapped value (of type T)</span><br>(*it);                   <span class="hljs-comment">// the &quot;element value&quot; (of type pair&lt;const Key,T&gt;)</span><br><br>it -&gt; first;  key       <span class="hljs-comment">// 它的键值分别是迭代器的first和second属性</span><br>it -&gt; second; T<br></code></pre></td></tr></table></figure>
+
+<h3 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h3><blockquote>
+<p>unordered_map 的构造方式有几种：构造空的容器、复制构造、范围构造、用数组构造</p>
+</blockquote>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unordered_map&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-keyword">typedef</span> unordered_map&lt;string, string&gt; stringmap;<br><br><span class="hljs-function">stringmap <span class="hljs-title">merge</span><span class="hljs-params">(stringmap a, stringmap b)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-function">stringmap <span class="hljs-title">temp</span><span class="hljs-params">(a)</span></span>;<br>    temp.<span class="hljs-built_in">insert</span>(b.<span class="hljs-built_in">begin</span>(), b.<span class="hljs-built_in">end</span>());<br>    <span class="hljs-keyword">return</span> temp;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    stringmap first;                                                <span class="hljs-comment">// 空</span><br>    <span class="hljs-function">stringmap <span class="hljs-title">second</span><span class="hljs-params">(&#123;&#123;<span class="hljs-string">&quot;apple&quot;</span>, <span class="hljs-string">&quot;red&quot;</span>&#125;, &#123;<span class="hljs-string">&quot;lemon&quot;</span>, <span class="hljs-string">&quot;yellow&quot;</span>&#125;&#125;)</span></span>;      <span class="hljs-comment">// 用数组初始</span><br>    <span class="hljs-function">stringmap <span class="hljs-title">third</span><span class="hljs-params">(&#123;&#123;<span class="hljs-string">&quot;orange&quot;</span>, <span class="hljs-string">&quot;orange&quot;</span>&#125;, &#123;<span class="hljs-string">&quot;strawberry&quot;</span>, <span class="hljs-string">&quot;red&quot;</span>&#125;&#125;)</span></span>; <span class="hljs-comment">// 用数组初始</span><br>    <span class="hljs-function">stringmap <span class="hljs-title">fourth</span><span class="hljs-params">(second)</span></span>;                                       <span class="hljs-comment">// 复制初始化</span><br>    <span class="hljs-function">stringmap <span class="hljs-title">fifth</span><span class="hljs-params">(merge(third, fourth))</span></span>;                          <span class="hljs-comment">// 移动初始化</span><br>    <span class="hljs-function">stringmap <span class="hljs-title">sixth</span><span class="hljs-params">(fifth.begin(), fifth.end())</span></span>;                    <span class="hljs-comment">// 范围初始化</span><br><br>    cout &lt;&lt; <span class="hljs-string">&quot;sixth contains:&quot;</span>;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> &amp;x : sixth)<br>        cout &lt;&lt; <span class="hljs-string">&quot; &quot;</span> &lt;&lt; x.first &lt;&lt; <span class="hljs-string">&quot;:&quot;</span> &lt;&lt; x.second;<br>    cout &lt;&lt; endl;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">sixth contains: apple:red lemon:yellow orange:orange strawberry:red<br></code></pre></td></tr></table></figure>
+
+<h3 id="常用成员函数"><a href="#常用成员函数" class="headerlink" title="常用成员函数"></a>常用成员函数</h3><ul>
+<li>size()：返回 unordered_map 的大小</li>
+<li>empty()：为空返回 true，不为空返回 false，和用 size() &#x3D;&#x3D; 0 判断一样</li>
+<li>find()：查找 key 所在的元素。找到：返回元素的迭代器，通过迭代器的 second 属性获取值；没找到：返回 unordered_map::end</li>
+<li>insert()：复制插入（复制一个已有的 pair 的内容）、数组插入（直接插入一个初始化数组）、范围插入（复制一个起始迭代器和终止迭代器中间的内容）、数组访问模式插入（和数组的 [] 操作很相似）</li>
+<li>at()：查找 key 所对应的值。如果存在：返回 key 对应的值，可以直接修改，和 [] 操作一样；如果不存在：抛出 out_of_range 异常</li>
+<li>erase()：通过位置（迭代器）、通过 key、通过范围（两个迭代器）</li>
+<li>clear()：清空 unordered_map</li>
+<li>swap()：<code>void swap(unordered_map&amp; ump);</code> 交换两个 unordered_map（整个交换两个 map 中的所有元素）</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unordered_map&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">display</span><span class="hljs-params">(unordered_map&lt;string, <span class="hljs-type">double</span>&gt; myrecipe, string str)</span></span><br><span class="hljs-function"></span>&#123;<br>    cout &lt;&lt; str &lt;&lt; endl;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> &amp;x : myrecipe)<br>        cout &lt;&lt; x.first &lt;&lt; <span class="hljs-string">&quot;: &quot;</span> &lt;&lt; x.second &lt;&lt; endl;<br>    cout &lt;&lt; endl;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    unordered_map&lt;string, <span class="hljs-type">double</span>&gt; myrecipe, mypantry = &#123;<br>        &#123;<span class="hljs-string">&quot;milk&quot;</span>, <span class="hljs-number">2.0</span>&#125;,<br>        &#123;<span class="hljs-string">&quot;flour&quot;</span>, <span class="hljs-number">1.5</span>&#125;<br>    &#125;;<br><br>    <span class="hljs-function">pair&lt;string, <span class="hljs-type">double</span>&gt; <span class="hljs-title">myshopping</span><span class="hljs-params">(<span class="hljs-string">&quot;baking powder&quot;</span>, <span class="hljs-number">0.3</span>)</span></span>;<br><br>    myrecipe.<span class="hljs-built_in">insert</span>(myshopping);                             <span class="hljs-comment">// 复制插入</span><br>    myrecipe.<span class="hljs-built_in">insert</span>(<span class="hljs-built_in">make_pair</span>&lt;string, <span class="hljs-type">double</span>&gt;(<span class="hljs-string">&quot;eggs&quot;</span>, <span class="hljs-number">6.0</span>)); <span class="hljs-comment">// 移动插入</span><br>    myrecipe.<span class="hljs-built_in">insert</span>(mypantry.<span class="hljs-built_in">begin</span>(), mypantry.<span class="hljs-built_in">end</span>());       <span class="hljs-comment">// 范围插入</span><br>    myrecipe.<span class="hljs-built_in">insert</span>(&#123;&#123;<span class="hljs-string">&quot;sugar&quot;</span>, <span class="hljs-number">0.8</span>&#125;, &#123;<span class="hljs-string">&quot;salt&quot;</span>, <span class="hljs-number">0.1</span>&#125;&#125;);        <span class="hljs-comment">// 初始化数组插入</span><br>    myrecipe[<span class="hljs-string">&quot;coffee&quot;</span>] = <span class="hljs-number">10.0</span>;                               <span class="hljs-comment">// 数组形式插入</span><br><br>    <span class="hljs-built_in">display</span>(myrecipe, <span class="hljs-string">&quot;myrecipe contains:&quot;</span>);<br><br>    <span class="hljs-comment">/****************查找*****************/</span><br>    unordered_map&lt;string, <span class="hljs-type">double</span>&gt;::const_iterator got = myrecipe.<span class="hljs-built_in">find</span>(<span class="hljs-string">&quot;coffee&quot;</span>);<br>    <span class="hljs-keyword">if</span> (got == myrecipe.<span class="hljs-built_in">end</span>())<br>        cout &lt;&lt; <span class="hljs-string">&quot;not found&quot;</span>;<br>    <span class="hljs-keyword">else</span><br>        cout &lt;&lt; <span class="hljs-string">&quot;found &quot;</span> &lt;&lt; got-&gt;first &lt;&lt; <span class="hljs-string">&quot; is &quot;</span> &lt;&lt; got-&gt;second &lt;&lt; <span class="hljs-string">&quot;\n\n&quot;</span>;<br><br>    <span class="hljs-comment">/****************修改*****************/</span><br>    myrecipe.<span class="hljs-built_in">at</span>(<span class="hljs-string">&quot;coffee&quot;</span>) = <span class="hljs-number">9.0</span>;<br>    myrecipe[<span class="hljs-string">&quot;milk&quot;</span>] = <span class="hljs-number">3.0</span>;<br>    <span class="hljs-built_in">display</span>(myrecipe, <span class="hljs-string">&quot;After modify myrecipe contains:&quot;</span>);<br><br>    <span class="hljs-comment">/****************擦除*****************/</span><br>    myrecipe.<span class="hljs-built_in">erase</span>(myrecipe.<span class="hljs-built_in">begin</span>()); <span class="hljs-comment">//通过位置</span><br>    myrecipe.<span class="hljs-built_in">erase</span>(<span class="hljs-string">&quot;milk&quot;</span>);           <span class="hljs-comment">//通过key</span><br>    <span class="hljs-built_in">display</span>(myrecipe, <span class="hljs-string">&quot;After erase myrecipe contains:&quot;</span>);<br><br>    <span class="hljs-comment">/****************交换*****************/</span><br>    myrecipe.<span class="hljs-built_in">swap</span>(mypantry);<br>    <span class="hljs-built_in">display</span>(myrecipe, <span class="hljs-string">&quot;After swap with mypantry, myrecipe contains:&quot;</span>);<br><br>    <span class="hljs-comment">/****************清空*****************/</span><br>    myrecipe.<span class="hljs-built_in">clear</span>();<br>    <span class="hljs-built_in">display</span>(myrecipe, <span class="hljs-string">&quot;After clear, myrecipe contains:&quot;</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs text">myrecipe contains:<br>salt: 0.1<br>milk: 2<br>flour: 1.5<br>coffee: 10<br>eggs: 6<br>sugar: 0.8<br>baking powder: 0.3<br><br>found coffee is 10<br><br>After modify myrecipe contains:<br>salt: 0.1<br>milk: 3<br>flour: 1.5<br>coffee: 9<br>eggs: 6<br>sugar: 0.8<br>baking powder: 0.3<br><br>After erase myrecipe contains:<br>flour: 1.5<br>coffee: 9<br>eggs: 6<br>sugar: 0.8<br>baking powder: 0.3<br><br>After swap with mypantry, myrecipe contains:<br>flour: 1.5<br>milk: 2<br><br>After clear, myrecipe contains:<br></code></pre></td></tr></table></figure>
+
+<h3 id="begin-end"><a href="#begin-end" class="headerlink" title="begin() &#x2F; end()"></a>begin() &#x2F; end()</h3><blockquote>
+<p>begin()：返回开始的迭代器；begin(int n)：返回 n 号 bucket 的第一个迭代器</p>
+<p>end()：返回结束位置的迭代器；end(int n)：返回 n 号 bucket 的最后一个迭代器</p>
+</blockquote>
+<h3 id="bucket（桶）操作"><a href="#bucket（桶）操作" class="headerlink" title="bucket（桶）操作"></a>bucket（桶）操作</h3><blockquote>
+<ul>
+<li>bucket()：返回通过哈希计算 key 所在的 bucket。此处仅使用哈希计算确定 bucket，不保证 key 一定存在 bucket 中</li>
+<li>bucket_count()：返回 bucket 的总数</li>
+<li>bucket_size()：返回第 i 个 bucket 的大小。此位置的桶里的元素数量，但是函数并不会判断 n 是否在 count 范围内</li>
+</ul>
+</blockquote>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unordered_map&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    unordered_map&lt;string, string&gt; mymap =<br>    &#123;<br>            &#123;<span class="hljs-string">&quot;house&quot;</span>, <span class="hljs-string">&quot;maison&quot;</span>&#125;,<br>            &#123;<span class="hljs-string">&quot;apple&quot;</span>, <span class="hljs-string">&quot;pomme&quot;</span>&#125;,<br>            &#123;<span class="hljs-string">&quot;tree&quot;</span>, <span class="hljs-string">&quot;arbre&quot;</span>&#125;,<br>            &#123;<span class="hljs-string">&quot;book&quot;</span>, <span class="hljs-string">&quot;livre&quot;</span>&#125;,<br>            &#123;<span class="hljs-string">&quot;door&quot;</span>, <span class="hljs-string">&quot;porte&quot;</span>&#125;,<br>            &#123;<span class="hljs-string">&quot;grapefruit&quot;</span>, <span class="hljs-string">&quot;pamplemousse&quot;</span>&#125;<br>    &#125;;<br><br>    <span class="hljs-comment">/************begin和end迭代器***************/</span><br>    cout &lt;&lt; <span class="hljs-string">&quot;mymap contains:&quot;</span>;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> it = mymap.<span class="hljs-built_in">begin</span>(); it != mymap.<span class="hljs-built_in">end</span>(); ++it)<br>        cout &lt;&lt; <span class="hljs-string">&quot; &quot;</span> &lt;&lt; it-&gt;first &lt;&lt; <span class="hljs-string">&quot;:&quot;</span> &lt;&lt; it-&gt;second;<br>    cout &lt;&lt; endl;<br><br>    <span class="hljs-comment">/************bucket操作***************/</span><br>    <span class="hljs-type">unsigned</span> n = mymap.<span class="hljs-built_in">bucket_count</span>();<br>    cout &lt;&lt; <span class="hljs-string">&quot;mymap has &quot;</span> &lt;&lt; n &lt;&lt; <span class="hljs-string">&quot; buckets.\n&quot;</span>;<br><br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">unsigned</span> i = <span class="hljs-number">0</span>; i &lt; n; ++i)<br>    &#123;<br>        cout &lt;&lt; <span class="hljs-string">&quot;bucket #&quot;</span> &lt;&lt; i &lt;&lt; <span class="hljs-string">&quot;&#x27;s size:&quot;</span><br>             &lt;&lt; mymap.<span class="hljs-built_in">bucket_size</span>(i) &lt;&lt; <span class="hljs-string">&quot; contains: &quot;</span>;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> it = mymap.<span class="hljs-built_in">begin</span>(i); it != mymap.<span class="hljs-built_in">end</span>(i); ++it)<br>            cout &lt;&lt; <span class="hljs-string">&quot;[&quot;</span> &lt;&lt; it-&gt;first &lt;&lt; <span class="hljs-string">&quot;:&quot;</span> &lt;&lt; it-&gt;second &lt;&lt; <span class="hljs-string">&quot;] &quot;</span>;<br>        cout &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>;<br>    &#125;<br><br>    cout &lt;&lt; <span class="hljs-string">&quot;\nkey:&#x27;apple&#x27; is in bucket #&quot;</span> &lt;&lt; mymap.<span class="hljs-built_in">bucket</span>(<span class="hljs-string">&quot;apple&quot;</span>) &lt;&lt; endl;<br>    cout &lt;&lt; <span class="hljs-string">&quot;\nkey:&#x27;computer&#x27; is in bucket #&quot;</span> &lt;&lt; mymap.<span class="hljs-built_in">bucket</span>(<span class="hljs-string">&quot;computer&quot;</span>) &lt;&lt; endl;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs text">mymap contains: door:porte grapefruit:pamplemousse tree:arbre apple:pomme book:livre house:maison<br>mymap has 7 buckets.<br>bucket #0&#x27;s size:2 contains: [book:livre] [house:maison]<br>bucket #1&#x27;s size:0 contains:<br>bucket #2&#x27;s size:0 contains:<br>bucket #3&#x27;s size:2 contains: [grapefruit:pamplemousse] [tree:arbre]<br>bucket #4&#x27;s size:0 contains:<br>bucket #5&#x27;s size:1 contains: [apple:pomme]<br>bucket #6&#x27;s size:1 contains: [door:porte]<br><br>key:&#x27;apple&#x27; is in bucket #5<br><br>key:&#x27;computer&#x27; is in bucket #6<br></code></pre></td></tr></table></figure>
+
+<h2 id="unordered-set（哈希表实现的集合）"><a href="#unordered-set（哈希表实现的集合）" class="headerlink" title="unordered_set（哈希表实现的集合）"></a>unordered_set（哈希表实现的集合）</h2><blockquote>
+<p>unordered_set 是一种关联容器。set 和 map 内部实现是基于红黑树（RedBlackTree），unordered_set 和 unordered_map 是基于哈希表（Hashtable）。红黑树有序，而哈希表无序。</p>
+</blockquote>
+<h3 id="特性-1"><a href="#特性-1" class="headerlink" title="特性"></a>特性</h3><blockquote>
+<ol>
+<li>不再以键值对的形式存储数据，而是直接存储数据的值（只有一个值）</li>
+<li>容器内部存储的各个元素的值都互不相等，且不能被修改</li>
+<li>不会对内部存储的数据进行排序</li>
+</ol>
+</blockquote>
+<h3 id="模板-1"><a href="#模板-1" class="headerlink" title="模板"></a>模板</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">template</span> &lt; <span class="hljs-keyword">class</span> <span class="hljs-title class_">Key</span>,                        <span class="hljs-comment">// unordered_set::key_type/value_type</span><br>           <span class="hljs-keyword">class</span> <span class="hljs-title class_">Hash</span> = hash&lt;Key&gt;,           <span class="hljs-comment">// unordered_set::hasher</span><br>           <span class="hljs-keyword">class</span> Pred = equal_to&lt;Key&gt;,       <span class="hljs-comment">// unordered_set::key_equal</span><br>           <span class="hljs-keyword">class</span> Alloc = allocator&lt;Key&gt;      <span class="hljs-comment">// unordered_set::allocator_type</span><br>           &gt; <span class="hljs-keyword">class</span> unordered_set;<br><br><span class="hljs-comment">//一般定义使用</span><br>unordered_set&lt;T&gt; ans;<br></code></pre></td></tr></table></figure>
+
+<h3 id="迭代器-1"><a href="#迭代器-1" class="headerlink" title="迭代器"></a>迭代器</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">//返回头迭代器 begin()</span><br>unordered_set&lt;<span class="hljs-type">int</span>&gt;::iterator it_begin = ans.<span class="hljs-built_in">begin</span>();<br><br><span class="hljs-comment">//返回尾迭代器 end()</span><br>unordered_set&lt;<span class="hljs-type">int</span>&gt;::iterator it_end = ans.<span class="hljs-built_in">end</span>();<br><br><span class="hljs-comment">//返回const头迭代器 cbegin()</span><br>unordered_set&lt;<span class="hljs-type">int</span>&gt;::const_iterator const_it_begin = ans.<span class="hljs-built_in">cbegin</span>();<br><br><span class="hljs-comment">//返回const尾迭代器 cend()</span><br>unordered_set&lt;<span class="hljs-type">int</span>&gt;::const_iterator const_it_end = ans.<span class="hljs-built_in">cend</span>();<br><br><span class="hljs-comment">//槽迭代器</span><br>unordered_set&lt;<span class="hljs-type">int</span>&gt;::local_iterator local_iter_begin = ans.<span class="hljs-built_in">begin</span>(<span class="hljs-number">1</span>);<br>unordered_set&lt;<span class="hljs-type">int</span>&gt;::local_iterator local_iter_end = ans.<span class="hljs-built_in">end</span>(<span class="hljs-number">1</span>);<br></code></pre></td></tr></table></figure>
+
+<h3 id="一般操作"><a href="#一般操作" class="headerlink" title="一般操作"></a>一般操作</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">//查找函数 find() 通过给定主键查找元素</span><br>unordered_set&lt;<span class="hljs-type">int</span>&gt;::iterator find_iter = ans.<span class="hljs-built_in">find</span>(<span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//value出现的次数 count() 返回匹配给定主键的元素的个数</span><br>ans.<span class="hljs-built_in">count</span>(<span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//返回元素在哪个区域 equal_range() 返回值匹配给定搜索值的元素组成的范围</span><br>pair&lt;unordered_set&lt;<span class="hljs-type">int</span>&gt;::iterator, unordered_set&lt;<span class="hljs-type">int</span>&gt;::iterator&gt;<br>    							   pair_equal_range = ans.<span class="hljs-built_in">equal_range</span>(<span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//插入函数 emplace()</span><br>ans.<span class="hljs-built_in">emplace</span>(<span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//插入函数 emplace_hint() 使用迭代器</span><br>ans.<span class="hljs-built_in">emplace_hint</span>(it_begin, <span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//插入函数 insert()</span><br>ans.<span class="hljs-built_in">insert</span>(<span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//删除 erase()</span><br>ans.<span class="hljs-built_in">erase</span>(<span class="hljs-number">1</span>);<span class="hljs-comment">//1.迭代器 value 区域</span><br><br><span class="hljs-comment">//清空 clear()</span><br>ans.<span class="hljs-built_in">clear</span>();<br><br><span class="hljs-comment">//交换 swap()，括号内可接另外一个unordered_set</span><br>ans.<span class="hljs-built_in">swap</span>();<br><br><span class="hljs-comment">//判断是否为空</span><br>ans.<span class="hljs-built_in">empty</span>();<br><br><span class="hljs-comment">//获取元素个数 size()</span><br>ans.<span class="hljs-built_in">size</span>();<br><br><span class="hljs-comment">//获取最大存储量 max_size()</span><br>ans.<span class="hljs-built_in">max_size</span>();<br><br><span class="hljs-comment">//篮子操作 篮子个数 bucket_count() 返回槽（Bucket）数</span><br>ans.<span class="hljs-built_in">bucket_count</span>();<br><br><span class="hljs-comment">//篮子最大数量 max_bucket_count() 返回最大槽数</span><br>ans.<span class="hljs-built_in">max_bucket_count</span>();<br><br><span class="hljs-comment">//篮子个数 bucket_size() 返回槽大小</span><br>ans.<span class="hljs-built_in">bucket_size</span>(<span class="hljs-number">3</span>);<br><br><span class="hljs-comment">//返回篮子 bucket() 返回元素所在槽的序号</span><br>ans.<span class="hljs-built_in">bucket</span>(<span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//load_factor 返回载入因子，即一个元素槽（Bucket）的最大元素数</span><br>ans.<span class="hljs-built_in">load_factor</span>();<br><br><span class="hljs-comment">//max_load_factor 返回或设置最大载入因子</span><br>ans.<span class="hljs-built_in">max_load_factor</span>();<br><br><span class="hljs-comment">//rehash 设置槽数</span><br>ans.<span class="hljs-built_in">rehash</span>(<span class="hljs-number">1</span>);<br><br><span class="hljs-comment">//reserve 请求改变容器容量</span><br>ans.<span class="hljs-built_in">reserve</span>(<span class="hljs-number">1000</span>);<br><br><span class="hljs-comment">//hash_function() 返回与hash_func相同功能的函数指针</span><br><span class="hljs-keyword">auto</span> hash_func_test = ans.<span class="hljs-built_in">hash_function</span>();<br><br><span class="hljs-comment">//key_eq() 返回比较key值得函数指针</span><br><span class="hljs-keyword">auto</span> key_eq_test = ans.<span class="hljs-built_in">key_eq</span>();<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>参考：C++ STL 函数库（<a target="_blank" rel="noopener" href="https://www.cplusplus.com/reference/">https://www.cplusplus.com/reference/</a>）</p>
+</blockquote>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/cpp/" class="category-chain-item">cpp</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/C/" class="print-no-link">#C++</a>
+      
+        <a href="/tags/STL/" class="print-no-link">#STL</a>
+      
+        <a href="/tags/map/" class="print-no-link">#map</a>
+      
+        <a href="/tags/set/" class="print-no-link">#set</a>
+      
+        <a href="/tags/priority-queue/" class="print-no-link">#priority_queue</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>C++ STL 容器学习笔记</div>
+      <div>https://chaggle.github.io/2026/08/10/cpp/stl-containers-20260811/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月11日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/13/AI/agent-infra-job-analysis/" title="DeepSeek「Agent Infra 研发工程师」岗位分析与自我匹配评估">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">DeepSeek「Agent Infra 研发工程师」岗位分析与自我匹配评估</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/10/go/fundamentals-engineering-20260811/" title="Go 语言基础与工程实践笔记">
+                        <span class="hidden-mobile">Go 语言基础与工程实践笔记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'f6cc332171115b37ac21b620b2a4a4ab'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

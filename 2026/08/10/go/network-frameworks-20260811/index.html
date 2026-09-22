@@ -1,0 +1,1184 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/10/go/network-frameworks-20260811/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="2022 年学习 Go 网络编程的四篇笔记（HTTP 服务器&#x2F;客户端、gin 框架、zinx 框架、轻量级 IM 项目）合并整理。  Golang 开发一个 HTTP Web 服务器&#x2F;客户端             之前的 zinx 学习，是基于 TCP&#x2F;UDP 的 socket 协议进行编写，而本次要实现的是基于 HTTP 协议开发一个 Web 服务器端与客户端！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 网络编程与框架学习笔记">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/10/go/network-frameworks-20260811/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="2022 年学习 Go 网络编程的四篇笔记（HTTP 服务器&#x2F;客户端、gin 框架、zinx 框架、轻量级 IM 项目）合并整理。  Golang 开发一个 HTTP Web 服务器&#x2F;客户端             之前的 zinx 学习，是基于 TCP&#x2F;UDP 的 socket 协议进行编写，而本次要实现的是基于 HTTP 协议开发一个 Web 服务器端与客户端！">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chaggle.github.io/images/go/gin.jpg">
+<meta property="article:published_time" content="2026-08-10T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T16:09:29.336Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="HTTP">
+<meta property="article:tag" content="IM">
+<meta property="article:tag" content="gin">
+<meta property="article:tag" content="zinx">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://chaggle.github.io/images/go/gin.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Go 网络编程与框架学习笔记 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Go 网络编程与框架学习笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-10 16:00" pubdate>
+          2026年8月10日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          9.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          76 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Go 网络编程与框架学习笔记</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-11T00:09:29+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>2022 年学习 Go 网络编程的四篇笔记（HTTP 服务器&#x2F;客户端、gin 框架、zinx 框架、轻量级 IM 项目）合并整理。</p>
+</blockquote>
+<h2 id="Golang-开发一个-HTTP-Web-服务器-客户端"><a href="#Golang-开发一个-HTTP-Web-服务器-客户端" class="headerlink" title="Golang 开发一个 HTTP Web 服务器&#x2F;客户端"></a>Golang 开发一个 HTTP Web 服务器&#x2F;客户端</h2><div class="note note-info">
+            <p>之前的 zinx 学习，是基于 TCP&#x2F;UDP 的 socket 协议进行编写，而本次要实现的是基于 HTTP 协议开发一个 Web 服务器端与客户端！</p> 
+          </div>
+
+<h3 id="要求"><a href="#要求" class="headerlink" title="要求"></a>要求</h3><p>服务器端要求：</p>
+<ul>
+<li>1、服务端维护一个内存数据结构，所有数据进程重启丢失，不做数据持久化，不考虑内存容量问题</li>
+<li>2、服务端实现一个网络 API 接口，客户端向该 API 发送一个网络请求，请求数据是一个 string 的信息</li>
+<li>3、服务端该 API 收到请求后响应一个 []string 的信息，返回之前发送过的所有 string，当次请求发送的 string 一定在最后，不关心是否重复</li>
+</ul>
+<p>示例：</p>
+<blockquote>
+<p>第一次请求发送：”a”，响应: []string{“a”}</p>
+<p>第二次请求发送：”b”，响应: []string{“a”, “b”}</p>
+<p>第三次请求发送：”a”，响应: []string{“a”, “b”, “a”}</p>
+<p>注意服务端代码部分，任何情况下均不能退出进程。</p>
+</blockquote>
+<p>客户端要求：</p>
+<ul>
+<li>1、客户端必须是 Golang 函数（该函数后面简称 BcjClient），调用该服务端的 API 接口</li>
+<li>2、该客户端函数输入参数为：string，输出参数为：[]string 和 error。客户端函数是个 function&#x2F;函数，不是 method&#x2F;方法</li>
+<li>3、注意客户端函数业务代码执行过程中，任何情况下均不能退出进程</li>
+<li>4、客户端函数的类型必须严格匹配</li>
+</ul>
+<p>源码要求：</p>
+<ul>
+<li>1、代码运行结果应当正确</li>
+<li>2、不应该有 data race（race condition&#x2F;竞争条件&#x2F;数据竞争）。多线程客户端调用服务端时，不应当出现任何 2 个客户端得到的同样响应的可能性</li>
+<li>3、需要满足 Database transaction（数据库事务）的 Serializability（可串行性）要求（注意：Golang 的 data race 工具只能找到部分 data race 情况）</li>
+<li>4、代码不允许忽略错误，而且只能调用官方标准库，不能包含其他第三方代码（比如 github.com&#x2F;xxx，比如 “golang.org&#x2F;x&#x2F;sync&#x2F;xx”）。只有 GOROOT&#x2F;src 下面的库算官方库，其他都不算官方库</li>
+<li>5、实现应当简洁，代码可读性不能过差</li>
+</ul>
+<h3 id="设计思路"><a href="#设计思路" class="headerlink" title="设计思路"></a>设计思路</h3><p>1、http 服务，基于 http 协议规则实现，并非 socket 协议规则进行实现</p>
+<p>2、web 请求，restful 标准下，采用 POST 进行客户端的 web 服务请求</p>
+<p>3、开发第一个版本时服务器维护的内存数据结构采用 sync.Map，采用 client 不设置用户名称，统一设置 token 值为 Client，返回客户端数据为 string 类型，并通过简单的空格字符串 “ “ 进行分离每一个 []string 类型的元素</p>
+<p>4、（未完成）第二个版本客户端自设名称为 token 值，通过 header 包头的 token 值来对客户端进行区分，这个 token 值的维护放置于客户端，理论上为保证数据安全，应该放置于服务器。（2025 年再来看，只需要服务器端针对于 token 进行校验即可，jwt 的设置即为服务器端不保存 token，由客户端自行维护，当然这里可以采用双 token 的设计方法，在服务器端进行 redis 存储，当然设计也是有安全性风险的，但是一般性企业也不会需要安全性高到此中设计程度）</p>
+<h3 id="开发的细节"><a href="#开发的细节" class="headerlink" title="开发的细节"></a>开发的细节</h3><blockquote>
+<p>1、Go 语言很适合使用<strong>测试驱动开发</strong>，在工期缩短的情况下，可能不适用 TDD，而在工期充足的情况下，开发过程中，首先需要进行逻辑的梳理，逻辑梳理好之后再开始代码的撰写，上来就写代码都是想到哪里写到哪里，这种习惯不好，<strong>最合适的方法是先使用注释写好相应的需求逻辑，再写代码，对于逻辑思考很实用</strong>！</p>
+<p>2、在做 string 字符串存储成 []string 类型的切片的时候，服务器端程序也需要使用一个 []string 类型进行保存，但是服务器回显给客户端是以 io.writer 实现的 writer 接口返回 []byte 流的数据，<strong>而 []string 直接转为 []byte 流数据形式，之后客户端对于格式的处理较为麻烦</strong>，所以最好还是 []string 类型，通过拼接一个 string 传输给客户端，我选择 []string 中间分割字符为空格字符。客户端接收到这个 string 类型的字符串后，使用 strings.Split() 函数，以空格字符进行分割。</p>
+<p>3、为了解决客户端先于服务器端启动时间不同，导致的客户端 Dial 服务器端发生端口拒绝错误，采用 for 循环提交 POST 请求，直到请求建立成功后，再 break for 循环。</p>
+<p>4、bug fix: 防止程序 panic 掉，mutex.unlock 并未释放，所以采用 defer m.Unlock 合适</p>
+</blockquote>
+<h3 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h3><p>在服务器端，<strong>使用 sync.Map 数据结构对传输的字符串进行存储，防止进行并发访问与并发存储</strong>，但是由于自己在并发的能力功底不足，导致虽然设计是 sync.Map 控制，但仍存在 data race 的情况，无奈之下还是对一整段进行了加锁处理，其实也能使用全局的 channel 进行处理。但是这都与最初自己想要一步实现拒绝数据的竞争性访问的设计理念冲突，暂时也没想到很好的解决办法！等日后再对其进行优化！</p>
+<h3 id="代码附件"><a href="#代码附件" class="headerlink" title="代码附件"></a>代码附件</h3><p>客户端：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> gohttp<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;bytes&quot;</span><br>	<span class="hljs-string">&quot;fmt&quot;</span><br>	<span class="hljs-string">&quot;io&quot;</span><br>	<span class="hljs-string">&quot;io/ioutil&quot;</span><br>	<span class="hljs-string">&quot;net/http&quot;</span><br>	<span class="hljs-string">&quot;strings&quot;</span><br>	<span class="hljs-string">&quot;time&quot;</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BcjClient</span><span class="hljs-params">(writer <span class="hljs-type">string</span>)</span></span> ([]<span class="hljs-type">string</span>, <span class="hljs-type">error</span>) &#123;<br>	<span class="hljs-keyword">var</span> r *http.Response<br>	<span class="hljs-keyword">for</span> &#123;<br>		client := &amp;http.Client&#123;&#125;<br>		req, err := http.NewRequest(<br>			http.MethodPost,<br>			<span class="hljs-string">&quot;http://127.0.0.1:8999/v1&quot;</span>,<br>			bytes.NewReader([]<span class="hljs-type">byte</span>(writer)),<br>		)<br><br>		req.Header.Add(<span class="hljs-string">&quot;Token&quot;</span>, <span class="hljs-string">&quot;Client&quot;</span>)<br>		req.Header.Add(<span class="hljs-string">&quot;content-Type&quot;</span>, <span class="hljs-string">&quot;text/plain&quot;</span>)<br><br>		r, err = client.Do(req)<br>		<span class="hljs-keyword">if</span> err == <span class="hljs-literal">nil</span> &#123;<br>			<span class="hljs-keyword">break</span><br>		&#125; <span class="hljs-keyword">else</span> &#123;<br>			fmt.Printf(<span class="hljs-string">&quot;err: %s\n&quot;</span>, err)<br>			time.Sleep(<span class="hljs-number">3</span> * time.Second)<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(Body io.ReadCloser)</span></span> &#123;<br>		_ = Body.Close()<br>	&#125;(r.Body)<br><br>	content, err := ioutil.ReadAll(r.Body)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err<br>	&#125;<br><br>	<span class="hljs-comment">//将传入的字符串变成字符串切片，并除去最后的换行格式问题！</span><br>	ToVisual := strings.Split(<span class="hljs-type">string</span>(content), <span class="hljs-string">&quot; &quot;</span>)<br>	ToVisual = ToVisual[:<span class="hljs-built_in">len</span>(ToVisual)<span class="hljs-number">-1</span>]<br><br>	<span class="hljs-keyword">return</span> ToVisual, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>服务器端：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> gohttp<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;fmt&quot;</span><br>	<span class="hljs-string">&quot;io/ioutil&quot;</span><br>	<span class="hljs-string">&quot;net/http&quot;</span><br>	<span class="hljs-string">&quot;sync&quot;</span><br>)<br><br><span class="hljs-keyword">var</span> cache sync.Map<br><span class="hljs-keyword">var</span> m sync.Mutex<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">ClientHandler</span><span class="hljs-params">(writer http.ResponseWriter, req *http.Request)</span></span> &#123;<br><br>	<span class="hljs-keyword">if</span> req.Method != <span class="hljs-string">&quot;POST&quot;</span> &#123;<br>		_, _ = fmt.Fprintf(writer, <span class="hljs-string">&quot;Request is not POST! please send POST request!&quot;</span>)<br>		<span class="hljs-keyword">return</span><br>	&#125;<br><br>	token := req.Header.Get(<span class="hljs-string">&quot;Token&quot;</span>)<br>	body, err := ioutil.ReadAll(req.Body)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		_, _ = fmt.Fprintf(writer, <span class="hljs-string">&quot;read body err, %v\n&quot;</span>, err)<br>		<span class="hljs-keyword">return</span><br>	&#125;<br><br>	m.Lock()<br>	<span class="hljs-keyword">defer</span> m.Unlock()<br><br>	GetFromCache, ok := cache.Load(token)<br>	<span class="hljs-keyword">if</span> ok &#123;<br>		GetFromCache = <span class="hljs-built_in">append</span>(GetFromCache.([]<span class="hljs-type">string</span>), []<span class="hljs-type">string</span>&#123;<span class="hljs-type">string</span>(body)&#125;...)<br>		cache.Store(token, GetFromCache)<br>	&#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> !ok &#123;<br>		cache.Store(token, []<span class="hljs-type">string</span>&#123;<span class="hljs-type">string</span>(body)&#125;)<br>		GetFromCache, _ = cache.Load(token)<br>	&#125;<br><br>	change := GetFromCache.([]<span class="hljs-type">string</span>)<br>	<span class="hljs-keyword">var</span> ToClient <span class="hljs-type">string</span><br>	<span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> change &#123;<br>		ToClient += v<br>		ToClient += <span class="hljs-string">&quot; &quot;</span><br>	&#125;<br>	_, _ = fmt.Fprintf(writer, <span class="hljs-string">&quot;%s\n&quot;</span>, ToClient)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="Go-web-的相关知识复习（gin）"><a href="#Go-web-的相关知识复习（gin）" class="headerlink" title="Go web 的相关知识复习（gin）"></a>Go web 的相关知识复习（gin）</h2><p>开始动手学习一些框架的基本样例，抛开学习底层的设计不谈，主要还是参考文档进行相应的组件开发。</p>
+<h3 id="Beego-与-gin"><a href="#Beego-与-gin" class="headerlink" title="Beego 与 gin"></a>Beego 与 gin</h3><p>首先学习框架之前，需要我们理解一个道理，学习框架的目的首先是适应业务场景的需要，其次是分为两种大类：一种是为了开发效率，另一种是为了追求运行的性能。追求运行性能的框架包含的东西挺多，比如 GIN，另一种追求开发效率的框架封装得非常好，即是 Beego 框架。</p>
+<h3 id="路由分组"><a href="#路由分组" class="headerlink" title="路由分组"></a>路由分组</h3><p>gin 框架的路由分组为：对 router 创建 Group 即为分组，同一分组拥有同一前缀和同一中间件。其相关的写法如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs go">r := gin.Default()<br><br>v1 := r.Group(<span class="hljs-string">&quot;v1&quot;</span>)<br>&#123;<br>    v1.POST(<span class="hljs-string">&quot;/login&quot;</span>, login)<br>    v1.POST(<span class="hljs-string">&quot;/submit&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span>)</span><br>    v1.POST(<span class="hljs-string">&quot;/read&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span>)</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>路由分组的目的是：使路由更加清晰，方便管理路由。</p>
+<h3 id="中间件"><a href="#中间件" class="headerlink" title="中间件"></a>中间件</h3><p>在请求到达路由的方法前和后进行的一系列的操作，使用中间件的时候，在路由组上进行 use 操作，后面传入中间件函数即可。中间件有概念叫做<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/279391637">洋葱中间件</a>：</p>
+<p><img src="/images/go/gin.jpg" srcset="/img/loading.gif" lazyload alt="gin"></p>
+<p>用 Go 语言写的还有以下的相关中间件：</p>
+<blockquote>
+<p>日志：一般日志使用其他的工具：如 go-logging、logrus 等开源库。以及配合相应的日志切割工具去使用。</p>
+<p>Gorm：orm 是一种数据库操作辅助工具。Gorm 即是在 go 语言结构体和数据库产生映射，使得数据库关系、表内容可以直观的体现在结构体上。即可使用结构体完成增删改查的操作！至于 Gorm 如何使用，可以参考相应的详细文档，简单的增删改查可以使用 Gorm。设计复杂的结构以及优化操作，建议阅读 MYSQL 性能调优，阅读相应的例子进行优化。</p>
+</blockquote>
+<h3 id="框架的学习"><a href="#框架的学习" class="headerlink" title="框架的学习"></a>框架的学习</h3><p>快速掌握代码库中的库函数，最适合的学习方法为：先读库函数 -&gt; 再读相应的结构体定义 -&gt; 最后读相应的结构体绑定的方法。其中前两部分只需要执行 go doc 命令即可查看相应的函数与结构体，而第三部分需要仔细阅读相应的源码。记录学习的过程，建议使用思维导图，最后导入 markdown 文件中。</p>
+<h3 id="Restful-风格"><a href="#Restful-风格" class="headerlink" title="Restful 风格"></a>Restful 风格</h3><p>其中 restful 主要有四种方式：GET、POST、PUT、DELETE：</p>
+<blockquote>
+<p>GET 用于获取资源</p>
+<p>POST 用于创建资源</p>
+<p>PUT 用于修改资源</p>
+<p>DELETE 用于删除资源</p>
+</blockquote>
+<blockquote>
+<p>参考文档：<a target="_blank" rel="noopener" href="https://www.kancloud.cn/shuangdeyu/gin_book/949415">https://www.kancloud.cn/shuangdeyu/gin_book/949415</a>、<a target="_blank" rel="noopener" href="https://gorm.io/zh_CN/docs/">https://gorm.io/zh_CN/docs/</a></p>
+</blockquote>
+<h2 id="Zinx-框架的学习"><a href="#Zinx-框架的学习" class="headerlink" title="Zinx 框架的学习"></a>Zinx 框架的学习</h2><p>开始学习 Go 语言实现的 zinx 框架，项目地址为：<a target="_blank" rel="noopener" href="https://github.com/chaggle/zinx-study">https://github.com/chaggle/zinx-study</a></p>
+<blockquote>
+<p>使用 go mod 管理，初始化为 go mod init github.com&#x2F;chaggle&#x2F;zinx-study，并部署代码到 github.com 以及使用 go get 同步到本地 Gopath 的 github 包下！</p>
+</blockquote>
+<h3 id="V0-1-基础的-server-模块"><a href="#V0-1-基础的-server-模块" class="headerlink" title="V0.1 基础的 server 模块"></a>V0.1 基础的 server 模块</h3><blockquote>
+<p>方法：初始化服务器 NewServer(name string) ziface.IServer、启动服务器 Start()、停止服务器 Stop()、运行服务器 Serve()</p>
+<p>属性：名称 name、IP 版本 IPVersion、监听 IP IP、监听端口 Port</p>
+</blockquote>
+<h3 id="V0-2-简单的链接封装和业务绑定"><a href="#V0-2-简单的链接封装和业务绑定" class="headerlink" title="V0.2 简单的链接封装和业务绑定"></a>V0.2 简单的链接封装和业务绑定</h3><blockquote>
+<p>方法：启动链接 Start()、停止链接 Stop()、获取当前链接的 conn 对象（套接字）GetTCPConnection() *net.TCPConn、得到链接 ID GetConnID() uint32、得到客户端连接的地址和端口 RemoteAddr() net.TCPAddr、发送数据的方法 Send(data []byte) error</p>
+<p>属性：socket TCP 套接字 Conn *net.TCPConn、链接的 ID ConnID uint32、当前链接状态（是否已经关闭）isClosed bool、与当前链接所绑定的处理业务与方法 handlerAPI ziface.HandleFunc、等待退出的 channel 管道 ExitChan chan bool</p>
+</blockquote>
+<h3 id="V0-3-基础的-router-模块"><a href="#V0-3-基础的-router-模块" class="headerlink" title="V0.3 基础的 router 模块"></a>V0.3 基础的 router 模块</h3><p>Request 请求封装：将链接与数据绑定一起：</p>
+<blockquote>
+<p>属性：链接的句柄 GetConnection() IConnection、请求数据 GetData() []byte</p>
+<p>方法：得到链接 func (r *Request) GetConnection() ziface.IConnection、得到数据 func (r *Request) GetData() []byte、新建一个 Request 请求</p>
+</blockquote>
+<p>Router 模块：</p>
+<blockquote>
+<p>抽象的 IRouter：处理业务之前的方法 PreHandle(request IRequest)、处理业务的主方法 Handle(request IRequest)、处理业务之后的方法 PostHandle(request IRequest)</p>
+<p>具体的 BaseRouter：继承并实现三个接口方法</p>
+</blockquote>
+<p>zinx 集成 Router 模块：</p>
+<blockquote>
+<p>IServer 增添路由功能 AddRouter(router IRouter)</p>
+<p>Server 类增加 Router 成员（去掉之前的 HandAPI）</p>
+<p>Connection 类绑定一个 Router 成员</p>
+<p>在 Connection 调用已经注册过的 Router 处理业务</p>
+</blockquote>
+<p>当前版本只有一个路由能使用，如果加入新的路由模块，会使上一个路由模块的方法被重写覆盖。</p>
+<h3 id="V0-4-全局配置模块"><a href="#V0-4-全局配置模块" class="headerlink" title="V0.4 全局配置模块"></a>V0.4 全局配置模块</h3><blockquote>
+<p>路径：服务器项目主地址&#x2F;conf&#x2F;zinx.json（用户进行填写）</p>
+<p>创建一个 zinx 的全局配置模块 utils&#x2F;globalobj.go</p>
+<p>初始化后读取用户配置的 zinx.json，globalobj 对象中对应的 zinx 服务器句柄代码进行参数替换</p>
+<p>提供一个 GlobalObject 对象 var GlobalObject *GlobalObj</p>
+</blockquote>
+<h3 id="V0-5-消息封装"><a href="#V0-5-消息封装" class="headerlink" title="V0.5 消息封装"></a>V0.5 消息封装</h3><p>定义消息的结构 Message：</p>
+<blockquote>
+<p>属性：消息的 ID、消息的长度、消息的内容</p>
+<p>方法：SetMsgId(uint32)、SetData([]byte)、SetDataLen(uint32)、GetDataLen() uint32、GetMsgId() uint32、GetData() []byte</p>
+</blockquote>
+<p>定义解决 TCP 粘包问题的封包拆包的模块：</p>
+<blockquote>
+<p>针对 Message 进行 TLV 格式的封装 func (dp *DataPack) Pack(msg ziface.IMessage) ([]byte, error)：写 Message 的长度、写 Message 的 ID、写 Message 的内容</p>
+<p>针对 Message 进行 TLV 格式的拆包 func (dp *DataPack) Unpack(binaryData []byte) (ziface.IMessage, error)：先读取固定长度的 head（消息的长度和消息的类型），再根据消息内容的长度，再进行一次读写，从 conn 中读取消息的内容</p>
+</blockquote>
+<p>将消息封装机制集成到 Zinx 框架中：</p>
+<blockquote>
+<p>将 Message 添加到 Request 属性字段</p>
+<p>修改连接读取数据的机制，将之前的单纯读取 byte 改成拆包形式，读取按照 TLV 形式进行读取</p>
+<p>给链接提供一个发包的机制：将发送的消息打包，再发送</p>
+</blockquote>
+<h3 id="V0-6-多路由模式"><a href="#V0-6-多路由模式" class="headerlink" title="V0.6 多路由模式"></a>V0.6 多路由模式</h3><p>消息管理模块（支持多路由 API 调度管理）：</p>
+<blockquote>
+<p>属性：集合 - 消息 ID 与对应 router 的关系 - map Apis map[uint32]ziface.IRouter</p>
+<p>方法：根据 MsgId 来索引调度路由方法 func (mh *MsgHandle) DoMsgHandler(request ziface.IRequest)、添加路由方法到 map 集合中 func (mh *MsgHandle) AddRouter(msgID uint32, router ziface.IRouter)</p>
+</blockquote>
+<p>消息管理模块集成到 Zinx 框架中：</p>
+<blockquote>
+<p>将 server 模块里面的 Router 属性变为 MsgHandle 属性</p>
+<p>将 server 模块中的 AddRouter 修改调用 MsgHandler 的 AddRouter</p>
+<p>将 connection 模块中的 Router 属性替换为 MsgHandle 属性</p>
+<p>将 connection 模块中 Router 的业务调度改为 MsgHandle 调度，并修改 StartRead 方法</p>
+</blockquote>
+<h3 id="V0-7-读写协程分离"><a href="#V0-7-读写协程分离" class="headerlink" title="V0.7 读写协程分离"></a>V0.7 读写协程分离</h3><p>小修改，新增一个 goroutine 即可：</p>
+<blockquote>
+<p>1、添加一个 Reader 和 Writer 之间通信的 channel</p>
+<p>2、添加一个 Writer Goroutine</p>
+<p>3、Reader 由之前发送给客户端 改成 发送给 通信 Channel</p>
+<p>4、启动 Reader 和 Writer 一同工作</p>
+</blockquote>
+<h3 id="V0-8-消息队列以及多任务"><a href="#V0-8-消息队列以及多任务" class="headerlink" title="V0.8 消息队列以及多任务"></a>V0.8 消息队列以及多任务</h3><p>消息队列以及 Worker 工作池的实现：</p>
+<blockquote>
+<p>创建一个消息队列 — MsgHandler 消息管理模块：</p>
+<ul>
+<li>消息队列 TaskQueue []chan ziface.IRequest</li>
+<li>工作池的数量 WorkPoolSize uint32</li>
+</ul>
+<p>创建多任务 work 工作池，并且启动：</p>
+<ul>
+<li>创建一个 worker 工作池：func (mh *MsgHandle) StartWorkerPool()</li>
+<li>根据 WorkPoolSize 的数量去创建 Worker</li>
+<li>每个 worker 都应该用一个 Go 去承载</li>
+<li>1、阻塞等待当前 worker 的对应的 channel 的消息</li>
+<li>2、一旦有消息到来，worker 应该处理当前消息对应的业务</li>
+<li>3、将之前的发送消息，全部改成将消息发送给消息队列和 worker 工作池处理</li>
+</ul>
+<p>定义一个方法，将消息发送给消息队列工作池的方法：</p>
+<ul>
+<li>func (mh *MsgHandle) SendMsgToTaskQueue(request ziface.IRequest)</li>
+</ul>
+</blockquote>
+<p>将消息队列机制集成到 Zinx 框架中：</p>
+<blockquote>
+<p>1、开启并调用消息队列及 worker 工作池，保证 workerPool 只有一个，应该在创建 Server 模块时候开启（在 Server listen 之前添加）</p>
+<p>2、将从客户端处理的消息，发送给当前的 Worker 工作池来处理，在处理完拆包，得到了 request 请求，交给工作池来处理</p>
+</blockquote>
+<p>小型项目，具体以技术方案跟思考为主，而与需求、产品、测试、运维的沟通可以让步于项目的上线。</p>
+<h2 id="Go语言实现的轻量级IM项目"><a href="#Go语言实现的轻量级IM项目" class="headerlink" title="Go语言实现的轻量级IM项目"></a>Go语言实现的轻量级IM项目</h2><p>项目地址：<a target="_blank" rel="noopener" href="https://github.com/chaggle/go-im">https://github.com/chaggle/go-im</a></p>
+<h3 id="V0-1：建立基础的-main-go、server-go"><a href="#V0-1：建立基础的-main-go、server-go" class="headerlink" title="V0.1：建立基础的 main.go、server.go"></a>V0.1：建立基础的 main.go、server.go</h3><blockquote>
+<p>main 功能主要为创建服务器以及启动服务器</p>
+<p>server 功能有：</p>
+<p>1、创建 server 对象</p>
+<p>2、启动 Server 服务（TCP socket 套接字）</p>
+<p>3、处理连接的业务</p>
+</blockquote>
+<h3 id="V0-2：用户上线功能"><a href="#V0-2：用户上线功能" class="headerlink" title="V0.2：用户上线功能"></a>V0.2：用户上线功能</h3><blockquote>
+<p>user 功能新增：</p>
+<p>1、创建 user 对象</p>
+<p>2、监听每个 user 对应的 channel 的消息</p>
+<p>server 新增功能：</p>
+<p>1、新增 OnlineMap 与 Message 属性</p>
+<p>2、在处理客户端上线的 Handler 创建并添加用户（使用到 OS 中的同步 Lock）</p>
+<p>3、新增广播消息方法以及监听广播消息的 channel 方法</p>
+</blockquote>
+<h3 id="V0-3：用户消息广播机制完善"><a href="#V0-3：用户消息广播机制完善" class="headerlink" title="V0.3：用户消息广播机制完善"></a>V0.3：用户消息广播机制完善</h3><blockquote>
+<p>server 新增功能：</p>
+<p>1、完善 handle 模块处处理业务的方法，启动一个针对于当前客户端的读 goroutine</p>
+</blockquote>
+<h3 id="V0-4：用户业务层封装"><a href="#V0-4：用户业务层封装" class="headerlink" title="V0.4：用户业务层封装"></a>V0.4：用户业务层封装</h3><blockquote>
+<p>对于用户层业务的层次化、模块化：</p>
+<p>server 中的 user 业务进行迁移：</p>
+<p>1、server 关联</p>
+<p>2、新增 Online、Offline、Domessage 方法</p>
+</blockquote>
+<h3 id="V0-5：查询用户名以及用户名修改"><a href="#V0-5：查询用户名以及用户名修改" class="headerlink" title="V0.5：查询用户名以及用户名修改"></a>V0.5：查询用户名以及用户名修改</h3><blockquote>
+<p>user 新增两个功能：</p>
+<p>1、用户名查询的功能</p>
+<p>2、用户名修改的功能，保证每个用户名唯一</p>
+</blockquote>
+<h3 id="V0-6：超时强制下线以及私聊功能"><a href="#V0-6：超时强制下线以及私聊功能" class="headerlink" title="V0.6：超时强制下线以及私聊功能"></a>V0.6：超时强制下线以及私聊功能</h3><blockquote>
+<p>user 新增两个功能：</p>
+<p>1、设置定时器，超时强制剔除，发消息代表活跃，长时间不发消息代表超时，即强制关闭用户连接</p>
+<p>2、私聊功能，通过获取用户名队列中的用户名，来向用户发起私聊</p>
+</blockquote>
+<h3 id="V1-0、V1-1：客户端基本功能"><a href="#V1-0、V1-1：客户端基本功能" class="headerlink" title="V1.0、V1.1：客户端基本功能"></a>V1.0、V1.1：客户端基本功能</h3><blockquote>
+<p>新增 client 客户端，当然并非 GUI 界面版本，也可以使用带 GUI 界面版本，满足通信协议即可：</p>
+<p>1、连接建立功能、命令行解析功能</p>
+<p>2、客户端菜单功能的预写</p>
+</blockquote>
+<h3 id="V1-2：客户端的相应基本请求"><a href="#V1-2：客户端的相应基本请求" class="headerlink" title="V1.2：客户端的相应基本请求"></a>V1.2：客户端的相应基本请求</h3><blockquote>
+<p>client 新增：</p>
+<p>1、用户名修改请求，通过 io.copy() 阻塞监听的方式进行回显输出</p>
+<p>2、用户进入公聊模式，进行消息的广播与退出公聊模式</p>
+<p>3、用户进行私聊模式，选择用户功能封装以及单独对其发送消息</p>
+</blockquote>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/go/" class="category-chain-item">go</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/Go/" class="print-no-link">#Go</a>
+      
+        <a href="/tags/HTTP/" class="print-no-link">#HTTP</a>
+      
+        <a href="/tags/gin/" class="print-no-link">#gin</a>
+      
+        <a href="/tags/zinx/" class="print-no-link">#zinx</a>
+      
+        <a href="/tags/IM/" class="print-no-link">#IM</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Go 网络编程与框架学习笔记</div>
+      <div>https://chaggle.github.io/2026/08/10/go/network-frameworks-20260811/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月11日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/10/go/concurrency-memory-20260811/" title="Go 并发与内存学习笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Go 并发与内存学习笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/10/bigdata/datasophon-iteration-vs-transformation-20260811/" title="企业级大数据底座技术架构与未来迭代思路">
+                        <span class="hidden-mobile">企业级大数据底座技术架构与未来迭代思路</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'c4d3f0bef26c0048614e4c1c0c907cae'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

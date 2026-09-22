@@ -1,0 +1,1682 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/09/bigdata/datasophon-deploy-params-20260810/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="本文基于本地源码工程（datasophon，2.0.0 分支，对应 datasophon-api&#x2F;src&#x2F;main&#x2F;resources&#x2F;meta&#x2F;DDP-2.0.0）梳理 DataSophon 的组件部署机制：服务如何定义、参数如何组织、平台如何自动注入变量，并逐一给出核心组件的参数说明与优化建议。此前的手工部署与调优系列（HDFS&#x2F;YARN&#x2F;Hive&#x2F;Spark&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DataSophon 部署大数据组件：参数说明与优化实践">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/09/bigdata/datasophon-deploy-params-20260810/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="本文基于本地源码工程（datasophon，2.0.0 分支，对应 datasophon-api&#x2F;src&#x2F;main&#x2F;resources&#x2F;meta&#x2F;DDP-2.0.0）梳理 DataSophon 的组件部署机制：服务如何定义、参数如何组织、平台如何自动注入变量，并逐一给出核心组件的参数说明与优化建议。此前的手工部署与调优系列（HDFS&#x2F;YARN&#x2F;Hive&#x2F;Spark&amp;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-09T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T16:02:21.195Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="datasophon">
+<meta property="article:tag" content="部署">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>DataSophon 部署大数据组件：参数说明与优化实践 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="DataSophon 部署大数据组件：参数说明与优化实践"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-09 16:00" pubdate>
+          2026年8月9日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          10k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          88 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">DataSophon 部署大数据组件：参数说明与优化实践</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-11T00:02:21+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>本文基于本地源码工程（<code>datasophon</code>，2.0.0 分支，对应 <code>datasophon-api/src/main/resources/meta/DDP-2.0.0</code>）梳理 DataSophon 的组件部署机制：服务如何定义、参数如何组织、平台如何自动注入变量，并逐一给出核心组件的参数说明与优化建议。此前的手工部署与调优系列（HDFS&#x2F;YARN&#x2F;Hive&#x2F;Spark&#x2F;Flink&#x2F;ZK&#x2F;Kafka 等调优实践）可作为参数取舍的理论依据，本文讲”在 DataSophon 里这些参数长什么样、怎么配”。</p>
+</blockquote>
+<h2 id="一、DataSophon-2-0-0-组件全景"><a href="#一、DataSophon-2-0-0-组件全景" class="headerlink" title="一、DataSophon 2.0.0 组件全景"></a>一、DataSophon 2.0.0 组件全景</h2><p>源码中 <code>meta/DDP-2.0.0/</code> 目录定义了当前版本支持的全部服务，每个服务一个 <code>service_ddl.json</code>。共 21 个组件：</p>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>版本</th>
+<th>依赖</th>
+<th>角色（roleType）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ZOOKEEPER</td>
+<td>3.6.4</td>
+<td>无</td>
+<td>ZkServer（master）</td>
+</tr>
+<tr>
+<td>HDFS</td>
+<td>3.3.6</td>
+<td>ZOOKEEPER</td>
+<td>JournalNode、NameNode、ZKFC（master）、DataNode（worker）、HdfsClient（client）</td>
+</tr>
+<tr>
+<td>YARN</td>
+<td>3.3.6</td>
+<td>HDFS</td>
+<td>ResourceManager、HistoryServer（master）、NodeManager（worker）、YarnClient（client）</td>
+</tr>
+<tr>
+<td>HIVE</td>
+<td>3.1.3</td>
+<td>HDFS</td>
+<td>HiveMetaStore、HiveServer2（master）、HiveClient（client）</td>
+</tr>
+<tr>
+<td>SPARK3</td>
+<td>3.4.3</td>
+<td>无</td>
+<td>SparkClient3（client）</td>
+</tr>
+<tr>
+<td>FLINK</td>
+<td>1.16.2</td>
+<td>无</td>
+<td>FlinkClient（client）</td>
+</tr>
+<tr>
+<td>KAFKA</td>
+<td>2.8.2</td>
+<td>ZOOKEEPER</td>
+<td>KafkaBroker（master）</td>
+</tr>
+<tr>
+<td>TEZ</td>
+<td>0.10.4</td>
+<td>HDFS</td>
+<td>TezServer（master）、TezClient（client）</td>
+</tr>
+<tr>
+<td>HBASE</td>
+<td>2.4.16</td>
+<td>HDFS</td>
+<td>HbaseMaster（master）、RegionServer（worker）</td>
+</tr>
+<tr>
+<td>DORIS</td>
+<td>1.2.6</td>
+<td>无</td>
+<td>DorisFE（master）、DorisFEObserver（worker）、DorisBE（worker）</td>
+</tr>
+<tr>
+<td>DS（DolphinScheduler）</td>
+<td>3.1.8</td>
+<td>ZOOKEEPER</td>
+<td>ApiServer、MasterServer、AlertServer（master）、WorkerServer（worker）</td>
+</tr>
+<tr>
+<td>KYUUBI</td>
+<td>1.7.3</td>
+<td>无</td>
+<td>KyuubiServer（master）、KyuubiClient（client）</td>
+</tr>
+<tr>
+<td>RANGER</td>
+<td>2.1.0</td>
+<td>无</td>
+<td>RangerAdmin（master）</td>
+</tr>
+<tr>
+<td>KERBEROS</td>
+<td>1.15.1</td>
+<td>无</td>
+<td>Krb5Kdc、KAdmin（master）、Krb5Client（client）</td>
+</tr>
+<tr>
+<td>TRINO</td>
+<td>367</td>
+<td>无</td>
+<td>TrinoCoordinator（master）、TrinoWorker（worker）</td>
+</tr>
+<tr>
+<td>ELASTICSEARCH</td>
+<td>7.16.2</td>
+<td>无</td>
+<td>ElasticSearch（master）、EsExporter（master）</td>
+</tr>
+<tr>
+<td>ICEBERG</td>
+<td>1.4.0</td>
+<td>无</td>
+<td>IcebergClient（client）</td>
+</tr>
+<tr>
+<td>STREAMPARK</td>
+<td>2.1.1</td>
+<td>无</td>
+<td>StreamPark（master）</td>
+</tr>
+<tr>
+<td>PROMETHEUS</td>
+<td>2.54.0</td>
+<td>无</td>
+<td>Prometheus（master）</td>
+</tr>
+<tr>
+<td>GRAFANA</td>
+<td>11.2.1</td>
+<td>无</td>
+<td>Grafana（master）</td>
+</tr>
+<tr>
+<td>ALERTMANAGER</td>
+<td>0.23.0</td>
+<td>无</td>
+<td>AlertManager（master）</td>
+</tr>
+</tbody></table>
+<div class="note note-info">
+            <p><strong>依赖关系即安装顺序</strong>：HDFS 依赖 ZOOKEEPER，YARN&#x2F;Hive&#x2F;Tez&#x2F;HBase 依赖 HDFS，Kafka&#x2F;DolphinScheduler 依赖 ZOOKEEPER。DataSophon 在安装向导中按依赖拓扑排序，先装依赖服务。</p> 
+          </div>
+
+<div class="note note-warning">
+            <p>本地工程为<strong>定制版本</strong>：Hive&#x2F;Ranger 等服务的元数据库默认指向<strong>达梦数据库</strong>（<code>javax.jdo.option.ConnectionDriverName=dm.jdbc.driver.DmDriver</code>），与社区版默认 MySQL 不同。部署前务必按企业环境修改数据库连接参数。</p> 
+          </div>
+
+<h2 id="二、服务定义模型（service-ddl-json）"><a href="#二、服务定义模型（service-ddl-json）" class="headerlink" title="二、服务定义模型（service_ddl.json）"></a>二、服务定义模型（service_ddl.json）</h2><p>每个组件的 <code>service_ddl.json</code> 描述四件事：<strong>服务</strong>、<strong>角色</strong>、<strong>启停脚本</strong>、<strong>参数</strong>。</p>
+<h3 id="1-服务与角色"><a href="#1-服务与角色" class="headerlink" title="1. 服务与角色"></a>1. 服务与角色</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;HDFS&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;3.3.6&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;dependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;ZOOKEEPER&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;packageName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;hadoop-3.3.6.tar.gz&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;roles&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>    <span class="hljs-punctuation">&#123;</span><br>      <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;NameNode&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;roleType&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;master&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;runAs&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;user&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;hdfs&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;group&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;hadoop&quot;</span> <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;cardinality&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1+&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;logFile&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;$&#123;hadoopLogDir&#125;/hadoop-hdfs-namenode-$&#123;host&#125;.log&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;jmxPort&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">27001</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;externalLink&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;NameNode Ui&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;url&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http://$&#123;host&#125;:9870&quot;</span> <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">&#125;</span><br>  <span class="hljs-punctuation">]</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>关键字段：</p>
+<ul>
+<li><code>cardinality</code>：角色实例数约束（<code>1</code> 表示固定 1 个，<code>1+</code> 表示至少 1 个可多个）——HDFS 的 JournalNode&#x2F;NameNode 是 <code>1+</code>，配合 HA 参数实现双主</li>
+<li><code>runAs</code>：进程运行用户与组（hdfs:hadoop、kafka:kafka 等），平台自动创建用户与组</li>
+<li><code>startRunner/stopRunner/statusRunner</code>：调用的控制脚本与参数（如 <code>control_hadoop.sh start namenode</code>），脚本在服务目录内</li>
+<li><code>externalLink</code>：部署完成后 Web UI 直链（NameNode 9870、RM 8088 等）</li>
+<li><code>jmxPort</code>：JMX 指标端口，Prometheus 抓取用</li>
+</ul>
+<h3 id="2-参数模型"><a href="#2-参数模型" class="headerlink" title="2. 参数模型"></a>2. 参数模型</h3><p>每个参数是一个对象，字段含义：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>name</code></td>
+<td>参数名（即写入组件配置文件的键）</td>
+</tr>
+<tr>
+<td><code>label</code> &#x2F; <code>description</code></td>
+<td>界面展示的中文名与说明</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>控件类型：<code>input</code>、<code>select</code>、<code>switch</code>、<code>slider</code>、<code>multiple</code>（数组）、<code>multipleWithKey</code>（自定义键值对）</td>
+</tr>
+<tr>
+<td><code>configType</code></td>
+<td>参数归属：<code>ha</code>（高可用）、<code>path</code>（路径）、<code>map</code>（环境变量）、<code>rack</code>（机架）、<code>kb</code>（Kerberos）、<code>permission</code>（Ranger 权限）、<code>custom</code>（自定义配置）</td>
+</tr>
+<tr>
+<td><code>value</code> &#x2F; <code>defaultValue</code></td>
+<td>当前值 &#x2F; 默认值</td>
+</tr>
+<tr>
+<td><code>configurableInWizard</code></td>
+<td>是否在安装向导中可改</td>
+</tr>
+<tr>
+<td><code>hidden</code></td>
+<td>是否在界面隐藏</td>
+</tr>
+</tbody></table>
+<div class="note note-info">
+            <p><strong>参数渲染机制</strong>：<code>configType</code> 决定参数在向导中如何分组展示（HA 组、Kerberos 组、机架组……），最终由 worker 端的 FreeMarker 模板（<code>templates/*.ftl</code>，如 <code>hdfs-site.xml</code> 由 <code>xml.ftl</code>、<code>capacity-scheduler.ftl</code>、<code>jvm.config.ftl</code>）渲染成组件真实配置文件。<code>multipleWithKey</code> 类型的参数允许”自定义配置 key&#x3D;value 追加到配置文件”——这是不改源码扩展参数的口子。</p> 
+          </div>
+
+<h2 id="三、变量注入机制"><a href="#三、变量注入机制" class="headerlink" title="三、变量注入机制"></a>三、变量注入机制</h2><p>参数默认值大量使用 <code>$&#123;...&#125;</code> 占位符，部署时平台自动解析：</p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th>来源</th>
+<th>示例用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>$&#123;zkUrls&#125;</code></td>
+<td>Zookeeper 服务实例</td>
+<td>HDFS 的 <code>ha.zookeeper.quorum</code>、Kafka 的 <code>zookeeper.connect</code> 自动填入 ZK 地址</td>
+</tr>
+<tr>
+<td><code>$&#123;dfs.nameservices&#125;</code> &#x2F; <code>$&#123;nn1&#125;</code> &#x2F; <code>$&#123;nn2&#125;</code></td>
+<td>HDFS HA 参数</td>
+<td><code>fs.defaultFS=hdfs://$&#123;dfs.nameservices&#125;</code> 自动组装</td>
+</tr>
+<tr>
+<td><code>$&#123;host&#125;</code></td>
+<td>当前角色所在主机</td>
+<td>角色专属参数（<code>hive.server2.thrift.bind.host</code>）</td>
+</tr>
+<tr>
+<td><code>$&#123;realm&#125;</code></td>
+<td>KERBEROS 服务</td>
+<td>各组件 Kerberos principal 自动拼接</td>
+</tr>
+<tr>
+<td><code>$&#123;apiHost&#125;</code></td>
+<td>管理端地址</td>
+<td>数据库连接（<code>jdbc:...$&#123;apiHost&#125;...</code>）</td>
+</tr>
+<tr>
+<td><code>$&#123;HADOOP_HOME&#125;</code> &#x2F; <code>$&#123;INSTALL_PATH&#125;</code> 等</td>
+<td>安装路径</td>
+<td>日志、配置目录引用</td>
+</tr>
+<tr>
+<td><code>$&#123;metastoreHost&#125;</code> &#x2F; <code>$&#123;historyserverHost&#125;</code> &#x2F; <code>$&#123;rm1&#125;</code></td>
+<td>对应角色部署主机</td>
+<td>服务间地址互引</td>
+</tr>
+</tbody></table>
+<div class="note note-warning">
+            <p><strong>变量注入是”编排正确性”的核心</strong>：手工部署最大的痛点（地址写错、主机名不统一）被这套机制消解。但注意：${变量} 引用的服务必须已部署（如 <code>${zkUrls}</code> 需要先装 Zookeeper），依赖顺序错误会导致渲染出空地址。</p> 
+          </div>
+
+<h2 id="四、部署流程"><a href="#四、部署流程" class="headerlink" title="四、部署流程"></a>四、部署流程</h2><ol>
+<li><strong>建集群</strong>：创建集群、选框架版本（对应 DDP-2.0.0）</li>
+<li><strong>加主机</strong>：填 IP&#x2F;SSH 信息，管理端向节点分发 Worker 并采集主机信息（<code>host-info-collect.sh</code>）</li>
+<li><strong>选服务与角色分配</strong>：勾选组件 → 每个角色指定节点（master&#x2F;worker&#x2F;client 三类角色各就各位）</li>
+<li><strong>参数配置</strong>：向导中按 configType 分组展示参数，改动 <code>value</code> 即可；HA&#x2F;路径&#x2F;Kerberos 参数集中在此</li>
+<li><strong>一键部署</strong>：管理端生成 DAG（DAGBuildActor）→ 分发部署包（DispatcherWorkerActor）→ worker 解压 → 渲染配置（ConfigureServiceActor，FreeMarker）→ 执行 <code>control_xxx.sh</code> 启停（InstallServiceActor&#x2F;StartServiceActor）→ 状态回传</li>
+</ol>
+<h2 id="五、核心组件参数说明与优化"><a href="#五、核心组件参数说明与优化" class="headerlink" title="五、核心组件参数说明与优化"></a>五、核心组件参数说明与优化</h2><p>以下参数均来自 DDP-2.0.0 实际定义（含默认值），优化建议与《XXX 生产调优实践》系列一致。</p>
+<h3 id="HDFS（默认：blocksize-256M、replication-3、NN-堆-8G）"><a href="#HDFS（默认：blocksize-256M、replication-3、NN-堆-8G）" class="headerlink" title="HDFS（默认：blocksize 256M、replication 3、NN 堆 8G）"></a>HDFS（默认：blocksize 256M、replication 3、NN 堆 8G）</h3><table>
+<thead>
+<tr>
+<th>平台参数</th>
+<th>默认值</th>
+<th>说明与优化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>dfs.blocksize</code></td>
+<td>268435456（256M）</td>
+<td>已比社区默认 128M 大一档：大块省元数据；文件以小文件为主时改回 134217728</td>
+</tr>
+<tr>
+<td><code>dfs.replication</code></td>
+<td>3</td>
+<td>容量与可靠性取舍：有异地备份可降 2</td>
+</tr>
+<tr>
+<td><code>namenodeHeapSize</code>（slider）</td>
+<td>8</td>
+<td>NN 堆内存，按”每百万块 2~4G”估算：32C256G 中型集群调 16，64C512G 大规模调 32</td>
+</tr>
+<tr>
+<td><code>datanodeHeapSize</code></td>
+<td>8</td>
+<td>DN 堆，写密集调大</td>
+</tr>
+<tr>
+<td><code>dfs.namenode.handler.count</code>（slider）</td>
+<td>16</td>
+<td>按 <code>20×log2(节点数)</code>：百节点集群应调到 130~200</td>
+</tr>
+<tr>
+<td><code>dfs.datanode.handler.count</code></td>
+<td>8</td>
+<td>写密集调 30~50</td>
+</tr>
+<tr>
+<td><code>dfs.namenode.name.dir</code>（multiple）</td>
+<td>空</td>
+<td><strong>必填</strong>：多目录分盘（如 &#x2F;data1&#x2F;nn,&#x2F;data2&#x2F;nn），元数据命根子</td>
+</tr>
+<tr>
+<td><code>dfs.datanode.data.dir</code>（multiple）</td>
+<td>空</td>
+<td>每节点多盘逗号填多目录</td>
+</tr>
+<tr>
+<td><code>hadoop.tmp.dir</code></td>
+<td>&#x2F;data&#x2F;tmp&#x2F;hadoop</td>
+<td>运行临时目录，放数据盘</td>
+</tr>
+<tr>
+<td><code>dfs.journalnode.edits.dir</code></td>
+<td>&#x2F;data&#x2F;hdfs&#x2F;jn</td>
+<td>JournalNode 日志目录，独立盘</td>
+</tr>
+<tr>
+<td><code>enableRack</code> + rack 参数</td>
+<td>false</td>
+<td>大集群开启机架感知（TableMapping + rack.properties）</td>
+</tr>
+<tr>
+<td><code>dfs.permissions.enabled</code></td>
+<td>false</td>
+<td>注意默认关闭权限检查；接 Ranger 后由 Ranger 策略管权限</td>
+</tr>
+</tbody></table>
+<h3 id="YARN（默认：NM-内存-32G、容器上限-128G、公平调度）"><a href="#YARN（默认：NM-内存-32G、容器上限-128G、公平调度）" class="headerlink" title="YARN（默认：NM 内存 32G、容器上限 128G、公平调度）"></a>YARN（默认：NM 内存 32G、容器上限 128G、公平调度）</h3><table>
+<thead>
+<tr>
+<th>平台参数</th>
+<th>默认值</th>
+<th>说明与优化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>yarn.nodemanager.resource.memory-mb</code></td>
+<td>32768</td>
+<td>单节点容器内存总量：8C16G 配 12G、32C256G 配 220G、64C512G 配 460G（预留系统）</td>
+</tr>
+<tr>
+<td><code>yarn.nodemanager.resource.cpu-vcores</code></td>
+<td>4</td>
+<td>与 <code>pcores-vcores-multiplier</code>（2.1）配合：<code>pcores × 2.1</code> 是默认核数算法，可按物理核直接改</td>
+</tr>
+<tr>
+<td><code>yarn.scheduler.minimum/maximum-allocation-mb</code></td>
+<td>2048 &#x2F; 131072</td>
+<td>容器内存上下限：最小 2G、最大 128G，防单容器”一口吃太多”</td>
+</tr>
+<tr>
+<td><code>yarn.nodemanager.local-dirs</code> &#x2F; <code>log-dirs</code>（multiple）</td>
+<td>空</td>
+<td>多盘填多目录，容器临时数据与日志分散 IO</td>
+</tr>
+<tr>
+<td><code>yarn.log-aggregation-enable</code></td>
+<td>true</td>
+<td>日志聚合到 HDFS，<code>yarn.nodemanager.remote-app-log-dir</code> 指定位置</td>
+</tr>
+<tr>
+<td><code>yarn.nodemanager.aux-services</code></td>
+<td>spark_shuffle,mapreduce_shuffle</td>
+<td>已预置 Spark Shuffle Service，配合 Spark 动态分配</td>
+</tr>
+<tr>
+<td><code>yarn.resourcemanager.scheduler.class</code></td>
+<td>FairScheduler</td>
+<td>生产按队列规划选 Capacity 或保留 Fair：配合 <code>yarn.scheduler.fair.allocation.file</code> 定义队列</td>
+</tr>
+<tr>
+<td><code>yarn.node-labels.enabled</code></td>
+<td>true</td>
+<td>节点标签调度：大集群按”计算型&#x2F;内存型”打标签隔离</td>
+</tr>
+</tbody></table>
+<h3 id="Zookeeper（默认：堆-1G、tickTime-2000）"><a href="#Zookeeper（默认：堆-1G、tickTime-2000）" class="headerlink" title="Zookeeper（默认：堆 1G、tickTime 2000）"></a>Zookeeper（默认：堆 1G、tickTime 2000）</h3><table>
+<thead>
+<tr>
+<th>平台参数</th>
+<th>默认值</th>
+<th>说明与优化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>dataDir</code> &#x2F; <code>dataLogDir</code></td>
+<td>&#x2F;data&#x2F;zookeeper、&#x2F;data&#x2F;log&#x2F;zookeeper</td>
+<td>快照与事务日志<strong>分目录分盘</strong>，事务日志盘性能决定写性能</td>
+</tr>
+<tr>
+<td><code>zkHeapSize</code>（slider）</td>
+<td>1</td>
+<td>ZK 数据全在内存，2~4G 足够；不随规格盲目加大</td>
+</tr>
+<tr>
+<td><code>maxClientCnxns</code></td>
+<td>60</td>
+<td>连接池大的业务调 500~3000</td>
+</tr>
+<tr>
+<td><code>initLimit</code> &#x2F; <code>syncLimit</code></td>
+<td>10 &#x2F; 5</td>
+<td>大集群&#x2F;慢网络调 30&#x2F;10</td>
+</tr>
+<tr>
+<td><code>server.1</code> ~ <code>server.7</code></td>
+<td>空</td>
+<td>集群节点声明（ip:2888:3888），几台配几个</td>
+</tr>
+<tr>
+<td><code>autopurge.snapRetainCount</code> &#x2F; <code>purgeInterval</code></td>
+<td>3 &#x2F; 12</td>
+<td>快照自动清理，防磁盘写满</td>
+</tr>
+<tr>
+<td><code>custom.zoo.cfg</code>（multipleWithKey）</td>
+<td>-</td>
+<td>追加任意 zoo.cfg 配置的扩展口</td>
+</tr>
+</tbody></table>
+<h3 id="Kafka（默认：分区-8、副本-2、IO-线程-12、堆-6G）"><a href="#Kafka（默认：分区-8、副本-2、IO-线程-12、堆-6G）" class="headerlink" title="Kafka（默认：分区 8、副本 2、IO 线程 12、堆 6G）"></a>Kafka（默认：分区 8、副本 2、IO 线程 12、堆 6G）</h3><table>
+<thead>
+<tr>
+<th>平台参数</th>
+<th>默认值</th>
+<th>说明与优化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>num.partitions</code></td>
+<td>8</td>
+<td>分区数按吞吐规划：目标吞吐 ÷ 单分区吞吐；后期只加不减</td>
+</tr>
+<tr>
+<td><code>default.replication.factor</code></td>
+<td>2</td>
+<td>生产 3 副本 + 内置 topic（<code>offsets.topic.replication.factor=3</code>）</td>
+</tr>
+<tr>
+<td><code>num.network.threads</code> &#x2F; <code>num.io.threads</code></td>
+<td>3 &#x2F; 12</td>
+<td>按核数调：8C 网络 4、IO 8；32C IO 16</td>
+</tr>
+<tr>
+<td><code>log.dirs</code>（multiple）</td>
+<td>空</td>
+<td>数据目录多盘</td>
+</tr>
+<tr>
+<td><code>log.retention.hours</code></td>
+<td>168</td>
+<td>与磁盘容量联动，配 <code>log.retention.bytes</code> 更可控</td>
+</tr>
+<tr>
+<td><code>kafkaHeapSize</code>（slider）</td>
+<td>6</td>
+<td>页缓存优先，堆 4~8G 即可，不随规格涨</td>
+</tr>
+<tr>
+<td><code>message.max.bytes</code></td>
+<td>10000120</td>
+<td>单条消息上限，大消息业务按需调</td>
+</tr>
+<tr>
+<td><code>unclean.leader.election.enable</code></td>
+<td>false</td>
+<td>保持 false，杜绝数据乱序</td>
+</tr>
+</tbody></table>
+<h3 id="Hive（默认：MR-引擎、map-reduce-内存-8G、堆-256M）"><a href="#Hive（默认：MR-引擎、map-reduce-内存-8G、堆-256M）" class="headerlink" title="Hive（默认：MR 引擎、map&#x2F;reduce 内存 8G、堆 256M）"></a>Hive（默认：MR 引擎、map&#x2F;reduce 内存 8G、堆 256M）</h3><table>
+<thead>
+<tr>
+<th>平台参数</th>
+<th>默认值</th>
+<th>说明与优化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>hive.execution.engine</code></td>
+<td>mr（select）</td>
+<td>生产切 tez（装 TEZ 服务后）或 spark</td>
+</tr>
+<tr>
+<td><code>mapreduce.map/reduce.memory.mb</code></td>
+<td>8192</td>
+<td>MR 引擎容器内存；切 Tez 后由 <code>tez.container.size</code> 接管</td>
+</tr>
+<tr>
+<td><code>mapreduce.input.fileinputformat.split.maxsize</code></td>
+<td>1073741824（1G）</td>
+<td>输入分片上限：小文件多调小（如 256M）提并行</td>
+</tr>
+<tr>
+<td><code>hive.merge.mapfiles</code> &#x2F; <code>mapredfiles</code> &#x2F; <code>merge.size.per.task</code></td>
+<td>true&#x2F;true&#x2F;256M</td>
+<td>小文件合并三件套已默认开启</td>
+</tr>
+<tr>
+<td><code>hive.metastore.warehouse.dir</code></td>
+<td>&#x2F;user&#x2F;hive&#x2F;warehouse</td>
+<td>数仓根目录</td>
+</tr>
+<tr>
+<td><code>hiveHeapSize</code></td>
+<td>256</td>
+<td><strong>默认偏小</strong>：HiveServer2 堆按规格调 4~8G</td>
+</tr>
+<tr>
+<td><code>hive.server2.support.dynamic.service.discovery</code></td>
+<td>true</td>
+<td>HS2 多实例 + ZK 动态发现，HiveServer2 可多台</td>
+</tr>
+<tr>
+<td><code>custom.hive.site.xml</code></td>
+<td>-</td>
+<td>追加 hive-site.xml 参数扩展口（如 CBO、MapJoin 阈值）</td>
+</tr>
+</tbody></table>
+<h3 id="Spark3（默认：executor-8g×2core、driver-8g、动态分配开）"><a href="#Spark3（默认：executor-8g×2core、driver-8g、动态分配开）" class="headerlink" title="Spark3（默认：executor 8g×2core、driver 8g、动态分配开）"></a>Spark3（默认：executor 8g×2core、driver 8g、动态分配开）</h3><table>
+<thead>
+<tr>
+<th>平台参数</th>
+<th>默认值</th>
+<th>说明与优化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>spark.executor.memory</code> &#x2F; <code>spark.executor.cores</code></td>
+<td>8g &#x2F; 2</td>
+<td>单 Executor 内存 8<del>32G、核 3</del>5；8C16G 节点降 4g×2</td>
+</tr>
+<tr>
+<td><code>spark.driver.memory</code></td>
+<td>8g</td>
+<td>client 模式本地 JVM；大规模调 16g</td>
+</tr>
+<tr>
+<td><code>spark.dynamicAllocation.enabled</code> + min&#x2F;max</td>
+<td>true、1&#x2F;6</td>
+<td>动态分配已开；maxExecutors 按队列资源定</td>
+</tr>
+<tr>
+<td><code>spark.shuffle.service.enabled</code></td>
+<td>true</td>
+<td>与 YARN aux-services 的 spark_shuffle 配套</td>
+</tr>
+<tr>
+<td><code>spark.eventLog.enabled</code> &#x2F; <code>spark.history.fs.logDirectory</code></td>
+<td>true &#x2F; hdfs:&#x2F;&#x2F;…&#x2F;spark-logs</td>
+<td>事件日志与 HistoryServer 已默认开</td>
+</tr>
+<tr>
+<td><code>custom.spark.defaults.conf</code></td>
+<td>-</td>
+<td>追加参数口（AQE、广播阈值、Kryo 等按调优文章补）</td>
+</tr>
+</tbody></table>
+<h3 id="Flink（默认：JM-堆-1-6G、TM-1-28G）"><a href="#Flink（默认：JM-堆-1-6G、TM-1-28G）" class="headerlink" title="Flink（默认：JM 堆 1.6G、TM 1.28G）"></a>Flink（默认：JM 堆 1.6G、TM 1.28G）</h3><table>
+<thead>
+<tr>
+<th>平台参数</th>
+<th>默认值</th>
+<th>说明与优化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>jobmanager.memory.heap.size</code></td>
+<td>1600m</td>
+<td>8C16G 够用；大集群调 4~8G</td>
+</tr>
+<tr>
+<td><code>taskmanager.memory.flink.size</code></td>
+<td>1280m</td>
+<td><strong>偏小</strong>：按规格调（8C16G→12G、32C256G→24G），配合 <code>custom.flink.conf.yaml</code> 补托管内存比例</td>
+</tr>
+<tr>
+<td><code>enableJMHA</code> + zookeeper 参数</td>
+<td>false</td>
+<td>生产开启：<code>high-availability=zookeeper</code>、<code>storageDir</code> 指向 HDFS</td>
+</tr>
+<tr>
+<td><code>custom.flink.conf.yaml</code></td>
+<td>-</td>
+<td>追加 flink-conf.yaml 参数口（RocksDB、checkpoint、并行度）</td>
+</tr>
+</tbody></table>
+<h3 id="Tez（依赖-HDFS）"><a href="#Tez（依赖-HDFS）" class="headerlink" title="Tez（依赖 HDFS）"></a>Tez（依赖 HDFS）</h3><table>
+<thead>
+<tr>
+<th>平台参数</th>
+<th>默认值</th>
+<th>说明与优化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>tez.lib.uris</code></td>
+<td>${fs.defaultFS}&#x2F;tez&#x2F;tez.tar.gz</td>
+<td>平台自动把 Tez 库上传到 HDFS 并注入，无需手工 put</td>
+</tr>
+<tr>
+<td><code>custom.tez.site.xml</code></td>
+<td>-</td>
+<td>追加 tez-site.xml（<code>tez.container.size</code>、Session 超时等）</td>
+</tr>
+</tbody></table>
+<h3 id="Kerberos（1-15-1）"><a href="#Kerberos（1-15-1）" class="headerlink" title="Kerberos（1.15.1）"></a>Kerberos（1.15.1）</h3><table>
+<thead>
+<tr>
+<th>平台参数</th>
+<th>默认值</th>
+<th>说明与优化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>realm</code></td>
+<td>HADOOP.COM</td>
+<td>域名（全大写惯例）</td>
+</tr>
+<tr>
+<td><code>ticketLifetime</code> &#x2F; <code>renewLifetime</code></td>
+<td>24h &#x2F; 7d</td>
+<td>覆盖长作业：按作业时长调大 renew 并配自动续票</td>
+</tr>
+<tr>
+<td><code>kdcHost</code> &#x2F; <code>kadminHost</code></td>
+<td>${kdcHost}</td>
+<td>KDC 主机自动回填</td>
+</tr>
+</tbody></table>
+<div class="note note-info">
+            <p><strong>Kerberos 全局联动</strong>：各组件参数中的 <code>enableKerberos</code> 开关 + <code>configType=kb</code> 组（principal&#x2F;keytab 等）会统一启用：HDFS 的 <code>nn/_HOST@${realm}</code>、Kafka 的 <code>SASL_PLAINTEXT</code>、Hive 的 <code>hive.server2.authentication=kerberos</code> 全部由平台按 <code>${realm}</code> 自动组装——这正是”编排平台”相对手工部署的巨大优势。</p> 
+          </div>
+
+<h3 id="Ranger（2-1-0）"><a href="#Ranger（2-1-0）" class="headerlink" title="Ranger（2.1.0）"></a>Ranger（2.1.0）</h3><table>
+<thead>
+<tr>
+<th>平台参数</th>
+<th>默认值</th>
+<th>说明与优化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>auditStore</code></td>
+<td>elasticsearch</td>
+<td>审计存储指向 ES（版本内已集成 7.16.2）</td>
+</tr>
+<tr>
+<td><code>enableHDFSPlugin</code> &#x2F; <code>enableHIVEPlugin</code> &#x2F; <code>enableHBASEPlugin</code></td>
+<td>false</td>
+<td><strong>按需开启</strong>：开插件后对应组件侧自动生成 Ranger 集成（HDFS 的 <code>RangerHdfsAuthorizer</code>、HBase 的 coprocessor 类）</td>
+</tr>
+<tr>
+<td><code>rangerWebUrl</code> &#x2F; <code>rangerUserPass</code></td>
+<td>${rangerAdminUrl} &#x2F; 初始密码</td>
+<td>部署后立即修改默认密码</td>
+</tr>
+</tbody></table>
+<h2 id="六、三档规格参数速查"><a href="#六、三档规格参数速查" class="headerlink" title="六、三档规格参数速查"></a>六、三档规格参数速查</h2><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>8C16G</th>
+<th>32C256G</th>
+<th>64C512G</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>HDFS <code>namenodeHeapSize</code></td>
+<td>4</td>
+<td>16</td>
+<td>32</td>
+</tr>
+<tr>
+<td>YARN <code>memory-mb</code></td>
+<td>12G</td>
+<td>220G</td>
+<td>460G</td>
+</tr>
+<tr>
+<td>YARN <code>cpu-vcores</code></td>
+<td>6</td>
+<td>28</td>
+<td>58</td>
+</tr>
+<tr>
+<td>Kafka <code>kafkaHeapSize</code></td>
+<td>4</td>
+<td>8</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Spark executor</td>
+<td>4g×2</td>
+<td>16g×4</td>
+<td>32g×5</td>
+</tr>
+<tr>
+<td>Flink <code>taskmanager.memory.flink.size</code></td>
+<td>12G</td>
+<td>24G</td>
+<td>48G</td>
+</tr>
+<tr>
+<td>Hive <code>hiveHeapSize</code>(MB)</td>
+<td>4096</td>
+<td>8192</td>
+<td>16384</td>
+</tr>
+<tr>
+<td>ZK <code>zkHeapSize</code></td>
+<td>2</td>
+<td>4</td>
+<td>4</td>
+</tr>
+</tbody></table>
+<h2 id="七、部署优化建议"><a href="#七、部署优化建议" class="headerlink" title="七、部署优化建议"></a>七、部署优化建议</h2><ol>
+<li><strong>先装依赖链</strong>：ZOOKEEPER → HDFS → YARN → Hive&#x2F;Tez&#x2F;Spark&#x2F;Kafka；Kerberos 建议最早装（后续组件 principal 自动联动）</li>
+<li><strong>路径类参数（configType&#x3D;path）部署前一次配对</strong>：数据目录、日志目录、HA 地址，后期改动需重启组件</li>
+<li><strong>善用 <code>custom.*</code> 扩展参数</strong>：官方参数表没有的（如 Spark AQE、Hive MapJoin 阈值、Tez container 大小），用 <code>multipleWithKey</code> 追加，不必改源码</li>
+<li><strong>HA 参数组在向导中集中核对</strong>：HDFS 双 NN + JournalNode（3 台）+ ZKFC、YARN 双 RM，<code>cardinality=1+</code> 保证可分配两台</li>
+<li><strong>Kerberos&#x2F;Ranger 一键联动</strong>：安全需求高的集群，先装 KERBEROS，各组件开启 <code>enableKerberos</code>；再装 RANGER 并开启各组件插件</li>
+<li><strong>监控栈随装随用</strong>：PROMETHEUS + GRAFANA + ALERTMANAGER 由平台部署并自动抓取各组件 jmxPort</li>
+<li><strong>与手工部署的衔接</strong>：DataSophon 生成的配置文件在组件安装目录（<code>$&#123;INSTALL_PATH&#125;</code>）下，<code>custom.*</code> 追加的参数与平台默认参数合并渲染，排障时可直接查看最终配置文件，与调优系列文章的参数互相印证</li>
+</ol>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><ul>
+<li><strong>变量渲染出空地址</strong>（如 <code>zookeeper.connect</code> 为空）：依赖服务未安装或未启动，检查服务依赖顺序</li>
+<li><strong>参数修改不生效</strong>：向导中改参数后需重新分发配置并重启对应角色；<code>custom.*</code> 参数修改同理</li>
+<li><strong>达梦&#x2F;数据库连接失败</strong>：定制版默认达梦驱动，换 MySQL 需同步修改驱动类与连接串</li>
+<li><strong>角色分配不符校验</strong>：HA 角色（NameNode&#x2F;JournalNode&#x2F;RM）<code>cardinality=1+</code>，至少分配 1 个；双主需 2 个</li>
+<li><strong>部署失败排查入口</strong>：worker 端组件目录的 <code>control_xxx.sh</code> 脚本与日志（<code>logFile</code> 参数定义了路径），单角色可单独重装</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>DataSophon 的价值不在”省去敲命令”，而在<strong>把组件间的依赖、地址、安全联动固化成参数模型</strong>：变量注入解决了地址编排，configType 分类管理了 HA&#x2F;Kerberos&#x2F;Ranger 等横切关注点，<code>custom.*</code> 保留了手工调优的全部自由度。部署时按”依赖链 → 路径参数 → 规格参数 → 安全联动”的顺序推进，再结合调优系列的三档规格表，即可从”能装”走向”装好”。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/%E9%83%A8%E7%BD%B2/" class="print-no-link">#部署</a>
+      
+        <a href="/tags/datasophon/" class="print-no-link">#datasophon</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>DataSophon 部署大数据组件：参数说明与优化实践</div>
+      <div>https://chaggle.github.io/2026/08/09/bigdata/datasophon-deploy-params-20260810/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月9日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月11日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/09/bigdata/components-deploy-all-20260810/" title="大数据与中间件组件部署总览">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">大数据与中间件组件部署总览</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/09/bigdata/datasophon-local-vs-remote-20260810/" title="本地 DataSophon 与开源增强版对比及升级思路">
+                        <span class="hidden-mobile">本地 DataSophon 与开源增强版对比及升级思路</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '9073ab476274b5432a9830177c9085ab'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

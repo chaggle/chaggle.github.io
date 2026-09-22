@@ -1,0 +1,1073 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/10/bigdata/paimon-deploy-tuning-20260811/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="Paimon（原 Flink Table Store，Apache 孵化项目）是”流式数据湖仓”：在湖格式上叠加 LSM 结构与 Changelog，让 Flink 能对湖表做流读流写，主键表支持 CDC 同步与行级更新。本文覆盖原理（LSM&#x2F;Bucket&#x2F;Changelog）、集成部署（Flink&#x2F;Spark）、参数优化与常见问题。  底层原理速览 表类型：主键表">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Paimon 原理、部署与调优指南">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/10/bigdata/paimon-deploy-tuning-20260811/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="Paimon（原 Flink Table Store，Apache 孵化项目）是”流式数据湖仓”：在湖格式上叠加 LSM 结构与 Changelog，让 Flink 能对湖表做流读流写，主键表支持 CDC 同步与行级更新。本文覆盖原理（LSM&#x2F;Bucket&#x2F;Changelog）、集成部署（Flink&#x2F;Spark）、参数优化与常见问题。  底层原理速览 表类型：主键表">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-10T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T16:41:03.099Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="flink">
+<meta property="article:tag" content="paimon">
+<meta property="article:tag" content="湖仓">
+<meta property="article:tag" content="部署">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Paimon 原理、部署与调优指南 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Paimon 原理、部署与调优指南"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-10 16:00" pubdate>
+          2026年8月10日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          34 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Paimon 原理、部署与调优指南</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-11T00:41:03+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>Paimon（原 Flink Table Store，Apache 孵化项目）是”流式数据湖仓”：在湖格式上叠加 LSM 结构与 Changelog，让 <strong>Flink 能对湖表做流读流写</strong>，主键表支持 CDC 同步与行级更新。本文覆盖原理（LSM&#x2F;Bucket&#x2F;Changelog）、集成部署（Flink&#x2F;Spark）、参数优化与常见问题。</p>
+</blockquote>
+<h2 id="底层原理速览"><a href="#底层原理速览" class="headerlink" title="底层原理速览"></a>底层原理速览</h2><ul>
+<li><strong>表类型</strong>：主键表（Primary Key，支持行级更新&#x2F;删除）与 Append-Only 表（纯追加，日志型场景）</li>
+<li><strong>LSM 结构</strong>：写入先进内存缓冲（MemTable），落盘成 Sorted Run（有序数据文件），查询时多路归并——与 HBase&#x2F;RocksDB 同款思路，换来了<strong>随机写变顺序写</strong></li>
+<li><strong>Bucket（分桶）</strong>：主键哈希分桶，桶是写入与并发的最小单元，桶内有序；<strong>桶数建表后不可改</strong></li>
+<li><strong>Changelog</strong>：主键表每次变更产生增删改记录，落在 changelog 文件里 → 下游可做<strong>增量流读</strong>（实时数仓”湖上实时”的关键）</li>
+<li><strong>Compaction</strong>：后台把多个 Sorted Run 合并（减少读放大）；full-compaction 生成完整 changelog</li>
+<li><strong>Lookup</strong>：主键点查走索引文件，Flink Join 湖表时按需拉取，替代”全表缓存”</li>
+<li><strong>与 Iceberg 对比</strong>：Iceberg 是”批写批读 + ACID”，Paimon 是”流写流读 + LSM”，Paimon 更贴 Flink 生态，Iceberg 更贴 Spark 生态</li>
+</ul>
+<div class="note note-info">
+            <p>Paimon 一句话定位：<strong>把 Flink 的状态和 Changelog 落成”可读可查的湖表”</strong>。以前 Flink 实时数仓的明细要写 Kafka + 再同步到 Hive&#x2F;OLAP，现在直接写 Paimon，下游 Spark&#x2F;Doris&#x2F;Trino 都能读，还能继续流读。</p> 
+          </div>
+
+<h2 id="部署（集成式，强依赖-Flink）"><a href="#部署（集成式，强依赖-Flink）" class="headerlink" title="部署（集成式，强依赖 Flink）"></a>部署（集成式，强依赖 Flink）</h2><h3 id="1-集成-Flink"><a href="#1-集成-Flink" class="headerlink" title="1. 集成 Flink"></a>1. 集成 Flink</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 拷贝 paimon-flink（带连接器版本）到 $FLINK_HOME/lib</span><br><span class="hljs-built_in">cp</span> paimon-flink-1.18-0.8.x.jar <span class="hljs-variable">$FLINK_HOME</span>/lib/<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- Flink SQL 注册 Catalog</span><br><span class="hljs-keyword">CREATE</span> CATALOG paimon <span class="hljs-keyword">WITH</span> (<br>  <span class="hljs-string">&#x27;type&#x27;</span> <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;paimon&#x27;</span>,<br>  <span class="hljs-string">&#x27;warehouse&#x27;</span> <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;hdfs:///paimon&#x27;</span>,<br>  <span class="hljs-string">&#x27;metastore&#x27;</span> <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;filesystem&#x27;</span>          <span class="hljs-comment">-- 或 hive（借用 HMS）</span><br>  <span class="hljs-comment">-- ,&#x27;uri&#x27; = &#x27;thrift://node1:9083&#x27;   -- metastore=hive 时配置</span><br>);<br>USE CATALOG paimon;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 建主键表（流写流读的核心形态）</span><br><span class="hljs-keyword">CREATE TABLE</span> dwd_orders (<br>  order_id <span class="hljs-type">BIGINT</span> <span class="hljs-keyword">PRIMARY KEY</span> <span class="hljs-keyword">NOT</span> ENFORCED,<br>  user_id  <span class="hljs-type">BIGINT</span>,<br>  amount   <span class="hljs-type">DECIMAL</span>(<span class="hljs-number">20</span>,<span class="hljs-number">2</span>),<br>  status   STRING,<br>  ts       <span class="hljs-type">TIMESTAMP</span>(<span class="hljs-number">3</span>),<br>  WATERMARK <span class="hljs-keyword">FOR</span> ts <span class="hljs-keyword">AS</span> ts <span class="hljs-operator">-</span> <span class="hljs-type">INTERVAL</span> <span class="hljs-string">&#x27;5&#x27;</span> <span class="hljs-keyword">SECOND</span><br>) <span class="hljs-keyword">WITH</span> (<br>  <span class="hljs-string">&#x27;bucket&#x27;</span> <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;32&#x27;</span>,<br>  <span class="hljs-string">&#x27;changelog-producer&#x27;</span> <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;input&#x27;</span>,<br>  <span class="hljs-string">&#x27;merge-engine&#x27;</span> <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;deduplicate&#x27;</span><br>);<br><br><span class="hljs-comment">-- 流式写入（来自 Kafka 的 CDC/实时流）</span><br><span class="hljs-keyword">CREATE</span> TEMPORARY <span class="hljs-keyword">TABLE</span> kafka_orders (...) <span class="hljs-keyword">WITH</span> (<span class="hljs-string">&#x27;connector&#x27;</span><span class="hljs-operator">=</span><span class="hljs-string">&#x27;kafka&#x27;</span>, ...);<br><span class="hljs-keyword">INSERT INTO</span> dwd_orders <span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> kafka_orders;<br><br><span class="hljs-comment">-- 流式读取（增量读 changelog，下游可做实时数仓）</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> dwd_orders <span class="hljs-comment">/*+ OPTIONS(&#x27;scan.mode&#x27;=&#x27;latest&#x27;) */</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-集成-Spark-查询端"><a href="#2-集成-Spark-查询端" class="headerlink" title="2. 集成 Spark &#x2F; 查询端"></a>2. 集成 Spark &#x2F; 查询端</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># Spark 3.x 读取 Paimon 表</span><br>spark-sql \<br>  --packages org.apache.paimon:paimon-spark-3.5:0.8.x \<br>  --conf spark.sql.catalog.paimon=org.apache.paimon.spark.SparkCatalog \<br>  --conf spark.sql.catalog.paimon.warehouse=hdfs:///paimon<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> user_id, <span class="hljs-built_in">SUM</span>(amount) <span class="hljs-keyword">FROM</span> paimon.dwd.dwd_orders<br><span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> user_id;   <span class="hljs-comment">-- Spark 离线读同一张流表</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="3-MySQL-CDC-同步（实时数仓标配链路）"><a href="#3-MySQL-CDC-同步（实时数仓标配链路）" class="headerlink" title="3. MySQL CDC 同步（实时数仓标配链路）"></a>3. MySQL CDC 同步（实时数仓标配链路）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 用 Flink CDC 把 MySQL 实时同步成 Paimon 主键表</span><br><span class="hljs-keyword">CREATE</span> TEMPORARY <span class="hljs-keyword">TABLE</span> mysql_orders (<br>  order_id <span class="hljs-type">BIGINT</span> <span class="hljs-keyword">PRIMARY KEY</span> <span class="hljs-keyword">NOT</span> ENFORCED, ...<br>) <span class="hljs-keyword">WITH</span> (<span class="hljs-string">&#x27;connector&#x27;</span><span class="hljs-operator">=</span><span class="hljs-string">&#x27;mysql-cdc&#x27;</span>, <span class="hljs-string">&#x27;hostname&#x27;</span><span class="hljs-operator">=</span><span class="hljs-string">&#x27;...&#x27;</span>, <span class="hljs-string">&#x27;database-name&#x27;</span><span class="hljs-operator">=</span><span class="hljs-string">&#x27;shop&#x27;</span>, <span class="hljs-string">&#x27;table-name&#x27;</span><span class="hljs-operator">=</span><span class="hljs-string">&#x27;orders&#x27;</span>);<br><br><span class="hljs-keyword">CREATE TABLE</span> paimon.dwd.orders (...) <span class="hljs-keyword">WITH</span> (<span class="hljs-string">&#x27;bucket&#x27;</span><span class="hljs-operator">=</span><span class="hljs-string">&#x27;32&#x27;</span>);<br><span class="hljs-keyword">INSERT INTO</span> paimon.dwd.orders <span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> mysql_orders;<br></code></pre></td></tr></table></figure>
+
+<h2 id="调优"><a href="#调优" class="headerlink" title="调优"></a>调优</h2><h3 id="1-Bucket-与并发"><a href="#1-Bucket-与并发" class="headerlink" title="1. Bucket 与并发"></a>1. Bucket 与并发</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>建议</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>bucket</code></td>
+<td>写入并行度一致（或整数倍）</td>
+<td><strong>建表后不可改</strong>，前期定错要重建表</td>
+</tr>
+<tr>
+<td>sink 并行度</td>
+<td>&#x3D; bucket 数</td>
+<td>每个写入子任务对应若干桶，避免重分布</td>
+</tr>
+<tr>
+<td><code>bucket-key</code></td>
+<td>主键子集</td>
+<td>打散热点，如 user_id%N</td>
+</tr>
+</tbody></table>
+<h3 id="2-写入"><a href="#2-写入" class="headerlink" title="2. 写入"></a>2. 写入</h3><ul>
+<li><code>write-buffer-size</code>（默认 64MB）：单任务内存缓冲，调大减少小文件但吃内存（注意并行度乘积）</li>
+<li><code>sink.parallelism</code> 与 bucket 匹配；<code>commit.force-compact</code> 可开启提交前强制 compact（写读隔离但延迟高，慎用）</li>
+<li><code>write-only=true</code>：只写不 compaction（导入大任务场景，事后统一 compact）</li>
+</ul>
+<h3 id="3-Compaction"><a href="#3-Compaction" class="headerlink" title="3. Compaction"></a>3. Compaction</h3><ul>
+<li><code>num-sorted-runs.compaction-trigger</code>（默认 5）：达到阈值触发 compaction，调大可减少触发频率</li>
+<li><code>compaction.max.file-num</code> &#x2F; <code>full-compaction.delta-commits</code>（如 10）：定期 full compaction 生成完整 changelog（供快照读）</li>
+<li>大表建议独立 compaction 作业池（<code>compaction.parallelism</code>），避免与写入抢资源</li>
+</ul>
+<h3 id="4-读取"><a href="#4-读取" class="headerlink" title="4. 读取"></a>4. 读取</h3><ul>
+<li>流读：<code>scan.mode=latest</code>（实时）&#x2F; <code>from-timestamp</code>（追增量）；<code>read.changelog-producer=lookup</code> 时点查代价高，尽量 input 模式</li>
+<li>批读（Spark）：谓词下推 + 分区裁剪自动生效；大表先 <code>ANALYZE</code> 相关统计</li>
+<li>点查 Lookup：<code>lookup.cache</code> 开启（如 10000 条&#x2F;10 分钟），Flink Join 湖表时命中缓存</li>
+</ul>
+<h3 id="5-快照与文件"><a href="#5-快照与文件" class="headerlink" title="5. 快照与文件"></a>5. 快照与文件</h3><ul>
+<li><code>snapshot.num-retained.min</code>（默认 10）&#x2F;max：控制快照保留，影响流读回溯窗口</li>
+<li>小文件治理：<code>write-buffer-size</code> 调大 + compaction 周期内聚；<code>paimon gc</code> 逻辑同 Iceberg（孤儿文件清理）</li>
+</ul>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><table>
+<thead>
+<tr>
+<th>现象</th>
+<th>原因</th>
+<th>处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>桶数想改</td>
+<td>bucket 建表后固定</td>
+<td>评估重建表 + 数据回灌，或早期按峰值并行度定</td>
+</tr>
+<tr>
+<td>流读延迟高</td>
+<td>changelog-producer 配置弱</td>
+<td>用 input&#x2F;full-compaction，别用 lookup</td>
+</tr>
+<tr>
+<td>小文件多</td>
+<td>写缓冲太小&#x2F;并行度与桶不匹配</td>
+<td>调 write-buffer-size，桶数&#x3D;并行度</td>
+</tr>
+<tr>
+<td>CDC 同步延迟</td>
+<td>单任务吞吐&#x2F;检查点间隔</td>
+<td>调大并行度、检查点间隔 60-120s</td>
+</tr>
+<tr>
+<td>读快照数据量大</td>
+<td>保留快照过多</td>
+<td>调 snapshot.num-retained，full compaction 后清理</td>
+</tr>
+<tr>
+<td>Flink 找不到表</td>
+<td>Catalog&#x2F;warehouse 配置漂移</td>
+<td>确认 catalog 类型与 warehouse 路径一致</td>
+</tr>
+</tbody></table>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>Paimon &#x3D; Flink 生态的流式湖仓：LSM + Bucket + Changelog，主键表支持 CDC 与行级更新，流读流写</li>
+<li>部署 &#x3D; 放 jar + 注册 catalog（filesystem&#x2F;hive）+ 建主键表；无独立服务，强依赖 Flink</li>
+<li>调优主线：<strong>bucket 数前期定死</strong>（核心）→ write-buffer-size → compaction 节奏 → changelog-producer 模式 → 快照保留</li>
+<li>在底座迭代中，Paimon 承接”实时数仓湖化”：Flink 实时链路直接落湖，替代”Kafka + 双写 Hive”的复杂架构；与 Iceberg 分工——实时链路 Paimon，离线&#x2F;多引擎场景 Iceberg，两套并存是常态</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/%E9%83%A8%E7%BD%B2/" class="print-no-link">#部署</a>
+      
+        <a href="/tags/flink/" class="print-no-link">#flink</a>
+      
+        <a href="/tags/%E6%B9%96%E4%BB%93/" class="print-no-link">#湖仓</a>
+      
+        <a href="/tags/paimon/" class="print-no-link">#paimon</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Paimon 原理、部署与调优指南</div>
+      <div>https://chaggle.github.io/2026/08/10/bigdata/paimon-deploy-tuning-20260811/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月11日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/10/bigdata/hudi-deploy-tuning-20260811/" title="Hudi 原理、部署与调优指南">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Hudi 原理、部署与调优指南</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/10/bigdata/juicefs-deploy-tuning-20260811/" title="JuiceFS 原理、部署与调优指南">
+                        <span class="hidden-mobile">JuiceFS 原理、部署与调优指南</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'e696067bc854595a0af0f13f69c8f598'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

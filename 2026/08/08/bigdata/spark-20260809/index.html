@@ -1,0 +1,1197 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/08/bigdata/spark-20260809/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="本文是对 Spark 核心知识的系统性总结，覆盖架构、RDD 与 DAG 调度、Shuffle、缓存与 Checkpoint、运行模式、常用参数以及日常问题排查要点，作为个人技术笔记使用。  整体架构：一次任务是怎么跑起来的Spark 是内存计算框架，采用 Master-Slave 架构，核心组件如下：  Driver：任务的”大脑”，运行用户程序 main 函数，负责解析代码、构建 DAG、调">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark 底层原理与知识要点">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/08/bigdata/spark-20260809/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="本文是对 Spark 核心知识的系统性总结，覆盖架构、RDD 与 DAG 调度、Shuffle、缓存与 Checkpoint、运行模式、常用参数以及日常问题排查要点，作为个人技术笔记使用。  整体架构：一次任务是怎么跑起来的Spark 是内存计算框架，采用 Master-Slave 架构，核心组件如下：  Driver：任务的”大脑”，运行用户程序 main 函数，负责解析代码、构建 DAG、调">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-08T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-10T15:33:41.414Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="spark">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Spark 底层原理与知识要点 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Spark 底层原理与知识要点"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-08 16:00" pubdate>
+          2026年8月8日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          56 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Spark 底层原理与知识要点</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-08-10T23:33:41+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>本文是对 Spark 核心知识的系统性总结，覆盖架构、RDD 与 DAG 调度、Shuffle、缓存与 Checkpoint、运行模式、常用参数以及日常问题排查要点，作为个人技术笔记使用。</p>
+</blockquote>
+<h2 id="整体架构：一次任务是怎么跑起来的"><a href="#整体架构：一次任务是怎么跑起来的" class="headerlink" title="整体架构：一次任务是怎么跑起来的"></a>整体架构：一次任务是怎么跑起来的</h2><p>Spark 是内存计算框架，采用 Master-Slave 架构，核心组件如下：</p>
+<ul>
+<li><strong>Driver</strong>：任务的”大脑”，运行用户程序 main 函数，负责解析代码、构建 DAG、调度任务、分发 Task，同时持有 SparkContext</li>
+<li><strong>Executor</strong>：实际执行计算的工作进程，运行在 Worker 节点上，负责执行 Task、存储 RDD 缓存数据</li>
+<li><strong>Master</strong>：集群的”总管”，负责资源管理，接收 Worker 心跳，将资源分配给 Application</li>
+<li><strong>Worker</strong>：集群中的”包工头”，汇报资源给 Master，负责启动和监控本机的 Executor</li>
+<li><strong>Cluster Manager</strong>：外部资源调度器（Standalone &#x2F; YARN &#x2F; Mesos &#x2F; Kubernetes），Spark 本身支持 Standalone 自带的 Master-Worker</li>
+</ul>
+<p>提交一个 Application 后的大致流程：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs text">spark-submit → 启动 Driver(SparkContext)<br>    → Driver 向 Cluster Manager 申请资源<br>    → Cluster Manager 通知 Worker 启动 Executor<br>    → Executor 反向注册给 Driver<br>    → Driver 把代码拆成 Job → Stage → Task 分发执行<br>    → Task 在 Executor 上执行，结果汇聚给 Driver<br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>Spark 的内存计算优势在于：中间结果优先放内存，避免像 MapReduce 那样每步都落盘。但前提是 Executor 内存要够，否则退化为磁盘计算，性能反而不如 MR。</p> 
+          </div>
+
+<h3 id="Application-Job-Stage-Task-层次"><a href="#Application-Job-Stage-Task-层次" class="headerlink" title="Application &#x2F; Job &#x2F; Stage &#x2F; Task 层次"></a>Application &#x2F; Job &#x2F; Stage &#x2F; Task 层次</h3><ul>
+<li><strong>Application</strong>：一次 spark-submit 提交的任务，包含一个 Driver 和若干 Executor</li>
+<li><strong>Job</strong>：一个 Action 算子（count、collect、saveAsTextFile 等）触发一个 Job，一个 Application 可以有多个 Job</li>
+<li><strong>Stage</strong>：一个 Job 按宽依赖（Shuffle）划分成多个 Stage，窄依赖之间不切 Stage</li>
+<li><strong>Task</strong>：Stage 的最小执行单元，一个分区对应一个 Task，同一 Stage 的 Task 执行相同的代码片段</li>
+</ul>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text">Application<br> └── Job1 (Action: count)<br>      ├── Stage0 (读 HDFS / 窄依赖算子)<br>      └── Stage1 (Shuffle → reduce)<br>           └── Task × N (每个分区一个 Task)<br></code></pre></td></tr></table></figure>
+
+<div class="note note-success">
+            <p>记住：<strong>Action 触发 Job，宽依赖划分 Stage，分区数决定 Task 数</strong>，这是 Spark 调优最核心的三个概念。</p> 
+          </div>
+
+<h2 id="RDD-与-DAG-调度原理"><a href="#RDD-与-DAG-调度原理" class="headerlink" title="RDD 与 DAG 调度原理"></a>RDD 与 DAG 调度原理</h2><h3 id="RDD：弹性分布式数据集"><a href="#RDD：弹性分布式数据集" class="headerlink" title="RDD：弹性分布式数据集"></a>RDD：弹性分布式数据集</h3><p>RDD（Resilient Distributed Dataset）是只读、可分区的数据集合抽象，核心特性：</p>
+<ul>
+<li><strong>分区（Partition）</strong>：数据被切成多块分布在不同节点，并行计算的粒度</li>
+<li><strong>血缘（Lineage）</strong>：记录 RDD 从父 RDD 派生的过程，是容错的基础</li>
+<li><strong>惰性求值（Lazy）</strong>：转换算子（map、filter）只是记录血缘，不真正计算，遇到 Action 才触发</li>
+<li><strong>缓存（Cache）</strong>：可以持久化到内存&#x2F;磁盘，供多次复用</li>
+</ul>
+<h3 id="宽依赖与窄依赖"><a href="#宽依赖与窄依赖" class="headerlink" title="宽依赖与窄依赖"></a>宽依赖与窄依赖</h3><p>依赖关系决定了容错成本和 Stage 划分：</p>
+<ul>
+<li><strong>窄依赖</strong>：父 RDD 的每个分区只被一个子分区使用（map、filter、union、coalesce），计算在同一个 Stage 内流水线式执行，父分区丢失只需重算这一个分区</li>
+<li><strong>宽依赖</strong>：父 RDD 的一个分区被多个子分区使用（groupByKey、reduceByKey、join），必然产生 Shuffle，子分区计算必须等父分区全部算完，父分区丢失需要整条血缘重算</li>
+</ul>
+<div class="note note-danger">
+            <p>宽依赖是 Shuffle 的唯一来源，也是性能瓶颈和节点宕机风险的重灾区。能用 map-side 预聚合的算子（reduceByKey、aggregateByKey）就不要用 groupByKey。</p> 
+          </div>
+
+<h3 id="DAG-调度与-Stage-划分"><a href="#DAG-调度与-Stage-划分" class="headerlink" title="DAG 调度与 Stage 划分"></a>DAG 调度与 Stage 划分</h3><p>DAGScheduler 把 Job 的 DAG 反向解析，从 Action 往前回溯：</p>
+<ul>
+<li>遇到宽依赖就切一刀，形成新的 Stage</li>
+<li>先执行前面的 Stage，Shuffle 数据落盘后由后面的 Stage 拉取</li>
+<li>Stage 内窄依赖算子串成流水线，减少调度开销</li>
+</ul>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs text">rdd.map(f1).filter(f2).groupByKey(f3).mapValues(f4).collect()<br>        └── Stage0 ──┘    └──── Stage1（Shuffle 切割）────┘<br></code></pre></td></tr></table></figure>
+
+<p>划分好 Stage 后，TaskScheduler 按数据本地性（Data Locality）把 Task 派发给 Executor 执行。</p>
+<h2 id="Shuffle-机制"><a href="#Shuffle-机制" class="headerlink" title="Shuffle 机制"></a>Shuffle 机制</h2><h3 id="演进：Hash-Shuffle-到-Sort-Shuffle"><a href="#演进：Hash-Shuffle-到-Sort-Shuffle" class="headerlink" title="演进：Hash Shuffle 到 Sort Shuffle"></a>演进：Hash Shuffle 到 Sort Shuffle</h3><ul>
+<li><strong>Hash Shuffle（1.x 早期）</strong>：每个 Map Task 为每个下游分区写一个文件，M 个 Task × R 个分区 &#x3D; M×R 个文件，小文件爆炸，磁盘 IO 是灾难</li>
+<li><strong>Consolidated Hash Shuffle</strong>：同 Executor 的 Map Task 复用输出文件组，减少到 Executor 数 × R</li>
+<li><strong>Sort Shuffle（2.x 默认）</strong>：每个 Map Task 只输出一个数据文件 + 一个索引文件，先按分区排序（可选再按键排序），下游按索引拉取，小文件数量从 M×R 降到 M</li>
+</ul>
+<div class="note note-info">
+            <p>Sort Shuffle 之所以胜出，本质是<strong>用排序代价换小文件数</strong>。spark.shuffle.sort.bypassMergeThreshold 默认为 200，当分区数小于 200 时走 bypass 模式，不排序直接合并，更快。</p> 
+          </div>
+
+<h3 id="中间数据与合并小文件"><a href="#中间数据与合并小文件" class="headerlink" title="中间数据与合并小文件"></a>中间数据与合并小文件</h3><ul>
+<li>Shuffle 中间文件由 Executor 负责清理（不再依赖 Driver 删除，规避了 Driver 挂掉数据残留问题）</li>
+<li>小文件过多的优化手段：<ul>
+<li>调节 <code>spark.sql.shuffle.partitions</code>，分区数不是越大越好，200 起步，按数据量评估</li>
+<li>使用 <code>coalesce</code>（减少分区，无 Shuffle）或 <code>repartition</code>（重分布，有 Shuffle）</li>
+<li>开启 <code>spark.sql.adaptive.coalescePartitions.enabled</code>（AQE）自动合并小分区</li>
+</ul>
+</li>
+</ul>
+<h3 id="缓存与-Checkpoint"><a href="#缓存与-Checkpoint" class="headerlink" title="缓存与 Checkpoint"></a>缓存与 Checkpoint</h3><ul>
+<li><strong>Cache&#x2F;persist</strong>：把 RDD 缓存在 Executor 内存或磁盘，多次 Action 复用，存储级别有 MEMORY_ONLY、MEMORY_AND_DISK、DISK_ONLY 等</li>
+<li><strong>Checkpoint</strong>：把 RDD 数据物理写入 HDFS，<strong>截断血缘</strong>。与 cache 不同，checkpoint 是为了容错而不是性能——血缘过长时重算代价高，直接读取检查点恢复</li>
+</ul>
+<div class="note note-warning">
+            <p>使用 Checkpoint 前建议先 cache，否则 checkpoint 会触发一次完整计算；且 checkpoint 要等 Job 执行完才落盘，第一次运行没有实际效果。</p> 
+          </div>
+
+<h3 id="广播变量与累加器"><a href="#广播变量与累加器" class="headerlink" title="广播变量与累加器"></a>广播变量与累加器</h3><ul>
+<li><strong>广播变量（Broadcast）</strong>：把小表或大字典发给所有 Executor 一份只读副本，避免每个 Task 都从 Driver 拉取一份（序列化走网络、内存翻 N 倍）。join 小表用 broadcast join 可避免 shuffle</li>
+<li><strong>累加器（Accumulator）</strong>：Driver 定义的只写变量，Executor 只能累加，Driver 最终读取，用于统计（如过滤掉的行数、错误计数）。注意 Task 重试会导致重复累加，需要结合执行次数判断</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> dict = spark.sparkContext.broadcast(<span class="hljs-type">Map</span>(<span class="hljs-string">&quot;a&quot;</span> -&gt; <span class="hljs-number">1</span>, <span class="hljs-string">&quot;b&quot;</span> -&gt; <span class="hljs-number">2</span>))<br><span class="hljs-keyword">val</span> badCnt = spark.sparkContext.longAccumulator(<span class="hljs-string">&quot;badCnt&quot;</span>)<br><br>rdd.map(x =&gt; &#123;<br>  <span class="hljs-keyword">if</span> (!dict.value.contains(x)) badCnt.add(<span class="hljs-number">1</span>)<br>  dict.value.getOrElse(x, <span class="hljs-number">-1</span>)<br>&#125;)<br>println(<span class="hljs-string">s&quot;bad count: <span class="hljs-subst">$&#123;badCnt.value&#125;</span>&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h2 id="运行模式"><a href="#运行模式" class="headerlink" title="运行模式"></a>运行模式</h2><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>说明</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Local</td>
+<td>单机多线程，local[2] 表示 2 个线程</td>
+<td>开发调试</td>
+</tr>
+<tr>
+<td>Standalone</td>
+<td>Spark 自带 Master&#x2F;Worker 集群</td>
+<td>无 Hadoop 的小集群</td>
+</tr>
+<tr>
+<td>YARN Client</td>
+<td>Driver 跑在提交机，适合交互式调试</td>
+<td>日志直接打在本机</td>
+</tr>
+<tr>
+<td>YARN Cluster</td>
+<td>Driver 跑在集群内 AM 容器中，提交机即退</td>
+<td>生产环境推荐</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td>Executor 以 Pod 方式动态创建</td>
+<td>容器化平台</td>
+</tr>
+</tbody></table>
+<div class="note note-success">
+            <p>生产环境几乎都是 YARN Cluster 或 K8s。client 模式的 Driver 跑在提交机上，提交机一断网&#x2F;宕机任务就挂，且 Web UI 无法统一查看。</p> 
+          </div>
+
+<p>YARN 模式下 Executor 内存配额会按公式被二次削减：<code>executor-memory × (1 - spark.memory.overheadFactor)</code>，overhead 默认 0.1，这部分是堆外内存，留给 JVM 自身和网络缓冲。申请 10g 实际可用堆约 9g。</p>
+<h2 id="重要参数介绍"><a href="#重要参数介绍" class="headerlink" title="重要参数介绍"></a>重要参数介绍</h2><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>spark.executor.memory</td>
+<td>1g</td>
+<td>每个 Executor 的 JVM 堆内存</td>
+</tr>
+<tr>
+<td>spark.executor.cores</td>
+<td>1</td>
+<td>每个 Executor 的 CPU 核数</td>
+</tr>
+<tr>
+<td>spark.executor.instances</td>
+<td>2</td>
+<td>固定模式下的 Executor 数量</td>
+</tr>
+<tr>
+<td>spark.driver.memory</td>
+<td>1g</td>
+<td>Driver 堆内存，collect 大数据时调大</td>
+</tr>
+<tr>
+<td>spark.sql.shuffle.partitions</td>
+<td>200</td>
+<td>SQL 聚合&#x2F;Join 的 Shuffle 分区数</td>
+</tr>
+<tr>
+<td>spark.default.parallelism</td>
+<td>取决于模式</td>
+<td>未指定时的默认并行度（分区数）</td>
+</tr>
+<tr>
+<td>spark.memory.fraction</td>
+<td>0.6</td>
+<td>堆内可用统一内存占比（0.6 × 堆），剩 0.4 留给用户代码和元数据</td>
+</tr>
+<tr>
+<td>spark.memory.storageFraction</td>
+<td>0.5</td>
+<td>统一内存中 storage 的”保底份额”，execution 可抢占超出部分</td>
+</tr>
+<tr>
+<td>spark.shuffle.file.buffer</td>
+<td>32k</td>
+<td>Shuffle write 输出缓冲区大小，调大减少磁盘写次数</td>
+</tr>
+<tr>
+<td>spark.reducer.maxSizeInFlight</td>
+<td>48m</td>
+<td>Shuffle read 每次拉取数据上限</td>
+</tr>
+</tbody></table>
+<h3 id="动态资源分配"><a href="#动态资源分配" class="headerlink" title="动态资源分配"></a>动态资源分配</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text">spark.dynamicAllocation.enabled=true<br>spark.dynamicAllocation.initialExecutors=2<br>spark.dynamicAllocation.minExecutors=2<br>spark.dynamicAllocation.maxExecutors=50<br>spark.shuffle.service.enabled=true   # 必须配套开启（Standalone 默认开）<br></code></pre></td></tr></table></figure>
+
+<p>原理：Driver 根据待处理 Task 数和 Executor 利用率周期性扩容&#x2F;缩容。<strong>注意 YARN 下必须开启 spark.shuffle.service，否则 Executor 被回收后 Shuffle 中间文件无法被其他 Executor 读取</strong>，会导致任务失败或性能退化。</p>
+<div class="note note-warning">
+            <p>executor.cores 建议与 Executor 内存匹配，一个 Executor 核数太多（如 8 核 8G）会导致并发 Task 共享内存互相挤压 OOM；常见配比：1 Executor &#x3D; 4<del>5 核 + 8</del>16G。</p> 
+          </div>
+
+<h2 id="常见问题排查"><a href="#常见问题排查" class="headerlink" title="常见问题排查"></a>常见问题排查</h2><h3 id="Executor-OOM"><a href="#Executor-OOM" class="headerlink" title="Executor OOM"></a>Executor OOM</h3><ul>
+<li>现象：<code>ExecutorLostFailure</code>、<code>Java heap space</code>、YARN 页面看到容器被杀（Container killed by RM）</li>
+<li>排查思路：<ul>
+<li>看是 Task 内存不足（加大 spark.executor.memory）还是 Executor 太多 Task 并发（减少 spark.executor.cores）</li>
+<li>大聚合&#x2F;大 join 场景调大 <code>spark.memory.fraction</code> 或直接加内存</li>
+<li>数据倾斜导致的局部 OOM 优先解决倾斜，而不是盲目加内存</li>
+<li>使用 <code>spark.executor.extraJavaOptions=-XX:+PrintGCDetails</code> 打 GC 日志辅助定位</li>
+</ul>
+</li>
+</ul>
+<h3 id="Driver-OOM"><a href="#Driver-OOM" class="headerlink" title="Driver OOM"></a>Driver OOM</h3><ul>
+<li>现象：<code>java.lang.OutOfMemoryError: Java heap space</code> 出现在 Driver 日志，<code>collect</code>&#x2F;<code>take</code> 拉回的数据量过大</li>
+<li>解决：避免 collect 全量数据；非要拉数据用 <code>take(N)</code> 或先聚合；调大 spark.driver.memory；广播变量过大也占 Driver 内存</li>
+</ul>
+<h3 id="数据倾斜"><a href="#数据倾斜" class="headerlink" title="数据倾斜"></a>数据倾斜</h3><ul>
+<li>现象：某个 Task 运行时间远超同 Stage 其他 Task，GC 频繁</li>
+<li>定位：Spark Web UI 看 Stage 的 Task 耗时分布，或对 key 做 count 统计</li>
+<li>解法（按优先级）：<ul>
+<li>过滤无效 key（如 null、空字符串，先确认业务上可丢弃）</li>
+<li>两阶段聚合：key 加随机前缀打散 → 局部聚合 → 去前缀 → 全局聚合</li>
+<li>join 倾斜：小表广播（broadcast join）；或把大 key 拆分加盐后与扩容的小表 join</li>
+<li>提升并行度：调大 spark.sql.shuffle.partitions</li>
+</ul>
+</li>
+</ul>
+<h3 id="Shuffle-慢"><a href="#Shuffle-慢" class="headerlink" title="Shuffle 慢"></a>Shuffle 慢</h3><ul>
+<li>现象：Stage 卡在 Shuffle Read，或大量 fetch failed</li>
+<li>检查：executor 心跳是否超时、网络是否拥塞、<code>spark.reducer.maxSizeInFlight</code> 是否过大导致瞬时拉取压力</li>
+<li>优化：开启压缩（spark.shuffle.compress）、调大 <code>spark.shuffle.file.buffer</code>、检查是否有大量小文件需要读取、合并小分区</li>
+</ul>
+<h3 id="任务-Straggler（掉队-Task）"><a href="#任务-Straggler（掉队-Task）" class="headerlink" title="任务 Straggler（掉队 Task）"></a>任务 Straggler（掉队 Task）</h3><ul>
+<li>现象：大部分 Task 秒级完成，少数 Task 跑很久</li>
+<li>解法：开启 <code>spark.speculation=true</code>（推测执行），对慢 Task 复制一份在别的 Executor 上执行，先完成的生效；倾斜场景靠 speculation 治标不治本，还是得处理倾斜</li>
+</ul>
+<h3 id="序列化错误"><a href="#序列化错误" class="headerlink" title="序列化错误"></a>序列化错误</h3><ul>
+<li>现象：<code>NotSerializableException</code>、<code>Task not serializable</code>（最常见是闭包里引用了不可序列化的对象，如 SparkSession、Connection）</li>
+<li>解法：把不可序列化的对象声明为 transient 或改用广播变量；使用 Kryo 序列化（<code>spark.serializer=org.apache.spark.serializer.KryoSerializer</code>）并注册类，比 Java 默认快 10 倍以上</li>
+</ul>
+<h3 id="动态分配不生效"><a href="#动态分配不生效" class="headerlink" title="动态分配不生效"></a>动态分配不生效</h3><ul>
+<li>现象：Executor 数量恒定不变，不扩容</li>
+<li>检查：是否开启了 <code>spark.dynamicAllocation.enabled</code>；YARN 下是否开了 <code>spark.shuffle.service.enabled</code> 且 Shuffle Service 实例存活；是否设置了 <code>spark.executor.instances</code> 固定值（两者冲突，固定值优先）</li>
+</ul>
+<h3 id="Executor-丢失"><a href="#Executor-丢失" class="headerlink" title="Executor 丢失"></a>Executor 丢失</h3><ul>
+<li>现象：<code>Lost executor</code> &#x2F; <code>Executor is not registered</code> &#x2F; <code>Connection refused</code></li>
+<li>排查：<ul>
+<li>YARN 看容器是被主动杀死（内存超限）还是机器宕机（节点内存&#x2F;磁盘满）</li>
+<li>Executor 日志找 <code>Container killed by YARN for exceeding memory limits</code> 说明内存配小了</li>
+<li>心跳超时（heartbeatInterval 默认 10s，超时 spark.network.timeout 默认 120s）调大网络超时或检查 GC 长停顿</li>
+<li>磁盘空间不足导致 Shuffle 写失败，检查 spark.local.dir 所在盘</li>
+</ul>
+</li>
+</ul>
+<div class="note note-danger">
+            <p>排查问题的通用顺序：<strong>先看 Spark Web UI 的 Stage&#x2F;Task 耗时与日志 → 再查 Executor 日志与 YARN 容器状态 → 最后结合参数与数据分布下结论</strong>，不要上来就盲目调参。</p> 
+          </div>
+
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>Spark 的核心思想可以浓缩为一句话：<strong>以 RDD 血缘为基础、以宽依赖为界划分 Stage、用内存换速度</strong>。调优也是围绕这三点展开：减小 Shuffle 数据量、提高并行度、让内存物尽其用。掌握架构与调度原理后，大部分性能问题都能从 Web UI 上一眼定位到根因。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/spark/" class="print-no-link">#spark</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Spark 底层原理与知识要点</div>
+      <div>https://chaggle.github.io/2026/08/08/bigdata/spark-20260809/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月8日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/08/bigdata/mapreduce-20260809/" title="MapReduce 底层原理与知识要点">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">MapReduce 底层原理与知识要点</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/08/bigdata/tez-20260809/" title="Tez 底层原理与知识要点">
+                        <span class="hidden-mobile">Tez 底层原理与知识要点</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '238d5a3820eb83852247c3a4723ed7d0'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

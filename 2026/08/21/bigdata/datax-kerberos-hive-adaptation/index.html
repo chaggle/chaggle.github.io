@@ -1,0 +1,1051 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/08/21/bigdata/datax-kerberos-hive-adaptation/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="上一篇博客讲了 DolphinScheduler 怎么接入 Kerberos 认证的 Hive（数据源配置层面）。这次继续往链路深处走：调度平台里的 DataX 任务要真正读写 Kerberos 集群的 HDFS&#x2F;Hive，官方开源版 DataX 直接跑不通，本文记录从 hdfsreader 读到…">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DataX 适配 Kerberos Hadoop&#x2F;Hive 集群：从 hdfsreader 到 hdfswriter 的踩坑实录">
+<meta property="og:url" content="https://chaggle.github.io/2026/08/21/bigdata/datax-kerberos-hive-adaptation/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="上一篇博客讲了 DolphinScheduler 怎么接入 Kerberos 认证的 Hive（数据源配置层面）。这次继续往链路深处走：调度平台里的 DataX 任务要真正读写 Kerberos 集群的 HDFS&#x2F;Hive，官方开源版 DataX 直接跑不通，本文记录从 hdfsreader 读到…">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-21T10:40:00.000Z">
+<meta property="article:modified_time" content="2026-09-01T16:53:38.180Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="datax">
+<meta property="article:tag" content="hdfs">
+<meta property="article:tag" content="hive">
+<meta property="article:tag" content="kerberos">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>DataX 适配 Kerberos Hadoop/Hive 集群：从 hdfsreader 到 hdfswriter 的踩坑实录 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="DataX 适配 Kerberos Hadoop/Hive 集群：从 hdfsreader 到 hdfswriter 的踩坑实录"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-21 18:40" pubdate>
+          2026年8月21日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          48 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">DataX 适配 Kerberos Hadoop/Hive 集群：从 hdfsreader 到 hdfswriter 的踩坑实录</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-09-02T00:53:38+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>上一篇博客讲了 DolphinScheduler 怎么接入 Kerberos 认证的 Hive（数据源配置层面）。这次继续往链路深处走：调度平台里的 DataX 任务要真正读写 Kerberos 集群的 HDFS&#x2F;Hive，官方开源版 DataX 直接跑不通，本文记录从 hdfsreader 读到 hdfswriter 写、再到 GBase 8c 反向推 Hive 的完整适配过程与排错结论。</p>
+</blockquote>
+<h2 id="一、先看结论"><a href="#一、先看结论" class="headerlink" title="一、先看结论"></a>一、先看结论</h2><p>官方 DataX 默认依赖 Hadoop 2.7.1 + Hive 1.1.1 + fastjson 1.x，而实际集群是 Hadoop 3.3.6 + Hive 3.1.3，且服务器发行版做了 fastjson2 改造。五个硬伤逐层暴露，每层都有对应的修复动作：</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>现象</th>
+<th>根因</th>
+<th>修复</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>UnknownHost nameservice1</code> &#x2F; 表找不到</td>
+<td>defaultFS 与 hadoopConfig 的 nameservice 前缀不一致</td>
+<td>统一 ns 名，配全 HA 五个配置项</td>
+</tr>
+<tr>
+<td>2</td>
+<td>DataNode 全部 <code>连接被对方重设</code>（RST）</td>
+<td>Kerberos 集群 DataNode 数据传输默认 SASL，客户端明文握手被拒</td>
+<td>hadoopConfig 加 <code>dfs.data.transfer.protection: authentication</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>ClassCastException: JSONObject cannot be cast to JSONObject</code></td>
+<td>发行版 datax-common 已 fastjson2 化，插件源码还是 fastjson1</td>
+<td>源码 import 改 fastjson2 + pom 显式加 fastjson2 2.0.23</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>unrecognized Hadoop major version number: 3.3.6</code></td>
+<td>hive-exec 1.1.1 的 shims 不识别 Hadoop 3.x</td>
+<td>hive.version 升 3.1.3，删 hive-service &#x2F; hive-hcatalog-core</td>
+</tr>
+<tr>
+<td>5</td>
+<td>插件包内新旧版本并存</td>
+<td>maven-assembly 增量输出不清理</td>
+<td>打包前手动删残留 jar（注意别误删 hadoop 3.x 的 shaded 依赖）</td>
+</tr>
+</tbody></table>
+<p>hdfswriter 在 hdfsreader 的全部适配之上还多了两个坑：parquet 依赖要靠 hive-hcatalog-core 传递、删掉后就断了；parquet 1.8 之后包名从 <code>parquet.schema.*</code> 迁到 <code>org.apache.parquet.schema.*</code>，源码 import 必须同步改。</p>
+<h2 id="二、30-秒看懂-DataX-的插件类加载"><a href="#二、30-秒看懂-DataX-的插件类加载" class="headerlink" title="二、30 秒看懂 DataX 的插件类加载"></a>二、30 秒看懂 DataX 的插件类加载</h2><p>DataX 每个插件（reader&#x2F;writer）独立目录、独立 classloader（child-first）：插件 <code>libs/</code> 里的 jar 优先于全局 <code>lib/</code>。这一条解释了后面几乎所有”版本冲突”：</p>
+<ul>
+<li>插件 libs 里的 <code>datax-common</code> 若带旧 fastjson，会反向污染全局——<strong>插件包内禁止打 datax-common</strong>；</li>
+<li>服务器发行版的 <code>datax-common</code> 是 fastjson2 改造版（<code>datax/lib/fastjson2-2.0.23.jar</code>），所以插件源码必须按 fastjson2 编译。</li>
+</ul>
+<p>另外 rdbmsreader 有个特殊机制：插件初始化时读 <code>plugin.json</code> 的 <code>drivers</code> 数组，逐个 <code>Class.forName</code> <strong>预加载</strong>，任何一个类缺失直接抛 <code>数据库驱动加载错误</code>——即使任务根本不用那个驱动。</p>
+<h2 id="三、hdfsreader：读-Kerberos-HDFS-的五层修复"><a href="#三、hdfsreader：读-Kerberos-HDFS-的五层修复" class="headerlink" title="三、hdfsreader：读 Kerberos HDFS 的五层修复"></a>三、hdfsreader：读 Kerberos HDFS 的五层修复</h2><h3 id="3-1-nameservice-全套配置"><a href="#3-1-nameservice-全套配置" class="headerlink" title="3.1 nameservice 全套配置"></a>3.1 nameservice 全套配置</h3><p>defaultFS 的 ns 名必须与 hadoopConfig 的 <code>dfs.nameservices</code> 前缀完全一致，且 HA 五个配置项缺一不可：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-attr">&quot;defaultFS&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;hdfs://nameservice1&quot;</span><span class="hljs-punctuation">,</span><br><span class="hljs-attr">&quot;hadoopConfig&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;dfs.nameservices&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;nameservice1&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;dfs.ha.namenodes.nameservice1&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;nn1,nn2&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;dfs.namenode.rpc-address.nameservice1.nn1&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;10.0.0.1:8020&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;dfs.namenode.rpc-address.nameservice1.nn2&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;10.0.0.2:8020&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;dfs.client.failover.proxy.provider.nameservice1&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;hadoop.security.authentication&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;kerberos&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;dfs.data.transfer.protection&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;authentication&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="3-2-dfs-data-transfer-protection-是-RST-的根因"><a href="#3-2-dfs-data-transfer-protection-是-RST-的根因" class="headerlink" title="3.2 dfs.data.transfer.protection 是 RST 的根因"></a>3.2 dfs.data.transfer.protection 是 RST 的根因</h3><p>现象最有迷惑性：三个 DataNode 全部 <code>Failed to connect to /10.x.x.x:1025 ... 连接被对方重设</code>，换 2.7.1 客户端也一样。集群内 <code>hdfs dfs -cat</code> 却能读——先隔离”客户端问题 vs 集群问题”，再猜原因。</p>
+<p>根因：Kerberos 集群 DataNode 数据传输默认 SASL 保护（<code>authentication</code>），DataX 客户端没声明传输保护，以明文握手直接被 DataNode 拒绝（RST）。补上 <code>dfs.data.transfer.protection: authentication</code> 后日志立刻出现「是[orc]类型的文件」，block 读取成功。</p>
+<h3 id="3-3-文件格式必须对齐（ORC-魔数）"><a href="#3-3-文件格式必须对齐（ORC-魔数）" class="headerlink" title="3.3 文件格式必须对齐（ORC 魔数）"></a>3.3 文件格式必须对齐（ORC 魔数）</h3><p>Hive 默认建表即 ORC，<code>hdfs dfs -cat</code> 看到文件头魔数 <code>ORC</code>。fileType 配错（写成 text）会在探测阶段误判。读侧按 <code>fileType: &quot;orc&quot;</code> 配。</p>
+<h3 id="3-4-fastjson2-双向冲突"><a href="#3-4-fastjson2-双向冲突" class="headerlink" title="3.4 fastjson2 双向冲突"></a>3.4 fastjson2 双向冲突</h3><p>发行版 datax-common 已 fastjson2 化，而 hdfsreader &#x2F; plugin-unstructured-storage-util 源码还是 fastjson1，运行时报 <code>ClassCastException: com.alibaba.fastjson2.JSONObject cannot be cast to com.alibaba.fastjson.JSONObject</code>。</p>
+<p>修复三件套：</p>
+<ol>
+<li><code>DFSUtil.java</code>、<code>UnstructuredStorageReaderUtil.java</code> 的 import 改 <code>com.alibaba.fastjson2.*</code>；</li>
+<li>两个模块 pom 显式加 <code>fastjson2:2.0.23</code>；</li>
+<li>插件包内删除 datax-common（避免 child-first 加载到旧版 common）。</li>
+</ol>
+<h3 id="3-5-hive-版本与打包残留"><a href="#3-5-hive-版本与打包残留" class="headerlink" title="3.5 hive 版本与打包残留"></a>3.5 hive 版本与打包残留</h3><ul>
+<li>hive-exec 1.1.1 的 shims 不识别 Hadoop 3.x（<code>unrecognized Hadoop major version number</code>），升 3.1.3 并<strong>去掉 hive-service、hive-hcatalog-core</strong> 两个重型依赖（会拉入 Hadoop 2.x 旧 jar）；</li>
+<li>maven-assembly 增量输出不会清理 target&#x2F;datax，版本升级后新旧 jar 并存（曾出现 19 个 1.1.1 残留），打包前必须手动清理；</li>
+<li>清理时注意：<code>hadoop-shaded-guava-1.1.1</code>、<code>hadoop-shaded-protobuf_3_7-1.1.1</code> 是 Hadoop 3.3.6 的正常依赖（版本号恰好也是 1.1.1），<strong>别误删</strong>，只匹配 <code>hive.*1.1.1</code> 与 <code>hcatalog</code>。</li>
+</ul>
+<h2 id="四、hdfswriter：写侧多出的两个坑"><a href="#四、hdfswriter：写侧多出的两个坑" class="headerlink" title="四、hdfswriter：写侧多出的两个坑"></a>四、hdfswriter：写侧多出的两个坑</h2><h3 id="4-1-parquet-依赖断裂"><a href="#4-1-parquet-依赖断裂" class="headerlink" title="4.1 parquet 依赖断裂"></a>4.1 parquet 依赖断裂</h3><p>hdfswriter 源码 import 了 <code>parquet.schema.*</code>，原依赖靠 hive-hcatalog-core 传递。删除重型依赖后必须显式补：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.apache.parquet<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>parquet-hadoop<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.10.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-2-parquet-包名迁移"><a href="#4-2-parquet-包名迁移" class="headerlink" title="4.2 parquet 包名迁移"></a>4.2 parquet 包名迁移</h3><p>光有 jar 不够：parquet 1.8 之后包名从 <code>parquet.schema.*</code> 迁到 <code>org.apache.parquet.schema.*</code>。本地 javac 单测即可复现「程序包parquet.schema不存在」，4 处 import（<code>MessageTypeParser</code> &#x2F; <code>OriginalType</code> &#x2F; <code>PrimitiveType</code> &#x2F; <code>Types</code>）必须改，否则 classpath 里明明有 jar 也编不过。</p>
+<h3 id="4-3-fieldDelimiter-无条件必填"><a href="#4-3-fieldDelimiter-无条件必填" class="headerlink" title="4.3 fieldDelimiter 无条件必填"></a>4.3 fieldDelimiter 无条件必填</h3><p>hdfswriter 的 <code>fieldDelimiter</code> 在 Job 初始化时强制校验（null 直接抛 <code>REQUIRED_VALUE</code>，且仅支持单字符），<strong>不区分文件格式</strong>——即使写 ORC 也必须填 <code>&quot;\t&quot;</code> 或 <code>&quot;,&quot;</code>（列式存储实际不依赖它，但源码强制）。</p>
+<h2 id="五、反向场景：GBase-8c-推-Hive"><a href="#五、反向场景：GBase-8c-推-Hive" class="headerlink" title="五、反向场景：GBase 8c 推 Hive"></a>五、反向场景：GBase 8c 推 Hive</h2><p>目标变为：从 GBase 8c（openGauss&#x2F;PostgreSQL 内核）读表，写 Kerberos 集群 Hive（ORC）。方向反过来，适配成果直接复用：</p>
+<ul>
+<li><strong>reader 换 rdbmsreader</strong>（GBase 8c 是 PG 系，不能用 8a 的 gbasereader）。驱动选 openGauss 官方 JDBC（<code>opengauss-jdbc</code>，驱动类 <code>org.postgresql.Driver</code>），jdbcUrl 写 <code>jdbc:postgresql://host:5432/db</code>——DataX 的 <code>DataBaseType</code> 枚举按 URL 前缀匹配驱动，PG 是内置支持，<strong>插件源码与 plugin.json 都不用改</strong>；</li>
+<li><strong>writer 用已适配的 hdfswriter</strong>，JSON 侧与第三章完全相同。</li>
+</ul>
+<p>排错中踩到发行版的隐藏机制：任务一启动就报 <code>ClassNotFoundException: org.apache.hive.jdbc.HiveDriver</code>——服务器版 <code>rdbmsreader/plugin.json</code> 的 <code>drivers</code> 数组<strong>比源码版多了 Hive 驱动</strong>，<code>Class.forName</code> 预加载缺类直接失败，与任务是否用 Hive 无关。补齐 <code>hive-jdbc-*-standalone.jar</code> 后进入下一层：</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gams"><span class="hljs-keyword">No</span> suitable driver found <span class="hljs-keyword">for</span> jdbc:postgresql:<span class="hljs-comment">//...</span><br></code></pre></td></tr></table></figure>
+
+<p>这一层说明 <code>org.postgresql.Driver</code> 根本没进 classpath——检查 <code>rdbmsreader/libs/</code> 确认 openGauss 驱动 jar 是否真的放到位。逐层排查的顺序本身也是经验：<strong>先让 plugin.json 的 drivers 全部能 Class.forName，再谈具体连接</strong>。</p>
+<h2 id="六、一页速记"><a href="#六、一页速记" class="headerlink" title="六、一页速记"></a>六、一页速记</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs text">hdfsreader / hdfswriter 适配：<br>  pom: hadoop 3.3.6 + hive 3.1.3<br>       删 hive-service / hive-hcatalog-core<br>       hadoop-aliyun 排除 hadoop 传递<br>       fastjson2 2.0.23（源码 import 同步改）<br>       hdfswriter 另加 parquet-hadoop 1.10.1 + import 改 org.apache.parquet.schema.*<br>  打包: 清 hive.*1.1.1 与 hcatalog 残留（别动 hadoop-shaded-*1.1.1）<br>        删插件 libs 里的 datax-common<br>  JSON: hadoopConfig 全套 nameservice + dfs.data.transfer.protection=authentication<br>        fileType 按文件魔数（ORC）配<br>        fieldDelimiter 必填单字符（ORC 也要）<br><br>GBase 8c → Hive：<br>  reader = rdbmsreader + opengauss-jdbc（org.postgresql.Driver）<br>  jdbcUrl 前缀必须 jdbc:postgresql://<br>  发行版 plugin.json 的 drivers 数组可能含 HiveDriver，<br>  先保证 drivers 全部可加载，再排查具体连接<br><br>排错顺序：<br>  RST / 连接被重设 → 查 dfs.data.transfer.protection<br>  ClassCastException fastjson → 查插件 libs 与 datax/lib 版本<br>  unrecognized Hadoop major version → 查 hive-exec 版本<br>  驱动加载错误 ClassNotFound → 查 plugin.json drivers 与 libs jar<br>  No suitable driver → 查驱动 jar 是否真在 libs<br></code></pre></td></tr></table></figure>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://github.com/alibaba/DataX">DataX 官方仓库（GitHub）</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/nehcuh/DataX/blob/master/docs/rdbmsreader.md">DataX rdbmsreader 文档（GitHub）</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/alibaba/DataX/tree/master/hdfswriter">hdfswriter 源码与 assembly 打包结构（GitHub）</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/dellaxing/DataX/commit/d763fa33c6ab6b289ad288aaa0f650a01c6ac6a9">修复 rdbmsreader 插件 plugin.json 驱动加载问题（GitHub commit）</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs-archive.cloudera.com/documentation/enterprise/5-7-x/topics/cdh_sg_hiveserver2_security.html">HiveServer2 Security Configuration（Cloudera）</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/apache/parquet-java">Apache Parquet 版本与包名迁移说明（GitHub）</a></li>
+<li><a target="_blank" rel="noopener" href="https://repo1.maven.org/maven2/org/opengauss/opengauss-jdbc/">openGauss JDBC 驱动（Maven Central）</a></li>
+</ol>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/datax/" class="print-no-link">#datax</a>
+      
+        <a href="/tags/hive/" class="print-no-link">#hive</a>
+      
+        <a href="/tags/hdfs/" class="print-no-link">#hdfs</a>
+      
+        <a href="/tags/kerberos/" class="print-no-link">#kerberos</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>DataX 适配 Kerberos Hadoop/Hive 集群：从 hdfsreader 到 hdfswriter 的踩坑实录</div>
+      <div>https://chaggle.github.io/2026/08/21/bigdata/datax-kerberos-hive-adaptation/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月21日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年9月2日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/09/08/AI/deepseek-jobs-update-20260908/" title="DeepSeek 招聘更新复盘：37 个在招岗位对比与投递策略修订">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">DeepSeek 招聘更新复盘：37 个在招岗位对比与投递策略修订</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/21/bigdata/hive-kerberos-dolphinscheduler/" title="DolphinScheduler 接入 Kerberos 认证 Hive：从 KDC 到数据源测试连接">
+                        <span class="hidden-mobile">DolphinScheduler 接入 Kerberos 认证 Hive：从 KDC 到数据源测试连接</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '3645caccf7053913a5d7c1990b929c47'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
