@@ -31,7 +31,7 @@
 <meta property="og:description" content="YARN 调优的核心是算好每台机器能拿出多少资源给容器，以及资源怎么分给不同业务。前者是内存与核数预算（要留给操作系统和系统进程），后者是队列规划（Capacity Scheduler）。调不好最常见的症状：作业一直 ACCEPTED 不跑、容器 OOM、大作业挤死小作业。部署安装见《大数据与中间件组件部署总览》。  核心参数与调优理解   参数 默认值 调优理解    yarn.nodeman">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-08-09T08:00:00.000Z">
-<meta property="article:modified_time" content="2026-08-10T16:02:21.198Z">
+<meta property="article:modified_time" content="2026-09-22T11:34:00.601Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="2026">
 <meta property="article:tag" content="yarn">
@@ -403,7 +403,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2026-08-11T00:02:21+08:00
+                    本文最后更新于 2026-09-22T19:34:00+08:00
                   
                   
 
@@ -466,7 +466,7 @@
 </tr>
 </tbody></table>
 <div class="note note-info">
-            <p><strong>内存预算公式</strong>：可分配内存 &#x3D; 物理内存 - 系统预留。经验值：16G 机器预留 3<del>4G，256G 机器预留 20</del>30G（给操作系统页缓存、Agent、JVM 元空间），512G 机器预留 40~50G。</p> 
+            <p><strong>内存预算公式</strong>：可分配内存 &#x3D; 物理内存 - 系统预留。经验值：16G 机器预留 3~4G，256G 机器预留 20~30G（给操作系统页缓存、Agent、JVM 元空间），512G 机器预留 40~50G。</p> 
           </div>
 
 <h2 id="三档规格推荐参数"><a href="#三档规格推荐参数" class="headerlink" title="三档规格推荐参数"></a>三档规格推荐参数</h2><table>
@@ -650,7 +650,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2026年8月11日</div>
+          <div>2026年9月22日</div>
         </div>
       
       
@@ -693,9 +693,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/08/09/bigdata/tez-deploy-tuning-20260810/" title="Tez 部署与调优指南">
+                      <a href="/2026/08/09/bigdata/ranger-deploy-tuning-20260810/" title="Ranger 部署与调优指南">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Tez 部署与调优指南</span>
+                        <span class="hidden-mobile">Ranger 部署与调优指南</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -703,8 +703,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/08/09/linux/k8s-tuning-20260810/" title="Kubernetes 部署参数优化">
-                        <span class="hidden-mobile">Kubernetes 部署参数优化</span>
+                      <a href="/2026/08/09/linux/k8s-faq-20260810/" title="Kubernetes 常见问题排查">
+                        <span class="hidden-mobile">Kubernetes 常见问题排查</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

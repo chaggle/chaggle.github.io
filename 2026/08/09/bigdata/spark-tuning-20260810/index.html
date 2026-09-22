@@ -31,7 +31,7 @@
 <meta property="og:description" content="Spark 调优围绕四个变量转：Executor 的数量 × 单 Executor 的内存 × 单 Executor 的核数，以及分区数（并行度）。前三个决定资源总量，第四个决定并行度是否与资源匹配——资源给了、并行度不够，照样跑不快。本文给出三档规格的分配方案与常见坑。部署安装见《大数据与中间件组件部署总览》。  核心参数与调优理解   参数 默认值 调优理解    spark.executo">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-08-09T08:00:00.000Z">
-<meta property="article:modified_time" content="2026-08-10T16:02:21.198Z">
+<meta property="article:modified_time" content="2026-09-22T11:34:00.600Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="2026">
 <meta property="article:tag" content="spark">
@@ -403,7 +403,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2026-08-11T00:02:21+08:00
+                    本文最后更新于 2026-09-22T19:34:00+08:00
                   
                   
 
@@ -476,7 +476,7 @@
 </tr>
 </tbody></table>
 <div class="note note-info">
-            <p><strong>Executor 分配的黄金法则</strong>：单 Executor 核数 3<del>5，内存 8</del>32G。每节点 Executor 数 &#x3D; 可用核 ÷ Executor 核数。宁可 Executor 多而小，不要大而少（单 Executor 太大 → GC 长暂停 + 故障影响面大）。</p> 
+            <p><strong>Executor 分配的黄金法则</strong>：单 Executor 核数 3~5，内存 8~32G。每节点 Executor 数 &#x3D; 可用核 ÷ Executor 核数。宁可 Executor 多而小，不要大而少（单 Executor 太大 → GC 长暂停 + 故障影响面大）。</p> 
           </div>
 
 <h2 id="三档规格推荐参数（on-YARN）"><a href="#三档规格推荐参数（on-YARN）" class="headerlink" title="三档规格推荐参数（on YARN）"></a>三档规格推荐参数（on YARN）</h2><table>
@@ -569,7 +569,7 @@
 <li><strong>广播超限报 OOM</strong>：<code>autoBroadcastJoinThreshold</code> 调太大，广播表超过 Executor 内存；阈值按最小 Executor 内存的 1&#x2F;3 封顶</li>
 </ul>
 <h2 id="调优检查清单"><a href="#调优检查清单" class="headerlink" title="调优检查清单"></a>调优检查清单</h2><ol>
-<li>Executor &#x3D; 核 3<del>5、内存 8</del>32G，与 YARN 上限匹配</li>
+<li>Executor &#x3D; 核 3~5、内存 8~32G，与 YARN 上限匹配</li>
 <li>动态资源分配开启</li>
 <li>shuffle.partitions 与数据量&#x2F;集群核数联动</li>
 <li>AQE 全开 + Kryo + 多盘 local.dir</li>
@@ -644,7 +644,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2026年8月11日</div>
+          <div>2026年9月22日</div>
         </div>
       
       
@@ -687,9 +687,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/08/09/bigdata/ranger-deploy-tuning-20260810/" title="Ranger 部署与调优指南">
+                      <a href="/2026/08/09/bigdata/kerberos-deploy-tuning-20260810/" title="Kerberos 部署与调优指南">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Ranger 部署与调优指南</span>
+                        <span class="hidden-mobile">Kerberos 部署与调优指南</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     

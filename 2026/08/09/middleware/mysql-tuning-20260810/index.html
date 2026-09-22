@@ -31,7 +31,7 @@
 <meta property="og:description" content="MySQL 调优的优先级永远是：慢查询 → 索引 → 参数。参数调优是最后一步——一个被慢查询拖垮的库，innodb_buffer_pool_size 调得再大也救不了。本文先给参数理解与规格表，再强调集群规模的读写分离与容灾。部署安装见《大数据与中间件组件部署总览》。  核心参数与调优理解   参数 默认值 调优理解    innodb_buffer_pool_size 128M InnoDB">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-08-09T08:00:00.000Z">
-<meta property="article:modified_time" content="2026-08-10T16:02:21.201Z">
+<meta property="article:modified_time" content="2026-09-22T11:34:00.603Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="2026">
 <meta property="article:tag" content="mysql">
@@ -403,7 +403,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2026-08-11T00:02:21+08:00
+                    本文最后更新于 2026-09-22T19:34:00+08:00
                   
                   
 
@@ -596,7 +596,7 @@
 <li><strong><code>Deadlock found when trying to get lock</code></strong>：业务侧事务顺序不一致，统一加锁顺序 + 缩短事务</li>
 </ul>
 <h2 id="调优检查清单"><a href="#调优检查清单" class="headerlink" title="调优检查清单"></a>调优检查清单</h2><ol>
-<li>buffer_pool 60<del>75% 内存，redo 1</del>4G</li>
+<li>buffer_pool 60~75% 内存，redo 1~4G</li>
 <li>双 1 或 2（按一致性要求），O_DIRECT</li>
 <li>慢查询日志开启 + 定期治理</li>
 <li>主从 + 并行复制 + 半同步</li>
@@ -671,7 +671,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2026年8月11日</div>
+          <div>2026年9月22日</div>
         </div>
       
       

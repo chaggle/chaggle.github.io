@@ -31,7 +31,7 @@
 <meta property="og:description" content="本文是对 Spark 核心知识的系统性总结，覆盖架构、RDD 与 DAG 调度、Shuffle、缓存与 Checkpoint、运行模式、常用参数以及日常问题排查要点，作为个人技术笔记使用。  整体架构：一次任务是怎么跑起来的Spark 是内存计算框架，采用 Master-Slave 架构，核心组件如下：  Driver：任务的”大脑”，运行用户程序 main 函数，负责解析代码、构建 DAG、调">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-08-08T08:00:00.000Z">
-<meta property="article:modified_time" content="2026-08-10T15:33:41.414Z">
+<meta property="article:modified_time" content="2026-09-22T11:34:00.596Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="2026">
 <meta property="article:tag" content="spark">
@@ -402,7 +402,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2026-08-10T23:33:41+08:00
+                    本文最后更新于 2026-09-22T19:34:00+08:00
                   
                   
 
@@ -601,7 +601,7 @@
 
 <p>原理：Driver 根据待处理 Task 数和 Executor 利用率周期性扩容&#x2F;缩容。<strong>注意 YARN 下必须开启 spark.shuffle.service，否则 Executor 被回收后 Shuffle 中间文件无法被其他 Executor 读取</strong>，会导致任务失败或性能退化。</p>
 <div class="note note-warning">
-            <p>executor.cores 建议与 Executor 内存匹配，一个 Executor 核数太多（如 8 核 8G）会导致并发 Task 共享内存互相挤压 OOM；常见配比：1 Executor &#x3D; 4<del>5 核 + 8</del>16G。</p> 
+            <p>executor.cores 建议与 Executor 内存匹配，一个 Executor 核数太多（如 8 核 8G）会导致并发 Task 共享内存互相挤压 OOM；常见配比：1 Executor &#x3D; 4~5 核 + 8~16G。</p> 
           </div>
 
 <h2 id="常见问题排查"><a href="#常见问题排查" class="headerlink" title="常见问题排查"></a>常见问题排查</h2><h3 id="Executor-OOM"><a href="#Executor-OOM" class="headerlink" title="Executor OOM"></a>Executor OOM</h3><ul>
@@ -727,7 +727,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2026年8月10日</div>
+          <div>2026年9月22日</div>
         </div>
       
       

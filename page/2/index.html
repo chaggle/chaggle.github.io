@@ -338,209 +338,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/08/10/bigdata/hudi-deploy-tuning-20260811/" target="_self">
-          Hudi 原理、部署与调优指南
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/10/bigdata/hudi-deploy-tuning-20260811/" target="_self">
-        <div>
-          Hudi 是 Uber 开源的增量数据湖框架：给”不可变”的数据湖加上更新与增量读取能力。它与 Iceberg、Paimon 并称湖格式三兄弟，特点是 Copy-on-Write &#x2F; Merge-on-Read 双表型与成熟的索引体系。本文覆盖原理、集成部署（Spark&#x2F;Flink）、参数优化与常见问题。  底层原理速览 两种表类型： COW（Copy-on-Write，写时
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-08-10 16:00" pubdate>
-              2026-08-10
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/2026/">#2026</a>
-            
-              <a href="/tags/%E9%83%A8%E7%BD%B2/">#部署</a>
-            
-              <a href="/tags/%E6%B9%96%E4%BB%93/">#湖仓</a>
-            
-              <a href="/tags/hudi/">#hudi</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/08/10/bigdata/paimon-deploy-tuning-20260811/" target="_self">
-          Paimon 原理、部署与调优指南
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/10/bigdata/paimon-deploy-tuning-20260811/" target="_self">
-        <div>
-          Paimon（原 Flink Table Store，Apache 孵化项目）是”流式数据湖仓”：在湖格式上叠加 LSM 结构与 Changelog，让 Flink 能对湖表做流读流写，主键表支持 CDC 同步与行级更新。本文覆盖原理（LSM&#x2F;Bucket&#x2F;Changelog）、集成部署（Flink&#x2F;Spark）、参数优化与常见问题。  底层原理速览 表类型：主键表
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-08-10 16:00" pubdate>
-              2026-08-10
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/2026/">#2026</a>
-            
-              <a href="/tags/%E9%83%A8%E7%BD%B2/">#部署</a>
-            
-              <a href="/tags/flink/">#flink</a>
-            
-              <a href="/tags/%E6%B9%96%E4%BB%93/">#湖仓</a>
-            
-              <a href="/tags/paimon/">#paimon</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/08/10/bigdata/juicefs-deploy-tuning-20260811/" target="_self">
-          JuiceFS 原理、部署与调优指南
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/10/bigdata/juicefs-deploy-tuning-20260811/" target="_self">
-        <div>
-          JuiceFS 是”元数据 + 数据分离”的分布式文件系统：数据放对象存储，元数据放数据库，本地留一层缓存。它给大数据底座带来的价值是存算分离的 POSIX 入口——Hadoop 生态、AI 训练、容器都挂同一份数据。本文覆盖原理、部署（客户端&#x2F;Hadoop SDK&#x2F;CSI）、参数优化与常见问题。  底层原理速览 三件套架构：对象存储（存数据）+ 元数据引擎（存目录&#x2F
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-08-10 16:00" pubdate>
-              2026-08-10
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/2026/">#2026</a>
-            
-              <a href="/tags/%E9%83%A8%E7%BD%B2/">#部署</a>
-            
-              <a href="/tags/juicefs/">#juicefs</a>
-            
-              <a href="/tags/%E5%AD%98%E5%82%A8/">#存储</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
         <a href="/2026/08/10/bigdata/starrocks-deploy-tuning-20260811/" target="_self">
           StarRocks 原理、部署与调优指南
         </a>
@@ -608,15 +405,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/08/10/middleware/jenkins-deploy-tuning-20260811/" target="_self">
-          Jenkins 原理、部署与调优指南
+        <a href="/2026/08/10/go/network-frameworks-20260811/" target="_self">
+          Go 网络编程与框架学习笔记
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/10/middleware/jenkins-deploy-tuning-20260811/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/10/go/network-frameworks-20260811/" target="_self">
         <div>
-          大数据底座的迭代思路里提到”引入 CI&#x2F;CD，把组件部署从手工变为流水线”，落地首选就是 Jenkins。本文按”原理 → 部署 → 调优”三步整理企业级使用指南，延续《Kerberos 部署与调优指南》等系列的结构。  一、Jenkins 核心原理1、Jenkins 是什么Jenkins 是 Java 编写的开源 CI&#x2F;CD 工具，负责”自动化的构建、测试、发布”。它的核心
+          2022 年学习 Go 网络编程的四篇笔记（HTTP 服务器&#x2F;客户端、gin 框架、zinx 框架、轻量级 IM 项目）合并整理。  Golang 开发一个 HTTP Web 服务器&#x2F;客户端             之前的 zinx 学习，是基于 TCP&#x2F;UDP 的 socket 协议进行编写，而本次要实现的是基于 HTTP 协议开发一个 Web 服务器端与客户端！
         </div>
       </a>
 
@@ -640,7 +437,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
+  <a href="/categories/go/" class="category-chain-item">go</a>
   
   
 
@@ -657,13 +454,157 @@
             
               <a href="/tags/2026/">#2026</a>
             
-              <a href="/tags/middleware/">#middleware</a>
+              <a href="/tags/Go/">#Go</a>
             
-              <a href="/tags/jenkins/">#jenkins</a>
+              <a href="/tags/HTTP/">#HTTP</a>
             
-              <a href="/tags/ci-cd/">#ci/cd</a>
+              <a href="/tags/gin/">#gin</a>
             
-              <a href="/tags/devops/">#devops</a>
+              <a href="/tags/zinx/">#zinx</a>
+            
+              <a href="/tags/IM/">#IM</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/08/10/go/concurrency-memory-20260811/" target="_self">
+          Go 并发与内存学习笔记
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/10/go/concurrency-memory-20260811/" target="_self">
+        <div>
+          2022 年学习 Go 并发编程的五篇笔记（GMP 模型、垃圾回收、channel、sync.Mutex、sync.Pool）合并整理。内容主要参考极客时间 Go 并发编程实战课（鸟窝大佬），如有需要查看其详细内容，请前去购买。  GMP 模型分析关于 GMP 模型的一些理解，G 为 goroutine，M 为 thread（内核级线程）、P 为 Processor（处理器）。 Golang 早
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-08-10 16:00" pubdate>
+              2026-08-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/go/" class="category-chain-item">go</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/2026/">#2026</a>
+            
+              <a href="/tags/Go/">#Go</a>
+            
+              <a href="/tags/GMP/">#GMP</a>
+            
+              <a href="/tags/GC/">#GC</a>
+            
+              <a href="/tags/channel/">#channel</a>
+            
+              <a href="/tags/mutex/">#mutex</a>
+            
+              <a href="/tags/sync/">#sync</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/08/10/go/fundamentals-engineering-20260811/" target="_self">
+          Go 语言基础与工程实践笔记
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/10/go/fundamentals-engineering-20260811/" target="_self">
+        <div>
+          2022 年学习 Go 语言基础与工程实践的多篇笔记（基础知识点、错误处理、TDD、面试复盘、学习方向思考等）合并整理。  Go 基础知识点自我总结 tips: 总结知识点一定要自己动手，这样知识点才能牢记！比如开源社区有雨痕大佬的 Go 语言笔记，但是光看几个用法，而不进行代码的编写，代码能力提升不明显，能看懂，但是做不到，形成一种眼高手低的习惯。更何况，以后的工作本来就是写需求的代码，所以，
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-08-10 16:00" pubdate>
+              2026-08-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/go/" class="category-chain-item">go</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/2026/">#2026</a>
+            
+              <a href="/tags/%E9%9D%A2%E8%AF%95/">#面试</a>
+            
+              <a href="/tags/Go/">#Go</a>
+            
+              <a href="/tags/TDD/">#TDD</a>
+            
+              <a href="/tags/%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86/">#错误处理</a>
             
           </div>
         
@@ -733,6 +674,75 @@
               <a href="/tags/sql/">#sql</a>
             
               <a href="/tags/innodb/">#innodb</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/08/10/middleware/jenkins-deploy-tuning-20260811/" target="_self">
+          Jenkins 原理、部署与调优指南
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/10/middleware/jenkins-deploy-tuning-20260811/" target="_self">
+        <div>
+          大数据底座的迭代思路里提到”引入 CI&#x2F;CD，把组件部署从手工变为流水线”，落地首选就是 Jenkins。本文按”原理 → 部署 → 调优”三步整理企业级使用指南，延续《Kerberos 部署与调优指南》等系列的结构。  一、Jenkins 核心原理1、Jenkins 是什么Jenkins 是 Java 编写的开源 CI&#x2F;CD 工具，负责”自动化的构建、测试、发布”。它的核心
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-08-10 16:00" pubdate>
+              2026-08-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/2026/">#2026</a>
+            
+              <a href="/tags/middleware/">#middleware</a>
+            
+              <a href="/tags/jenkins/">#jenkins</a>
+            
+              <a href="/tags/ci-cd/">#ci/cd</a>
+            
+              <a href="/tags/devops/">#devops</a>
             
           </div>
         
@@ -876,71 +886,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/08/09/bigdata/components-deploy-all-20260810/" target="_self">
-          大数据与中间件组件部署总览
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/09/bigdata/components-deploy-all-20260810/" target="_self">
-        <div>
-          本文汇总 HDFS、YARN、Hive、Spark、Flink、Zookeeper、Kafka、MySQL、Redis、Nacos、RocketMQ 共 11 个组件的安装部署文档，统一了目录导航，便于对照查阅。各组件更深入的生产调优（8C16G &#x2F; 32C256G &#x2F; 64C512G 三档规格参数、集群规模优化、容灾备份）见对应组件各自的《XXX 生产调优实践》文章；K8S
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-08-09 16:00" pubdate>
-              2026-08-09
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/2026/">#2026</a>
-            
-              <a href="/tags/%E9%83%A8%E7%BD%B2/">#部署</a>
-            
-              <a href="/tags/bigdata/">#bigdata</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
         <a href="/2026/08/09/bigdata/datasophon-deploy-params-20260810/" target="_self">
           DataSophon 部署大数据组件：参数说明与优化实践
         </a>
@@ -993,6 +938,71 @@
               <a href="/tags/%E9%83%A8%E7%BD%B2/">#部署</a>
             
               <a href="/tags/datasophon/">#datasophon</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/08/09/bigdata/components-deploy-all-20260810/" target="_self">
+          大数据与中间件组件部署总览
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/09/bigdata/components-deploy-all-20260810/" target="_self">
+        <div>
+          本文汇总 HDFS、YARN、Hive、Spark、Flink、Zookeeper、Kafka、MySQL、Redis、Nacos、RocketMQ 共 11 个组件的安装部署文档，统一了目录导航，便于对照查阅。各组件更深入的生产调优（8C16G &#x2F; 32C256G &#x2F; 64C512G 三档规格参数、集群规模优化、容灾备份）见对应组件各自的《XXX 生产调优实践》文章；K8S
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-08-09 16:00" pubdate>
+              2026-08-09
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/2026/">#2026</a>
+            
+              <a href="/tags/%E9%83%A8%E7%BD%B2/">#部署</a>
+            
+              <a href="/tags/bigdata/">#bigdata</a>
             
           </div>
         
@@ -1071,71 +1081,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/08/09/bigdata/hdfs-tuning-20260810/" target="_self">
-          HDFS 生产调优实践
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/09/bigdata/hdfs-tuning-20260810/" target="_self">
-        <div>
-          HDFS 的调优思路只有一条主线：NameNode 是瓶颈，DataNode 是 IO。NameNode 吃内存（元数据全在堆里），DataNode 吃磁盘与网络。所以调优时先算两笔账：集群的块数决定 NameNode 堆要多大，节点的磁盘吞吐决定副本数与块大小。部署安装见《大数据与中间件组件部署总览》。  核心参数与调优理解   参数 默认值 调优理解    dfs.blocksize 128
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-08-09 16:00" pubdate>
-              2026-08-09
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/2026/">#2026</a>
-            
-              <a href="/tags/hdfs/">#hdfs</a>
-            
-              <a href="/tags/%E8%B0%83%E4%BC%98/">#调优</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
         <a href="/2026/08/09/bigdata/flink-tuning-20260810/" target="_self">
           Flink 生产调优实践
         </a>
@@ -1186,6 +1131,71 @@
               <a href="/tags/2026/">#2026</a>
             
               <a href="/tags/flink/">#flink</a>
+            
+              <a href="/tags/%E8%B0%83%E4%BC%98/">#调优</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/08/09/bigdata/hdfs-tuning-20260810/" target="_self">
+          HDFS 生产调优实践
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/09/bigdata/hdfs-tuning-20260810/" target="_self">
+        <div>
+          HDFS 的调优思路只有一条主线：NameNode 是瓶颈，DataNode 是 IO。NameNode 吃内存（元数据全在堆里），DataNode 吃磁盘与网络。所以调优时先算两笔账：集群的块数决定 NameNode 堆要多大，节点的磁盘吞吐决定副本数与块大小。部署安装见《大数据与中间件组件部署总览》。  核心参数与调优理解   参数 默认值 调优理解    dfs.blocksize 128
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-08-09 16:00" pubdate>
+              2026-08-09
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/2026/">#2026</a>
+            
+              <a href="/tags/hdfs/">#hdfs</a>
             
               <a href="/tags/%E8%B0%83%E4%BC%98/">#调优</a>
             
@@ -1331,71 +1341,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/08/09/bigdata/ranger-deploy-tuning-20260810/" target="_self">
-          Ranger 部署与调优指南
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/09/bigdata/ranger-deploy-tuning-20260810/" target="_self">
-        <div>
-          Ranger 是 Hadoop 生态的集中授权与审计系统：管理员在网页上配置”谁能访问哪些资源、什么权限”，各组件（HDFS&#x2F;Hive&#x2F;Kafka&#x2F;YARN）通过内置插件实时拦截执行。与 Kerberos（认证：你是谁）配合，Ranger 管授权（你能做什么），审计（你做了什么）。本文覆盖原理、部署、参数优化与常见问题。  底层原理架构三件套123456Ranger
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-08-09 16:00" pubdate>
-              2026-08-09
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/2026/">#2026</a>
-            
-              <a href="/tags/%E9%83%A8%E7%BD%B2/">#部署</a>
-            
-              <a href="/tags/ranger/">#ranger</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
         <a href="/2026/08/09/bigdata/spark-tuning-20260810/" target="_self">
           Spark 生产调优实践
         </a>
@@ -1526,6 +1471,71 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2026/08/09/bigdata/ranger-deploy-tuning-20260810/" target="_self">
+          Ranger 部署与调优指南
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/09/bigdata/ranger-deploy-tuning-20260810/" target="_self">
+        <div>
+          Ranger 是 Hadoop 生态的集中授权与审计系统：管理员在网页上配置”谁能访问哪些资源、什么权限”，各组件（HDFS&#x2F;Hive&#x2F;Kafka&#x2F;YARN）通过内置插件实时拦截执行。与 Kerberos（认证：你是谁）配合，Ranger 管授权（你能做什么），审计（你做了什么）。本文覆盖原理、部署、参数优化与常见问题。  底层原理架构三件套123456Ranger
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-08-09 16:00" pubdate>
+              2026-08-09
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/2026/">#2026</a>
+            
+              <a href="/tags/%E9%83%A8%E7%BD%B2/">#部署</a>
+            
+              <a href="/tags/ranger/">#ranger</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2026/08/09/bigdata/yarn-tuning-20260810/" target="_self">
           YARN 生产调优实践
         </a>
@@ -1591,15 +1601,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/08/09/linux/k8s-tuning-20260810/" target="_self">
-          Kubernetes 部署参数优化
+        <a href="/2026/08/09/linux/k8s-faq-20260810/" target="_self">
+          Kubernetes 常见问题排查
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/09/linux/k8s-tuning-20260810/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/09/linux/k8s-faq-20260810/" target="_self">
         <div>
-          K8S 部署优化分两层：集群层（控制面规格、etcd 磁盘、系统参数）与工作负载层（requests&#x2F;limits、调度策略、扩缩容）。本文给出 8C16G &#x2F; 32C256G &#x2F; 64C512G 三种节点规格下的部署建议，以及大数据&#x2F;中间件组件容器化的关键参数。  集群层优化节点规格规划   角色 规格 说明    控制面（etcd+apiserver+
+          K8S 排障有固定套路：先看事件，再看日志，最后看资源状态。绝大多数问题能通过 kubectl describe、kubectl logs、kubectl get events 三步定位。本文按”Pod 起不来 → 网络不通 → 存储异常 → 控制面异常”的顺序整理高频问题。  一、Pod 层问题1. Pod 一直 Pending排查路径：kubectl describe pod xxx 看 E
         </div>
       </a>
 
