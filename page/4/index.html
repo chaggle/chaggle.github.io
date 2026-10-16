@@ -338,132 +338,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/08/08/middleware/redis-20260809/" target="_self">
-          Redis 底层原理与知识要点
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/08/middleware/redis-20260809/" target="_self">
-        <div>
-          本文总结 Redis 的核心底层原理：数据结构实现、单线程模型、持久化机制、过期与淘汰策略、缓存三大问题、高可用方案以及常见问题排查要点，作为个人技术笔记。  五种基础数据结构与底层实现string：SDSstring 底层是 SDS（Simple Dynamic String），而非 C 字符串：  带长度字段，获取长度 O(1) 预分配空间 + 惰性释放，减少内存重分配次数 二进制安全，可存
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-08-08 16:00" pubdate>
-              2026-08-08
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/2026/">#2026</a>
-            
-              <a href="/tags/redis/">#redis</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/08/08/middleware/rocketmq-20260809/" target="_self">
-          RocketMQ 底层原理与知识要点
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/08/middleware/rocketmq-20260809/" target="_self">
-        <div>
-          本文是我学习 RocketMQ 时整理的笔记，围绕四大组件、存储与高可用架构、消息模型，以及线上常见的堆积、丢失、顺序与事务问题展开，适合面试复习和日常排查参考。  核心架构RocketMQ 集群由四大组件构成：  NameServer：轻量级路由中心，维护 Topic 与 Broker 的路由信息，Broker 启动时注册、断开时剔除，不存储消息数据，无状态，可多台部署互为冗余。 Broker
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-08-08 16:00" pubdate>
-              2026-08-08
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/middleware/" class="category-chain-item">middleware</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/2026/">#2026</a>
-            
-              <a href="/tags/rocketmq/">#rocketmq</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
         <a href="/2026/08/08/middleware/zookeeper-20260809/" target="_self">
           Zookeeper 底层原理与知识要点
         </a>
@@ -514,6 +388,69 @@
               <a href="/tags/2026/">#2026</a>
             
               <a href="/tags/zookeeper/">#zookeeper</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/08/08/bigdata/hive-20260809/" target="_self">
+          Hive 底层原理与知识要点
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/08/08/bigdata/hive-20260809/" target="_self">
+        <div>
+          Hive 是大数据圈”SQL 化”的起点：把 HDFS 上的数据抽象成表，把 SQL 翻译成 MapReduce&#x2F;Tez&#x2F;Spark 作业。它不存数据、不跑计算，只做翻译和元数据管理。搞懂 Hive 的架构和优化手段，是数据开发的基本功。  核心架构Hive 由三个关键部分组成：MetaStore（元数据）、HiveServer2（服务入口）、Driver（SQL 解析与执行
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-08-08 16:00" pubdate>
+              2026-08-08
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/bigdata/" class="category-chain-item">bigdata</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/2026/">#2026</a>
+            
+              <a href="/tags/hive/">#hive</a>
             
           </div>
         
@@ -883,13 +820,13 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
+              <a href="/tags/middleware/">#middleware</a>
+            
               <a href="/tags/GPE/">#GPE</a>
             
               <a href="/tags/prometheus/">#prometheus</a>
             
               <a href="/tags/grafana/">#grafana</a>
-            
-              <a href="/tags/middleware/">#middleware</a>
             
           </div>
         
@@ -1137,11 +1074,11 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/middleware/">#middleware</a>
-            
               <a href="/tags/gcc/">#gcc</a>
             
               <a href="/tags/gdb/">#gdb</a>
+            
+              <a href="/tags/middleware/">#middleware</a>
             
           </div>
         
