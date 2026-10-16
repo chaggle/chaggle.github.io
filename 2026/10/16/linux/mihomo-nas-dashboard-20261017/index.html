@@ -1,0 +1,1053 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/10/16/linux/mihomo-nas-dashboard-20261017/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="家里 NAS 上的代理内核跑了大半年，面板却一直停留在四年前的版本：一百多个节点平铺在一个下拉框里，想找个延迟低的得一个个点。这篇文章记录换面板、写幂等脚本、自动分组的全过程。为免广告嫌疑，文中不出现具体的服务商与客户端名称。  起因：那个 2022 年的面板NAS 上的管理面板是浏览器里默认端口打开的那个页面。能用，但实在谈不上好用——节点列表就是一长串纯文本，一百多个节点塞在一个下拉框里，连">
+<meta property="og:type" content="article">
+<meta property="og:title" content="给 NAS 上的 mihomo 换个现代面板">
+<meta property="og:url" content="https://chaggle.github.io/2026/10/16/linux/mihomo-nas-dashboard-20261017/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="家里 NAS 上的代理内核跑了大半年，面板却一直停留在四年前的版本：一百多个节点平铺在一个下拉框里，想找个延迟低的得一个个点。这篇文章记录换面板、写幂等脚本、自动分组的全过程。为免广告嫌疑，文中不出现具体的服务商与客户端名称。  起因：那个 2022 年的面板NAS 上的管理面板是浏览器里默认端口打开的那个页面。能用，但实在谈不上好用——节点列表就是一长串纯文本，一百多个节点塞在一个下拉框里，连">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-10-16T10:45:00.000Z">
+<meta property="article:modified_time" content="2026-10-16T18:41:48.211Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="clash">
+<meta property="article:tag" content="mihomo">
+<meta property="article:tag" content="nas">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>给 NAS 上的 mihomo 换个现代面板 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="给 NAS 上的 mihomo 换个现代面板"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-10-16 18:45" pubdate>
+          2026年10月16日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          22 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">给 NAS 上的 mihomo 换个现代面板</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-10-17T02:41:48+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>家里 NAS 上的代理内核跑了大半年，面板却一直停留在四年前的版本：一百多个节点平铺在一个下拉框里，想找个延迟低的得一个个点。这篇文章记录换面板、写幂等脚本、自动分组的全过程。为免广告嫌疑，文中不出现具体的服务商与客户端名称。</p>
+</blockquote>
+<h2 id="起因：那个-2022-年的面板"><a href="#起因：那个-2022-年的面板" class="headerlink" title="起因：那个 2022 年的面板"></a>起因：那个 2022 年的面板</h2><p>NAS 上的管理面板是浏览器里默认端口打开的那个页面。能用，但实在谈不上好用——节点列表就是一长串纯文本，<br>一百多个节点塞在一个下拉框里，连「按延迟排序」都没有。</p>
+<p>顺手查了一下，这个面板最后一次提交停在 2023 年，最后一个版本是 2022 年 11 月发的。四年没更新，难看是有原因的。</p>
+<h2 id="先摸清家底，再动手"><a href="#先摸清家底，再动手" class="headerlink" title="先摸清家底，再动手"></a>先摸清家底，再动手</h2><p>换面板之前，第一件事是搞清楚「我到底在跑什么」。这件事的收益远超预期——后面所有的判断都建立在这次摸底上。</p>
+<p>几个关键发现：</p>
+<ul>
+<li>内核是 <strong>mihomo</strong>（Clash.Meta），控制器 API 开在 <code>:9090</code>，而且<strong>没有设访问密码</strong>；</li>
+<li>节点是<strong>内联</strong>在配置里的（不是 <code>proxy-providers</code>），这直接决定了后面分组方案的选择；</li>
+<li>12 个策略组，每组都塞了一百多个节点，也就是说同一份扁平长列表被重复了 12 遍；</li>
+<li>更关键的是：<strong>117 个节点里只有 53 个有过测速记录</strong>——一半以上的节点从没测过速。</li>
+</ul>
+<p>最后一条基本解释了「选节点为什么这么痛苦」：不是面板不努力，是它压根没帮你测过。</p>
+<h2 id="选面板：三个候选"><a href="#选面板：三个候选" class="headerlink" title="选面板：三个候选"></a>选面板：三个候选</h2><table>
+<thead>
+<tr>
+<th>面板</th>
+<th>维护状态</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>zashboard</strong></td>
+<td>几乎每天有提交，最新版 2026-09</td>
+<td>节点卡片网格、右键卡片整组测速、搜索、PWA、可改键位</td>
+</tr>
+<tr>
+<td><strong>metacubexd</strong></td>
+<td>活跃，内核官方推荐</td>
+<td>32 套主题、7 种语言、规则搜索带命中数</td>
+</tr>
+<tr>
+<td>yacd-meta</td>
+<td>活跃（yacd 的续命分支）</td>
+<td>界面和原来一样，改动最小</td>
+</tr>
+<tr>
+<td><del>yacd</del></td>
+<td>2022 年后停更</td>
+<td>就是原来那个</td>
+</tr>
+</tbody></table>
+<p>最后选了 <strong>zashboard</strong>，理由是它对「选节点」这个动作的优化最直接：右键节点卡片只测这一个，<br>右键组卡片整组一起测，然后按延迟排序。</p>
+<h2 id="部署：让内核自己托管面板"><a href="#部署：让内核自己托管面板" class="headerlink" title="部署：让内核自己托管面板"></a>部署：让内核自己托管面板</h2><p>常规做法是起一个 nginx 容器托管静态文件，但 mihomo 有个更省事的能力：它可以直接把自己的 API 端口当成静态服务器。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">external-ui:</span> <span class="hljs-string">ui</span><br><span class="hljs-attr">external-ui-name:</span> <span class="hljs-string">zashboard</span><br><span class="hljs-attr">unified-delay:</span> <span class="hljs-literal">true</span><br><span class="hljs-attr">profile:</span><br>  <span class="hljs-attr">store-selected:</span> <span class="hljs-literal">true</span><br></code></pre></td></tr></table></figure>
+
+<p>把面板的静态文件解压到内核工作目录下的 <code>ui/zashboard/</code>，重启即可通过 <code>http://&lt;NAS&gt;:9090/ui/zashboard/</code> 访问。</p>
+<p>三个好处：</p>
+<ul>
+<li><strong>同源</strong>：面板和 API 在同一个端口，不用配跨域，也不用额外维护一个容器；</li>
+<li>内核日志会明确写出 <code>UI already exists, skip downloading</code>，不会偷偷覆盖你的文件；</li>
+<li>顺带解锁了 <code>unified-delay</code>。</li>
+</ul>
+<div class="note note-info">
+            <p><strong>unified-delay 为什么重要</strong>：不同协议（Trojan &#x2F; VLESS &#x2F; AnyTLS 等）的握手开销不一样，不统一延迟的话，测出来的数字根本没法横向比较，排序也就失去了意义。</p> 
+          </div>
+
+<div class="note note-warning">
+            <p>解压 release 包时注意：很多包的最外层是 <code>dist/</code>，要让 <code>index.html</code> 直接躺在 <code>ui/zashboard/</code> 下，否则打开只会看到一个 404 页面。</p> 
+          </div>
+
+<h2 id="踩坑：服务商配置会覆盖你的设置"><a href="#踩坑：服务商配置会覆盖你的设置" class="headerlink" title="踩坑：服务商配置会覆盖你的设置"></a>踩坑：服务商配置会覆盖你的设置</h2><p>换完面板没两天，更新了一次订阅，然后发现：</p>
+<ul>
+<li>面板打不开了——新配置把 <code>external-controller</code> 从 <code>0.0.0.0:9090</code> 改成了 <code>127.0.0.1:9090</code>；</li>
+<li>局域网其它设备不能再用这个代理了——<code>allow-lan</code> 被改成了 <code>false</code>；</li>
+<li>出问题没有任何日志——<code>log-level</code> 被改成了 <code>silent</code>。</li>
+</ul>
+<p>订阅配置并不「知道」你在拿它做局域网网关。所以需要一个<strong>幂等的后处理脚本</strong>，每次订阅更新后跑一次：</p>
+<ol>
+<li>规范化这几个关键项；</li>
+<li>补齐面板相关设置；</li>
+<li>重新生成自定义分组；</li>
+<li><strong>用内核自己的 <code>-t</code> 参数校验候选配置，不通过就一个字节都不替换</strong>；</li>
+<li>备份 → 替换 → 重启 → <strong>等到内核真正就绪</strong>再返回。</li>
+</ol>
+<div class="note note-warning">
+            <p>第 5 步别省。内核加载 GeoIP 数据库要 10 秒以上，如果脚本重启完立刻返回，紧接着的检查会全部失败，很容易误判成「配置把内核搞崩了」——我就这么误判过一次。</p> 
+          </div>
+
+<h2 id="进阶：按落地地区自动分组"><a href="#进阶：按落地地区自动分组" class="headerlink" title="进阶：按落地地区自动分组"></a>进阶：按落地地区自动分组</h2><p>面板好看了，但「一百多个节点塞在一个下拉框里」这个问题还在。</p>
+<p>节点命名其实有规律：<code>&lt;入口机房&gt;转&lt;落地地区&gt;&lt;代号&gt;[协议][倍率:x]</code>。于是写了个脚本，按<strong>落地地区</strong>自动生成分组：<br>日本、台湾、香港、美国、新加坡等等，再加一个「省钱组」（倍率 ≤ 0.6 的节点）。</p>
+<p>两个关键设计：</p>
+<ul>
+<li><strong>取最后一次「转」之后的部分</strong>作为落地地区。<code>A转美国X</code> 应该归到美国，而不是被名字里的「A」带偏；</li>
+<li>新组名<strong>追加</strong>到主选择组末尾，而不是插到开头。因为 select 组的默认值是列表第一项，插到开头会静默改变你现有的默认走向——这种 bug 最难查。</li>
+</ul>
+<p>脚本还要幂等：重跑时先按名字删掉旧的自建组再重建，两次运行结果<strong>字节一致</strong>。</p>
+<p>改造完的体感是这样的：打开面板，十几个地区分组一目了然，每组里的节点都按测速结果排好序，右键组卡片就能整组重测；<br>常用的几个组直接放在主选择组的最前面。选节点从「翻一百多行列表」变成了「点两下」。</p>
+<h2 id="几条经验"><a href="#几条经验" class="headerlink" title="几条经验"></a>几条经验</h2><ol>
+<li><strong>先摸家底再动手。</strong> 「有多少节点、测过几个、API 有哪些字段」这些问题，决定了后面能用什么方案。比如节点是内联还是 provider，直接决定了分组能不能用 <code>filter</code>。</li>
+<li><strong>让内核托管面板。</strong> 少一个容器、少一个跨域问题，还顺带能同步设置。</li>
+<li><strong>订阅配置会重置你的设置。</strong> 任何「更新后要重做一遍」的事，都该写成幂等脚本，并且<strong>必须在替换前用内核自己校验</strong>。</li>
+<li><strong>追加，不要插入。</strong> 改别人的策略组时，注意默认值语义。</li>
+<li><strong>备份先行。</strong> 每次替换配置前留一份带时间戳的备份，回滚成本就只剩一条 <code>cp</code> 命令。</li>
+</ol>
+<h2 id="最后一个教训（关于隐私）"><a href="#最后一个教训（关于隐私）" class="headerlink" title="最后一个教训（关于隐私）"></a>最后一个教训（关于隐私）</h2><p>这次折腾里我犯了个错：排查问题时顺手把配置文件的第一行打印了出来，而那一行恰好是带 token 的订阅链接。<br><strong>在自动化工具里，「打印出来」就等于「上传出去」。</strong></p>
+<p>后来给自己定了条规矩，也分享给同样爱折腾的人：</p>
+<ul>
+<li>涉及凭据的操作，<strong>写成脚本让脚本读，只打印聚合结果</strong>（数量、状态码、可用率）；</li>
+<li>需要交互输入时用不回显的方式（<code>getpass</code> &#x2F; <code>read -rsp</code>），不进命令行参数、不进 shell 历史；</li>
+<li>万不得已要展示，只给「长度 + 前缀几位」；</li>
+<li>排查任何文件时，<strong>先看结构特征</strong>（长度、字符集、熵、魔数），不要为了找线索把整个文件 cat 出来。</li>
+</ul>
+<p>能自动化是本事，把凭据一起贴出去就是事故了。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/clash/" class="print-no-link">#clash</a>
+      
+        <a href="/tags/mihomo/" class="print-no-link">#mihomo</a>
+      
+        <a href="/tags/nas/" class="print-no-link">#nas</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>给 NAS 上的 mihomo 换个现代面板</div>
+      <div>https://chaggle.github.io/2026/10/16/linux/mihomo-nas-dashboard-20261017/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年10月16日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年10月17日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/09/22/AI/fanruan-social-jobs-scan/" title="帆软社会招聘 84 个岗位全量扫描与自我匹配评估">
+                        <span class="hidden-mobile">帆软社会招聘 84 个岗位全量扫描与自我匹配评估</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '42698b1a56419641fa047fa9c09c094e'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
