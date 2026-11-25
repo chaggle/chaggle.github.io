@@ -31,7 +31,7 @@
 <meta property="og:description" content="本文是《在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录》的姊妹篇。那次任务在 PowerShell 上踩的坑，单独值得写一篇。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-08-14T15:00:00.000Z">
-<meta property="article:modified_time" content="2026-09-01T16:57:40.544Z">
+<meta property="article:modified_time" content="2026-10-17T03:34:03.370Z">
 <meta property="article:author" content="chaggle">
 <meta property="article:tag" content="DISM">
 <meta property="article:tag" content="PowerShell">
@@ -341,7 +341,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          6k 字
+          8.2k 字
         
       </span>
     
@@ -352,7 +352,7 @@
         
         
         
-          51 分钟
+          69 分钟
         
       </span>
     
@@ -405,7 +405,7 @@
               <p id="updated-time" class="note note-info" style="display: none">
                 
                   
-                    本文最后更新于 2026-09-02T00:57:40+08:00
+                    本文最后更新于 2026-10-17T11:34:03+08:00
                   
                   
 
@@ -419,7 +419,7 @@
 <p>本文是《<a href="/2026/08/14/windows/wsl2-restore-on-stripped-windows/">在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录</a>》的姊妹篇。那次任务在 PowerShell 上踩的坑，单独值得写一篇。</p>
 </blockquote>
 <blockquote>
-<p>文章按主题分五组：<strong>① 语法与解析 → ② 字符串、转义与输出 → ③ 外部命令与进程调用 → ④ Windows 组件与 DISM → ⑤ 数据与迭代</strong>；每一节都标注了对应的检查规则编号（R1–R19），文末是沉淀成的检查插件与完整映射表。</p>
+<p>文章按主题分六组：<strong>① 语法与解析 → ② 字符串、转义与输出 → ③ 外部命令与进程调用 → ④ Windows 组件与 DISM → ⑤ 数据与迭代 → ⑥ 网络、JSON 与原生程序交互</strong>；每一节都标注了对应的检查规则编号（R1–R23），文末是沉淀成的检查插件与完整映射表。</p>
 </blockquote>
 <h2 id="第一部分-·-语法与解析（语言本身的坑）"><a href="#第一部分-·-语法与解析（语言本身的坑）" class="headerlink" title="第一部分 · 语法与解析（语言本身的坑）"></a>第一部分 · 语法与解析（语言本身的坑）</h2><h2 id="1-1、-var-被解析成”驱动器限定变量”（R2）"><a href="#1-1、-var-被解析成”驱动器限定变量”（R2）" class="headerlink" title="1-1、$var: 被解析成”驱动器限定变量”（R2）"></a>1-1、<code>$var:</code> 被解析成”驱动器限定变量”（R2）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-string">&quot;attempt <span class="hljs-variable">$attempt:</span> downloading...&quot;</span>   <span class="hljs-comment"># 报错: &#x27;:&#x27; was not followed by a valid variable name</span><br></code></pre></td></tr></table></figure>
 
@@ -480,7 +480,18 @@
 <h2 id="5-3、Remove-Item-传文件系统对象：按当前目录解析（R19）"><a href="#5-3、Remove-Item-传文件系统对象：按当前目录解析（R19）" class="headerlink" title="5-3、Remove-Item 传文件系统对象：按当前目录解析（R19）"></a>5-3、Remove-Item 传文件系统对象：按当前目录解析（R19）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-variable">$items</span> = <span class="hljs-built_in">Get-ChildItem</span> <span class="hljs-variable">$target</span> <span class="hljs-literal">-Force</span> | <span class="hljs-built_in">Where-Object</span> &#123; <span class="hljs-variable">$keep</span> <span class="hljs-operator">-notcontains</span> <span class="hljs-variable">$_</span>.Name &#125;<br><span class="hljs-built_in">Remove-Item</span> <span class="hljs-literal">-Recurse</span> <span class="hljs-literal">-Force</span> <span class="hljs-variable">$items</span><br><span class="hljs-comment"># ↑ PS 5.1 把对象经 ToString() 转成 -Path：DirectoryInfo 只返回目录名（如 about），</span><br><span class="hljs-comment">#   相对当前目录解析 → Cannot find path &#x27;C:\&lt;当前目录&gt;\about&#x27;（文件对象同样中招）</span><br><span class="hljs-built_in">Remove-Item</span> <span class="hljs-literal">-Recurse</span> <span class="hljs-literal">-Force</span> <span class="hljs-literal">-Path</span> <span class="hljs-variable">$items</span>.FullName    <span class="hljs-comment"># 正确：显式完整路径</span><br><span class="hljs-built_in">Get-ChildItem</span> <span class="hljs-variable">$target</span> <span class="hljs-literal">-Force</span> | <span class="hljs-built_in">Remove-Item</span> <span class="hljs-literal">-Recurse</span> <span class="hljs-literal">-Force</span>  <span class="hljs-comment"># 或管道传参（按 PSPath 绑定）</span><br></code></pre></td></tr></table></figure>
 
 <p><code>Get-ChildItem</code> 拿到的对象直接塞给 <code>Remove-Item</code> 是 AI 最爱写的形态；在 PS 5.1 上会按当前目录重新解析，<code>DirectoryInfo.ToString()</code> 只返回名字，目录对象必炸。<strong>用 <code>-Path $items.FullName</code> 或管道传参</strong>，别把对象当位置参数。</p>
-<h2 id="第六部分-·-沉淀成检查插件：powershell-check"><a href="#第六部分-·-沉淀成检查插件：powershell-check" class="headerlink" title="第六部分 · 沉淀成检查插件：powershell-check"></a>第六部分 · 沉淀成检查插件：powershell-check</h2><p>这些坑如果只躺在文章里，下次还是会踩。我把它们提取成了一个<strong>检查插件</strong>：<code>powershell-check</code> —— 一个静态检查脚本 + 配套使用规范，位于博客仓库 <code>.dsh/skills/powershell-check/</code> 下。<strong>规则：一旦涉及 PowerShell 的执行（调用 pwsh、生成 .ps1、把命令嵌进脚本模板），先启动插件进行检查，FAIL 修复后再执行。</strong></p>
+<h2 id="第六部分-·-网络、JSON-与原生程序交互（R20–R23）"><a href="#第六部分-·-网络、JSON-与原生程序交互（R20–R23）" class="headerlink" title="第六部分 · 网络、JSON 与原生程序交互（R20–R23）"></a>第六部分 · 网络、JSON 与原生程序交互（R20–R23）</h2><h2 id="6-1、Invoke-RestMethod-用字符串-body-发中文，服务端收到一串问号（R20）"><a href="#6-1、Invoke-RestMethod-用字符串-body-发中文，服务端收到一串问号（R20）" class="headerlink" title="6-1、Invoke-RestMethod 用字符串 body 发中文，服务端收到一串问号（R20）"></a>6-1、Invoke-RestMethod 用字符串 body 发中文，服务端收到一串问号（R20）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-variable">$json</span> = <span class="hljs-string">&#x27;&#123;&quot;comment&quot;:&quot;上游无补丁版本&quot;&#125;&#x27;</span><br><span class="hljs-built_in">Invoke-RestMethod</span> <span class="hljs-literal">-Uri</span> <span class="hljs-variable">$u</span> <span class="hljs-literal">-Method</span> PATCH <span class="hljs-literal">-Body</span> <span class="hljs-variable">$json</span> <span class="hljs-literal">-ContentType</span> <span class="hljs-string">&#x27;application/json&#x27;</span><br><span class="hljs-comment"># ↑ PS 5.1 用默认代码页把字符串编成字节：服务端存下的是 &quot;???????&quot;</span><br><br><span class="hljs-built_in">Invoke-RestMethod</span> <span class="hljs-literal">-Uri</span> <span class="hljs-variable">$u</span> <span class="hljs-literal">-Method</span> PATCH <span class="hljs-literal">-ContentType</span> <span class="hljs-string">&#x27;application/json; charset=utf-8&#x27;</span> `<br>  <span class="hljs-literal">-Body</span> ([<span class="hljs-type">System.Text.Encoding</span>]::UTF8.GetBytes(<span class="hljs-variable">$json</span>))   <span class="hljs-comment"># 正确：自己发 UTF-8 字节</span><br></code></pre></td></tr></table></figure>
+
+<p>PS 5.1 的 <code>Invoke-RestMethod</code> &#x2F; <code>Invoke-WebRequest</code> 把字符串 body 序列化成字节时走系统默认编码，<strong>不会</strong>因为 <code>ContentType</code> 里写了 <code>charset=utf-8</code> 就自动转 UTF-8——请求成功、数据静默损坏。这次给 GitHub 告警写驳回说明时踩到：第一版注释在安全页上变成一串 <code>?</code>，只能把告警 reopen、再用 UTF-8 字节重新 dismiss。<strong>非 ASCII body 一律自己 <code>[System.Text.Encoding]::UTF8.GetBytes(...)</code>。</strong></p>
+<h2 id="6-2、ConvertFrom-Json-解析-package-lock-json-抛-“name-无效”（R21）"><a href="#6-2、ConvertFrom-Json-解析-package-lock-json-抛-“name-无效”（R21）" class="headerlink" title="6-2、ConvertFrom-Json 解析 package-lock.json 抛 “name 无效”（R21）"></a>6-2、<code>ConvertFrom-Json</code> 解析 package-lock.json 抛 “name 无效”（R21）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-built_in">Get-Content</span> package<span class="hljs-literal">-lock</span>.json <span class="hljs-literal">-Raw</span> | <span class="hljs-built_in">ConvertFrom-Json</span><br><span class="hljs-comment"># ↑ Cannot process argument because the value of argument &quot;name&quot; is not valid.</span><br><br>node <span class="hljs-literal">-e</span> <span class="hljs-string">&quot;const l=require(&#x27;./package-lock.json&#x27;);console.log(Object.keys(l.packages).length)&quot;</span>   <span class="hljs-comment"># 正确</span><br></code></pre></td></tr></table></figure>
+
+<p>package-lock v3 的 <code>packages</code> 里有一个<strong>空属性名 <code>&quot;&quot;</code></strong>（根包条目），PS 5.1 的 <code>ConvertFrom-Json</code> 无法把空键转成对象，抛的就是这条 “name 无效”。同族还有一条：仅大小写不同的重复键会报 <code>dictionary ... contains the duplicated keys &#39;a&#39; and &#39;A&#39;</code>。这类文件（lockfile、SBOM）<strong>交给 node 解析</strong>，或升级到 PS 7 用 <code>-AsHashtable</code>。</p>
+<h2 id="6-3、管道喂原生程序-stdin：空行丢失，git-credential-报协议字段缺失（R22）"><a href="#6-3、管道喂原生程序-stdin：空行丢失，git-credential-报协议字段缺失（R22）" class="headerlink" title="6-3、管道喂原生程序 stdin：空行丢失，git credential 报协议字段缺失（R22）"></a>6-3、管道喂原生程序 stdin：空行丢失，git credential 报协议字段缺失（R22）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-selector-tag">@</span>(<span class="hljs-string">&#x27;protocol=https&#x27;</span>,<span class="hljs-string">&#x27;host=github.com&#x27;</span>,<span class="hljs-string">&#x27;&#x27;</span>) | git credential fill<br><span class="hljs-comment"># ↑ fatal: refusing to work with credential missing protocol field</span><br><br>cmd /c <span class="hljs-string">&quot;git credential fill &lt; cred-in.txt &gt; cred-out.txt&quot;</span>   <span class="hljs-comment"># 正确：文件重定向</span><br></code></pre></td></tr></table></figure>
+
+<p>PowerShell 把集合逐项写给原生命令的 stdin，空行&#x2F;终止行不可靠；凡是以空行结束的协议（<code>git credential</code>、<code>git apply</code> 的 patch、<code>openssl</code>、<code>gpg</code>）都别走管道。这次取 GitHub token 时，管道版和 .NET <code>Process</code> 版都没跑通，改成 <code>cmd /c &quot;... &lt; 文件&quot;</code> 一次成功。</p>
+<h2 id="6-4、原生命令加-2-1：输出里全是-NativeCommandError，还可能直接终止（R23）"><a href="#6-4、原生命令加-2-1：输出里全是-NativeCommandError，还可能直接终止（R23）" class="headerlink" title="6-4、原生命令加 2&gt;&amp;1：输出里全是 NativeCommandError，还可能直接终止（R23）"></a>6-4、原生命令加 <code>2&gt;&amp;1</code>：输出里全是 NativeCommandError，还可能直接终止（R23）</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs powershell">git push origin master <span class="hljs-number">2</span>&gt;&amp;<span class="hljs-number">1</span> | <span class="hljs-built_in">Select-String</span> <span class="hljs-string">&#x27;master&#x27;</span><br><span class="hljs-comment"># ↑ git : ... At line:1 char:1 ... NativeCommandError —— 每行 stderr 都被包成 ErrorRecord</span><br><span class="hljs-comment">#   且 $ErrorActionPreference=&#x27;Stop&#x27; 时会直接抛错终止</span><br><br>git push origin master <span class="hljs-number">2</span>&gt;<span class="hljs-variable">$null</span>                               <span class="hljs-comment"># 只看 stdout</span><br><span class="hljs-variable">$ErrorActionPreference</span>=<span class="hljs-string">&#x27;Continue&#x27;</span>                            <span class="hljs-comment"># 要合并：先保证不终止</span><br>git push origin master <span class="hljs-number">2</span>&gt;&amp;<span class="hljs-number">1</span> | <span class="hljs-built_in">ForEach-Object</span> &#123; <span class="hljs-string">&quot;<span class="hljs-variable">$_</span>&quot;</span> &#125;        <span class="hljs-comment"># 再显式转成字符串</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="第七部分-·-沉淀成检查插件：powershell-check"><a href="#第七部分-·-沉淀成检查插件：powershell-check" class="headerlink" title="第七部分 · 沉淀成检查插件：powershell-check"></a>第七部分 · 沉淀成检查插件：powershell-check</h2><p>这些坑如果只躺在文章里，下次还是会踩。我把它们提取成了一个<strong>检查插件</strong>：<code>powershell-check</code> —— 一个静态检查脚本 + 配套使用规范，位于博客仓库 <code>.dsh/skills/powershell-check/</code> 下。<strong>规则：一旦涉及 PowerShell 的执行（调用 pwsh、生成 .ps1、把命令嵌进脚本模板），先启动插件进行检查，FAIL 修复后再执行。</strong></p>
 <p>该插件已按 DeepSeek Harness 官方插件范式升级为独立仓库：<a target="_blank" rel="noopener" href="https://github.com/chaggle/dsh-powershell-check"><strong>dsh-powershell-check</strong></a> —— 原生 Cordis 插件，通过官方 <code>tools/pre-execute</code> 拦截点对每次 pwsh 调用<strong>自动</strong>检查并拦截（deny reason 即修复指引），同时以 <code>ctx.skills.registerProvider</code> 内置同名技能，无需每次手动启动；可配置 <code>analyzer: psscriptanalyzer</code> 叠加官方 PSScriptAnalyzer 深度检查。</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs text"># 检查命令串<br>node .dsh/skills/powershell-check/scripts/check-pwsh.mjs -- &#x27;&lt;命令原文&gt;&#x27;<br><br># 检查 .ps1 脚本文件（无 BOM 的 UTF-8 文件建议加 -Encoding UTF8，避免 PS 5.1 按 ANSI 误读）<br>Get-Content fix.ps1 -Raw -Encoding UTF8 | node .dsh/skills/powershell-check/scripts/check-pwsh.mjs -<br><br># 插件自检（跑内置正反例）<br>node .dsh/skills/powershell-check/scripts/check-pwsh.mjs --selftest<br></code></pre></td></tr></table></figure>
 
@@ -608,6 +619,30 @@
 <td>5-3</td>
 </tr>
 <tr>
+<td>R20</td>
+<td>阻断</td>
+<td>HTTP body 非 ASCII 编码</td>
+<td>6-1</td>
+</tr>
+<tr>
+<td>R21</td>
+<td>建议</td>
+<td>ConvertFrom-Json 空键名</td>
+<td>6-2</td>
+</tr>
+<tr>
+<td>R22</td>
+<td>建议</td>
+<td>管道喂原生 stdin</td>
+<td>6-3</td>
+</tr>
+<tr>
+<td>R23</td>
+<td>建议</td>
+<td>原生命令 2&gt;&amp;1</td>
+<td>6-4</td>
+</tr>
+<tr>
 <td>写作侧</td>
 <td>—</td>
 <td>JS 模板转义</td>
@@ -648,15 +683,15 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/PowerShell/" class="print-no-link">#PowerShell</a>
-      
         <a href="/tags/Windows/" class="print-no-link">#Windows</a>
       
         <a href="/tags/DISM/" class="print-no-link">#DISM</a>
       
-        <a href="/tags/%E8%84%9A%E6%9C%AC/" class="print-no-link">#脚本</a>
-      
         <a href="/tags/%E8%B8%A9%E5%9D%91/" class="print-no-link">#踩坑</a>
+      
+        <a href="/tags/PowerShell/" class="print-no-link">#PowerShell</a>
+      
+        <a href="/tags/%E8%84%9A%E6%9C%AC/" class="print-no-link">#脚本</a>
       
     </div>
   
@@ -687,7 +722,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2026年9月2日</div>
+          <div>2026年10月17日</div>
         </div>
       
       
@@ -697,21 +732,9 @@
             
               
               
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
                   <span class="hint--top hint--rounded" aria-label="BY - 署名">
                     <i class="iconfont icon-cc-by"></i>
-                  </span>
-                </a>
-              
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
-                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
-                    <i class="iconfont icon-cc-nc"></i>
-                  </span>
-                </a>
-              
-                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
-                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
-                    <i class="iconfont icon-cc-sa"></i>
                   </span>
                 </a>
               
@@ -730,9 +753,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/08/14/AI/blog-writing-standards/" title="博客写作与维护规范（项目常规操作）">
+                      <a href="/2026/08/14/windows/wsl2-restore-on-stripped-windows/" title="在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">博客写作与维护规范（项目常规操作）</span>
+                        <span class="hidden-mobile">在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -740,8 +763,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/08/14/windows/wsl2-restore-on-stripped-windows/" title="在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录">
-                        <span class="hidden-mobile">在精简版 Windows 上恢复 WSL2 与 Docker：一次从检测到落地的全过程实录</span>
+                      <a href="/2026/08/14/AI/agent-harness-learning-guide/" title="Agent Harness 岗的核心学习方法">
+                        <span class="hidden-mobile">Agent Harness 岗的核心学习方法</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

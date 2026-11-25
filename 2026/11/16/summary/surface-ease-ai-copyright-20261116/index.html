@@ -1,0 +1,1017 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/chaggle.png">
+  <link rel="icon" href="/img/chaggle.png">
+  
+    <link rel="canonical" href="https://chaggle.github.io/2026/11/16/summary/surface-ease-ai-copyright-20261116/"/>
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="chaggle">
+  <meta name="keywords" content="chaggle">
+  
+    <meta name="description" content="2026 年 5 月之后，我越来越习惯把作品顺手丢给 AI，直到有人问我版权是谁的。那次我本能地对抗，随后被自己的三个问题问住。这篇文章记录我对版权、开源协议与深度关系的一次反思。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="不止表面的轻松：从一次 AI 版权争论说起">
+<meta property="og:url" content="https://chaggle.github.io/2026/11/16/summary/surface-ease-ai-copyright-20261116/index.html">
+<meta property="og:site_name" content="大布丁的博客">
+<meta property="og:description" content="2026 年 5 月之后，我越来越习惯把作品顺手丢给 AI，直到有人问我版权是谁的。那次我本能地对抗，随后被自己的三个问题问住。这篇文章记录我对版权、开源协议与深度关系的一次反思。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-11-15T23:56:00.000Z">
+<meta property="article:modified_time" content="2026-11-25T15:13:31.259Z">
+<meta property="article:author" content="chaggle">
+<meta property="article:tag" content="2026">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="Thinking">
+<meta property="article:tag" content="版权">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>不止表面的轻松：从一次 AI 版权争论说起 - 大布丁的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"chaggle.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":1},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>大布丁の博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bc1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="不止表面的轻松：从一次 AI 版权争论说起"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        chaggle
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-11-16 07:56" pubdate>
+          2026年11月16日 早上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          28 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">不止表面的轻松：从一次 AI 版权争论说起</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-11-25T23:13:31+08:00
+                  
+                  
+
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>人与人之间的相处，<br>如果只有停在表面的轻松，<br>没有交流对各种事物的各自理解，<br>没有交流对自我的探索，<br>没有交流对问题的思考，<br>没有直面问题的勇气与沟通，<br>那么不管是友情、爱情、亲情，<br>都会不知不觉间，<br>就走散了。</p>
+</blockquote>
+<p>这段话是我最近反复想到的。它听起来像在讲别人的故事，其实是下面这件事之后，我才真正读懂的。</p>
+<h2 id="一次没有准备好的对话"><a href="#一次没有准备好的对话" class="headerlink" title="一次没有准备好的对话"></a>一次没有准备好的对话</h2><p>2026 年 5 月以后，我把 AI 用得越来越深。日常里，只要是我觉得还能继续优化的作品——一段文案、一张图、一段音频、一版设计——我顺手就丢进对话里，让它改、让它拆、让它重做。对我来说，这几乎算不上一个“决定”，只是一种习惯动作。</p>
+<p>直到有一次，我像往常一样把东西丢进去之后，有人问我：这些东西的版权是谁的？你把它们喂给 AI，问过原作者吗？</p>
+<p>我的第一反应不是想，而是挡。我下意识地觉得对方在挑刺、在否定我，于是用对抗的语气顶了回去。对方并不接受我这套说法，气氛就僵在那里。</p>
+<p>在那种情绪里，我是不愿意承认错误的。承认错误意味着我先前说的那些话都站不住，意味着我在这段关系里低了一头。可就在我准备继续辩解的时候，心里有个声音把我按住了：</p>
+<blockquote>
+<p>你把作品喂给 AI 这一块，真的仔细思考过行为的合理性吗？<br>你真的用心反思过，这种行为在任何场合都是对的吗？<br>还是你只是像往常一样，习惯性地不承认自己的错误？</p>
+</blockquote>
+<p>我确实动摇了——这三个问题，我答不上来。</p>
+<h2 id="我确实没有认真想过"><a href="#我确实没有认真想过" class="headerlink" title="我确实没有认真想过"></a>我确实没有认真想过</h2><p>被问住之后，我第一次把那个“顺手”的动作拆开来看。</p>
+<p>我丢给 AI 的画面、文案、音频，不是凭空长出来的。一张图背后有拍摄的人、修图的人，一段文案背后有写字的人，一段音频背后有录音、混音和演奏的人。这些东西被产出的时候，都带着具体的人的判断和取舍。而我用它们的时候，没有问过他们，甚至没有想过要问。</p>
+<p>于是问题就变成了：<strong>把别人产出的东西随手喂给 AI，算不算一种不尊重？</strong></p>
+<p>至少对我自己来说，答案是算的。我一边享受“站在巨人肩膀上”的便利，一边忽略了巨人也是要被署名、要被知会、要靠作品吃饭的人。</p>
+<p>所以这件事的重点，其实不只是版权。版权只是外面那层壳，壳里面是：我用着别人做出来的东西，却从未把对方当成一个需要被询问的人。</p>
+<div class="note note-warning">
+            <p>把一段素材丢进模型，和把它贴到公开网页上，当然不是一回事。但它们的共同点是：在使用之前，我都没有问过它能不能被这样使用。</p> 
+          </div>
+
+<h2 id="开源协议给了我一套好用的逻辑，也给了我一个盲区"><a href="#开源协议给了我一套好用的逻辑，也给了我一个盲区" class="headerlink" title="开源协议给了我一套好用的逻辑，也给了我一个盲区"></a>开源协议给了我一套好用的逻辑，也给了我一个盲区</h2><p>我为什么会一直这样想？得从开源说起。</p>
+<p>我算是开源社区的受益者。各种大牛的技术思路、别人的实现代码、issue 里陌生人耐心的纠正，构成了我这些年学习的主要来源。其中我最喜欢的协议是 MIT。</p>
+<p>MIT 是最宽松的一类许可协议，对使用者的限制很少：</p>
+<ul>
+<li>允许自由使用、复制、修改、合并、发布、分发、再授权和销售；</li>
+<li>允许用在商业闭源项目里，不要求公开修改后的源代码；</li>
+<li>允许再授权，把修改后的版本按别的条款发布。</li>
+</ul>
+<p>需要遵守的义务也很少：在软件和所有副本中保留原始版权声明与许可声明；软件按“原样”提供，作者不承担任何担保责任。此外，它本身不附带专利授权，专利风险要另外评估。</p>
+<p>从许可类型上说，它属于宽松型许可，不具有“传染性”，也不强制衍生作品开源，并且与 GPL 兼容。</p>
+<p>这套逻辑用久了，我遇到“能不能用别人的东西”时，第一反应就变成了“能，只要保留声明”。它简洁、高效，也让我在过去很多年里省掉了一堆麻烦。</p>
+<p><strong>但我忽略了一个前提：MIT 之所以宽松，是因为作者主动选择了宽松。</strong></p>
+<p>开源协议本质上是一份由作者给出的授权书，它规定的是“在什么条件下，你可以使用我的作品”。它从来不等于“没有写禁止，就等于允许”。</p>
+<p>更何况，我面对的东西很多时候根本不是开源作品：一张别人拍的照片、一段别人写的文案、一段别人录的音频、一份字幕组熬夜译出来的字幕。它们默认保留所有权利，版权在作者手里。开源世界里的那套“合理性”，在这里并不成立。</p>
+<p>这种思路，可能也跟我这些年的工作经历有关。在国企做了四五年，我长期在合规的灰色地带里找可行解，习惯先确认“有没有明文禁止”，再考虑“应不应该”。规则没写到的地方，就默认可以做。开源协议恰好给这套习惯提供了一个很体面的说法。</p>
+<div class="note note-info">
+            <p>我不是法律从业者，上面这些只是我自己的理解，不构成任何法律意见。我想说的也不是“怎样才算合法”，而是“我有没有认真想过”。</p> 
+          </div>
+
+<h2 id="这套逻辑还延伸到了别的地方"><a href="#这套逻辑还延伸到了别的地方" class="headerlink" title="这套逻辑还延伸到了别的地方"></a>这套逻辑还延伸到了别的地方</h2><p>习惯是会溢出的。用开源协议理解代码用久了，我很容易把它套到别的事情上：</p>
+<ul>
+<li>用各种手段拿到版权之外的音频文件，再上传使用；</li>
+<li>下载没有授权的电影来看；</li>
+<li>默认字幕组把译制作品挂到公网分享是理所应当的；</li>
+<li>对到处都有的破解版游戏，也觉得“有就用”。</li>
+</ul>
+<p>我不觉得字幕组只是“盗版”两个字能概括的。他们身上有一种我很熟悉的、开源社区式的东西：好东西应该被更多人看到，翻译是劳动，分享是美德。但这套逻辑和出版发行方的权益天然相悖——分享的人觉得自己在做好事，被分享的人觉得自己被拿走了东西。两者都成立，冲突却是真的。</p>
+<p>其中最让我在意的一点是：我最喜欢的那款游戏，每一次都是在 Steam 上买的正版。既然破解版到处都有，我为什么偏偏在游戏上愿意付钱？</p>
+<p>我想过这个问题。或许是因为游戏是我要投入很多时间的东西，付费和体验直接挂钩；而电影、音频是“看一眼就走”的，付不付费好像不影响我得到什么。但创作者得到的回报，恰恰是由这些“看一眼就走”累积起来的。</p>
+<p>在游戏上愿意买正版，说明我心里其实是有“尊重创作者”这个念头的。只是这个念头没有覆盖到我所有的使用场景里。这不是立场问题，是习惯问题——而习惯，恰恰是最难被自己看见的东西。</p>
+<h2 id="AI-把这个问题放大了"><a href="#AI-把这个问题放大了" class="headerlink" title="AI 把这个问题放大了"></a>AI 把这个问题放大了</h2><p>现在 AI 已经能生成游戏、电影、音频、文案。这些内容的训练数据从哪来，多数人说不清楚。里面有多少版权冲突，也没有人真正去定义。</p>
+<p>如果没有人追究，这件事就好像不存在；如果有人认真追究，损失又该由谁承担、怎么计算？</p>
+<p>法律可以规定赔偿，但赔偿能不能换回一个人“我的东西被人拿去用了，却没有人告诉我”的那种感受？我不知道。</p>
+<p>我能确定的只有一件事：<strong>在规则还没有长出牙齿的地方，能约束我的，只剩我自己愿不愿意多想一步。</strong></p>
+<div class="note note-warning">
+            <p>这一节不是要否定 AI。我自己就是重度使用者，工具本身没有立场，使用它的人有。</p> 
+          </div>
+
+<h2 id="承认错误，比守住立场更难"><a href="#承认错误，比守住立场更难" class="headerlink" title="承认错误，比守住立场更难"></a>承认错误，比守住立场更难</h2><p>人有时候需要有勇气承认错误，而不是一直守着自己的立场，忘了自己也曾经是创作者中的一员。</p>
+<p>我也写博客，也产出过一些自己觉得还算认真的东西。如果有人把我的文章整篇丢进模型，拆开、改写、再用到别处，连一句“我用了你的东西”都没有，我会怎么想？大概不会舒服。</p>
+<p>我并不是站在道德高地上说这些话。前面提到的那些事，我大多做过。写下来不是为了忏悔给别人看，而是想给自己留一个清楚的记录：<strong>我曾经这样想过，也曾经这样错过；以后遇到类似的事，至少不能再装作不知道。</strong></p>
+<h2 id="关系为什么需要“不轻松”的部分"><a href="#关系为什么需要“不轻松”的部分" class="headerlink" title="关系为什么需要“不轻松”的部分"></a>关系为什么需要“不轻松”的部分</h2><p>说回开头。</p>
+<p>人与人之间的联系是很脆弱的。一次争吵、一个插曲、一句没接住的话，都可能让它变样；更不用说中间还夹着经济、利益、情感和立场。爱与恨常常交织在同一个人身上，“爱之深，恨之切”的事，我见过太多。</p>
+<p>所以如果没有共同的经历，如果没有足够多的思想碰撞，让人意识到某些事必须达成统一的理解，必须能反思自己的问题，一段关系是很难走到深处的。</p>
+<p>关系不是交易。交易讲的是等价交换，你给我多少，我还你多少；关系讲的是，我愿意在你指出我的问题的时候，先不急着反驳，而是想一想你说得对不对。</p>
+<p><strong>长择的感情，必须扎根在足够深厚的土壤里，才能保持美丽。</strong></p>
+<p>有时候轻松是轻松，有时候深刻是深刻。一段关系如果只有前者，它大概只能停在表面上；而能一起穿过后者的人，才值得被认真对待。</p>
+<h2 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h2><p>这次争论没有赢家。我顶撞了对方，也丢了自己的体面。但如果没有那次顶撞，我可能到现在还觉得“把东西丢给 AI”是一件不需要思考的事。</p>
+<p>所以我把它写下来。把一次不太体面的对抗摊开在博客里，也是我能做到的、直面问题的一种方式。</p>
+<p>也要谢谢那位当时没有顺着我、而是坚持问我一句的人。当时我没接住，现在补上：你说的是对的。</p>
+<p>以后再用别人的素材，我会先问一句：这是谁的？我有没有资格这样用？如果答案是“不确定”，那就先去确认，而不是先用了再说。这是我能给出的、最小的改正。</p>
+<div class="note note-success">
+            <p>人最有魅力的地方，也许不是永远正确，而是愿意在关系里暴露自己的错误，并且真的去改。</p> 
+          </div>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/summary/" class="category-chain-item">summary</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/2026/" class="print-no-link">#2026</a>
+      
+        <a href="/tags/AI/" class="print-no-link">#AI</a>
+      
+        <a href="/tags/Thinking/" class="print-no-link">#Thinking</a>
+      
+        <a href="/tags/%E7%89%88%E6%9D%83/" class="print-no-link">#版权</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>不止表面的轻松：从一次 AI 版权争论说起</div>
+      <div>https://chaggle.github.io/2026/11/16/summary/surface-ease-ai-copyright-20261116/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>chaggle</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年11月16日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年11月25日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/11/25/summary/mbti-self-observation-20261125/" title="我做了十次 MBTI，还是没给自己定论">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">我做了十次 MBTI，还是没给自己定论</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/10/16/linux/mihomo-nas-dashboard-20261017/" title="给 NAS 上的 mihomo 换个现代面板">
+                        <span class="hidden-mobile">给 NAS 上的 mihomo 换个现代面板</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1ec140c932ea1d34eeba","clientSecret":"02260007f8a43fde4d3b2084193e093dce5b1ae2","repo":"chaggle.github.io","owner":"chaggle","admin":["chaggle"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'ce44a9e76b437e668f09015b6d489cfb'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

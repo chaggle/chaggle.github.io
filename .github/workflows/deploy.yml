@@ -25,7 +25,11 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
-          exclude: .github
+
+      # upload-pages-artifact 上传完成后，artifact 元数据并非立即可查；
+      # 站点变大后 deploy-pages 会先一步查询并报 "No artifacts named github-pages"。
+      - name: Wait for artifact registration
+        run: sleep 15
 
       - name: Deploy to GitHub Pages
         id: deployment
